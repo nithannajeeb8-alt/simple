@@ -233,13 +233,18 @@
       .hero { grid-template-columns: 1fr; gap: 40px; }
     }
 
-    @media(max-width: 600px) {
+       @media(max-width: 600px) {
       header { flex-direction: column; padding: 12px 4vw; gap: 12px; }
       nav { gap: 10px; flex-wrap: wrap; justify-content: center; }
       nav a { padding: 6px 8px; font-size: 0.75rem; }
-      main { padding-top: 160px; } /* Extra room for stacked header */
+      
+      /* THE FIX: Reduced padding and adjusted hero height for mobile */
+      main { padding-top: 120px; } 
+      .hero { min-height: auto; align-items: flex-start; gap: 20px; }
+      
       .two-col { grid-template-columns: 1fr; }
     }
+
 
     /* If device does NOT have a fine pointer (it's a touchscreen), restore normal cursors */
     @media (pointer: coarse), (hover: none) {
