@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Nithan (Portfolio) — WELCOME</title>
+  <title>Nithan (Portfolio)</title>
   <meta name="description" content="Portfolio of Nithan: web experiments, Mind Atlas, and creative projects." />
 
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
@@ -30,7 +30,8 @@
       background: var(--bg-1);
       -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
-      cursor: none;
+      /* Default to none for desktop, overridden for mobile below */
+      cursor: none; 
     }
 
     /* Ambient Backgrounds */
@@ -109,6 +110,7 @@
       text-transform: uppercase;
       position: relative;
       display: inline-block;
+      cursor: none; /* Desktop default */
     }
 
     nav a::after {
@@ -118,8 +120,15 @@
       background: var(--accent);
       transition: width 0.3s ease;
     }
-    nav a:hover { color: #fff; }
-    nav a:hover::after { width: 100%; }
+    
+    /* Only apply hover effects if device supports hover */
+    @media (hover: hover) {
+      nav a:hover { color: #fff; }
+      nav a:hover::after { width: 100%; }
+      .card:hover::before { left: 150%; }
+      .card:hover { border-color: rgba(255, 0, 76, 0.4); box-shadow: 0 20px 50px rgba(255,0,76,0.15); }
+      .btn:hover::before { transform: scaleX(1); transform-origin: left; }
+    }
 
     /* Main Layout */
     main { position: relative; z-index: 20; padding: 120px 6vw 120px; }
@@ -131,7 +140,7 @@
 
     h1 {
       font-family: var(--mono);
-      font-size: clamp(40px, 7vw, 90px);
+      font-size: clamp(36px, 7vw, 90px);
       line-height: 0.95;
       color: #fff;
       text-shadow: 0 0 20px rgba(255, 0, 76, 0.6), 2px 2px 0px var(--accent);
@@ -165,8 +174,6 @@
       transform: skewX(-20deg);
       transition: 0.5s ease;
     }
-    .card:hover::before { left: 150%; }
-    .card:hover { border-color: rgba(255, 0, 76, 0.4); box-shadow: 0 20px 50px rgba(255,0,76,0.15); }
 
     section { margin-top: 120px; }
     .two-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; }
@@ -214,7 +221,6 @@
       transition: transform 0.4s cubic-bezier(0.86, 0, 0.07, 1);
       z-index: -1;
     }
-    .btn:hover::before { transform: scaleX(1); transform-origin: left; }
 
     footer {
       padding: 40px 6vw; text-align: center;
@@ -222,9 +228,23 @@
       color: var(--muted); font-family: var(--mono); font-size: 0.9rem;
     }
 
+    /* --- RESPONSIVE / MOBILE CSS --- */
     @media(max-width: 920px) {
       .hero { grid-template-columns: 1fr; gap: 40px; }
-      h1 { font-size: 48px; }
+    }
+
+    @media(max-width: 600px) {
+      header { flex-direction: column; padding: 12px 4vw; gap: 12px; }
+      nav { gap: 10px; flex-wrap: wrap; justify-content: center; }
+      nav a { padding: 6px 8px; font-size: 0.75rem; }
+      main { padding-top: 160px; } /* Extra room for stacked header */
+      .two-col { grid-template-columns: 1fr; }
+    }
+
+    /* If device does NOT have a fine pointer (it's a touchscreen), restore normal cursors */
+    @media (pointer: coarse), (hover: none) {
+      body, nav a, .btn { cursor: auto !important; }
+      nav a, .btn, a { cursor: pointer !important; }
     }
   </style>
 </head>
@@ -328,7 +348,7 @@
       <div class="two-col">
         <div class="card scroll-card" style="display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
           <h3 style="font-family:var(--mono);">Transmit Signal</h3>
-          <p style="margin:20px 0;"><a href="mailto:contact@nithan.in" class="magnetic" style="color:var(--accent); text-decoration:none; font-size:1.2rem; font-weight:bold;">contact@nithan.in</a></p>
+          <p style="margin:20px 0;"><a href="mailto:mail@nithan.in" style="color:var(--accent); text-decoration:none; font-size:1.2rem; font-weight:bold;">contact@nithan.in</a></p>
         </div>
       </div>
     </section>
@@ -347,66 +367,97 @@
 
     document.getElementById('year').textContent = new Date().getFullYear();
 
-    // --- Cursor Engine ---
+    // --- Device Detection Strategy ---
+    // Check if the device uses a mouse (fine pointer) and can hover
+    const isDesktop = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+
+    // --- Cursor & Interaction Engine (DESKTOP ONLY) ---
     const cursor = document.getElementById('cursor');
     const cursorTrail = document.getElementById('cursor-trail');
-    let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-    let trail = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    
+    if (!isDesktop) {
+      // Completely hide custom cursors on mobile to prevent ghosting
+      if(cursor) cursor.style.display = 'none';
+      if(cursorTrail) cursorTrail.style.display = 'none';
+    } else {
+      // Execute Desktop Mouse Logic
+      let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+      let trail = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
 
-    window.addEventListener('mousemove', e => {
-      mouse.x = e.clientX;
-      mouse.y = e.clientY;
-      cursor.style.transform = `translate3d(${mouse.x}px, ${mouse.y}px, 0) translate(-50%, -50%)`;
-    });
+      window.addEventListener('mousemove', e => {
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+        cursor.style.transform = `translate3d(${mouse.x}px, ${mouse.y}px, 0) translate(-50%, -50%)`;
+      });
 
-    function animateTrail() {
-      trail.x += (mouse.x - trail.x) * 0.15;
-      trail.y += (mouse.y - trail.y) * 0.15;
-      cursorTrail.style.transform = `translate3d(${trail.x}px, ${trail.y}px, 0) translate(-50%, -50%)`;
-      requestAnimationFrame(animateTrail);
+      function animateTrail() {
+        trail.x += (mouse.x - trail.x) * 0.15;
+        trail.y += (mouse.y - trail.y) * 0.15;
+        cursorTrail.style.transform = `translate3d(${trail.x}px, ${trail.y}px, 0) translate(-50%, -50%)`;
+        requestAnimationFrame(animateTrail);
+      }
+      animateTrail();
+
+      // Interactive Hover States for custom cursor
+      document.querySelectorAll('a, button, .card').forEach(el => {
+        el.addEventListener('mouseenter', () => cursorTrail.classList.add('hover'));
+        el.addEventListener('mouseleave', () => cursorTrail.classList.remove('hover'));
+      });
+
+      // Magnetic UI Engine
+      document.querySelectorAll('.magnetic').forEach(el => {
+        el.addEventListener('mousemove', (e) => {
+          const rect = el.getBoundingClientRect();
+          const x = e.clientX - rect.left - rect.width / 2;
+          const y = e.clientY - rect.top - rect.height / 2;
+          gsap.to(el, { x: x * 0.4, y: y * 0.4, duration: 0.3, ease: 'power2.out' });
+        });
+        el.addEventListener('mouseleave', () => {
+          gsap.to(el, { x: 0, y: 0, duration: 0.7, ease: 'elastic.out(1, 0.3)' });
+        });
+      });
+
+      // 3D Card Tilt Engine
+      document.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('mousemove', e => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left; 
+          const y = e.clientY - rect.top;  
+          const rotateX = ((y - rect.height / 2) / rect.height) * -12; 
+          const rotateY = ((x - rect.width / 2) / rect.width) * 12;
+          card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+        });
+        card.addEventListener('mouseleave', () => {
+          card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+        });
+      });
     }
-    animateTrail();
 
-    // Interactive Hover States
-    document.querySelectorAll('a, button, .card').forEach(el => {
-      el.addEventListener('mouseenter', () => cursorTrail.classList.add('hover'));
-      el.addEventListener('mouseleave', () => cursorTrail.classList.remove('hover'));
-    });
-
-    // --- Magnetic UI Engine ---
-    document.querySelectorAll('.magnetic').forEach(el => {
-      el.addEventListener('mousemove', (e) => {
-        const rect = el.getBoundingClientRect();
-        const x = e.clientX - rect.left - rect.width / 2;
-        const y = e.clientY - rect.top - rect.height / 2;
-        gsap.to(el, { x: x * 0.4, y: y * 0.4, duration: 0.3, ease: 'power2.out' });
-      });
-      el.addEventListener('mouseleave', () => {
-        gsap.to(el, { x: 0, y: 0, duration: 0.7, ease: 'elastic.out(1, 0.3)' });
-      });
-    });
-
-    // --- Cyberpunk Glitch Text ---
+    // --- Cyberpunk Glitch Text (All Devices) ---
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*+<>_";
     document.querySelectorAll('.glitch-text').forEach(el => {
       const originalText = el.dataset.value;
+      let isGlitching = false;
       
       const playGlitch = () => {
+        if(isGlitching) return;
+        isGlitching = true;
         let iterations = 0;
         const interval = setInterval(() => {
           el.innerText = originalText.split("").map((letter, index) => {
             if(index < iterations) return originalText[index];
             return chars[Math.floor(Math.random() * chars.length)];
           }).join("");
-          if(iterations >= originalText.length) clearInterval(interval);
-          iterations += 1 / 2; // Speed of decoding
+          if(iterations >= originalText.length) {
+            clearInterval(interval);
+            isGlitching = false;
+          }
+          iterations += 1 / 2;
         }, 30);
       };
 
-      // Play on hover
-      el.addEventListener('mouseenter', playGlitch);
+      if (isDesktop) el.addEventListener('mouseenter', playGlitch);
       
-      // Play on scroll into view
       ScrollTrigger.create({
         trigger: el,
         start: "top 85%",
@@ -414,33 +465,15 @@
       });
     });
 
-    // --- 3D Card Tilt Engine ---
-    document.querySelectorAll('.card').forEach(card => {
-      card.addEventListener('mousemove', e => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left; 
-        const y = e.clientY - rect.top;  
-        const rotateX = ((y - rect.height / 2) / rect.height) * -12; 
-        const rotateY = ((x - rect.width / 2) / rect.width) * 12;
-        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
-      });
-      card.addEventListener('mouseleave', () => {
-        card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
-      });
-    });
-
-    // --- GSAP Scroll Animations ---
-    // Hero Elements Reveal
+    // --- GSAP Scroll Animations (All Devices) ---
     gsap.from('.gs-reveal', {
       y: 30, opacity: 0, duration: 1, stagger: 0.15, ease: 'power3.out', delay: 0.5
     });
 
-    // Profile Cards staggered entrance
     gsap.from('.p-card', {
       scale: 0.8, opacity: 0, duration: 0.6, stagger: 0.1, ease: 'back.out(1.5)', delay: 0.8
     });
 
-    // Scroll section reveals
     gsap.utils.toArray('.scroll-card').forEach(card => {
       gsap.from(card, {
         scrollTrigger: {
@@ -462,10 +495,9 @@
         document.getElementById('navbar').style.transform = 'translateY(0)';
       }
       lastScroll = currentScroll;
-    });
+    }, {passive: true});
 
-    // --- Parallax Particles Engine ---
-    // (Reusing your highly optimized canvas logic, but tying Y position to scroll for deep parallax)
+    // --- Parallax Particles Engine (All Devices) ---
     const canvases = [document.getElementById('p-back'), document.getElementById('p-mid'), document.getElementById('p-front')];
     
     class ParticleLayer {
@@ -496,10 +528,8 @@
         this.ctx.clearRect(0, 0, this.w, this.h);
         this.particles.forEach(p => {
           p.y -= p.speed;
-          // Apply scroll parallax
           let renderY = p.y - (scrollY * this.parallaxSpeed);
           
-          // Wrap around logic
           if (renderY < -50) p.y = this.h + 50 + (scrollY * this.parallaxSpeed);
           if (renderY > this.h + 50) p.y = -50 + (scrollY * this.parallaxSpeed);
           
@@ -515,10 +545,13 @@
       }
     }
 
+    // Scale down particle count slightly on mobile to save battery
+    const particleMultiplier = isDesktop ? 1 : 0.5;
+
     const layers = [
-      new ParticleLayer(canvases[0], 40, [0.1, 0.3], [1, 3], 340, 0.1), // Slow, back
-      new ParticleLayer(canvases[1], 30, [0.3, 0.7], [2, 5], 345, 0.3), // Mid
-      new ParticleLayer(canvases[2], 20, [0.8, 1.5], [3, 8], 350, 0.6)  // Fast, front
+      new ParticleLayer(canvases[0], 40 * particleMultiplier, [0.1, 0.3], [1, 3], 340, 0.1),
+      new ParticleLayer(canvases[1], 30 * particleMultiplier, [0.3, 0.7], [2, 5], 345, 0.3),
+      new ParticleLayer(canvases[2], 20 * particleMultiplier, [0.8, 1.5], [3, 8], 350, 0.6)
     ];
 
     function renderParticles() {
