@@ -130,18 +130,56 @@
     footer { padding: 40px 6vw; text-align: center; border-top: 1px solid rgba(255, 0, 76, 0.2); color: var(--muted); font-family: var(--mono); font-size: 0.9rem; margin-top: 80px; }
 
     /* --- MOBILE RESPONSIVE TWEAKS --- */
-    @media(max-width: 960px) { .hero { grid-template-columns: 1fr; gap: 60px; } }
-    @media(max-width: 600px) {
+        @media(max-width: 600px) {
       header { flex-direction: column; padding: 16px 4vw; gap: 16px; }
       .brand { justify-content: center; width: 100%; }
       nav { gap: 12px; flex-wrap: wrap; justify-content: center; width: 100%; }
       nav a { padding: 6px 8px; font-size: 0.75rem; }
-      main { padding-top: 140px; } 
-      .hero { display: flex; flex-direction: column; align-items: center; gap: 40px; }
-      .hero-content { align-items: center; text-align: center; }
-      p.lead { text-align: center; }
+      
+      main { padding-top: 150px; } 
+      
+      /* --- THE NEW TACTICAL HUD AESTHETIC --- */
+      .hero { 
+        display: flex; 
+        flex-direction: column; 
+        align-items: stretch; /* Stretches children to full width */
+        gap: 32px; 
+      }
+      
+      .hero-content { 
+        align-items: flex-start; 
+        text-align: left; 
+        width: 100%; 
+        /* HUD Framing */
+        border-left: 3px solid var(--accent);
+        padding: 16px 0 16px 20px;
+        background: linear-gradient(90deg, rgba(255,0,76,0.08) 0%, transparent 100%);
+        border-radius: 0 16px 16px 0;
+      }
+      
+      h1 { font-size: 2.5rem; margin-bottom: 16px; text-align: left; }
+      p.lead { text-align: left; font-size: 1rem; line-height: 1.6; margin-bottom: 12px; }
+      
+      /* Full-width mobile app-style button */
+      .hero-content > div { width: 100%; margin-top: 16px; padding-right: 20px; }
+      .hero-content .btn { 
+        width: 100%; 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        padding: 16px 24px;
+      }
+      .hero-content .btn::after {
+        content: '>>';
+        font-family: var(--mono);
+        color: var(--muted);
+        transition: color 0.3s ease;
+      }
+      .hero-content .btn:active::after { color: #fff; }
+      
       .two-col { grid-template-columns: 1fr; gap: 24px; }
     }
+
 
     /* Strict Mobile Touch Overrides */
     @media (pointer: coarse) {
