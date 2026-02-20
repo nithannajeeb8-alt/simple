@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Nithan (Portfolio)</title>
+  <title>Nithan (Portfolio) </title>
   <meta name="description" content="Portfolio of Nithan: web experiments, Mind Atlas, and creative projects." />
 
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
@@ -21,80 +21,55 @@
 
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
-    html, body { height: 100%; margin: 0; overflow-x: hidden; }
-
+    
+    /* SCROLL LOCKED INITIALLY FOR BOOT SCREEN */
+    html, body { height: 100%; margin: 0; }
     body {
-      font-family: var(--ui);
-      color: #fff;
-      background: var(--bg-1);
+      font-family: var(--ui); color: #fff; background: var(--bg-1);
       -webkit-font-smoothing: antialiased;
-      cursor: none; /* Hide default cursor for desktop */
+      overflow: hidden; /* Prevents scrolling during boot */
     }
+    
+    /* Hide default cursor on desktop, handled by JS later */
+    @media (hover: hover) and (pointer: fine) { body { cursor: none; } }
 
-    /* --- CUSTOM CURSOR (FORCED TO TOP) --- */
+    /* --- CUSTOM CURSOR --- */
     #cursor, #cursor-trail {
-      position: fixed; left: 0; top: 0;
-      pointer-events: none; 
+      position: fixed; left: 0; top: 0; pointer-events: none; 
       z-index: 999999; /* Absolute highest layer */
-      transform: translate(-50%, -50%);
-      border-radius: 50%;
+      transform: translate(-50%, -50%); border-radius: 50%;
+      opacity: 0; /* Hidden until mouse moves */
+      transition: opacity 0.3s ease;
     }
-    #cursor {
-      width: 10px; height: 10px;
-      background: var(--accent);
-      box-shadow: 0 0 20px var(--accent);
-    }
+    #cursor { width: 10px; height: 10px; background: var(--accent); box-shadow: 0 0 20px var(--accent); }
     #cursor-trail {
-      width: 40px; height: 40px;
-      border: 1px solid rgba(255, 0, 76, 0.5);
-      transition: width 0.2s, height 0.2s, background 0.2s;
+      width: 40px; height: 40px; border: 1px solid rgba(255, 0, 76, 0.5);
+      transition: width 0.2s, height 0.2s, background 0.2s, opacity 0.3s ease;
     }
-    #cursor-trail.hover {
-      width: 70px; height: 70px;
-      background: rgba(255, 0, 76, 0.1);
-      border-color: transparent;
-    }
+    #cursor-trail.hover { width: 70px; height: 70px; background: rgba(255, 0, 76, 0.1); border-color: transparent; }
 
     /* --- BOOT SCREEN --- */
     #boot-screen {
-      position: fixed; inset: 0;
-      z-index: 100000; /* Just below cursor */
-      background: var(--bg-1);
+      position: fixed; inset: 0; z-index: 100000;
+      background: var(--bg-1); /* Solid background to hide main content */
       display: flex; align-items: center; justify-content: center; flex-direction: column;
       background-image: repeating-linear-gradient(to bottom, transparent, transparent 2px, rgba(255, 0, 76, 0.05) 3px);
       padding: 20px;
     }
-
-    .boot-content {
-      width: 100%; max-width: 500px;
-      display: flex; flex-direction: column; align-items: center; text-align: center;
-    }
-
+    .boot-content { width: 100%; max-width: 500px; display: flex; flex-direction: column; align-items: center; text-align: center; }
     #terminal-output {
-      width: 100%; text-align: left;
-      color: var(--accent); font-family: var(--mono);
-      font-size: 0.9rem; line-height: 1.8;
-      margin-top: 30px; min-height: 140px;
+      width: 100%; text-align: left; color: var(--accent); font-family: var(--mono);
+      font-size: 0.9rem; line-height: 1.8; margin-top: 30px; min-height: 140px;
     }
-
-    #progress-container {
-      width: 100%; height: 4px;
-      background: rgba(255,255,255,0.1);
-      margin-top: 24px; border-radius: 4px; overflow: hidden;
-    }
-
-    #progress-bar {
-      width: 0%; height: 100%;
-      background: var(--accent);
-      box-shadow: 0 0 15px var(--accent);
-    }
+    #progress-container { width: 100%; height: 4px; background: rgba(255,255,255,0.1); margin-top: 24px; border-radius: 4px; overflow: hidden; }
+    #progress-bar { width: 0%; height: 100%; background: var(--accent); box-shadow: 0 0 15px var(--accent); }
 
     /* --- AMBIENT BACKGROUNDS --- */
     .bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; background: radial-gradient(circle at 14% 18%, rgba(255, 0, 76, 0.15), transparent 40%), radial-gradient(circle at 86% 82%, rgba(255, 30, 90, 0.08), transparent 40%), linear-gradient(180deg, var(--bg-1), var(--bg-2)); }
     .grid { position: fixed; inset: 0; z-index: 1; pointer-events: none; mix-blend-mode: screen; opacity: 0.12; background-image: linear-gradient(rgba(255, 0, 76, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 0, 76, 0.1) 1px, transparent 1px); background-size: 40px 40px; transform: perspective(500px) rotateX(20deg) scale(1.5) translateY(-5%); animation: gridMove 20s linear infinite; }
     @keyframes gridMove { 0% { transform: perspective(500px) rotateX(20deg) scale(1.5) translateY(0); } 100% { transform: perspective(500px) rotateX(20deg) scale(1.5) translateY(40px); } }
     .scanlines { position: fixed; inset: 0; z-index: 2; pointer-events: none; background: repeating-linear-gradient(to bottom, transparent, transparent 2px, rgba(0, 0, 0, 0.3) 3px); opacity: 0.3; }
-    .particles { position: fixed; inset: 0; pointer-events: none; }
+    .particles { position: fixed; inset: 0; pointer-events: none; z-index: 3;}
 
     /* --- HEADER & NAV --- */
     header {
@@ -118,11 +93,16 @@
       .btn:hover::before { transform: scaleX(1); transform-origin: left; }
     }
 
-    /* --- MAIN LAYOUT --- */
-    main { position: relative; z-index: 20; padding: 140px 6vw 120px; opacity: 0; }
+    /* --- MAIN LAYOUT & GSAP START STATES --- */
+    main { position: relative; z-index: 20; padding: 140px 6vw 120px; }
+    
+    /* These classes hide elements initially so GSAP can animate them cleanly */
+    .gs-reveal { opacity: 0; transform: translateY(40px); }
+    .p-card { opacity: 0; transform: scale(0.8); }
+    .scroll-card { opacity: 0; transform: translateY(50px); }
+
     .hero { display: grid; grid-template-columns: 1fr 400px; gap: 80px; align-items: center; min-height: 75vh; }
     .hero-content { display: flex; flex-direction: column; align-items: flex-start; }
-    
     h1 { font-family: var(--mono); font-size: clamp(36px, 6.5vw, 84px); line-height: 0.95; color: #fff; text-shadow: 0 0 20px rgba(255, 0, 76, 0.6), 2px 2px 0px var(--accent); margin-bottom: 24px; text-wrap: balance; }
     p.lead { color: var(--muted); max-width: 600px; font-size: 1.1rem; line-height: 1.7; margin-bottom: 16px; text-wrap: balance; }
 
@@ -143,50 +123,38 @@
     .btn {
       background: transparent; color: #fff; border: 1px solid var(--accent); padding: 16px 36px;
       border-radius: 8px; font-weight: 700; font-family: var(--mono); text-transform: uppercase; letter-spacing: 2px;
-      cursor: none; position: relative; overflow: hidden; display: inline-block;
-      transition: all 0.3s ease;
+      cursor: none; position: relative; overflow: hidden; display: inline-block; transition: all 0.3s ease;
     }
     .btn::before { content: ''; position: absolute; inset: 0; background: var(--accent); transform: scaleX(0); transform-origin: right; transition: transform 0.4s cubic-bezier(0.86, 0, 0.07, 1); z-index: -1; }
 
     footer { padding: 40px 6vw; text-align: center; border-top: 1px solid rgba(255, 0, 76, 0.2); color: var(--muted); font-family: var(--mono); font-size: 0.9rem; margin-top: 80px; }
 
     /* --- MOBILE RESPONSIVE TWEAKS --- */
-    @media(max-width: 960px) { 
-      .hero { grid-template-columns: 1fr; gap: 60px; } 
-    }
-
+    @media(max-width: 960px) { .hero { grid-template-columns: 1fr; gap: 60px; } }
     @media(max-width: 600px) {
       header { flex-direction: column; padding: 16px 4vw; gap: 16px; }
       .brand { justify-content: center; width: 100%; }
       nav { gap: 12px; flex-wrap: wrap; justify-content: center; width: 100%; }
       nav a { padding: 6px 8px; font-size: 0.75rem; }
-      
       main { padding-top: 140px; } 
-      
-      /* Center align hero on mobile */
       .hero { display: flex; flex-direction: column; align-items: center; gap: 40px; }
       .hero-content { align-items: center; text-align: center; }
       p.lead { text-align: center; }
-      
       .two-col { grid-template-columns: 1fr; gap: 24px; }
     }
 
-    /* Mobile Tactile Feedback */
-    @media (pointer: coarse), (hover: none) {
-      body, nav a, .btn { cursor: auto !important; }
+    /* Strict Mobile Touch Overrides */
+    @media (pointer: coarse) {
+      #cursor, #cursor-trail { display: none !important; }
+      body, a, button, .btn { cursor: auto !important; }
       nav a, .btn, a, .card { cursor: pointer !important; }
-      
       .card:active { transform: scale(0.97); border-color: var(--accent); }
       .btn:active { transform: scale(0.95); background: rgba(255,0,76,0.3); }
       nav a:active { color: var(--accent); }
     }
 
     /* Touch Ripple Effect Class */
-    .touch-ripple {
-      position: absolute; border-radius: 50%; transform: scale(0);
-      animation: ripple 0.6s linear; background: rgba(255, 255, 255, 0.3);
-      pointer-events: none;
-    }
+    .touch-ripple { position: absolute; border-radius: 50%; transform: scale(0); animation: ripple 0.6s linear; background: rgba(255, 255, 255, 0.3); pointer-events: none; }
     @keyframes ripple { to { transform: scale(4); opacity: 0; } }
   </style>
 </head>
@@ -223,7 +191,7 @@
       <div class="logo"><div id="logo-lottie" style="width:68px; height:68px"></div></div>
       <div>
         <div style="font-weight:900; font-family:var(--mono); letter-spacing:1px">NITHAN</div>
-        <div style="font-size:11px; color:var(--accent)">SYS_ONLINE // V_5.0</div>
+        <div style="font-size:11px; color:var(--accent)">SYS_ONLINE // V_5.2</div>
       </div>
     </div>
     <nav>
@@ -305,7 +273,7 @@
       <div class="two-col">
         <div class="card scroll-card interactive-el" style="display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding: 40px;">
           <h3 style="font-family:var(--mono);">Transmit Signal</h3>
-          <p style="margin:24px 0;"><a href="mailto:contact@nithan.in" style="color:var(--accent); text-decoration:none; font-size:1.4rem; font-weight:bold; font-family:var(--mono); letter-spacing: 1px;">contact@nithan.in</a></p>
+          <p style="margin:24px 0;"><a href="mailto:mail@nithan.in" style="color:var(--accent); text-decoration:none; font-size:1.4rem; font-weight:bold; font-family:var(--mono); letter-spacing: 1px;">contact</a></p>
         </div>
       </div>
     </section>
@@ -321,78 +289,104 @@
   <script>
     gsap.registerPlugin(ScrollTrigger);
     document.getElementById('year').textContent = new Date().getFullYear();
-    const isDesktop = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
-    // --- CURSOR LOGIC (Ensured to run immediately) ---
-    if (isDesktop) {
-      const cursor = document.getElementById('cursor');
-      const cursorTrail = document.getElementById('cursor-trail');
-      let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-      let trail = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    // --- BULLETPROOF CURSOR LOGIC ---
+    // Instead of relying on buggy media queries for hybrid laptops, we detect physical mouse movement.
+    let hasTouch = false;
+    let cursorVisible = false;
+    const cursor = document.getElementById('cursor');
+    const cursorTrail = document.getElementById('cursor-trail');
+    let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    let trail = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
 
-      window.addEventListener('mousemove', e => {
-        mouse.x = e.clientX; mouse.y = e.clientY;
-        cursor.style.transform = `translate3d(${mouse.x}px, ${mouse.y}px, 0) translate(-50%, -50%)`;
-      });
+    window.addEventListener('touchstart', () => { hasTouch = true; }, { once: true, passive: true });
 
-      function animateTrail() {
-        trail.x += (mouse.x - trail.x) * 0.15; trail.y += (mouse.y - trail.y) * 0.15;
-        cursorTrail.style.transform = `translate3d(${trail.x}px, ${trail.y}px, 0) translate(-50%, -50%)`;
-        requestAnimationFrame(animateTrail);
+    window.addEventListener('mousemove', e => {
+      if (hasTouch) return; // Ignore if user has touched the screen
+      
+      // Show cursor only on the very first mouse movement
+      if (!cursorVisible) {
+        cursor.style.opacity = '1';
+        cursorTrail.style.opacity = '1';
+        cursorVisible = true;
       }
-      animateTrail();
+      
+      mouse.x = e.clientX; 
+      mouse.y = e.clientY;
+      cursor.style.transform = `translate3d(${mouse.x}px, ${mouse.y}px, 0) translate(-50%, -50%)`;
+    });
 
-      document.querySelectorAll('a, button, .card').forEach(el => {
-        el.addEventListener('mouseenter', () => cursorTrail.classList.add('hover'));
-        el.addEventListener('mouseleave', () => cursorTrail.classList.remove('hover'));
-      });
-
-      document.querySelectorAll('.magnetic').forEach(el => {
-        el.addEventListener('mousemove', (e) => {
-          const rect = el.getBoundingClientRect();
-          gsap.to(el, { x: (e.clientX - rect.left - rect.width/2) * 0.4, y: (e.clientY - rect.top - rect.height/2) * 0.4, duration: 0.3 });
-        });
-        el.addEventListener('mouseleave', () => gsap.to(el, { x: 0, y: 0, duration: 0.7, ease: 'elastic.out(1, 0.3)' }));
-      });
-
-      document.querySelectorAll('.card').forEach(card => {
-        card.addEventListener('mousemove', e => {
-          const rect = card.getBoundingClientRect();
-          const rotateX = ((e.clientY - rect.top - rect.height / 2) / rect.height) * -12; 
-          const rotateY = ((e.clientX - rect.left - rect.width / 2) / rect.width) * 12;
-          card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
-        });
-        card.addEventListener('mouseleave', () => card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)');
-      });
-    } else {
-      document.getElementById('cursor').style.display = 'none';
-      document.getElementById('cursor-trail').style.display = 'none';
+    function animateTrail() {
+      if(cursorVisible) {
+        trail.x += (mouse.x - trail.x) * 0.15; 
+        trail.y += (mouse.y - trail.y) * 0.15;
+        cursorTrail.style.transform = `translate3d(${trail.x}px, ${trail.y}px, 0) translate(-50%, -50%)`;
+      }
+      requestAnimationFrame(animateTrail);
     }
+    animateTrail();
 
-    // --- Glitch Text Utility ---
+    // Hover states for cursor
+    document.querySelectorAll('a, button, .card').forEach(el => {
+      el.addEventListener('mouseenter', () => cursorTrail.classList.add('hover'));
+      el.addEventListener('mouseleave', () => cursorTrail.classList.remove('hover'));
+    });
+
+    // Magnetic buttons (Desktop only)
+    document.querySelectorAll('.magnetic').forEach(el => {
+      el.addEventListener('mousemove', (e) => {
+        if(hasTouch) return;
+        const rect = el.getBoundingClientRect();
+        gsap.to(el, { x: (e.clientX - rect.left - rect.width/2) * 0.4, y: (e.clientY - rect.top - rect.height/2) * 0.4, duration: 0.3 });
+      });
+      el.addEventListener('mouseleave', () => {
+        if(hasTouch) return;
+        gsap.to(el, { x: 0, y: 0, duration: 0.7, ease: 'elastic.out(1, 0.3)' });
+      });
+    });
+
+    // 3D Tilt for cards (Desktop only)
+    document.querySelectorAll('.card').forEach(card => {
+      card.addEventListener('mousemove', e => {
+        if(hasTouch) return;
+        const rect = card.getBoundingClientRect();
+        const rotateX = ((e.clientY - rect.top - rect.height / 2) / rect.height) * -12; 
+        const rotateY = ((e.clientX - rect.left - rect.width / 2) / rect.width) * 12;
+        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+      });
+      card.addEventListener('mouseleave', () => {
+        if(hasTouch) return;
+        card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+      });
+    });
+
+    // --- GLITCH TEXT UTILITY ---
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*+<>_";
-    function createGlitchEffect(el, onComplete = null) {
-      const originalText = el.dataset.value;
+    function createGlitchEffect(el) {
       if (el.dataset.isGlitching === "true") return;
       el.dataset.isGlitching = "true";
-      
+      const originalText = el.dataset.value;
       let iterations = 0;
+      
       const interval = setInterval(() => {
         el.innerText = originalText.split("").map((letter, index) => {
           if(index < iterations) return originalText[index];
           return chars[Math.floor(Math.random() * chars.length)];
         }).join("");
+        
         if(iterations >= originalText.length) {
           clearInterval(interval);
           el.dataset.isGlitching = "false";
-          if(onComplete) onComplete();
         }
         iterations += 1 / 2;
       }, 30);
     }
 
-    document.querySelectorAll('.glitch-text').forEach(el => {
-      if (isDesktop) el.addEventListener('mouseenter', () => createGlitchEffect(el));
+    // Initialize Glitch on Boot Title immediately
+    createGlitchEffect(document.querySelector('#boot-screen .glitch-text'));
+
+    document.querySelectorAll('main .glitch-text').forEach(el => {
+      el.addEventListener('mouseenter', () => { if(!hasTouch) createGlitchEffect(el); });
       ScrollTrigger.create({ trigger: el, start: "top 85%", onEnter: () => createGlitchEffect(el) });
     });
 
@@ -402,7 +396,6 @@
     const termOut = document.getElementById('terminal-output');
     const progCont = document.getElementById('progress-container');
     const progBar = document.getElementById('progress-bar');
-    const mainContent = document.getElementById('main-content');
 
     initBtn.addEventListener('click', () => {
       initBtn.style.display = 'none';
@@ -420,9 +413,7 @@
 
       let delay = 0;
       sequence.forEach((text, i) => {
-        // Variable typing speed for realism
         let typingSpeed = delay + (Math.random() * 400 + 300); 
-        
         setTimeout(() => {
           const line = document.createElement('div');
           line.innerText = `> ${text}`;
@@ -432,7 +423,6 @@
         delay = typingSpeed;
       });
 
-      // Finish Boot
       setTimeout(() => {
         gsap.to(bootScreen, {
           yPercent: -100, opacity: 0, duration: 1.2, ease: "power4.inOut",
@@ -444,30 +434,36 @@
       }, delay + 800);
     });
 
-    // --- MAIN PORTFOLIO ANIMATIONS ---
+    // --- MAIN PORTFOLIO ANIMATIONS (FLAWLESS REVEAL) ---
     function startPortfolioAnimations() {
-      gsap.to(mainContent, { opacity: 1, duration: 0.5 });
+      // 1. Unlock scrolling so user can move down
+      document.body.style.overflow = 'auto';
+      document.body.style.overflowX = 'hidden';
 
-      gsap.from('.gs-reveal', {
-        y: 50, opacity: 0, duration: 1.2, stagger: 0.2, ease: 'power3.out'
-      });
+      // 2. Animate Hero Section (From initial hidden CSS state to visible)
+      gsap.to('.gs-reveal', { y: 0, opacity: 1, duration: 1.2, stagger: 0.2, ease: 'power3.out' });
+      gsap.to('.p-card', { scale: 1, opacity: 1, duration: 0.8, stagger: 0.1, ease: 'back.out(1.5)', delay: 0.6 });
 
-      gsap.from('.p-card', {
-        scale: 0.8, opacity: 0, duration: 0.8, stagger: 0.1, ease: 'back.out(1.5)', delay: 0.6
-      });
-
+      // 3. Setup ScrollTriggers for lower cards
       gsap.utils.toArray('.scroll-card').forEach(card => {
-        gsap.from(card, {
-          scrollTrigger: { trigger: card, start: "top 90%", toggleActions: "play none none reverse" },
-          y: 50, opacity: 0, duration: 0.8, ease: "power3.out"
+        gsap.to(card, {
+          scrollTrigger: { 
+            trigger: card, 
+            start: "top 90%", // Animates when top of card hits bottom 10% of screen
+            toggleActions: "play none none reverse" 
+          },
+          y: 0, opacity: 1, duration: 0.8, ease: "power3.out"
         });
       });
+
+      // 4. Crucial: Refresh GSAP math now that scrollbar exists
+      setTimeout(() => ScrollTrigger.refresh(), 100);
     }
 
     // --- MOBILE TACTILE RIPPLE EFFECT ---
     document.querySelectorAll('.interactive-el').forEach(btn => {
       btn.addEventListener('click', function(e) {
-        if(isDesktop) return; 
+        if(!hasTouch) return; 
         let x = e.clientX - e.target.getBoundingClientRect().left;
         let y = e.clientY - e.target.getBoundingClientRect().top;
         
@@ -480,7 +476,7 @@
       });
     });
 
-    // Hide Navbar on scroll down
+    // --- NAVBAR HIDE ON SCROLL ---
     let lastScroll = 0;
     window.addEventListener('scroll', () => {
       const currentScroll = window.pageYOffset;
@@ -516,7 +512,7 @@
       }
     }
 
-    const mult = isDesktop ? 1 : 0.5;
+    const mult = window.innerWidth > 600 ? 1 : 0.5; // Cut particles in half for mobile
     const layers = [
       new ParticleLayer(canvases[0], 40*mult, [0.1, 0.3], [1, 3], 340, 0.1),
       new ParticleLayer(canvases[1], 30*mult, [0.3, 0.7], [2, 5], 345, 0.3),
