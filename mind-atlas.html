@@ -5,125 +5,134 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Constructing the Mind Atlas - Logs</title>
   
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 
   <style>
-    /* --- MASTER READER LAYOUT --- */
-    .post-container { 
-      max-width: 860px; 
-      margin: 0 auto; 
+    /* --- BULLETPROOF READER LAYOUT --- */
+    .reader-wrapper {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 4vw; /* Safe padding for mobile edges */
     }
-    
-    /* The main glass document file */
-    .reader-panel { 
-      background: rgba(10, 2, 5, 0.7); 
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 0, 76, 0.2); 
+
+    /* The Main Glass Container */
+    .reader-box {
+      background: rgba(10, 2, 5, 0.85);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 0, 76, 0.2);
+      border-top: 3px solid var(--accent);
       border-radius: 8px;
-      box-shadow: 0 30px 60px rgba(0,0,0,0.8);
-      overflow: hidden; /* Keeps the HUD bar inside the rounded corners */
+      box-shadow: 0 25px 50px rgba(0,0,0,0.7);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden; /* Contains the header background */
       position: relative;
     }
 
-    /* --- HUD TOP BAR --- */
-    /* Gives the document a "system window" feel */
-    .hud-bar {
+    /* --- READER HEADER (Title & Meta) --- */
+    .reader-header {
+      padding: 50px 50px 40px 50px;
+      background: linear-gradient(180deg, rgba(255, 0, 76, 0.08) 0%, transparent 100%);
+      border-bottom: 1px solid rgba(255, 0, 76, 0.15);
+      display: block; /* Forces static flow, preventing overlap */
+    }
+
+    .reader-meta {
       display: flex;
-      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
       align-items: center;
-      background: rgba(255, 0, 76, 0.1);
-      border-bottom: 1px solid rgba(255, 0, 76, 0.2);
-      padding: 12px 40px;
+      margin-bottom: 24px;
       font-family: var(--mono);
-      font-size: 0.75rem;
-      letter-spacing: 2px;
-      color: var(--accent);
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+      color: var(--muted);
       text-transform: uppercase;
     }
-    .hud-bar .status {
-      display: flex; align-items: center; gap: 8px;
-    }
-    .hud-bar .status::before {
-      content: ''; display: block; width: 6px; height: 6px; 
-      background: var(--accent); border-radius: 50%;
-      box-shadow: 0 0 8px var(--accent);
-      animation: pulse 2s infinite;
+
+    .reader-meta .tag {
+      color: var(--accent);
+      background: rgba(255, 0, 76, 0.1);
+      border: 1px solid rgba(255, 0, 76, 0.3);
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-weight: 700;
     }
 
-    /* --- THE HEADER (Title & Meta) --- */
-    .post-header {
-      padding: 50px 40px 30px;
-    }
-
-    /* Big, clean, left-aligned title */
-    .post-title {
+    .reader-title {
       font-family: var(--mono);
-      font-size: clamp(32px, 5vw, 56px);
-      line-height: 1.15;
+      font-size: clamp(32px, 6vw, 54px);
+      line-height: 1.15 !important;
       color: #fff;
-      margin: 0 0 24px 0;
-      text-shadow: 0 0 25px rgba(255, 0, 76, 0.3); /* Soft, premium glow */
+      margin: 0;
+      text-transform: uppercase;
+      text-shadow: 0 0 20px rgba(255, 0, 76, 0.4);
+      /* CRITICAL FIX: Normal wrap prevents height miscalculation bugs on mobile */
+      text-wrap: normal !important; 
     }
 
-    /* Meta tags aligned cleanly beneath the title */
-    .post-meta {
-      display: flex; gap: 20px; align-items: center; flex-wrap: wrap;
-      font-family: var(--mono); font-size: 0.85rem; letter-spacing: 1px;
-      color: var(--muted);
-    }
-    .post-meta .tag {
-      color: var(--accent); font-weight: 700;
-      border: 1px solid rgba(255, 0, 76, 0.4);
-      padding: 4px 12px; border-radius: 2px;
-      background: rgba(255, 0, 76, 0.05);
+    /* --- READER CONTENT (The actual blog text) --- */
+    .reader-body {
+      padding: 40px 50px 50px 50px;
+      font-family: var(--ui);
+      color: rgba(255, 255, 255, 0.85); /* Slightly muted for eye strain */
+      font-size: 1.1rem;
+      line-height: 1.8;
+      display: block;
     }
 
-    /* --- SEPARATOR LINE --- */
-    .cyber-divider {
-      height: 1px; border: none; margin: 0;
-      background: linear-gradient(90deg, rgba(255,0,76,0.6), rgba(255,0,76,0.1), transparent);
+    /* Lead paragraph styling */
+    .reader-body .lead-text {
+      font-size: 1.25rem;
+      color: #fff;
+      line-height: 1.7;
+      margin-bottom: 40px;
+      font-weight: 300;
     }
 
-    /* --- CONTENT AREA --- */
-    .post-content { 
-      padding: 40px; 
-      color: rgba(255, 255, 255, 0.85); 
-      font-size: 1.1rem; 
-      line-height: 1.8; 
+    .reader-body p {
+      margin-bottom: 28px;
     }
-    
-    .post-lead {
-      font-size: 1.25rem; color: #fff; line-height: 1.7; margin-bottom: 40px; 
-    }
-
-    .post-content p { margin-bottom: 24px; }
 
     /* Subheadings */
-    .post-content h2 { 
-      font-family: var(--mono); color: #fff;
-      font-size: 1.6rem; margin: 50px 0 20px; 
-      display: flex; align-items: center;
+    .reader-body h2 {
+      font-family: var(--mono);
+      color: #fff;
+      font-size: 1.6rem;
+      margin: 48px 0 20px 0;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
     }
-    .post-content h2::before { 
+
+    .reader-body h2::before {
       content: '>'; color: var(--accent); margin-right: 12px; font-weight: 900;
     }
 
     /* Cyberpunk Blockquote */
-    .post-content blockquote { 
-      border-left: 2px solid var(--accent); 
-      background: linear-gradient(90deg, rgba(255,0,76,0.08) 0%, transparent 100%);
-      padding: 24px 32px; margin: 40px 0; border-radius: 0 8px 8px 0;
-    }
-    .post-content blockquote p { 
-      margin: 0; font-family: var(--mono); font-size: 1.1rem; color: var(--muted); font-style: italic;
+    .reader-body blockquote {
+      margin: 40px 0;
+      padding: 24px 32px;
+      border-left: 3px solid var(--accent);
+      background: rgba(255, 0, 76, 0.05);
+      border-radius: 0 8px 8px 0;
     }
 
-    /* Mobile adjustments */
+    .reader-body blockquote p {
+      margin: 0;
+      font-style: italic;
+      color: #fff;
+      font-size: 1.15rem;
+    }
+
+    /* --- STRICT MOBILE FIXES --- */
     @media(max-width: 600px) {
-      .hud-bar { padding: 12px 20px; font-size: 0.65rem; }
-      .post-header { padding: 40px 20px 24px; }
-      .post-content { padding: 32px 20px; }
+      .reader-header { padding: 32px 24px 24px 24px; }
+      .reader-body { padding: 24px 24px 32px 24px; }
+      .reader-meta { gap: 12px; margin-bottom: 16px; }
+      .reader-title { font-size: 32px; }
     }
   </style>
 </head>
@@ -168,26 +177,20 @@
 
   <main id="main-content" style="padding-top: 140px;">
     
-    <article class="post-container">
-      <div class="reader-panel gs-reveal">
+    <div class="reader-wrapper gs-reveal">
+      <article class="reader-box">
         
-        <div class="hud-bar">
-          <div class="status">SECURE_ARCHIVE</div>
-          <div>FILE_ID: 0x9A4B</div>
-        </div>
-        
-        <header class="post-header">
-          <h1 class="glitch-text post-title" data-value="Constructing the Mind Atlas">Constructing the Mind Atlas</h1>
-          <div class="post-meta">
-            <span class="tag">MODULE: UI_ENGINE</span>
-            <span>LOGGED: 2026.02.24</span>
+        <header class="reader-header">
+          <div class="reader-meta">
+            <span class="tag">UI_ENGINE</span>
+            <span>DATE: 2026.02.24</span>
+            <span style="opacity: 0.5;">ID: 0x9A4B</span>
           </div>
+          <h1 class="glitch-text reader-title" data-value="Constructing the Mind Atlas">Constructing the Mind Atlas</h1>
         </header>
 
-        <hr class="cyber-divider">
-
-        <div class="post-content">
-          <p class="post-lead">The concept of a "Secondary Brain" isn't new, but the execution usually falls flat. We rely on bloated SaaS applications that trap our thoughts in proprietary databases. The Mind Atlas is an attempt to build a localized, markdown-driven node that I fully control.</p>
+        <div class="reader-body">
+          <p class="lead-text">The concept of a "Secondary Brain" isn't new, but the execution usually falls flat. We rely on bloated SaaS applications that trap our thoughts in proprietary databases. The Mind Atlas is an attempt to build a localized, markdown-driven node that I fully control.</p>
 
           <h2>The Architecture</h2>
           <p>By mapping ideas via graph theory rather than linear folders, the architecture mimics actual neural pathways. A thought logged on a Tuesday about hardware constraints can effortlessly bridge to a Friday note on UI rendering.</p>
@@ -199,8 +202,8 @@
           <p>Moving forward, the primary objective is tethering this frontend to an Ollama instance, allowing me to query my own localized knowledge base seamlessly through this exact terminal interface.</p>
         </div>
 
-      </div>
-    </article>
+      </article>
+    </div>
 
   </main>
 
