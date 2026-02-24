@@ -5,198 +5,221 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Constructing the Mind Atlas - Logs</title>
   
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 
   <style>
-    /* --- BULLETPROOF READER LAYOUT --- */
+    :root {
+      --accent: #ff004c;
+      --bg-dark: #0a0205;
+      --glass: rgba(10, 2, 5, 0.92);
+      --mono: 'JetBrains Mono', monospace;
+      --ui: 'Inter', sans-serif;
+      --header: 'Orbitron', sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background-color: var(--bg-dark);
+      color: #fff;
+      font-family: var(--ui);
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* --- BACKGROUND ELEMENTS --- */
+    .bg-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: radial-gradient(circle at 50% 50%, rgba(255, 0, 76, 0.05) 0%, transparent 80%);
+      z-index: -1;
+    }
+
+    /* --- NAVBAR --- */
+    #navbar {
+      position: fixed;
+      top: 0; width: 100%;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 30px 5vw;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 0, 76, 0.1);
+    }
+
+    .brand { display: flex; align-items: center; gap: 15px; }
+    .brand-text-main { font-family: var(--header); font-weight: 900; letter-spacing: 2px; font-size: 1.2rem; }
+    .brand-text-sub { font-size: 10px; color: var(--accent); font-family: var(--mono); }
+
+    nav a {
+      color: #fff; text-decoration: none; font-family: var(--mono);
+      font-size: 12px; letter-spacing: 1px;
+      transition: color 0.3s;
+    }
+    nav a:hover { color: var(--accent); }
+
+    /* --- READER UI --- */
+    #main-content { padding-top: 160px; padding-bottom: 100px; }
+
     .reader-wrapper {
-      max-width: 800px;
+      max-width: 850px;
       margin: 0 auto;
-      padding: 0 4vw; /* Safe padding for mobile edges */
+      padding: 0 20px;
     }
 
-    /* The Main Glass Container */
     .reader-box {
-      background: rgba(10, 2, 5, 0.85);
-      backdrop-filter: blur(16px);
+      background: var(--glass);
+      backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 0, 76, 0.2);
-      border-top: 3px solid var(--accent);
-      border-radius: 8px;
-      box-shadow: 0 25px 50px rgba(0,0,0,0.7);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden; /* Contains the header background */
+      border-radius: 4px;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.8);
       position: relative;
+      overflow: hidden;
     }
 
-    /* --- READER HEADER (Title & Meta) --- */
+    /* Tactical Top Bar Decoration */
+    .reader-box::before {
+      content: "SECURE_ARCHIVE // FILE_ID: 0x9A4B // AUTH_REQUIRED";
+      display: block;
+      background: rgba(255, 0, 76, 0.15);
+      color: var(--accent);
+      font-family: var(--mono);
+      font-size: 10px;
+      padding: 10px 25px;
+      border-bottom: 1px solid rgba(255, 0, 76, 0.2);
+      letter-spacing: 2px;
+    }
+
     .reader-header {
-      padding: 50px 50px 40px 50px;
-      background: linear-gradient(180deg, rgba(255, 0, 76, 0.08) 0%, transparent 100%);
-      border-bottom: 1px solid rgba(255, 0, 76, 0.15);
-      display: block; /* Forces static flow, preventing overlap */
+      padding: 60px 60px 30px 60px;
+      background: linear-gradient(to bottom, rgba(255, 0, 76, 0.05), transparent);
     }
 
     .reader-meta {
       display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
       align-items: center;
-      margin-bottom: 24px;
+      gap: 20px;
+      margin-bottom: 25px;
       font-family: var(--mono);
-      font-size: 0.8rem;
-      letter-spacing: 1px;
-      color: var(--muted);
-      text-transform: uppercase;
+      font-size: 11px;
+      color: var(--accent);
     }
 
-    .reader-meta .tag {
-      color: var(--accent);
-      background: rgba(255, 0, 76, 0.1);
-      border: 1px solid rgba(255, 0, 76, 0.3);
-      padding: 4px 10px;
-      border-radius: 4px;
+    .tag {
+      border: 1px solid var(--accent);
+      padding: 3px 10px;
       font-weight: 700;
+      text-transform: uppercase;
+      background: rgba(255, 0, 76, 0.1);
     }
 
     .reader-title {
-      font-family: var(--mono);
-      font-size: clamp(32px, 6vw, 54px);
-      line-height: 1.15 !important;
+      font-family: var(--header);
+      font-size: clamp(32px, 5vw, 52px);
+      line-height: 1.1;
       color: #fff;
-      margin: 0;
       text-transform: uppercase;
-      text-shadow: 0 0 20px rgba(255, 0, 76, 0.4);
-      /* CRITICAL FIX: Normal wrap prevents height miscalculation bugs on mobile */
-      text-wrap: normal !important; 
-    }
-
-    /* --- READER CONTENT (The actual blog text) --- */
-    .reader-body {
-      padding: 40px 50px 50px 50px;
-      font-family: var(--ui);
-      color: rgba(255, 255, 255, 0.85); /* Slightly muted for eye strain */
-      font-size: 1.1rem;
-      line-height: 1.8;
-      display: block;
-    }
-
-    /* Lead paragraph styling */
-    .reader-body .lead-text {
-      font-size: 1.25rem;
-      color: #fff;
-      line-height: 1.7;
-      margin-bottom: 40px;
-      font-weight: 300;
-    }
-
-    .reader-body p {
-      margin-bottom: 28px;
-    }
-
-    /* Subheadings */
-    .reader-body h2 {
-      font-family: var(--mono);
-      color: #fff;
-      font-size: 1.6rem;
-      margin: 48px 0 20px 0;
-      padding-bottom: 12px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      display: flex;
-      align-items: center;
-    }
-
-    .reader-body h2::before {
-      content: '>'; color: var(--accent); margin-right: 12px; font-weight: 900;
-    }
-
-    /* Cyberpunk Blockquote */
-    .reader-body blockquote {
-      margin: 40px 0;
-      padding: 24px 32px;
-      border-left: 3px solid var(--accent);
-      background: rgba(255, 0, 76, 0.05);
-      border-radius: 0 8px 8px 0;
-    }
-
-    .reader-body blockquote p {
       margin: 0;
+      letter-spacing: -1px;
+    }
+
+    .reader-body {
+      padding: 30px 60px 60px 60px;
+      font-size: 1.15rem;
+      line-height: 1.9;
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    .lead-text {
+      font-size: 1.35rem;
+      color: #fff;
+      font-weight: 300;
+      border-left: 3px solid var(--accent);
+      padding-left: 30px;
+      margin-bottom: 40px;
+      line-height: 1.7;
+    }
+
+    .reader-body h2 {
+      font-family: var(--header);
+      color: #fff;
+      font-size: 1.5rem;
+      margin: 50px 0 20px 0;
+      letter-spacing: 1px;
+      display: flex; align-items: center; gap: 15px;
+    }
+    
+    .reader-body h2::before {
+      content: ""; width: 20px; height: 2px; background: var(--accent);
+    }
+
+    .reader-body p { margin-bottom: 30px; }
+
+    blockquote {
+      margin: 50px 0;
+      padding: 30px;
+      background: rgba(255, 255, 255, 0.03);
+      border-right: 3px solid var(--accent);
       font-style: italic;
       color: #fff;
-      font-size: 1.15rem;
+      font-size: 1.2rem;
     }
 
-    /* --- STRICT MOBILE FIXES --- */
+    footer {
+      text-align: center; padding: 40px;
+      font-family: var(--mono); font-size: 10px;
+      letter-spacing: 2px; color: rgba(255,255,255,0.4);
+    }
+
+    /* --- MOBILE POLISH --- */
     @media(max-width: 600px) {
-      .reader-header { padding: 32px 24px 24px 24px; }
-      .reader-body { padding: 24px 24px 32px 24px; }
-      .reader-meta { gap: 12px; margin-bottom: 16px; }
-      .reader-title { font-size: 32px; }
+      #navbar { padding: 20px; }
+      .reader-header { padding: 40px 25px 20px 25px; }
+      .reader-body { padding: 20px 25px 40px 25px; }
+      .reader-title { font-size: 30px; }
+      .reader-meta { flex-direction: column; align-items: flex-start; gap: 10px; }
+      .lead-text { font-size: 1.15rem; padding-left: 20px; }
     }
   </style>
 </head>
 <body>
 
-  <div id="cursor"></div>
-  <div id="cursor-trail"></div>
-  <div class="bg"></div>
-  <div class="grid"></div>
-  <div class="scanlines"></div>
-  <canvas id="p-back" class="particles" style="z-index:3; opacity:0.4"></canvas>
-  <canvas id="p-mid" class="particles" style="z-index:4; opacity:0.7"></canvas>
-  <canvas id="p-front" class="particles" style="z-index:5; opacity:1"></canvas>
-
-  <div id="boot-screen">
-    <div class="boot-content">
-      <div class="logo" style="margin-bottom:24px; width:72px; height:72px;">
-        <div id="logo-lottie-boot" style="width:100px; height:100px;"></div>
-      </div>
-      <h1 class="glitch-text" data-value="DECRYPTING FILE" style="font-size: clamp(24px, 5vw, 36px); margin-bottom: 40px;">DECRYPTING FILE</h1>
-      <button id="init-btn" class="btn interactive-el magnetic">DECRYPT</button>
-      
-      <div id="terminal-output" style="display:none;"></div>
-      <div id="progress-container" style="display:none;">
-        <div id="progress-bar"></div>
-      </div>
-    </div>
-  </div>
+  <div class="bg-overlay"></div>
 
   <header id="navbar">
     <div class="brand">
-      <div class="logo"><div id="logo-lottie" style="width:68px; height:68px"></div></div>
+      <div style="width: 40px; height: 40px; background: var(--accent); border-radius: 4px;"></div>
       <div>
-        <div style="font-weight:900; font-family:var(--mono); letter-spacing:1px">NITHAN</div>
-        <div style="font-size:11px; color:var(--accent)">SYS_ONLINE // READ_MODE</div>
+        <div class="brand-text-main">NITHAN</div>
+        <div class="brand-text-sub">SYS_ONLINE // READ_MODE</div>
       </div>
     </div>
     <nav>
-      <a href="blog.html" class="magnetic interactive-el"><< BACK_TO_LOGS</a>
+      <a href="blog.html"><< BACK_TO_LOGS</a>
     </nav>
   </header>
 
-  <main id="main-content" style="padding-top: 140px;">
-    
-    <div class="reader-wrapper gs-reveal">
+  <main id="main-content">
+    <div class="reader-wrapper">
       <article class="reader-box">
         
         <header class="reader-header">
           <div class="reader-meta">
-            <span class="tag">UI_ENGINE</span>
-            <span>DATE: 2026.02.24</span>
-            <span style="opacity: 0.5;">ID: 0x9A4B</span>
+            <span class="tag">MODULE: UI_ENGINE</span>
+            <span>LOGGED // 2026.02.24</span>
           </div>
-          <h1 class="glitch-text reader-title" data-value="Constructing the Mind Atlas">Constructing the Mind Atlas</h1>
+          <h1 class="reader-title">Constructing the Mind Atlas</h1>
         </header>
 
         <div class="reader-body">
-          <p class="lead-text">The concept of a "Secondary Brain" isn't new, but the execution usually falls flat. We rely on bloated SaaS applications that trap our thoughts in proprietary databases. The Mind Atlas is an attempt to build a localized, markdown-driven node that I fully control.</p>
+          <p class="lead-text">The concept of a "Secondary Brain" isn't new, but the execution usually falls flat. We rely on bloated SaaS applications that trap our thoughts in proprietary databases.</p>
+
+          <p>The Mind Atlas is an attempt to build a localized, markdown-driven node that I fully control. By mapping ideas via graph theory rather than linear folders, the architecture mimics actual neural pathways.</p>
 
           <h2>The Architecture</h2>
-          <p>By mapping ideas via graph theory rather than linear folders, the architecture mimics actual neural pathways. A thought logged on a Tuesday about hardware constraints can effortlessly bridge to a Friday note on UI rendering.</p>
+          <p>A thought logged on a Tuesday about hardware constraints can effortlessly bridge to a Friday note on UI rendering. Data without structure is noise; structure without access is an archive.</p>
 
           <blockquote>
-            <p>"Data without structure is noise. Structure without access is an archive. The goal is to build an engine of active recall."</p>
+            "The goal is to build an engine of active recall, not just a digital warehouse for forgotten ideas."
           </blockquote>
 
           <p>Moving forward, the primary objective is tethering this frontend to an Ollama instance, allowing me to query my own localized knowledge base seamlessly through this exact terminal interface.</p>
@@ -204,16 +227,11 @@
 
       </article>
     </div>
-
   </main>
 
   <footer>
-    <p>NODE HOSTED AT <span style="color:var(--accent)">NITHAN.IN</span> // SYSTEM YEAR <span id="year"></span></p>
+    NODE HOSTED AT <span style="color:var(--accent)">NITHAN.IN</span> // SYSTEM YEAR 2026
   </footer>
-
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/ScrollTrigger.min.js"></script>
-  <script src="script.js"></script>
 
 </body>
 </html>
