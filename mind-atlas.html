@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Constructing the Mind Atlas - Logs</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    /* --- EXACT SCREENSHOT MATCH LAYOUT --- */
+    .post-container { 
+      max-width: 900px; 
+      margin: 0 auto; 
+    }
+    
+    /* The main dark card */
+    .reader-panel { 
+      background: rgba(8, 2, 5, 0.95); /* Deep, almost solid dark background */
+      border: 1px solid rgba(255, 0, 76, 0.3); /* Sharp pink/red border */
+      border-radius: 12px;
+      padding: 60px 70px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+    }
+
+    /* --- HUD TOP ROW --- */
+    .hud-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      letter-spacing: 2px;
+      color: var(--accent); /* Red text */
+      text-transform: uppercase;
+      margin-bottom: 40px;
+    }
+    .hud-row .status {
+      display: flex; align-items: center; gap: 12px;
+    }
+    /* Pulsing red dot */
+    .hud-row .status::before {
+      content: ''; display: block; width: 8px; height: 8px; 
+      background: var(--accent); border-radius: 50%;
+      box-shadow: 0 0 10px var(--accent);
+      animation: pulse 2s infinite;
+    }
+
+    /* --- BIG CRISP TITLE --- */
+    .post-title {
+      font-family: var(--mono);
+      font-size: clamp(2.5rem, 5.5vw, 4.2rem);
+      line-height: 1.15;
+      color: #fff;
+      margin: 0 0 24px 0;
+      text-transform: uppercase;
+      text-shadow: none; /* Removed the messy glows, keeping it flat and sharp */
+    }
+
+    /* --- METADATA ROW --- */
+    .post-meta {
+      display: flex; gap: 24px; align-items: center; flex-wrap: wrap;
+      font-family: var(--mono); font-size: 1rem; letter-spacing: 1px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+    /* Red Module Pill */
+    .post-meta .tag {
+      color: var(--accent); font-weight: 700;
+      border: 1px solid rgba(255, 0, 76, 0.2);
+      padding: 6px 16px; border-radius: 8px;
+      background: rgba(255, 0, 76, 0.08);
+    }
+
+    /* --- SHARP SEPARATOR LINE --- */
+    .cyber-divider {
+      height: 1px; border: none; 
+      margin: 40px 0;
+      background: rgba(255, 0, 76, 0.4); /* Solid, thin pink line */
+    }
+
+    /* --- CONTENT AREA --- */
+    .post-content { 
+      color: rgba(255, 255, 255, 0.9); 
+      font-size: 1.15rem; 
+      line-height: 1.8; 
+    }
+    .post-content p { margin-bottom: 24px; }
+
+    /* Button styling for the Top Nav to match your screenshot */
+    .nav-pill {
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(0, 0, 0, 0.5);
+      padding: 10px 20px;
+      border-radius: 8px;
+    }
+
+    /* Mobile adjustments */
+    @media(max-width: 768px) {
+      .reader-panel { padding: 40px 24px; }
+      .hud-row { font-size: 0.7rem; flex-direction: column; align-items: flex-start; gap: 12px; margin-bottom: 30px;}
+      .post-meta { gap: 16px; flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="cursor"></div>
+  <div id="cursor-trail"></div>
+  <div class="bg"></div>
+  <div class="grid"></div>
+  <div class="scanlines"></div>
+  <canvas id="p-back" class="particles" style="z-index:3; opacity:0.4"></canvas>
+  <canvas id="p-mid" class="particles" style="z-index:4; opacity:0.7"></canvas>
+  <canvas id="p-front" class="particles" style="z-index:5; opacity:1"></canvas>
+
+  <div id="boot-screen">
+    <div class="boot-content">
+      <div class="logo" style="margin-bottom:24px; width:72px; height:72px;">
+        <div id="logo-lottie-boot" style="width:100px; height:100px;"></div>
+      </div>
+      <h1 class="glitch-text" data-value="DECRYPTING FILE" style="font-size: clamp(24px, 5vw, 36px); margin-bottom: 40px;">DECRYPTING FILE</h1>
+      <button id="init-btn" class="btn interactive-el magnetic">DECRYPT</button>
+      
+      <div id="terminal-output" style="display:none;"></div>
+      <div id="progress-container" style="display:none;">
+        <div id="progress-bar"></div>
+      </div>
+    </div>
+  </div>
+
+  <header id="navbar">
+    <div class="brand">
+      <div class="logo"><div id="logo-lottie" style="width:68px; height:68px"></div></div>
+      <div>
+        <div style="font-weight:900; font-family:var(--mono); letter-spacing:1px">NITHAN</div>
+        <div style="font-size:11px; color:var(--accent)">SYS_ONLINE // READ_MODE</div>
+      </div>
+    </div>
+    <nav>
+      <a href="blog.html" class="magnetic interactive-el nav-pill"><< BACK_TO_LOGS</a>
+    </nav>
+  </header>
+
+  <main id="main-content" style="padding-top: 140px;">
+    
+    <article class="post-container">
+      <div class="reader-panel gs-reveal">
+        
+        <div class="hud-row">
+          <div class="status">SECURE_ARCHIVE</div>
+          <div>FILE_ID: 0X9A4B</div>
+        </div>
+        
+        <h1 class="post-title">CONSTRUCTING THE MIND ATLAS</h1>
+        
+        <div class="post-meta">
+          <span class="tag">MODULE: UI_ENGINE</span>
+          <span>LOGGED: 2026.02.24</span>
+        </div>
+
+        <hr class="cyber-divider">
+
+        <div class="post-content">
+          <p>The concept of a "Secondary Brain" isn't new, but the execution usually falls flat. We rely on bloated SaaS applications that trap our thoughts in proprietary databases. The Mind Atlas is an attempt to build a localized, markdown-driven node that I fully control.</p>
+        </div>
+
+      </div>
+    </article>
+
+  </main>
+
+  <footer>
+    <p>NODE HOSTED AT <span style="color:var(--accent)">NITHAN.IN</span> // SYSTEM YEAR <span id="year"></span></p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/ScrollTrigger.min.js"></script>
+  <script src="script.js"></script>
+
+</body>
+</html>
