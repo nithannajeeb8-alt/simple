@@ -70,24 +70,27 @@ header {
 .brand { display: flex; gap: 16px; align-items: center; }
 
 /* --- UPDATED LOGO CSS --- */
+/* --- THE TACTICAL BADGE LOGO --- */
 .logo { 
-  width: 50px; /* Base fallback size */
-  height: 50px; /* Base fallback size */
-  background: transparent !important; 
-  border: none !important;
-  box-shadow: none !important;
-  border-radius: 0 !important;
+  width: 48px; 
+  height: 48px; 
+  background: rgba(10, 1, 4, 0.85) !important; /* Very dark, almost black background */
+  border: 1px solid rgba(255, 0, 76, 0.4) !important; /* Subtle neon red border */
+  border-radius: 10px !important; /* Clean rounded corners */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6) !important; /* Dark shadow to separate it from the background */
   display: flex; 
   justify-content: center; 
   align-items: center; 
+  padding: 8px; /* Gives the 'N' breathing room inside the box */
 }
+
 .logo img {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  filter: drop-shadow(0 0 10px rgba(255, 0, 76, 0.6)); 
+  /* A tighter, cleaner white glow instead of a messy red one */
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.4)); 
 }
-
 nav { display: flex; gap: 24px; align-items: center; }
 nav a { color: var(--muted); text-decoration: none; padding: 8px 4px; font-weight: 600; letter-spacing: 1px; font-family: var(--mono); font-size: 0.85rem; text-transform: uppercase; position: relative; display: inline-block; cursor: none; }
 nav a::after { content: ''; position: absolute; width: 0; height: 2px; bottom: 0; left: 0; background: var(--accent); transition: width 0.3s ease; }
