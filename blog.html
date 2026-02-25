@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Nithan (Dev Logs)</title>
+  <title>Nithan // Dev Logs</title>
 
   <link rel="icon" type="image/png" href="/favicon.PNG">
   <link rel="apple-touch-icon" href="/favicon.PNG">
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="style.css?v=2">
 </head>
@@ -43,8 +43,8 @@
         <img src="/icon.PNG" alt="Logo" style="width: 100%; height: 100%; object-fit: contain;">
       </div>
       <div>
-        <div style="font-weight:900; font-family:var(--mono); letter-spacing:1px">NITHAN</div>
-        <div style="font-size:11px; color:var(--accent)">SYS_ONLINE // V_5.2</div>
+        <div style="font-weight:900; font-family:'Orbitron', sans-serif; letter-spacing:1px">NITHAN</div>
+        <div style="font-size:11px; color:var(--accent); font-family: 'JetBrains Mono', monospace;">SYS_ONLINE // V_5.2</div>
       </div>
     </div>
     <nav>
@@ -54,24 +54,24 @@
 
   <main id="main-content" style="padding-top: 180px;">
     
-    <section>
+    <section class="container">
       <div style="margin-bottom: 60px;">
-        <h1 class="glitch-text" data-value="DEV_LOGS" style="font-size: clamp(40px, 6vw, 64px); color: var(--accent); margin-bottom: 16px;">DEV_LOGS</h1>
+        <h1 class="glitch-text" data-value="DEV_LOGS" style="font-size: clamp(40px, 6vw, 64px); color: var(--accent); margin-bottom: 16px; font-family: 'Orbitron', sans-serif;">DEV_LOGS</h1>
         <p class="lead gs-reveal">System updates, architectural thoughts, and module documentation.</p>
       </div>
       
-<div class="blog-grid">
+      <div class="blog-grid">
+        
         <article class="card scroll-card blog-card interactive-el">
           <div class="blog-meta">
-            <span class="blog-date">SYS.DATE: 2026.02.24</span>
-            <span class="blog-tag">info</span>
+            <span class="blog-date">SYS.DATE: 2026.02.25</span>
+            <span class="blog-tag">CORE.IDENTITY</span>
           </div>
           <h3 class="blog-title">WHO IS NITHAN/</h3>
-          <p class="blog-excerpt">Nithan Najeeb (born 2004, India)—known online as Nithan—is an independent creator and systems researcher focused on the intersection of digital architecture, applied AI, and cognitive mapping.</p>
+          <p class="blog-excerpt">Independent creator and systems researcher focused on the intersection of digital architecture, applied AI, and cognitive mapping.</p>
           <a href="nithan.html" class="blog-link magnetic interactive-el">READ_FILE >></a>
         </article>
-      
-      <div class="blog-grid">
+
         <article class="card scroll-card blog-card interactive-el">
           <div class="blog-meta">
             <span class="blog-date">SYS.DATE: 2026.02.24</span>
@@ -88,7 +88,7 @@
             <span class="blog-tag">HARDWARE</span>
           </div>
           <h3 class="blog-title">Forenexa Architecture</h3>
-          <p class="blog-excerpt">How I engineered a digital storefront optimized for physical, small-batch handcrafted drops without relying on bloated web frameworks.</p>
+          <p class="blog-excerpt">Engineering a bespoke digital storefront optimized for physical, handcrafted drops without relying on bloated web frameworks.</p>
           <a href="#" class="blog-link magnetic interactive-el">READ_FILE >></a>
         </article>
 
@@ -101,8 +101,8 @@
           <p class="blog-excerpt">Tethering a localized, private LLM instance to a frontend interface. Exploring privacy-first querying and dynamic prompt injection.</p>
           <a href="#" class="blog-link magnetic interactive-el">READ_FILE >></a>
         </article>
-      </div>
-    </section>
+
+      </div> </section>
 
   </main>
 
@@ -113,6 +113,10 @@
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/ScrollTrigger.min.js"></script>
   <script src="script.js"></script>
+  <script>
+    // Simple script to auto-fill the year if your main script.js doesn't
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
 
 </body>
 </html>
