@@ -9,6 +9,121 @@
   <link rel="apple-touch-icon" href="/favicon.PNG">
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+
+  <!-- Responsive alignment CSS: centers on mobile, spaces on desktop (no aesthetic changes) -->
+  <style>
+    /* Footer layout container */
+    footer {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 18px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 9998;
+      /* keep visual style neutral so your main CSS controls colors */
+    }
+
+    footer p {
+      margin: 0;
+      font-family: Inter, sans-serif;
+      font-size: 0.95rem;
+      color: var(--muted, rgba(255,255,255,0.7));
+      text-align: center;
+      word-break: break-word;
+    }
+
+    /* Social box preserved, but responsive alignment */
+    .social-box {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      background: rgba(10, 10, 12, 0.6);
+      border: 1px solid rgba(255, 0, 76, 0.12);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      max-width: 100%;
+      flex-wrap: wrap;
+      z-index: 9999;
+      position: relative;
+      align-self: center; /* default center for small screens */
+    }
+
+    .social-box .mini-logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 8px;
+      object-fit: cover;
+      flex: 0 0 auto;
+      border: 1px solid rgba(255,255,255,0.04);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.6), inset 0 -2px 6px rgba(0,0,0,0.2);
+    }
+
+    .social-box a {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      color: var(--accent, #ff004c) !important;
+      font-family: Inter, sans-serif;
+      font-size: 0.95rem;
+      opacity: 0.98;
+      white-space: nowrap;
+    }
+
+    .social-box svg {
+      width: 18px;
+      height: 18px;
+      flex: 0 0 auto;
+      fill: var(--accent, #ff004c) !important;
+      stroke: none;
+      vertical-align: middle;
+    }
+
+    /* Desktop layout: footer becomes a row with space-between */
+    @media (min-width: 900px) {
+      footer {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px 46px;
+      }
+      footer p { text-align: left; }
+      .social-box { align-self: auto; } /* allow right alignment */
+    }
+
+    /* Tablet niceties */
+    @media (min-width: 640px) and (max-width: 899px) {
+      footer {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: 18px 28px;
+      }
+      footer p { text-align: left; max-width: 60%; }
+      .social-box { max-width: 40%; justify-content: flex-end; }
+    }
+
+    /* Mobile adjustments */
+    @media (max-width: 639px) {
+      .social-box { padding: 10px; gap: 10px; }
+      .social-box a { font-size: 0.92rem; }
+      .social-box .mini-logo { width: 38px; height: 38px; }
+      footer { padding: 14px 18px; }
+      footer p { font-size: 0.92rem; }
+    }
+
+    /* Prevent the footer layering under canvases */
+    /* If your global CSS sets overflow or z-index weirdly, this helps keep footer on top */
+    footer, .social-box { z-index: 9999; position: relative; }
+
+  </style>
 </head>
 <body>
 
@@ -162,7 +277,46 @@
 
   <footer>
     <p>NODE HOSTED AT <span style="color:var(--accent)">NITHAN.IN</span> // SYSTEM YEAR <span id="year"></span></p>
+
+    <!-- social box (keeps existing aesthetic) -->
+    <div class="social-box" aria-hidden="false">
+      <img src="/icon.PNG" alt="Nithan logo" class="mini-logo">
+
+      <a href="https://instagram.com/nithannajeeb_" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path fill="var(--accent, #ff004c)" d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7zm5 3.5a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9zm0 2a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM17.5 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+        </svg>
+        @nithannajeeb_
+      </a>
+
+      <a href="https://www.threads.net/@nithannajeeb_" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path fill="var(--accent, #ff004c)" d="M12 2C7.6 2 4 5.6 4 10s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 2c3.9 0 7 3.1 7 7s-3.1 7-7 7c-2.6 0-4.9-1.4-6.1-3.6 1.1 0.7 2.4 1.1 3.7 1.1 3.9 0 7-3.1 7-7 0-1.3-0.4-2.6-1.1-3.7C16.6 4.6 14.3 4 12 4z"/>
+        </svg>
+        @nithannajeeb_
+      </a>
+
+      <a href="https://www.facebook.com/nithan.najeeb" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path fill="var(--accent, #ff004c)" d="M22 12a10 10 0 1 0-11.5 9.9v-7h-2.2v-2.9h2.2V9.3c0-2.2 1.3-3.4 3.2-3.4.9 0 1.9.1 1.9.1v2.1h-1.1c-1.1 0-1.4.7-1.4 1.4v1.7h2.4l-.4 2.9h-2v7A10 10 0 0 0 22 12z"/>
+        </svg>
+        nithan najeeb
+      </a>
+
+      <a href="https://www.linkedin.com/in/nithan-najeeb" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path fill="var(--accent, #ff004c)" d="M4.98 3.5a2.5 2.5 0 1 1-.001 5.001A2.5 2.5 0 0 1 4.98 3.5zM3 9h4v12H3zM9 9h3.6v1.7h.1c.5-.9 1.8-1.7 3.7-1.7 4 0 4.7 2.6 4.7 6v7h-4v-6.2c0-1.5 0-3.4-2.1-3.4-2.1 0-2.4 1.6-2.4 3.3V21H9z"/>
+        </svg>
+        nithan najeeb
+      </a>
+    </div>
+
   </footer>
+
+  <script>
+    // Keep existing behavior: set year text
+    document.getElementById('year')?.appendChild(document.createTextNode(new Date().getFullYear()));
+  </script>
 
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/ScrollTrigger.min.js"></script>
