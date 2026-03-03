@@ -144,8 +144,153 @@
 </head>
 <body>
 
-  <!-- ... your unchanged page content above ... -->
-  <!-- (keep all content from your page unchanged; only footer-related code is below) -->
+  <div id="cursor"></div>
+  <div id="cursor-trail"></div>
+
+  <div id="boot-screen">
+    <div class="boot-content">
+      <div class="logo" style="margin-bottom:24px; width:72px; height:72px;">
+        <img src="/icon.PNG" alt="System Logo" style="width: 100%; height: 100%; object-fit: contain;">
+      </div>
+      <h1 class="glitch-text" data-value="SYSTEM STANDBY" style="font-size: clamp(24px, 5vw, 36px); margin-bottom: 40px;">SYSTEM STANDBY</h1>
+      <button id="init-btn" class="btn interactive-el magnetic">INITIALIZE</button>
+      
+      <div id="terminal-output" style="display:none;"></div>
+      <div id="progress-container" style="display:none;">
+        <div id="progress-bar"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg"></div>
+  <div class="grid"></div>
+  <div class="scanlines"></div>
+
+  <canvas id="p-back" class="particles" style="z-index:3; opacity:0.4"></canvas>
+  <canvas id="p-mid" class="particles" style="z-index:4; opacity:0.7"></canvas>
+  <canvas id="p-front" class="particles" style="z-index:5; opacity:1"></canvas>
+
+  <header id="navbar">
+    <div class="brand">
+      <div class="logo" style="width: 45px; height: 45px;">
+        <img src="/icon.PNG" alt="Logo" style="width: 100%; height: 100%; object-fit: contain;">
+      </div>
+      <div>
+        <div style="font-weight:900; font-family:var(--mono); letter-spacing:1px">NITHAN</div>
+        <div style="font-size:11px; color:var(--accent)">SYS_ONLINE // V_5.2</div>
+      </div>
+    </div>
+    <nav>
+      <a href="#about" class="magnetic interactive-el">Data</a>
+      <a href="#projects" class="magnetic interactive-el">Modules</a>
+      <a href="blog.html" class="magnetic interactive-el">Logs</a>
+      <a href="#contact" class="magnetic interactive-el">Comm</a>
+    </nav>
+  </header>
+
+<main id="main-content">
+  <section class="hero">
+    <div class="hero-content">
+      
+      <h1 id="hero-title" class="glitch-text" data-value="WELCOME">
+        WELCOME
+      </h1>
+
+      <p class="lead gs-reveal">
+        I’m <strong style="color:#fff;">Nithan Najeeb</strong>. 
+        I build and experiment with intelligent systems, web infrastructure, and emerging technologies. 
+        I’m currently pursuing a B.Com degree in India, where I combine my academic foundation in commerce with a deep interest in technology and digital architecture.
+        
+      <p class="gs-reveal">
+        This platform showcases projects focused on turning ideas into practical implementations — 
+        from AI-powered tools to structured knowledge systems.
+      </p>
+
+      <p class="gs-reveal">
+        The goal is simple: build useful things, document progress, and evolve with technology.
+      </p>
+
+      <p class="gs-reveal">
+        <strong style="color:#fff;">Mind Atlas</strong> knowledge systems, 
+        <strong style="color:#fff;">Forenexa</strong> storefronts, 
+        and local AI integration.
+      </p>
+
+      <div style="margin-top:40px" class="gs-reveal">
+        <a href="#projects" style="text-decoration:none;">
+          <button class="btn magnetic interactive-el">
+            Access Modules
+          </button>
+        </a>
+      </div>
+      </div>
+
+      <aside class="panel floaty gs-reveal" aria-hidden="true" style="width: 100%; max-width: 420px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,0,76,0.2); padding-bottom:12px; margin-bottom:20px;">
+            <div style="font-family:var(--mono); color:var(--accent); font-size:0.9rem;">USER_PROFILE</div>
+            <div style="width:10px; height:10px; border-radius:50%; background:#0f0; box-shadow:0 0 10px #0f0; animation: pulse 1.5s infinite;"></div>
+        </div>
+        <div class="about-grid">
+          <div class="card p-card interactive-el">ID:<br><strong style="color:var(--accent)">RUBIN STELLAR</strong></div>
+          <div class="card p-card interactive-el">CLS:<br><strong>Student (B.Com)</strong></div>
+          <div class="card p-card interactive-el">CLG:<br><strong>MES College</strong></div>
+          <div class="card p-card interactive-el">LOC:<br><strong>India</strong></div>
+          <div class="card p-card interactive-el">DOB:<br><strong>2004</strong></div>
+          <div class="card p-card interactive-el">PROJ:<br><strong>MIND ATLAS</strong></div>
+        </div>
+      </aside>
+    </section>
+
+    <section id="about">
+      <h2 class="glitch-text" data-value="01 // ARCHIVE_DATA" style="font-family:var(--mono); color:var(--accent); margin-bottom:40px">01 // ARCHIVE_DATA</h2>
+      <div class="two-col">
+        <div class="card scroll-card interactive-el">
+          <h3 style="font-family:var(--mono); border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:14px;">Biography</h3>
+          <p style="color:var(--muted); margin-top:20px; line-height: 1.8;">I blend code, content, and craft. Beyond the business degree, my real playground is the web. I build tools to remember, reflect, and create.</p>
+        </div>
+        <div class="card scroll-card interactive-el">
+          <h3 style="font-family:var(--mono); border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:14px;">Tech Specs</h3>
+          <ul style="color:var(--muted); line-height:1.8; margin-top:20px; padding-left:20px;">
+            <li><strong style="color:var(--accent)">Core:</strong> HTML5, CSS3, Vanilla JS</li>
+            <li><strong style="color:var(--accent)">Motion:</strong> GSAP, Lottie, Canvas API</li>
+            <li><strong style="color:var(--accent)">R&D:</strong> Ollama (Local LLMs)</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="projects">
+      <h2 class="glitch-text" data-value="02 // ACTIVE_MODULES" style="font-family:var(--mono); color:var(--accent); margin-bottom:40px">02 // ACTIVE_MODULES</h2>
+      <div class="two-col">
+        <div class="card scroll-card interactive-el">
+          <h3 style="font-family:var(--mono);">Mind Atlas</h3>
+          <p style="color:var(--muted); font-size:0.95rem; margin-top:12px; line-height: 1.6;">Personalized knowledge node. Tracking science, philosophy, and code logic to forge a permanent secondary brain.</p>
+        </div>
+        <div class="card scroll-card interactive-el">
+          <h3 style="font-family:var(--mono);">Forenexa</h3>
+          <p style="color:var(--muted); font-size:0.95rem; margin-top:12px; line-height: 1.6;">Digital storefront architecture optimized for physical, small-batch handcrafted hardware (goods).</p>
+        </div>
+        <div class="card scroll-card interactive-el">
+          <h3 style="font-family:var(--mono);">Born Legend</h3>
+          <p style="color:var(--muted); font-size:0.95rem; margin-top:12px; line-height: 1.6;">Creative text databanks. A fantasy narrative protocol exploring unity, sacrifice, and redemption arcs.</p>
+        </div>
+        <div class="card scroll-card interactive-el">
+          <h3 style="font-family:var(--mono);">Ollama Uplink</h3>
+          <p style="color:var(--muted); font-size:0.95rem; margin-top:12px; line-height: 1.6;">WIP protocol to tether a localized, private AI instance to this exact frontend for seamless cross-device querying.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact">
+      <h2 class="glitch-text" data-value="03 // COMMS_LINK" style="font-family:var(--mono); color:var(--accent); margin-bottom:40px">03 // COMMS_LINK</h2>
+      <div class="two-col">
+        <div class="card scroll-card interactive-el" style="display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding: 40px;">
+          <h3 style="font-family:var(--mono);">Transmit Signal</h3>
+          <p style="margin:24px 0;"><a href="mailto:mail@nithan.in" style="color:var(--accent); text-decoration:none; font-size:1.4rem; font-weight:bold; font-family:var(--mono); letter-spacing: 1px;">contact</a></p>
+        </div>
+      </div>
+    </section>
+  </main>
 
   <footer>
     <p>NODE HOSTED AT <span style="color:var(--accent)">NITHAN.IN</span> // SYSTEM YEAR <span id="year"></span></p>
