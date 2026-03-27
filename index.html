@@ -10,8 +10,26 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 
-  <!-- Layout fix: precise alignment for mobile + desktop (only footer/social area changed) -->
   <style>
+    /* NAVBAR OVERLAP PREVENTION (Added to handle the extra 'Game' button) */
+    header nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    @media (max-width: 639px) {
+      header nav {
+        gap: 8px;
+        justify-content: center;
+      }
+      header nav a {
+        font-size: 0.85rem; /* Scales down slightly so 5 buttons fit perfectly */
+      }
+    }
+
     /* FOOTER CONTAINER */
     footer {
       width: 100%;
@@ -52,7 +70,7 @@
       flex-wrap: wrap;
       z-index: 9999;
       position: relative;
-      justify-content: center; /* center for mobile */
+      justify-content: center;
     }
 
     /* Logo on left */
@@ -88,9 +106,9 @@
       color: var(--accent, #ff004c) !important;
       font-family: Inter, sans-serif;
       font-size: 0.95rem;
-      white-space: nowrap;         /* Prevent icon and name from breaking */
-      line-height: 1;              /* Keep vertical centering exact */
-      padding: 6px 0;              /* breathing room vertically */
+      white-space: nowrap;
+      line-height: 1;
+      padding: 6px 0;
       align-self: center;
     }
 
@@ -103,10 +121,8 @@
       vertical-align: middle;
     }
 
-    /* Prevent weird baseline shifts in some browsers */
     .social-item i, .social-item svg { vertical-align: middle; }
 
-    /* Desktop: footer becomes row with left/right spacing */
     @media (min-width: 900px) {
       footer {
         flex-direction: row;
@@ -119,7 +135,6 @@
       .social-links { justify-content: flex-end; }
     }
 
-    /* Tablet: similar to desktop but scaled */
     @media (min-width: 640px) and (max-width: 899px) {
       footer {
         flex-direction: row;
@@ -132,7 +147,6 @@
       .social-links { gap: 14px; }
     }
 
-    /* Mobile - tighten spacing and make sure things wrap nicely */
     @media (max-width: 639px) {
       .social-box { padding: 10px 12px; gap: 10px; }
       .social-box .mini-logo { width: 40px; height: 40px; margin-right:8px; }
@@ -184,6 +198,7 @@
       <a href="#about" class="magnetic interactive-el">Data</a>
       <a href="#projects" class="magnetic interactive-el">Modules</a>
       <a href="blog.html" class="magnetic interactive-el">Logs</a>
+      <a href="reaction-time-test.html" class="magnetic interactive-el">Game</a>
       <a href="#contact" class="magnetic interactive-el">Comm</a>
     </nav>
   </header>
@@ -295,13 +310,11 @@
   <footer>
     <p>NODE HOSTED AT <span style="color:var(--accent)">NITHAN.IN</span> // SYSTEM YEAR <span id="year"></span></p>
 
-    <!-- social box (keeps existing aesthetic) -->
     <div class="social-box" aria-hidden="false">
       <img src="/icon.PNG" alt="Nithan logo" class="mini-logo">
 
       <div class="social-links" role="navigation" aria-label="social links">
         <a class="social-item" href="https://instagram.com/nithannajeeb_" target="_blank" rel="noopener noreferrer">
-          <!-- Instagram -->
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7zm5 3.5a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9zm0 2a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM17.5 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
           </svg>
@@ -309,7 +322,6 @@
         </a>
 
         <a class="social-item" href="https://www.threads.net/@nithannajeeb_" target="_blank" rel="noopener noreferrer">
-          <!-- Threads (approx icon) -->
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path d="M12 2C7.6 2 4 5.6 4 10s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 2c3.9 0 7 3.1 7 7s-3.1 7-7 7c-2.6 0-4.9-1.4-6.1-3.6 1.1 0.7 2.4 1.1 3.7 1.1 3.9 0 7-3.1 7-7 0-1.3-0.4-2.6-1.1-3.7C16.6 4.6 14.3 4 12 4z"/>
           </svg>
@@ -317,7 +329,6 @@
         </a>
 
         <a class="social-item" href="https://www.facebook.com/nithan.najeeb" target="_blank" rel="noopener noreferrer">
-          <!-- Facebook -->
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path d="M22 12a10 10 0 1 0-11.5 9.9v-7h-2.2v-2.9h2.2V9.3c0-2.2 1.3-3.4 3.2-3.4.9 0 1.9.1 1.9.1v2.1h-1.1c-1.1 0-1.4.7-1.4 1.4v1.7h2.4l-.4 2.9h-2v7A10 10 0 0 0 22 12z"/>
           </svg>
@@ -325,7 +336,6 @@
         </a>
 
         <a class="social-item" href="https://www.linkedin.com/in/nithan-najeeb-015197318?utm_source=share_via&utm_content=profile&utm_medium=member_ios" target="_blank" rel="noopener noreferrer">
-          <!-- LinkedIn -->
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path d="M4.98 3.5a2.5 2.5 0 1 1-.001 5.001A2.5 2.5 0 0 1 4.98 3.5zM3 9h4v12H3zM9 9h3.6v1.7h.1c.5-.9 1.8-1.7 3.7-1.7 4 0 4.7 2.6 4.7 6v7h-4v-6.2c0-1.5 0-3.4-2.1-3.4-2.1 0-2.4 1.6-2.4 3.3V21H9z"/>
           </svg>
@@ -337,7 +347,6 @@
   </footer>
 
   <script>
-    // Keep existing behavior: set year text
     document.getElementById('year')?.appendChild(document.createTextNode(new Date().getFullYear()));
   </script>
 
