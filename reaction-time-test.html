@@ -50,12 +50,15 @@
     color: var(--crimson);
     font-family: var(--font);
     display: flex;
-    flex-direction: column; /* Changed to column to stack the header and game */
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
+    /* MOBILE FIX: Dynamic viewport height and safe scrolling */
+    min-height: 100dvh; 
     margin: 0;
-    overflow: hidden;
+    padding: 20px 0;
+    overflow-x: hidden;
+    overflow-y: auto; 
     touch-action: manipulation;
   }
 
@@ -63,7 +66,7 @@
   body::after {
     content: " ";
     display: block;
-    position: absolute;
+    position: fixed; /* Fixed so it stays over the screen even if scrolling */
     top: 0; left: 0; bottom: 0; right: 0;
     background: radial-gradient(circle, rgba(0,0,0,0) 60%, rgba(0,0,0,0.8) 100%);
     pointer-events: none;
@@ -72,7 +75,7 @@
 
   /* Moving CRT Scanlines */
   .scanlines {
-    position: absolute;
+    position: fixed; /* Fixed to cover whole viewport */
     inset: 0;
     background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.4) 51%);
     background-size: 100% 4px;
@@ -93,11 +96,12 @@
     max-width: 500px;
     width: 90%;
     margin-bottom: 20px;
+    margin-top: auto; /* Pushes content to center naturally */
   }
 
   .seo-header h1 {
     color: var(--cyan);
-    font-size: 1.2rem;
+    font-size: clamp(1rem, 4vw, 1.2rem);
     text-transform: uppercase;
     letter-spacing: 2px;
     margin: 0 0 8px 0;
@@ -106,7 +110,7 @@
 
   .seo-header p {
     color: rgba(255, 255, 255, 0.6);
-    font-size: 0.85rem;
+    font-size: clamp(0.75rem, 3vw, 0.85rem);
     line-height: 1.5;
     margin: 0;
     letter-spacing: 0.5px;
@@ -121,11 +125,13 @@
     padding: 2px;
     background: linear-gradient(45deg, var(--crimson), transparent 20%, transparent 80%, var(--crimson));
     clip-path: polygon(0 20px, 20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%);
+    margin-bottom: auto; /* Pushes content to center naturally */
   }
 
   .hud-inner {
     background: rgba(10, 0, 2, 0.95);
-    padding: 30px;
+    /* MOBILE FIX: Fluid padding so it doesn't crush narrow screens */
+    padding: clamp(20px, 6vw, 30px);
     clip-path: polygon(0 18px, 18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%);
     position: relative;
   }
@@ -133,7 +139,7 @@
   .sys-header {
     display: flex;
     justify-content: space-between;
-    font-size: 14px;
+    font-size: clamp(11px, 3vw, 14px);
     letter-spacing: 1px;
     margin-bottom: 2rem;
     border-bottom: 1px solid var(--crimson-dim);
@@ -165,12 +171,12 @@
   }
 
   .main-time {
-    font-size: 3.5rem;
+    /* MOBILE FIX: Fluid typography prevents overflow */
+    font-size: clamp(2.5rem, 12vw, 3.5rem);
     color: #fff;
     text-shadow: 0 0 15px var(--crimson), 0 0 30px var(--crimson);
   }
 
-  /* Visual Noise for the Blind Phase */
   .noise-stream {
     font-size: 14px;
     color: var(--crimson);
@@ -184,14 +190,13 @@
     display: none;
   }
 
-  /* Interactive Button */
   .action-btn {
     width: 100%;
     background: transparent;
     color: var(--crimson);
     border: 1px solid var(--crimson);
-    padding: 18px;
-    font-size: 1.8rem;
+    padding: clamp(14px, 4vw, 18px);
+    font-size: clamp(1.4rem, 5vw, 1.8rem);
     font-family: var(--font);
     cursor: pointer;
     text-transform: uppercase;
@@ -203,14 +208,8 @@
     -webkit-tap-highlight-color: transparent;
   }
 
-  .action-btn:hover {
-    background: rgba(255, 0, 60, 0.1);
-  }
-
-  .action-btn:active {
-    background: var(--crimson);
-    color: var(--bg-base);
-  }
+  .action-btn:hover { background: rgba(255, 0, 60, 0.1); }
+  .action-btn:active { background: var(--crimson); color: var(--bg-base); }
 
   .action-btn.active-state {
     border-color: var(--cyan);
@@ -219,10 +218,7 @@
     animation: btnGlitch 0.2s infinite;
   }
 
-  .action-btn.active-state:active {
-    background: var(--cyan);
-    color: var(--bg-base);
-  }
+  .action-btn.active-state:active { background: var(--cyan); color: var(--bg-base); }
 
   @keyframes btnGlitch {
     0% { transform: translate(0) }
@@ -233,40 +229,32 @@
     100% { transform: translate(0) }
   }
 
-  /* Stats Grid */
   .diagnostics {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 20px;
+    gap: 15px;
     margin-top: 2rem;
     font-size: 13px;
     letter-spacing: 1px;
   }
 
   @media (min-width: 600px) {
-    .diagnostics { grid-template-columns: 1fr 1fr; }
+    .diagnostics { grid-template-columns: 1fr 1fr; gap: 20px; }
   }
 
-  .data-block {
-    border-top: 1px solid var(--crimson-dim);
-    padding-top: 10px;
-  }
-
+  .data-block { border-top: 1px solid var(--crimson-dim); padding-top: 10px; }
   .data-label { color: rgba(255,255,255,0.5); font-size: 11px; margin-bottom: 5px; }
   .data-value { font-size: 1.2rem; }
   .cyan-text { color: var(--cyan); text-shadow: 0 0 8px rgba(0,229,255,0.6); }
 
-  .memory-list {
-    list-style: none; padding: 0; margin: 0;
-  }
+  .memory-list { list-style: none; padding: 0; margin: 0; }
   .memory-list li {
     display: flex; justify-content: space-between;
     border-bottom: 1px dotted var(--crimson-dim);
     padding: 6px 0;
     opacity: 0.8;
   }
-  .memory-list li:first-child { color: var(--alert); opacity: 1; }
-
+  .memory-list li:first-child { color: var(--alert); opacity: 1; text-shadow: 0 0 5px var(--alert); }
 </style>
 </head>
 <body>
@@ -303,8 +291,7 @@
       
       <div class="data-block">
         <div class="data-label">Recent History</div>
-        <ul class="memory-list" id="memory-cache">
-          </ul>
+        <ul class="memory-list" id="memory-cache"></ul>
       </div>
     </div>
 
@@ -331,7 +318,6 @@
 
   // F1 & Humorous Dialogue Matrix
   const evaluateProfile = (error) => {
-    // Elite Ranks (F1 Drivers) - Under 1 second margin
     if (error <= 0.015) return "F1 Robot - Are you a machine?";
     if (error <= 0.040) return "Valtteri Bottas - Jumped the lights!";
     if (error <= 0.080) return "Max Verstappen - Absolutely clinical.";
@@ -342,8 +328,6 @@
     if (error <= 0.500) return "Yuki Tsunoda - Yelling on the team radio.";
     if (error <= 0.750) return "Lance Stroll - Did you check your mirrors?";
     if (error < 1.000) return "Safety Car Driver - Taking in the scenery.";
-
-    // Humorous Ranks - Off by 1 to 20+ seconds
     if (error < 2.000) return "Pit Lane Penalty - 5 Seconds to Ocon.";
     if (error < 3.000) return "Ferrari Pit Wall - 'We are checking...'";
     if (error < 4.000) return "Bono, my tires are gone!";
@@ -363,41 +347,33 @@
     if (error < 18.000) return "Are we still racing? Fans went home.";
     if (error < 19.000) return "You missed the entire Grand Prix.";
     if (error < 20.000) return "Engine failure on the formation lap.";
-    
-    // Anything worse than 20 seconds off
     return "Sir, this is a Wendy's. The race finished yesterday.";
   };
 
-  // Generates random hex codes to distract the user
   const generateNoise = () => {
     let hex = "";
-    for(let i = 0; i < 200; i++) {
-      hex += Math.floor(Math.random() * 16).toString(16).toUpperCase();
-    }
+    for(let i = 0; i < 200; i++) hex += Math.floor(Math.random() * 16).toString(16).toUpperCase();
     noiseEl.textContent = hex;
   };
 
-  // UI Updates for LocalStorage
   const renderCache = () => {
     const memory = JSON.parse(localStorage.getItem('sys_chrono_memory') || '[]');
     if(!memory.length) { cacheEl.innerHTML = "<li><span>No Data Yet</span></li>"; return; }
     
     cacheEl.innerHTML = memory.map((entry, index) => {
-      const isNew = index === 0 ? "style='color: var(--alert); text-shadow: 0 0 5px var(--alert);'" : "";
+      const isNew = index === 0 ? "style='color: var(--alert);'" : "";
       return `<li ${isNew}><span>${entry.time}s</span><span>±${entry.errMs}ms</span></li>`;
     }).join('');
   };
 
-  // Save to LocalStorage
   const logToMemory = (time, errMs) => {
     const memory = JSON.parse(localStorage.getItem('sys_chrono_memory') || '[]');
     memory.unshift({ time, errMs });
-    if (memory.length > 5) memory.pop(); // Keep only the last 5
+    if (memory.length > 5) memory.pop();
     localStorage.setItem('sys_chrono_memory', JSON.stringify(memory));
     renderCache();
   };
 
-  // Start the blind timer
   const initiateSequence = () => {
     isRunning = true;
     startTime = Date.now();
@@ -419,7 +395,6 @@
     profEl.textContent = "Analyzing...";
   };
 
-  // Stop the timer and calculate precise milliseconds
   const terminateSequence = () => {
     isRunning = false;
     const endTime = Date.now();
@@ -435,10 +410,10 @@
     dotEl.style.boxShadow = "0 0 10px var(--crimson)";
 
     const elapsed = (endTime - startTime) / 1000;
-    const deviation = Math.abs(elapsed - targetTime); // Logic kept in seconds for accurate math
+    const deviation = Math.abs(elapsed - targetTime); 
     
     const timeStr = elapsed.toFixed(3);
-    const devMs = Math.round(deviation * 1000); // Display converted to whole milliseconds
+    const devMs = Math.round(deviation * 1000); 
 
     noiseEl.style.display = "none";
     displayEl.style.display = "block";
@@ -450,10 +425,7 @@
     logToMemory(timeStr, devMs);
   };
 
-  // Event Listener
   btnEl.addEventListener('click', () => isRunning ? terminateSequence() : initiateSequence());
-
-  // Initialize on load
   renderCache();
 </script>
 </body>
