@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <title>SYS_DEFEND // Hardcore Minimalist Arcade Game</title>
+    <meta name="description" content="Test your reflexes in SYS_DEFEND, a hardcore minimalist physics game. Draw vectors to juggle the core, deflect corruption, and survive the digital void. Play instantly in your browser.">
+    <meta name="keywords" content="HTML5 game, browser arcade game, physics game, draw to survive, line drawing game, cyberpunk minimalist game, fast-paced web game, nithan.in">
+    <meta name="author" content="Nithan.in">
+    <meta name="robots" content="index, follow">
+    
+    <meta property="og:title" content="SYS_DEFEND // Survive The Void">
+    <meta property="og:description" content="A brutalist arcade survival game. Draw lines, manage heat, and trigger EMPs to protect the core.">
+    <meta property="og:type" content="website">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+
+        :root {
+            --bg: #000000;
+            --surface: #0a0a0a;
+            --text: #ffffff;
+            --dim: #444444;
+            --dim-text: #888888;
+            --danger: #ff003c;
+            --good: #00ff66;
+            --shield: #ffcc00;
+            --emp: #00ccff;
+            --font: 'Space Mono', 'Courier New', monospace;
+        }
+
+        html, body {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background: var(--bg); color: var(--text);
+            font-family: var(--font);
+            overflow: hidden; user-select: none; -webkit-user-select: none; touch-action: none;
+        }
+
+        canvas { display: block; touch-action: none; position: absolute; top: 0; left: 0; z-index: 5; }
+
+        .ui-screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            background: rgba(0, 0, 0, 0.85); z-index: 20; backdrop-filter: blur(2px);
+        }
+
+        #event-warning {
+            background: transparent; pointer-events: none; z-index: 15; backdrop-filter: none;
+        }
+
+        .hidden { display: none !important; }
+
+        .panel {
+            border: 1px solid var(--dim); background: var(--surface); padding: 30px;
+            width: 90%; max-width: 500px; text-align: left; position: relative;
+        }
+
+        .panel::before { content: ''; position: absolute; top: 0; left: 0; width: 10px; height: 10px; border-top: 2px solid var(--text); border-left: 2px solid var(--text); }
+        .panel::after { content: ''; position: absolute; bottom: 0; right: 0; width: 10px; height: 10px; border-bottom: 2px solid var(--text); border-right: 2px solid var(--text); }
+
+        h1 { font-size: 2rem; font-weight: 700; letter-spacing: 4px; margin: 0 0 10px 0; color: var(--text); text-transform: uppercase; border-bottom: 1px solid var(--dim); padding-bottom: 15px; }
+        .subtitle { color: var(--dim-text); font-size: 0.85rem; line-height: 1.6; letter-spacing: 1px; margin: 15px 0 20px 0; text-transform: uppercase; }
+
+        .legend { margin-bottom: 25px; font-size: 0.8rem; line-height: 1.8; color: var(--text); }
+        .hl-r { color: var(--danger); font-weight: bold; }
+        .hl-g { color: var(--good); font-weight: bold; }
+        .hl-y { color: var(--shield); font-weight: bold; }
+        .hl-b { color: var(--emp); font-weight: bold; }
+
+        button {
+            background: transparent; color: var(--text); border: 1px solid var(--dim);
+            padding: 15px 0; width: 100%; font-size: 1rem; font-family: var(--font); font-weight: 700;
+            letter-spacing: 4px; text-transform: uppercase; cursor: pointer; transition: all 0.2s ease;
+        }
+        button:hover, button:active { background: var(--text); color: var(--bg); border-color: var(--text); }
+
+        /* SEO Friendly Flavor Text */
+        .seo-description {
+            margin-top: 25px; font-size: 0.65rem; color: #333333; line-height: 1.4; text-align: justify; text-transform: none; border-top: 1px solid #222; padding-top: 15px;
+        }
+
+        #hud { position: absolute; top: 20px; left: 20px; z-index: 10; pointer-events: none; display: flex; flex-direction: column; gap: 8px; }
+        .hud-row { display: flex; align-items: center; gap: 15px; }
+        .hud-label { font-size: 12px; color: var(--dim-text); letter-spacing: 2px; width: 65px; }
+        .hud-val { font-size: 14px; color: var(--text); font-weight: 700; letter-spacing: 1px; }
+        
+        .bar-container { display: flex; gap: 2px; }
+        .bar-segment { width: 8px; height: 12px; background: var(--dim); }
+        .bar-segment.active { background: var(--text); }
+        .bar-segment.warn { background: var(--danger); }
+        .bar-segment.safe { background: var(--good); }
+
+        .glitch-text { animation: blink 0.1s steps(2, start) infinite; color: var(--danger); text-shadow: 2px 0 var(--text), -2px 0 var(--emp); }
+        .multiplier-text { color: var(--emp); text-shadow: 0 0 8px rgba(0, 204, 255, 0.5); }
+        @keyframes blink { to { visibility: hidden; } }
+        
+        #high-score-display { position: absolute; top: -35px; right: 0; font-size: 0.8rem; color: var(--emp); font-weight: bold; letter-spacing: 2px; }
+
+        #crosshair {
+            position: absolute; top: 50%; left: 50%; width: 2px; height: 2px; background: var(--dim);
+            transform: translate(-50%, -50%); pointer-events: none; z-index: 1;
+        }
+        #crosshair::before, #crosshair::after { content: ''; position: absolute; background: var(--dim); }
+        #crosshair::before { top: -20px; left: 0; width: 1px; height: 40px; }
+        #crosshair::after { left: -20px; top: 0; width: 40px; height: 1px; }
+    </style>
+</head>
+<body>
+
+    <div id="crosshair"></div>
+
+    <div id="hud" class="hidden">
+        <div class="hud-row">
+            <span class="hud-label">CYCLES</span>
+            <span class="hud-val" id="score">0000</span>
+            <span class="hud-val hidden" id="multiplier">x1</span>
+        </div>
+        <div class="hud-row">
+            <span class="hud-label">INK</span>
+            <div class="bar-container" id="ink-bar"></div>
+        </div>
+        <div class="hud-row">
+            <span class="hud-label">HEAT</span>
+            <div class="bar-container" id="heat-bar"></div>
+        </div>
+        <div class="hud-row hidden" id="shield-display">
+            <span class="hud-label hl-y">OVRD</span>
+            <span class="hud-val hl-y">[ SHIELD ACTIVE ]</span>
+        </div>
+    </div>
+
+    <div id="event-warning" class="ui-screen hidden">
+        <h1 class="glitch-text" style="font-size: 2.5rem; text-align: center; border: none;">CORRUPTION SPIKE</h1>
+        <div class="subtitle" style="color: var(--text);">BRACE FOR IMPACT</div>
+    </div>
+
+    <div id="start-screen" class="ui-screen">
+        <div class="panel">
+            <div id="high-score-display">BEST: <span id="local-high">00000</span></div>
+            <h1>SYS_DEFEND</h1>
+            <div class="subtitle">MAINTAIN ALTITUDE. SURVIVE THE SPIKES.<br>HIGH ALTITUDE = MULTIPLIED SCORE.</div>
+            <div class="legend">
+                [ <span class="hl-r">■</span> ] CORRUPTION : DESTROYS LINES<br>
+                [ <span class="hl-g">▲</span> ] DATA PACKET : RESTORES INK<br>
+                [ <span class="hl-y">◆</span> ] OVERRIDE    : INVULNERABILITY<br><br>
+                [ <span class="hl-b">DOUBLE-TAP</span> ] : FIRE EMP BOMB (-50 INK)
+            </div>
+            <button onclick="startGame()">INITIALIZE</button>
+            
+            <div class="seo-description">
+                SYS_DEFEND is a free HTML5 browser game that tests your reflexes. Draw vector lines to juggle the physics core while dodging falling hazards and laser streams. Manage your ink and heat capacity, utilize haptic feedback, and unleash EMP shockwaves to survive the digital void.
+            </div>
+        </div>
+    </div>
+
+    <div id="game-over-screen" class="ui-screen hidden">
+        <div class="panel">
+            <h1 class="hl-r">SIGNAL LOST</h1>
+            <div class="subtitle">THE CORE HAS FALLEN OFF-GRID.</div>
+            <div class="legend">
+                FINAL SCORE: <span id="final-score" class="hud-val">0000</span><br>
+                <span id="new-record" class="hl-y hidden">NEW LOCAL RECORD ESTABLISHED!</span>
+            </div>
+            <button onclick="startGame()">REBOOT_SYS</button>
+        </div>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d', { alpha: false });
+
+        const hud = document.getElementById('hud'), startScreen = document.getElementById('start-screen'), gameOverScreen = document.getElementById('game-over-screen'), eventWarning = document.getElementById('event-warning');
+        const scoreEl = document.getElementById('score'), multiplierEl = document.getElementById('multiplier'), finalScoreEl = document.getElementById('final-score'), localHighEl = document.getElementById('local-high'), newRecordEl = document.getElementById('new-record');
+        const inkBar = document.getElementById('ink-bar'), heatBar = document.getElementById('heat-bar'), shieldDisplay = document.getElementById('shield-display');
+
+        // PERSISTENCE: Load High Score
+        let highScore = parseInt(localStorage.getItem('sys_defend_high')) || 0;
+        localHighEl.innerText = highScore.toString().padStart(5, '0');
+
+        let physicsScale = 1;
+        function resize() { 
+            canvas.width = window.innerWidth; 
+            canvas.height = window.innerHeight; 
+            physicsScale = Math.min(1, canvas.height / 900);
+            if (player) player.gravity = 0.25 * physicsScale;
+        }
+        window.addEventListener('resize', resize);
+
+        // Game State
+        let state = 'menu', tick = 0, score = 0, difficulty = 1.0, animationId = null;
+        let shakeX = 0, shakeY = 0, freezeFrames = 0;
+        let displayScore = 0;
+        
+        // Wave State
+        let waveMode = 'none'; 
+        let waveTimer = 0;
+
+        // Player
+        let player = { x: 0, y: 0, vx: 0, vy: 0, radius: 7, gravity: 0.25, bounce: 0.85, friction: 0.98, shieldFrames: 0, trail: [], maxVelocity: 15 };
+
+        let lines = [], currentLine = [], isDrawing = false, ink = 100, drawHeat = 0;
+        let entities = [], particles = [], voidNodes = [], shockwaves = [];
+
+        const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+        const rand = (min, max) => Math.random() * (max - min) + min;
+        const getPos = e => e.touches ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : { x: e.clientX, y: e.clientY };
+
+        function haptic(pattern) { if (navigator.vibrate && state === 'playing') try { navigator.vibrate(pattern); } catch(e) {} }
+
+        for (let i = 0; i < 50; i++) voidNodes.push({ x: rand(0, window.innerWidth), y: rand(0, window.innerHeight), z: rand(0.1, 0.5) });
+
+        function triggerShake(intensity) { shakeX = rand(-intensity, intensity); shakeY = rand(-intensity, intensity); }
+        function triggerHitStop(frames) { freezeFrames = Math.max(freezeFrames, frames); }
+        function spawnParticles(x, y, count, color, type = 'square') {
+            if (particles.length > 150) return; 
+            for (let i = 0; i < count; i++) particles.push({ x, y, vx: rand(-8, 8), vy: rand(-8, 8), life: 1.0, decay: rand(0.02, 0.06), color, size: rand(1, 4), type, angle: rand(0, Math.PI*2), rotSpeed: rand(-0.2, 0.2) });
+        }
+
+        function updateBars() {
+            const ib = Math.floor(ink / 10), hb = Math.floor(drawHeat / 10);
+            inkBar.innerHTML = Array.from({length: 10}, (_, i) => `<div class="bar-segment ${i < ib ? 'safe' : ''}"></div>`).join('');
+            heatBar.innerHTML = Array.from({length: 10}, (_, i) => `<div class="bar-segment ${i < hb ? (hb > 7 ? 'warn glitch-text' : 'active') : ''}"></div>`).join('');
+            shieldDisplay.classList.toggle('hidden', player.shieldFrames <= 0);
+        }
+
+        let lastTap = 0;
+        function handleInputStart(e) {
+            if (state !== 'playing') return;
+            const now = Date.now();
+            if (now - lastTap < 300 && ink >= 50) {
+                ink -= 50; haptic([40, 50, 40]); triggerShake(15); triggerHitStop(5);
+                shockwaves.push({ x: player.x, y: player.y, radius: player.radius, life: 1.0 });
+                entities.forEach(ent => {
+                    if (ent.team === 'danger' && Math.hypot(ent.x - player.x, ent.y - player.y) < 250) {
+                        ent.dead = true; spawnParticles(ent.x + (ent.w||0)/2, ent.y + (ent.h||0)/2, 20, '#ff003c', 'line');
+                    }
+                });
+                entities = entities.filter(ent => !ent.dead);
+                lastTap = 0; return; 
+            }
+            lastTap = now; isDrawing = true; currentLine = [{ ...getPos(e) }];
+            if (e.cancelable) e.preventDefault();
+        }
+
+        function moveDraw(e) {
+            if (state !== 'playing' || !isDrawing || ink <= 0) return;
+            if (e.cancelable) e.preventDefault();
+            const p = getPos(e), lastP = currentLine[currentLine.length - 1];
+            if (Math.hypot(p.x - lastP.x, p.y - lastP.y) > 10) { currentLine.push(p); ink -= (1.0 + Math.min(drawHeat * 0.02, 1.8)); drawHeat = clamp(drawHeat + 3, 0, 100); }
+            if (ink <= 0) finishDraw();
+        }
+        function finishDraw() { if (isDrawing && currentLine.length > 1) { lines.push({ points: currentLine.slice(), life: 1.0 }); haptic(5); } isDrawing = false; currentLine = []; }
+
+        canvas.addEventListener('mousedown', handleInputStart); window.addEventListener('mousemove', moveDraw, { passive: false });
+        window.addEventListener('mouseup', finishDraw); canvas.addEventListener('mouseleave', finishDraw);
+        canvas.addEventListener('touchstart', handleInputStart, { passive: false }); canvas.addEventListener('touchmove', moveDraw, { passive: false });
+        canvas.addEventListener('touchend', finishDraw); canvas.addEventListener('touchcancel', finishDraw);
+
+        function spawnHazard(isWave = false) {
+            const r = Math.random();
+            if (r < (isWave ? 0.2 : 0.45)) { entities.push({ type: 'block', team: 'danger', x: rand(40, canvas.width - 80), y: -60, w: rand(40, 80), h: rand(20, 40), vy: rand(2, 6) * difficulty * physicsScale }); } 
+            else if (r < (isWave ? 0.6 : 0.75)) { entities.push({ type: 'seeker', team: 'danger', x: rand(30, canvas.width - 30), y: -30, vx: 0, vy: 2, speed: rand(4, 6.5) * difficulty * physicsScale, radius: 10, rotation: 0 }); } 
+            else { entities.push({ type: 'laser', team: 'danger', x: player.x + rand(-60, 60), y: 0, width: rand(10, 25), state: 'warn', timer: Math.max(10, (isWave ? 20 : 40) - difficulty * 3) }); }
+        }
+        function spawnPickup() {
+            if (Math.random() < 0.15) entities.push({ type: 'overcharge', team: 'good', x: rand(30, canvas.width - 30), y: -20, vy: rand(1.5, 3) * physicsScale, radius: 10 });
+            else entities.push({ type: 'ink', team: 'good', x: rand(30, canvas.width - 30), y: -20, vy: rand(1.5, 3) * physicsScale, radius: 10, amount: rand(30, 50) });
+        }
+
+        const pointInRect = (px, py, rx, ry, rw, rh) => px >= rx && px <= rx + rw && py >= ry && py <= ry + rh;
+
+        function testLineCollisions(sourceLines) {
+            let hit = false; const hitRadius = player.radius + 3;
+            for (let i = 0; i < sourceLines.length; i++) {
+                const pts = sourceLines[i].points;
+                for (let j = 0; j < pts.length - 1; j++) {
+                    const dx = pts[j+1].x - pts[j].x, dy = pts[j+1].y - pts[j].y, l2 = dx * dx + dy * dy;
+                    if (l2 === 0) continue;
+                    let t = clamp(((player.x - pts[j].x) * dx + (player.y - pts[j].y) * dy) / l2, 0, 1);
+                    const distX = player.x - (pts[j].x + t * dx), distY = player.y - (pts[j].y + t * dy), distSq = distX * distX + distY * distY;
+
+                    if (distSq <= hitRadius * hitRadius) {
+                        const dist = Math.sqrt(distSq) || 0.001, nx = distX / dist, ny = distY / dist, pen = hitRadius - dist;
+                        player.x += nx * pen; player.y += ny * pen; 
+                        const dot = player.vx * nx + player.vy * ny;
+                        if (dot < 0) {
+                            player.vx = (player.vx - (1 + player.bounce) * dot * nx) * player.friction; player.vy = (player.vy - (1 + player.bounce) * dot * ny) * player.friction;
+                            if (ny < -0.2) { player.vy -= 1.8 * physicsScale; spawnParticles(player.x, player.y + player.radius, 4, '#ffffff', 'line'); haptic(10); }
+                        } hit = true;
+                    }
+                }
+            } return hit;
+        }
+
+        function updateEntities() {
+            for (let i = entities.length - 1; i >= 0; i--) {
+                const e = entities[i]; let remove = false;
+
+                if (e.type === 'block') {
+                    e.y += e.vy; if (e.y > canvas.height) remove = true;
+                    for (let l = lines.length - 1; l >= 0; l--) { if (lines[l].points.some(p => pointInRect(p.x, p.y, e.x, e.y, e.w, e.h))) { spawnParticles(e.x + e.w/2, e.y + e.h, 10, '#ffffff', 'line'); lines.splice(l, 1); } }
+                    let cx = clamp(player.x, e.x, e.x + e.w), cy = clamp(player.y, e.y, e.y + e.h), dx = player.x - cx, dy = player.y - cy;
+                    if (dx*dx + dy*dy < player.radius**2) {
+                        if (player.shieldFrames > 0) { remove = true; triggerShake(6); spawnParticles(e.x + e.w/2, e.y + e.h/2, 25, '#ff003c', 'square'); haptic([20, 20]); } 
+                        else {
+                            let dist = Math.sqrt(dx*dx + dy*dy) || 1; player.x += (dx/dist) * (player.radius - dist); player.y += (dy/dist) * (player.radius - dist);
+                            player.vy = Math.max(player.vy, 0) + e.vy * 1.5; player.vx += (dx/dist) * 8; triggerHitStop(4); triggerShake(10); spawnParticles(cx, cy, 15, '#ff003c', 'square'); haptic([40, 30]);
+                        }
+                    }
+                } 
+                else if (e.type === 'seeker') {
+                    let mag = Math.hypot(player.x - e.x, player.y - e.y) || 1;
+                    e.vx = (player.x - e.x) / mag * e.speed; e.vy = (player.y - e.y) / mag * e.speed; e.x += e.vx; e.y += e.vy; e.rotation = Math.atan2(e.vy, e.vx);
+                    if (e.y > canvas.height + 50) remove = true;
+                    for (let l = lines.length - 1; l >= 0; l--) { if (lines[l].points.some(p => Math.hypot(p.x - e.x, p.y - e.y) < e.radius + 3)) { lines.splice(l, 1); spawnParticles(e.x, e.y, 10, '#ff003c', 'line'); remove = true; break; } }
+                    if (!remove && Math.hypot(player.x - e.x, player.y - e.y) < player.radius + e.radius) { triggerHitStop(3); triggerShake(12); spawnParticles(player.x, player.y, 20, '#ff003c', 'square'); if (!player.shieldFrames) { player.vy += 15 * physicsScale; haptic([50]); } remove = true; }
+                } 
+                else if (e.type === 'laser') {
+                    e.timer--; if (e.state === 'warn' && e.timer <= 0) { e.state = 'fire'; e.timer = 12; triggerShake(3); haptic(20); } else if (e.state === 'fire' && e.timer <= 0) remove = true;
+                    if (e.state === 'fire' && !player.shieldFrames && Math.abs(player.x - e.x) < e.width/2 + player.radius) { player.vy += 5 * physicsScale; ink = Math.max(0, ink - 3); spawnParticles(player.x, player.y, 3, '#ffffff', 'line'); haptic(15); }
+                }
+                else if (e.team === 'good') {
+                    e.y += e.vy; if (e.y > canvas.height + 50) remove = true;
+                    if (Math.hypot(player.x - e.x, player.y - e.y) < player.radius + e.radius) { haptic([15, 20]); if (e.type === 'ink') { ink = clamp(ink + e.amount, 0, 100); spawnParticles(e.x, e.y, 15, '#00ff66', 'square'); } else { player.shieldFrames = 360; spawnParticles(e.x, e.y, 25, '#ffcc00', 'square'); } remove = true; }
+                }
+                if (remove) entities.splice(i, 1);
+            }
+        }
+
+        function update() {
+            if (freezeFrames > 0) { freezeFrames--; return; }
+
+            tick++; 
+            if (shakeX !== 0) shakeX *= -0.6; if (Math.abs(shakeX) < 0.5) shakeX = 0;
+            if (shakeY !== 0) shakeY *= -0.6; if (Math.abs(shakeY) < 0.5) shakeY = 0;
+
+            let mult = 1;
+            if (player.y < canvas.height * 0.25) mult = 4; else if (player.y < canvas.height * 0.5) mult = 2;
+            if (mult > 1) { multiplierEl.classList.remove('hidden'); multiplierEl.innerText = `x${mult}`; multiplierEl.style.color = mult === 4 ? 'var(--danger)' : 'var(--emp)'; } else { multiplierEl.classList.add('hidden'); }
+
+            if (tick % 60 === 0) { score += (10 * mult); difficulty += 0.05; }
+            if (displayScore < score) displayScore += Math.ceil((score - displayScore) * 0.1);
+            scoreEl.innerText = displayScore.toString().padStart(5, '0');
+
+            if (tick > 0 && tick % 2400 === 0) { waveMode = 'warning'; waveTimer = 180; eventWarning.classList.remove('hidden'); haptic([100, 50, 100, 50, 100]); }
+            if (waveMode === 'warning') { waveTimer--; if (waveTimer <= 0) { waveMode = 'active'; waveTimer = 420; eventWarning.classList.add('hidden'); } } 
+            else if (waveMode === 'active') { waveTimer--; if (tick % 15 === 0) spawnHazard(true); if (tick % 40 === 0) spawnPickup(); if (waveTimer <= 0) waveMode = 'none'; } 
+            else { if (tick % Math.max(12, Math.floor(70 - difficulty * 8)) === 0) spawnHazard(); if (tick % Math.max(40, Math.floor(150 - difficulty * 4)) === 0) spawnPickup(); }
+
+            if (isDrawing) { drawHeat = clamp(drawHeat + 1.2, 0, 100); ink = Math.max(0, ink - (0.05 + drawHeat * 0.003)); } else { drawHeat = Math.max(0, drawHeat - 2); ink = Math.min(100, ink + 0.2); }
+            if (player.shieldFrames > 0) player.shieldFrames--;
+
+            player.vy += player.gravity; player.vx *= player.friction; player.vy *= player.friction;
+            player.vy = clamp(player.vy, -player.maxVelocity, player.maxVelocity); player.vx = clamp(player.vx, -player.maxVelocity, player.maxVelocity);
+            if (tick % 2 === 0) { player.trail.unshift({x: player.x, y: player.y}); if (player.trail.length > 12) player.trail.pop(); }
+
+            const steps = clamp(Math.ceil(Math.max(Math.abs(player.vx), Math.abs(player.vy)) / (player.radius * 0.5)), 1, 10);
+            for (let s = 0; s < steps; s++) {
+                player.x += player.vx / steps; player.y += player.vy / steps;
+                if (player.x < player.radius) { player.x = player.radius; player.vx *= -0.8; triggerShake(3); }
+                if (player.x > canvas.width - player.radius) { player.x = canvas.width - player.radius; player.vx *= -0.8; triggerShake(3); }
+                if (player.y < player.radius) { player.y = player.radius; player.vy *= -0.5; }
+                testLineCollisions(lines); if (isDrawing && currentLine.length > 1) testLineCollisions([{ points: currentLine }]);
+            }
+
+            updateEntities();
+            for (let i = lines.length - 1; i >= 0; i--) { lines[i].life -= 0.008; if (lines[i].life <= 0) lines.splice(i, 1); }
+            for (let i = particles.length - 1; i >= 0; i--) { let p = particles[i]; p.x += p.vx; p.y += p.vy; p.vy += 0.2; p.life -= p.decay; p.angle += p.rotSpeed; if (p.life <= 0) particles.splice(i, 1); }
+            for (let i = shockwaves.length - 1; i >= 0; i--) { let s = shockwaves[i]; s.radius += 15; s.life -= 0.04; if (s.life <= 0) shockwaves.splice(i, 1); }
+
+            updateBars(); if (player.y > canvas.height + 20) triggerGameOver();
+        }
+
+        function draw() {
+            ctx.fillStyle = '#000000'; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.save();
+            if (shakeX !== 0 || shakeY !== 0) ctx.translate(shakeX, shakeY);
+
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+            voidNodes.forEach(node => { let px = (node.x - (player.x * node.z * 0.05)) % canvas.width, py = (node.y - (player.y * node.z * 0.05)) % canvas.height; if(px < 0) px += canvas.width; if(py < 0) py += canvas.height; ctx.fillRect(px, py, 1, 1); });
+
+            let gridColor = 'rgba(255, 255, 255, 0.05)';
+            if (waveMode === 'active') gridColor = `rgba(255, 0, 60, ${0.1 + Math.sin(tick*0.2)*0.05})`;
+            else if (player.y < canvas.height * 0.25) gridColor = 'rgba(255, 0, 60, 0.08)'; 
+            else if (player.y < canvas.height * 0.5) gridColor = 'rgba(0, 204, 255, 0.05)'; 
+
+            ctx.strokeStyle = gridColor; ctx.lineWidth = 1; ctx.setLineDash([5, 10]);
+            ctx.beginPath(); ctx.moveTo(0, canvas.height * 0.5); ctx.lineTo(canvas.width, canvas.height * 0.5); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(0, canvas.height * 0.25); ctx.lineTo(canvas.width, canvas.height * 0.25); ctx.stroke(); ctx.setLineDash([]);
+
+            ctx.lineCap = 'square'; ctx.lineJoin = 'miter';
+
+            shockwaves.forEach(s => { ctx.beginPath(); ctx.arc(s.x, s.y, s.radius, 0, Math.PI*2); ctx.strokeStyle = `rgba(0, 204, 255, ${s.life})`; ctx.lineWidth = 4; ctx.stroke(); ctx.fillStyle = `rgba(0, 204, 255, ${s.life * 0.1})`; ctx.fill(); });
+            particles.forEach(p => { ctx.strokeStyle = p.color; ctx.fillStyle = p.color; ctx.globalAlpha = p.life; ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.angle); if (p.type === 'line') { ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(-p.size*2, 0); ctx.lineTo(p.size*2, 0); ctx.stroke(); } else { ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size); } ctx.restore(); }); ctx.globalAlpha = 1.0;
+
+            entities.forEach(e => {
+                if (e.type === 'block') { ctx.strokeStyle = '#ff003c'; ctx.lineWidth = 2; ctx.strokeRect(e.x, e.y, e.w, e.h); ctx.fillStyle = 'rgba(255, 0, 60, 0.1)'; ctx.fillRect(e.x, e.y, e.w, e.h); if (Math.random() < 0.1) { ctx.fillStyle = '#ff003c'; ctx.fillRect(e.x + rand(0, e.w-5), e.y + rand(0, e.h-2), rand(5, 10), 2); } }
+                else if (e.type === 'seeker') { ctx.save(); ctx.translate(e.x, e.y); ctx.rotate(e.rotation); ctx.beginPath(); ctx.moveTo(e.radius, 0); ctx.lineTo(-e.radius, e.radius); ctx.lineTo(-e.radius*0.3, 0); ctx.lineTo(-e.radius, -e.radius); ctx.closePath(); ctx.strokeStyle = '#ff003c'; ctx.lineWidth = 2; ctx.stroke(); ctx.fillStyle = 'rgba(255,0,60,0.2)'; ctx.fill(); ctx.restore(); }
+                else if (e.type === 'laser') { if (e.state === 'warn') { ctx.strokeStyle = '#ff003c'; ctx.lineWidth = 1; ctx.setLineDash([10, 15]); ctx.beginPath(); ctx.moveTo(e.x, 0); ctx.lineTo(e.x, canvas.height); ctx.stroke(); ctx.setLineDash([]); } else if (e.state === 'fire') { ctx.fillStyle = '#ff003c'; ctx.fillRect(e.x - e.width/2, 0, e.width, canvas.height); ctx.fillStyle = '#ffffff'; ctx.fillRect(e.x - e.width/6, 0, e.width/3, canvas.height); } }
+                else if (e.team === 'good') { ctx.strokeStyle = e.type === 'ink' ? '#00ff66' : '#ffcc00'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(e.x, e.y - e.radius); ctx.lineTo(e.x + e.radius, e.y); ctx.lineTo(e.x, e.y + e.radius); ctx.lineTo(e.x - e.radius, e.y); ctx.closePath(); ctx.stroke(); }
+            });
+
+            ctx.lineWidth = 2; lines.forEach(line => { ctx.beginPath(); ctx.strokeStyle = `rgba(255, 255, 255, ${line.life})`; line.points.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y)); ctx.stroke(); });
+            if (isDrawing && currentLine.length > 0) { ctx.beginPath(); ctx.strokeStyle = '#ffffff'; currentLine.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y)); ctx.stroke(); }
+
+            player.trail.forEach((t, i) => { ctx.strokeStyle = `rgba(255, 255, 255, ${0.6 - i/20})`; ctx.lineWidth = 1; ctx.save(); ctx.translate(t.x, t.y); ctx.rotate(Math.PI/4); let size = player.radius - (i * 0.4); ctx.strokeRect(-size, -size, size*2, size*2); ctx.restore(); });
+            ctx.save(); ctx.translate(player.x, player.y); ctx.rotate(Math.PI/4); ctx.fillStyle = player.shieldFrames > 0 ? '#ffcc00' : '#ffffff'; ctx.fillRect(-player.radius, -player.radius, player.radius*2, player.radius*2);
+            if (player.shieldFrames > 0) { ctx.strokeStyle = '#ffcc00'; ctx.lineWidth = 2; let s = player.radius + 4 + (Math.sin(tick*0.2)*2); ctx.strokeRect(-s, -s, s*2, s*2); } ctx.restore();
+
+            ctx.restore(); if (state === 'playing') { update(); animationId = requestAnimationFrame(draw); }
+        }
+
+        window.startGame = function () {
+            resize(); 
+            if (animationId) cancelAnimationFrame(animationId);
+            startScreen.classList.add('hidden'); gameOverScreen.classList.add('hidden'); hud.classList.remove('hidden'); newRecordEl.classList.add('hidden');
+            player.x = canvas.width / 2; player.y = canvas.height / 3; player.vx = 0; player.vy = 0; player.trail = []; player.shieldFrames = 0;
+            lines = []; entities = []; particles = []; shockwaves = []; score = 0; difficulty = 1.0; ink = 100; drawHeat = 0; tick = 0; shakeX = 0; shakeY = 0; freezeFrames = 0; waveMode = 'none'; waveTimer = 0;
+            scoreEl.innerText = '00000'; displayScore = 0; updateBars(); state = 'playing'; animationId = requestAnimationFrame(draw);
+        };
+
+        function triggerGameOver() { 
+            state = 'gameover'; 
+            if (animationId) { cancelAnimationFrame(animationId); animationId = null; } 
+            
+            if (score > highScore) { highScore = score; localStorage.setItem('sys_defend_high', highScore); localHighEl.innerText = highScore.toString().padStart(5, '0'); newRecordEl.classList.remove('hidden'); }
+            hud.classList.add('hidden'); eventWarning.classList.add('hidden'); gameOverScreen.classList.remove('hidden'); finalScoreEl.innerText = score.toString().padStart(5, '0'); haptic([100, 50, 100]); 
+        }
+
+        resize(); ctx.fillStyle = '#000000'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    </script>
+</body>
+</html>
