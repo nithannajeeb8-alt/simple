@@ -42,7 +42,7 @@ body {
 }
 
 /* ==========================================
-   2. CUSTOM CURSOR & HOVER REVEAL
+   2. CUSTOM CURSOR
    ========================================== */
 .cursor-dot {
     width: 8px;
@@ -60,28 +60,6 @@ body {
                 mix-blend-mode 0.3s;
 }
 
-.hover-reveal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 380px;
-    height: 480px;
-    pointer-events: none;
-    opacity: 0;
-    z-index: -1; 
-    transform: translate(-50%, -50%) scale(0.8);
-    overflow: hidden;
-    border-radius: 16px;
-    box-shadow: 0 30px 60px rgba(0,0,0,0.8);
-}
-
-.reveal-img {
-    width: 100%;
-    height: 100%;
-    background-size: cover;
-    background-position: center;
-}
-
 /* ==========================================
    3. iOS GLASSMORPHISM UTILITIES
    ========================================== */
@@ -93,7 +71,7 @@ body {
     border: 1px solid var(--glass-border);
     border-top: 1px solid var(--glass-border-light);
     padding: 10px 24px;
-    border-radius: 100px; /* Pill shape */
+    border-radius: 100px;
     font-family: var(--mono);
     font-size: 0.85rem;
     font-weight: 500;
@@ -458,31 +436,87 @@ footer {
 .blog-card:hover .blog-link { gap: 16px; }
 
 /* ==========================================
-   11. MOBILE RESPONSIVENESS
+   11. REFINED MOBILE & RESPONSIVENESS
    ========================================== */
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
     .hero-text-grid { grid-template-columns: 1fr; gap: 2rem; }
     .profile-grid { grid-template-columns: 1fr; gap: 3rem; }
 }
 
 @media (max-width: 768px) {
-    .nav { flex-direction: column; gap: 24px; padding: 2rem; text-align: center; }
-    .nav-right { justify-content: center; }
-    .brand-logo { width: 160px; justify-content: center; }
+    /* Navbar Mobile Polish */
+    .nav { 
+        flex-direction: column; 
+        align-items: flex-start;
+        padding: 1.5rem; 
+        gap: 1.5rem; 
+    }
+    .brand-logo { width: 150px; }
+    .nav-right { 
+        justify-content: flex-start; 
+        gap: 8px; 
+        width: 100%;
+    }
+    .glass-btn { 
+        padding: 8px 16px; 
+        font-size: 0.75rem; 
+    }
+
+    /* Global Spacing Mobile */
+    .section-padding { padding: 4rem 1.5rem; }
+
+    /* Hero Mobile Polish */
+    .hero { padding: 12vh 1.5rem 4rem; }
+    .hero-title { 
+        font-size: clamp(3rem, 12vw, 4rem); 
+        text-align: left; 
+        margin-bottom: 2rem; 
+    }
+    .hero-desc { 
+        text-align: left; 
+        font-size: 1.05rem; 
+    }
+    .hero-actions { 
+        display: flex; 
+        justify-content: flex-start; 
+    }
+
+    /* Data Section Mobile Polish */
+    .glass-card { padding: 24px 20px; }
+    .stat-row { font-size: 0.85rem; }
     
-    .section-padding { padding: 5rem 6vw; }
+    /* Project List Mobile Polish */
+    .project-item {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 2rem 0;
+        gap: 1rem;
+    }
+    .p-info h2 { font-size: 2.2rem; margin-bottom: 8px;}
+    .project-item:hover .p-info h2 { transform: translateX(8px); } 
+    .p-arrow { 
+        display: block; 
+        align-self: flex-end; 
+        margin-top: -2.5rem; 
+        font-size: 1.5rem;
+    } 
+
+    /* Contact & Footer Mobile Polish */
+    .massive-link { font-size: clamp(2rem, 8vw, 3rem); }
     
-    .hero-title { font-size: 3rem; text-align: center; }
-    .hero-desc { text-align: center; }
-    .hero-actions { display: flex; justify-content: center; }
+    footer { padding: 3rem 1.5rem; align-items: flex-start; text-align: left; }
+    .footer-status { line-height: 1.6; }
     
-    .p-info h2 { font-size: 2rem; }
-    .project-item:hover .p-info h2 { transform: translateX(10px); }
-    .p-arrow { display: none; } /* Hide arrow on mobile to save space */
+    .glass-social-box { 
+        flex-direction: column; 
+        width: 100%; 
+        border-radius: 20px; 
+        padding: 20px;
+        gap: 16px;
+        align-items: flex-start;
+    }
     
-    .glass-social-box { flex-direction: column; padding: 20px; border-radius: 24px; }
-    
-    /* Disable custom cursor and hover reveals on touch devices */
-    .cursor-dot, .hover-reveal { display: none !important; }
+    /* Disable custom cursor on touch devices to prevent sticky hover bugs */
+    .cursor-dot { display: none !important; }
     * { cursor: auto !important; }
 }
