@@ -126,46 +126,4 @@ document.addEventListener("DOMContentLoaded", () => {
             gsap.to(btn, { x: 0, y: 0, duration: 0.7, ease: "elastic.out(1, 0.3)" });
         });
     });
-
-    // ==========================================
-    // 5. FLUID HOVER REVEAL LOGIC (PROJECTS)
-    // ==========================================
-    const hoverReveal = document.querySelector(".hover-reveal");
-    const revealImg = document.querySelector(".reveal-img");
-    const projectItems = document.querySelectorAll(".project-item");
-
-    if (hoverReveal && revealImg && window.innerWidth > 768 && !hasTouch) {
-        let mouseX = 0, mouseY = 0;
-        let revealX = 0, revealY = 0;
-
-        window.addEventListener("mousemove", (e) => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-        });
-
-        // Smooth trailing animation loop using GSAP's internal ticker
-        gsap.ticker.add(() => {
-            revealX += (mouseX - revealX) * 0.1; // The 0.1 controls the "lag" or fluidity
-            revealY += (mouseY - revealY) * 0.1;
-            gsap.set(hoverReveal, { x: revealX, y: revealY });
-        });
-
-        projectItems.forEach(item => {
-            item.addEventListener("mouseenter", () => {
-                // Get the gradient color specific to this project
-                const bgGradient = item.getAttribute("data-color");
-                if (bgGradient) revealImg.style.background = bgGradient;
-                
-                // Fade in and scale up the box
-                gsap.to(hoverReveal, { opacity: 1, scale: 1, duration: 0.4, ease: "power3.out" });
-                // Scale down the inner image for a parallax effect
-                gsap.fromTo(revealImg, { scale: 1.2 }, { scale: 1, duration: 0.6, ease: "power3.out" });
-            });
-            
-            item.addEventListener("mouseleave", () => {
-                // Fade out and shrink
-                gsap.to(hoverReveal, { opacity: 0, scale: 0.8, duration: 0.4, ease: "power3.out" });
-            });
-        });
-    }
 });
