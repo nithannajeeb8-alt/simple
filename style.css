@@ -2,19 +2,17 @@
    1. CORE VARIABLES & SETUP
 ========================================== */
 :root {
-  --bg: #000000; /* Pure OLED Black */
+  --bg: #000000;
   --text-main: #ffffff;
   --text-muted: rgba(255, 255, 255, 0.5);
 
-  /* Typography */
   --serif: 'Playfair Display', serif;
   --mono: 'JetBrains Mono', monospace;
 
-  /* iOS Glassmorphism Variables */
   --glass-bg: rgba(255, 255, 255, 0.03);
   --glass-bg-hover: rgba(255, 255, 255, 0.08);
   --glass-border: rgba(255, 255, 255, 0.06);
-  --glass-border-light: rgba(255, 255, 255, 0.15); /* Top edge highlight */
+  --glass-border-light: rgba(255, 255, 255, 0.15);
 }
 
 * {
@@ -34,6 +32,7 @@ body {
   line-height: 1.6;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 /* Hide default cursor on desktop for custom fluid dot */
@@ -75,23 +74,29 @@ body {
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--glass-border);
   border-top: 1px solid var(--glass-border-light);
-  padding: 10px 24px;
+  padding: 10px 20px;
   border-radius: 100px;
   font-family: var(--mono);
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 500;
   text-transform: uppercase;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  white-space: nowrap;
+  flex: 0 0 auto;
+  transition: transform 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
 }
 
 .glass-btn:hover {
   background: var(--glass-bg-hover);
-  transform: translateY(-2px);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+}
+
+.glass-btn:active {
+  transform: translateY(0) scale(0.98);
 }
 
 .glass-btn.large {
@@ -118,7 +123,7 @@ body {
   border-top: 1px solid var(--glass-border-light);
   border-radius: 20px;
   padding: 32px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
   transition: transform 0.4s ease, border-color 0.4s ease;
 }
 
@@ -151,12 +156,14 @@ body {
   padding: 2rem 6vw;
   position: relative;
   z-index: 100;
+  gap: 1.5rem;
 }
 
 .brand-logo {
   width: 220px;
   display: flex;
   align-items: center;
+  flex: 0 0 auto;
 }
 
 .signature-svg {
@@ -171,9 +178,18 @@ body {
 
 .nav-right {
   display: flex;
-  gap: 12px;
   align-items: center;
-  flex-wrap: wrap;
+  gap: 12px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  max-width: 100%;
+  flex: 0 1 auto;
+}
+
+.nav-right::-webkit-scrollbar {
+  display: none;
 }
 
 /* ==========================================
@@ -249,6 +265,7 @@ body {
   padding: 12px 0;
   border-bottom: 1px dashed var(--glass-border);
   font-size: 0.9rem;
+  gap: 1rem;
 }
 
 .stat-row:last-child {
@@ -304,6 +321,7 @@ body {
   padding: 3rem 0;
   border-bottom: 1px solid var(--glass-border);
   transition: opacity 0.4s ease;
+  gap: 2rem;
 }
 
 .project-list:hover .project-item:not(:hover) {
@@ -334,6 +352,7 @@ body {
   font-family: var(--serif);
   color: var(--text-muted);
   transition: transform 0.4s ease, color 0.4s ease;
+  flex: 0 0 auto;
 }
 
 .project-item:hover .p-arrow {
@@ -374,31 +393,46 @@ footer {
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 1px;
+  text-align: center;
 }
 
 .glass-social-box {
   display: flex;
   align-items: center;
-  gap: 20px;
+  justify-content: flex-start;
+  gap: 16px;
   background: var(--glass-bg);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--glass-border);
   border-top: 1px solid var(--glass-border-light);
-  padding: 12px 24px 12px 12px;
+  padding: 12px 18px;
   border-radius: 100px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  max-width: 100%;
+}
+
+.glass-social-box::-webkit-scrollbar {
+  display: none;
 }
 
 .mini-logo {
-  width: 40px;
-  height: 40px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   object-fit: cover;
+  flex: 0 0 auto;
 }
 
 .social-links {
   display: flex;
-  gap: 16px;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: nowrap;
+  flex: 0 0 auto;
 }
 
 .social-item {
@@ -408,8 +442,9 @@ footer {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.05);
-  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.05);
+  transition: transform 0.3s ease, background 0.3s ease;
+  flex: 0 0 auto;
 }
 
 .social-item svg {
@@ -420,7 +455,7 @@ footer {
 
 .social-item:hover {
   background: var(--text-main);
-  transform: translateY(-3px);
+  transform: translateY(-3px) scale(1.05);
 }
 
 .social-item:hover svg {
@@ -451,7 +486,7 @@ footer {
 .blog-card:hover {
   transform: translateY(-10px);
   background: var(--glass-bg-hover);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
 }
 
 .blog-meta {
@@ -462,6 +497,7 @@ footer {
   margin-bottom: 24px;
   border-bottom: 1px solid var(--glass-border);
   padding-bottom: 12px;
+  gap: 1rem;
 }
 
 .blog-title {
@@ -509,12 +545,11 @@ footer {
 }
 
 @media (max-width: 768px) {
-  /* Navbar Mobile Polish */
   .nav {
     flex-direction: column;
     align-items: flex-start;
     padding: 1.5rem;
-    gap: 1.5rem;
+    gap: 1rem;
   }
 
   .brand-logo {
@@ -522,22 +557,20 @@ footer {
   }
 
   .nav-right {
+    width: 100%;
     justify-content: flex-start;
     gap: 8px;
-    width: 100%;
   }
 
   .glass-btn {
-    padding: 8px 16px;
-    font-size: 0.75rem;
+    padding: 8px 14px;
+    font-size: 0.72rem;
   }
 
-  /* Global Spacing Mobile */
   .section-padding {
     padding: 4rem 1.5rem;
   }
 
-  /* Hero Mobile Polish */
   .hero {
     padding: 12vh 1.5rem 4rem;
   }
@@ -558,7 +591,6 @@ footer {
     justify-content: flex-start;
   }
 
-  /* Data Section Mobile Polish */
   .glass-card {
     padding: 24px 20px;
   }
@@ -567,7 +599,6 @@ footer {
     font-size: 0.85rem;
   }
 
-  /* Project List Mobile Polish */
   .project-item {
     flex-direction: column;
     align-items: flex-start;
@@ -591,7 +622,6 @@ footer {
     font-size: 1.5rem;
   }
 
-  /* Contact & Footer Mobile Polish */
   .massive-link {
     font-size: clamp(2rem, 8vw, 3rem);
   }
@@ -604,23 +634,79 @@ footer {
 
   .footer-status {
     line-height: 1.6;
+    text-align: left;
   }
 
   .glass-social-box {
-    flex-direction: column;
     width: 100%;
-    border-radius: 20px;
-    padding: 20px;
-    gap: 16px;
-    align-items: flex-start;
+    justify-content: flex-start;
+    align-items: center;
+    border-radius: 22px;
+    padding: 14px 16px;
   }
 
-  /* Disable custom cursor on touch devices to prevent sticky hover bugs */
+  .mini-logo {
+    width: 34px;
+    height: 34px;
+  }
+
+  .social-links {
+    gap: 10px;
+  }
+
+  .social-item {
+    width: 38px;
+    height: 38px;
+  }
+
   .cursor-dot {
     display: none !important;
   }
 
   * {
     cursor: auto !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav {
+    padding: 1.25rem;
+  }
+
+  .brand-logo {
+    width: 135px;
+  }
+
+  .nav-right {
+    gap: 6px;
+  }
+
+  .glass-btn {
+    padding: 7px 12px;
+    font-size: 0.68rem;
+  }
+
+  .hero {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+
+  .section-padding {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+
+  .glass-social-box {
+    gap: 12px;
+    padding: 12px 14px;
+  }
+
+  .social-links {
+    gap: 8px;
+  }
+
+  .social-item {
+    width: 36px;
+    height: 36px;
   }
 }
