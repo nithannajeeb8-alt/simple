@@ -9,6 +9,33 @@ document.addEventListener("DOMContentLoaded", () => {
     let hasTouch = false;
     window.addEventListener('touchstart', () => { hasTouch = true; }, { once: true, passive: true });
 
+
+
+    // ==========================================
+    // MOBILE MENU LOGIC
+    // ==========================================
+    const menuToggle = document.getElementById('menuToggle');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const mobileLinks = document.querySelectorAll('.mobile-menu-links a');
+
+    if (menuToggle && mobileMenu) {
+        menuToggle.addEventListener('click', () => {
+            menuToggle.classList.toggle('active');
+            mobileMenu.classList.toggle('active');
+            // Toggle scroll lock on body
+            document.body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : 'auto';
+        });
+
+        // Close menu when a link is clicked
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                menuToggle.classList.remove('active');
+                mobileMenu.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+        });
+    }
+
     // ==========================================
     // 1. NAVBAR SIGNATURE & INTRO ANIMATION
     // ==========================================
