@@ -461,62 +461,93 @@ footer {
         padding: 8px 16px; 
         font-size: 0.75rem; 
     }
+/* ==========================================
+   REFINED MOBILE NAVIGATION
+   ========================================== */
+@media (min-width: 769px) {
+    .desktop-only { display: flex !important; }
+    .mobile-menu-toggle { display: none !important; }
+}
 
-    /* Global Spacing Mobile */
-    .section-padding { padding: 4rem 1.5rem; }
+@media (max-width: 768px) {
+    .desktop-only { display: none !important; }
 
-    /* Hero Mobile Polish */
-    .hero { padding: 12vh 1.5rem 4rem; }
-    .hero-title { 
-        font-size: clamp(3rem, 12vw, 4rem); 
-        text-align: left; 
-        margin-bottom: 2rem; 
-    }
-    .hero-desc { 
-        text-align: left; 
-        font-size: 1.05rem; 
-    }
-    .hero-actions { 
-        display: flex; 
-        justify-content: flex-start; 
+    /* Clean Navbar */
+    .nav {
+        padding: 1.5rem;
+        position: fixed;
+        width: 100%;
+        top: 0;
+        background: rgba(0,0,0,0.8);
+        backdrop-filter: blur(10px);
     }
 
-    /* Data Section Mobile Polish */
-    .glass-card { padding: 24px 20px; }
-    .stat-row { font-size: 0.85rem; }
-    
-    /* Project List Mobile Polish */
-    .project-item {
+    /* Minimalist Menu Toggle (Hamburger) */
+    .mobile-menu-toggle {
+        display: flex;
         flex-direction: column;
-        align-items: flex-start;
-        padding: 2rem 0;
-        gap: 1rem;
+        gap: 6px;
+        background: none;
+        border: none;
+        z-index: 10001;
     }
-    .p-info h2 { font-size: 2.2rem; margin-bottom: 8px;}
-    .project-item:hover .p-info h2 { transform: translateX(8px); } 
-    .p-arrow { 
-        display: block; 
-        align-self: flex-end; 
-        margin-top: -2.5rem; 
-        font-size: 1.5rem;
-    } 
 
-    /* Contact & Footer Mobile Polish */
-    .massive-link { font-size: clamp(2rem, 8vw, 3rem); }
-    
-    footer { padding: 3rem 1.5rem; align-items: flex-start; text-align: left; }
-    .footer-status { line-height: 1.6; }
-    
-    .glass-social-box { 
-        flex-direction: column; 
-        width: 100%; 
-        border-radius: 20px; 
-        padding: 20px;
-        gap: 16px;
-        align-items: flex-start;
+    .mobile-menu-toggle span {
+        width: 25px;
+        height: 2px;
+        background: #fff;
+        transition: 0.3s;
     }
-    
-    /* Disable custom cursor on touch devices to prevent sticky hover bugs */
-    .cursor-dot { display: none !important; }
-    * { cursor: auto !important; }
+
+    /* Active State for Hamburger */
+    .mobile-menu-toggle.active span:nth-child(1) { transform: translateY(4px) rotate(45deg); }
+    .mobile-menu-toggle.active span:nth-child(2) { transform: translateY(-4px) rotate(-45deg); }
+
+    /* Fullscreen Mobile Overlay */
+    .mobile-menu {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.95);
+        backdrop-filter: blur(20px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        opacity: 0;
+        visibility: hidden;
+        transition: 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .mobile-menu.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .mobile-menu-links {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        text-align: center;
+    }
+
+    .mobile-menu-links a {
+        font-family: var(--serif);
+        font-size: 3rem;
+        color: #fff;
+        text-decoration: none;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: 0.4s;
+    }
+
+    .mobile-menu.active a {
+        opacity: 1;
+        transform: translateY(0);
+        transition-delay: 0.2s;
+    }
+
+    /* Typography & Layout Polish */
+    .hero { padding-top: 16vh; }
+    .hero-title { font-size: 3.2rem; }
+    .section-padding { padding: 4rem 1.5rem; }
 }
