@@ -1,103 +1,82 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Nithan // Game Arcade</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Nithan // Game Arcade</title>
 
-  <link rel="icon" type="image/png" href="/favicon.PNG">
-  <link rel="apple-touch-icon" href="/favicon.PNG">
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-  
-  <link rel="stylesheet" href="style.css?v=2">
+    <link rel="icon" type="image/png" href="/favicon.PNG">
+    <link rel="apple-touch-icon" href="/favicon.PNG">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@100;300;400;500&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 </head>
 <body>
 
-  <div id="cursor"></div>
-  <div id="cursor-trail"></div>
-  <div class="bg"></div>
-  <div class="grid"></div>
-  <div class="scanlines"></div>
-  <canvas id="p-back" class="particles" style="z-index:3; opacity:0.4"></canvas>
-  <canvas id="p-mid" class="particles" style="z-index:4; opacity:0.7"></canvas>
-  <canvas id="p-front" class="particles" style="z-index:5; opacity:1"></canvas>
+    <div class="cursor-dot"></div>
 
-  <div id="boot-screen">
-    <div class="boot-content">
-      <div class="logo" style="margin-bottom: 24px; width: 80px; height: 80px;">
-        <img src="/icon.PNG" alt="Boot Logo" style="width: 100%; height: 100%; object-fit: contain;">
-      </div>
-      <h1 class="glitch-text" data-value="INITIATING ARCADE" style="font-size: clamp(24px, 5vw, 36px); margin-bottom: 40px;">INITIATING ARCADE</h1>
-      <button id="init-btn" class="btn interactive-el magnetic">LAUNCH</button>
-      
-      <div id="terminal-output" style="display:none;"></div>
-      <div id="progress-container" style="display:none;">
-        <div id="progress-bar"></div>
-      </div>
-    </div>
-  </div>
+    <nav class="nav">
+        <div class="brand-logo">
+            <svg class="signature-svg" viewBox="0 0 500 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path class="signature-word" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" 
+                d="M50,100 C70,20 100,20 90,100 C80,140 120,60 140,80 C150,90 140,110 160,110 C180,110 180,60 190,60 C200,60 190,110 210,110 C230,110 240,40 240,40 C240,40 230,110 250,110 C270,110 290,70 300,70 C310,70 300,110 320,110 C340,110 350,80 360,80 C370,80 370,110 390,110 C410,110 420,80 430,80 C440,80 430,110 450,110" />
+                <circle class="signature-dot" cx="470" cy="105" r="6" fill="#ffffff" />
+            </svg>
+        </div>
 
-  <header id="navbar">
-    <div class="brand">
-      <div class="logo" style="width: 45px; height: 45px;">
-        <img src="/icon.PNG" alt="Logo" style="width: 100%; height: 100%; object-fit: contain;">
-      </div>
-      <div>
-        <div style="font-weight:900; font-family:'Orbitron', sans-serif; letter-spacing:1px">NITHAN</div>
-        <div style="font-size:11px; color:var(--accent); font-family: 'JetBrains Mono', monospace;">SYS_ONLINE // V_5.2</div>
-      </div>
-    </div>
-    <nav>
-      <a href="index.html" class="magnetic interactive-el">Home Base</a>
-      <a href="blog.html" class="magnetic interactive-el">Dev Logs</a>
+        <div class="nav-right hidden-on-load">
+            <a href="index.html" class="glass-btn magnetic highlight">Home Base</a>
+            <a href="blog.html" class="glass-btn magnetic">Dev Logs</a>
+        </div>
     </nav>
-  </header>
 
-  <main id="main-content" style="padding-top: 180px;">
-    
-    <section class="container">
-      <div style="margin-bottom: 60px;">
-        <h1 class="glitch-text" data-value="SYS_ARCADE" style="font-size: clamp(40px, 6vw, 64px); color: var(--accent); margin-bottom: 16px; font-family: 'Orbitron', sans-serif;">SYS_ARCADE</h1>
-        <p class="lead gs-reveal">Interactive simulations, logic trials, and digital playgrounds built from scratch.</p>
-      </div>
-      
-      <div class="blog-grid">
+    <main class="hidden-on-load">
         
-        <article class="card scroll-card blog-card interactive-el">
-          <div class="blog-meta">
-            <span class="blog-date">STATUS: ONLINE</span>
-            <span class="blog-tag">LOGIC_TRIAL</span>
-          </div>
-          <h3 class="blog-title">10 CHALLENGE</h3>
-          <p class="blog-excerpt">Think you have the elite internal timing of a Formula 1 driver? Once you hit start, the display vanishes into a stream of digital noise, leaving you completely blind. Your only mission is to trust your instincts and kill the timer at exactly 10.000 milliseconds. Even a millisecond's hesitation will cost you the pole position. Can you hit the zero, or are you just a Sunday driver?</p>
-          <a href="reaction-time-test.html" class="blog-link magnetic interactive-el">INITIATE_GAME >></a>
-        </article>
+        <section class="section-padding" style="padding-top: 4rem;">
+            <div style="margin-bottom: 6rem;">
+                <p class="sub-heading gs-reveal">(01) ARCADE</p>
+                <h1 class="hero-title gs-reveal">System <i>Trials</i>.</h1>
+                <p class="hero-desc gs-reveal">Interactive simulations, logic trials, and digital playgrounds built from scratch.</p>
+            </div>
+            
+            <div class="blog-grid">
+                
+                <article class="blog-card gs-reveal">
+                    <div class="blog-meta">
+                        <span class="blog-date">STATUS: ONLINE</span>
+                        <span class="blog-tag">LOGIC_TRIAL</span>
+                    </div>
+                    <h3 class="blog-title">10 Second Challenge</h3>
+                    <p class="blog-excerpt">Think you have the elite internal timing of a Formula 1 driver? Once you hit start, the display vanishes into a stream of digital noise, leaving you completely blind. Trust your instincts and kill the timer at exactly 10.000 milliseconds.</p>
+                    <a href="reaction-time-test.html" class="blog-link magnetic">INITIATE_GAME ↗</a>
+                </article>
 
-        <article class="card scroll-card blog-card interactive-el">
-          <div class="blog-meta">
-            <span class="blog-date">STATUS: ONLINE</span>
-            <span class="blog-tag">DEFENSE_PROTOCOL</span>
-          </div>
-          <h3 class="blog-title">SYS_DEFEND</h3>
-          <p class="blog-excerpt">Defend the central core against relentless waves of anomalies. Strategic resource allocation and rapid reflexes are key to system survival.</p>
-          <a href="SYS_DEFEND.html" class="blog-link magnetic interactive-el">INITIATE_GAME >></a>
-        </article>
+                <article class="blog-card gs-reveal">
+                    <div class="blog-meta">
+                        <span class="blog-date">STATUS: ONLINE</span>
+                        <span class="blog-tag">DEFENSE_PROTOCOL</span>
+                    </div>
+                    <h3 class="blog-title">SYS_DEFEND</h3>
+                    <p class="blog-excerpt">Defend the central core against relentless waves of anomalies. Strategic resource allocation and rapid reflexes are key to system survival.</p>
+                    <a href="SYS_DEFEND.html" class="blog-link magnetic">INITIATE_GAME ↗</a>
+                </article>
 
-      </div> 
-    </section>
+            </div> 
+        </section>
 
-  </main>
+    </main>
 
-  <footer>
-    <p>NODE HOSTED AT <span style="color:var(--accent)">NITHAN.IN</span> // SYSTEM YEAR <span id="year"></span></p>
-  </footer>
+    <footer class="hidden-on-load gs-reveal">
+        <div class="footer-status">
+            <p>NODE HOSTED AT <strong>NITHAN.IN</strong> // SYSTEM YEAR <span id="year"></span></p>
+        </div>
+    </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/ScrollTrigger.min.js"></script>
-  <script src="script.js"></script>
-  <script>
-    document.getElementById('year').textContent = new Date().getFullYear();
-  </script>
+    <script src="script.js"></script>
 
 </body>
 </html>
