@@ -3,19 +3,13 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Nithan Najeeb | Systems Architecture</title>
-    
-    <link rel="icon" type="image/png" href="/favicon.PNG">
-    <link rel="apple-touch-icon" href="/favicon.PNG">
-    
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@100;300;400;500&display=swap" rel="stylesheet">
+    <title>Nithan Najeeb</title>
     <link rel="stylesheet" href="style.css">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@100;300;400;500&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 </head>
 <body>
-
     <div class="cursor-dot"></div>
 
     <nav class="nav">
@@ -27,71 +21,37 @@
             </svg>
         </div>
 
-        <div class="nav-links hidden-on-load">
-            <a href="#about" class="nav-item magnetic">Data</a>
-            <a href="#projects" class="nav-item magnetic">Modules</a>
-            <a href="blog.html" class="nav-item magnetic">Logs</a>
-            <a href="game.html" class="nav-item magnetic highlight">Game</a>
+        <div class="nav-right desktop-only hidden-on-load">
+            <a href="#about" class="glass-btn magnetic">Data</a>
+            <a href="#projects" class="glass-btn magnetic">Modules</a>
+            <a href="blog.html" class="glass-btn magnetic">Logs</a>
+            <a href="game.html" class="glass-btn magnetic highlight">Game</a>
         </div>
+        
+        <button class="menu-toggle mobile-only hidden-on-load" id="menuToggle">
+            <span></span>
+            <span></span>
+        </button>
     </nav>
 
+    <div class="mobile-overlay" id="mobileMenu">
+        <div class="overlay-content">
+            <a href="#about" class="overlay-link">Data</a>
+            <a href="#projects" class="overlay-link">Modules</a>
+            <a href="blog.html" class="overlay-link">Logs</a>
+            <a href="game.html" class="overlay-link">Game</a>
+        </div>
+    </div>
+
     <main class="hidden-on-load">
-        
         <section class="hero">
             <p class="sub-heading gs-reveal">(01) SYSTEM INITIALIZED</p>
             <h1 class="hero-title gs-reveal">Building <i>intelligent</i> <br>infrastructure.</h1>
-            
-            <div class="hero-text-grid gs-reveal">
-                <p class="hero-desc">
-                    I’m <strong>Nithan Najeeb</strong>. I build and experiment with intelligent systems, web infrastructure, and emerging technologies. Combining an academic foundation in commerce with a deep interest in digital architecture.
-                </p>
+            <div class="hero-desc gs-reveal">
+                <p>I’m <strong>Nithan Najeeb</strong>. I build and experiment with intelligent systems, web infrastructure, and emerging technologies. Currently pursuing B.Com, combining commerce logic with digital architecture.</p>
             </div>
         </section>
-
-        <section id="about" class="section-padding">
-            <div class="section-header gs-reveal">
-                <p>(02) ARCHIVE_DATA</p>
-            </div>
-            <div class="profile-grid gs-reveal">
-                <div class="glass-card profile-stats">
-                    <div class="stat-row"><span>ID:</span> <strong>RUBIN STELLAR</strong></div>
-                    <div class="stat-row"><span>CLS:</span> <strong>Student (B.Com)</strong></div>
-                    <div class="stat-row"><span>LOC:</span> <strong>India</strong></div>
-                </div>
-                <div class="profile-info">
-                    <h3>Biography</h3>
-                    <p>I blend code, content, and craft. I build tools to remember, reflect, and create.</p>
-                </div>
-            </div>
-        </section>
-
-        <section id="projects" class="section-padding">
-            <div class="section-header gs-reveal">
-                <p>(03) ACTIVE_MODULES</p>
-            </div>
-            <ul class="project-list">
-                <li class="project-item gs-reveal">
-                    <div class="p-info">
-                        <h2>Mind Atlas</h2>
-                        <span>Knowledge node tracking science & code logic.</span>
-                    </div>
-                    <div class="p-arrow">↗</div>
-                </li>
-                <li class="project-item gs-reveal">
-                    <div class="p-info">
-                        <h2>Forenexa</h2>
-                        <span>Storefront architecture for physical hardware.</span>
-                    </div>
-                    <div class="p-arrow">↗</div>
-                </li>
-            </ul>
-        </section>
-
-    </main>
-
-    <footer class="hidden-on-load gs-reveal">
-        <p>NODE HOSTED AT <strong>NITHAN.IN</strong> // <span id="year"></span></p>
-    </footer>
+        </main>
 
     <script src="script.js"></script>
 </body>
