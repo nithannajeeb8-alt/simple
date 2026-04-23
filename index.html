@@ -1,58 +1,171 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Nithan Najeeb</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@100;300;400;500&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Nithan (Portfolio)</title>
+  <meta name="description" content="Portfolio of Nithan: web experiments, Mind Atlas, and creative projects." />
+
+  <link rel="icon" type="image/png" href="/favicon.PNG">
+  <link rel="apple-touch-icon" href="/favicon.PNG">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@100;300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 </head>
+
 <body>
-    <div class="cursor-dot"></div>
+  <div class="cursor-dot"></div>
 
-    <nav class="nav">
-        <div class="brand-logo">
-            <svg class="signature-svg" viewBox="0 0 500 150" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path class="signature-word" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" 
-                d="M50,100 C70,20 100,20 90,100 C80,140 120,60 140,80 C150,90 140,110 160,110 C180,110 180,60 190,60 C200,60 190,110 210,110 C230,110 240,40 240,40 C240,40 230,110 250,110 C270,110 290,70 300,70 C310,70 300,110 320,110 C340,110 350,80 360,80 C370,80 370,110 390,110 C410,110 420,80 430,80 C440,80 430,110 450,110" />
-                <circle class="signature-dot" cx="470" cy="105" r="6" fill="#ffffff" />
-            </svg>
-        </div>
-
-        <div class="nav-right desktop-only hidden-on-load">
-            <a href="#about" class="glass-btn magnetic">Data</a>
-            <a href="#projects" class="glass-btn magnetic">Modules</a>
-            <a href="blog.html" class="glass-btn magnetic">Logs</a>
-            <a href="game.html" class="glass-btn magnetic highlight">Game</a>
-        </div>
-        
-        <button class="menu-toggle mobile-only hidden-on-load" id="menuToggle">
-            <span></span>
-            <span></span>
-        </button>
-    </nav>
-
-    <div class="mobile-overlay" id="mobileMenu">
-        <div class="overlay-content">
-            <a href="#about" class="overlay-link">Data</a>
-            <a href="#projects" class="overlay-link">Modules</a>
-            <a href="blog.html" class="overlay-link">Logs</a>
-            <a href="game.html" class="overlay-link">Game</a>
-        </div>
+  <nav class="nav">
+    <div class="brand-logo">
+      <svg class="signature-svg" viewBox="0 0 500 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path
+          class="signature-word"
+          stroke="#ffffff"
+          stroke-width="5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M50,100 C70,20 100,20 90,100 C80,140 120,60 140,80 C150,90 140,110 160,110 C180,110 180,60 190,60 C200,60 190,110 210,110 C230,110 240,40 240,40 C240,40 230,110 250,110 C270,110 290,70 300,70 C310,70 300,110 320,110 C340,110 350,80 360,80 C370,80 370,110 390,110 C410,110 420,80 430,80 C440,80 430,110 450,110"
+        />
+        <circle class="signature-dot" cx="470" cy="105" r="6" fill="#ffffff" />
+      </svg>
     </div>
 
-    <main class="hidden-on-load">
-        <section class="hero">
-            <p class="sub-heading gs-reveal">(01) SYSTEM INITIALIZED</p>
-            <h1 class="hero-title gs-reveal">Building <i>intelligent</i> <br>infrastructure.</h1>
-            <div class="hero-desc gs-reveal">
-                <p>I’m <strong>Nithan Najeeb</strong>. I build and experiment with intelligent systems, web infrastructure, and emerging technologies. Currently pursuing B.Com, combining commerce logic with digital architecture.</p>
-            </div>
-        </section>
-        </main>
+    <div class="nav-right hidden-on-load">
+      <a href="#about" class="glass-btn magnetic">Data</a>
+      <a href="#projects" class="glass-btn magnetic">Modules</a>
+      <a href="blog.html" class="glass-btn magnetic">Logs</a>
+      <a href="game.html" class="glass-btn magnetic">Game</a>
+    </div>
+  </nav>
 
-    <script src="script.js"></script>
+  <main class="hidden-on-load">
+    <section class="hero">
+      <p class="sub-heading gs-reveal">(01) SYSTEM INITIALIZED</p>
+
+      <h1 class="hero-title gs-reveal">
+        Building <i>intelligent</i> <br>infrastructure.
+      </h1>
+
+      <div class="hero-text-grid gs-reveal">
+        <p class="hero-desc">
+          I’m <strong>Nithan Najeeb</strong>. I build and experiment with intelligent systems, web infrastructure, and emerging technologies. I’m currently pursuing a B.Com degree in India, combining my academic foundation in commerce with a deep interest in digital architecture.
+        </p>
+
+        <p class="hero-desc">
+          This platform showcases projects focused on turning ideas into practical implementations — from AI-powered tools to structured knowledge systems. The goal is simple: build useful things, document progress, and evolve.
+        </p>
+      </div>
+
+      <div class="hero-actions gs-reveal">
+        <a href="#projects" class="glass-btn large magnetic">Access Modules</a>
+      </div>
+    </section>
+
+    <section id="about" class="section-padding">
+      <div class="section-header gs-reveal">
+        <p>(02) ARCHIVE_DATA</p>
+      </div>
+
+      <div class="profile-grid gs-reveal">
+        <div class="glass-card profile-stats">
+          <div class="stat-row"><span>ID:</span> <strong>RUBIN STELLAR</strong></div>
+          <div class="stat-row"><span>CLS:</span> <strong>Student (B.Com)</strong></div>
+          <div class="stat-row"><span>CLG:</span> <strong>MES College</strong></div>
+          <div class="stat-row"><span>LOC:</span> <strong>India</strong></div>
+          <div class="stat-row"><span>DOB:</span> <strong>2004</strong></div>
+          <div class="stat-row"><span>PROJ:</span> <strong>MIND ATLAS</strong></div>
+        </div>
+
+        <div class="profile-info">
+          <div class="info-block">
+            <h3>Biography</h3>
+            <p>I blend code, content, and craft. Beyond the business degree, my real playground is the web. I build tools to remember, reflect, and create.</p>
+          </div>
+
+          <div class="info-block" style="margin-top: 2rem;">
+            <h3>Tech Specs</h3>
+            <ul class="tech-list">
+              <li><strong>Core:</strong> HTML5, CSS3, Vanilla JS</li>
+              <li><strong>Motion:</strong> GSAP, Lottie, Canvas API</li>
+              <li><strong>R&D:</strong> Ollama (Local LLMs)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="projects" class="section-padding">
+      <div class="section-header gs-reveal">
+        <p>(03) ACTIVE_MODULES</p>
+      </div>
+
+      <ul class="project-list">
+        <li class="project-item gs-reveal">
+          <div class="p-info">
+            <h2>Mind Atlas</h2>
+            <span>Personalized knowledge node tracking science & code logic.</span>
+          </div>
+          <div class="p-arrow">↗</div>
+        </li>
+
+        <li class="project-item gs-reveal">
+          <div class="p-info">
+            <h2>Forenexa</h2>
+            <span>Storefront architecture optimized for physical hardware.</span>
+          </div>
+          <div class="p-arrow">↗</div>
+        </li>
+
+        <li class="project-item gs-reveal">
+          <div class="p-info">
+            <h2>Born Legend</h2>
+            <span>Creative text databanks exploring fantasy narrative arcs.</span>
+          </div>
+          <div class="p-arrow">↗</div>
+        </li>
+
+        <li class="project-item gs-reveal">
+          <div class="p-info">
+            <h2>Ollama Uplink</h2>
+            <span>Protocol tethering local AI instances to seamless frontends.</span>
+          </div>
+          <div class="p-arrow">↗</div>
+        </li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="hidden-on-load gs-reveal">
+    <div class="footer-status">
+      <p>NODE HOSTED AT <strong>NITHAN.IN</strong> // SYSTEM YEAR <span id="year"></span></p>
+    </div>
+
+    <div class="glass-social-box">
+      <img src="/icon.PNG" alt="Nithan logo" class="mini-logo">
+
+      <div class="social-links">
+        <a class="social-item magnetic" href="https://instagram.com/nithannajeeb_" target="_blank">
+          <svg viewBox="0 0 24 24"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7zm5 3.5a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9zm0 2a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM17.5 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" /></svg>
+        </a>
+
+        <a class="social-item magnetic" href="https://www.threads.net/@nithannajeeb_" target="_blank">
+          <svg viewBox="0 0 24 24"><path d="M12 2C7.6 2 4 5.6 4 10s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 2c3.9 0 7 3.1 7 7s-3.1 7-7 7c-2.6 0-4.9-1.4-6.1-3.6 1.1 0.7 2.4 1.1 3.7 1.1 3.9 0 7-3.1 7-7 0-1.3-0.4-2.6-1.1-3.7C16.6 4.6 14.3 4 12 4z"/></svg>
+        </a>
+
+        <a class="social-item magnetic" href="https://www.facebook.com/nithan.najeeb" target="_blank">
+          <svg viewBox="0 0 24 24"><path d="M22 12a10 10 0 1 0-11.5 9.9v-7h-2.2v-2.9h2.2V9.3c0-2.2 1.3-3.4 3.2-3.4.9 0 1.9.1 1.9.1v2.1h-1.1c-1.1 0-1.4.7-1.4 1.4v1.7h2.4l-.4 2.9h-2v7A10 10 0 0 0 22 12z"/></svg>
+        </a>
+
+        <a class="social-item magnetic" href="https://www.linkedin.com/in/nithannajeeb" target="_blank">
+          <svg viewBox="0 0 24 24"><path d="M4.98 3.5a2.5 2.5 0 1 1-.001 5.001A2.5 2.5 0 0 1 4.98 3.5zM3 9h4v12H3zM9 9h3.6v1.7h.1c.5-.9 1.8-1.7 3.7-1.7 4 0 4.7 2.6 4.7 6v7h-4v-6.2c0-1.5 0-3.4-2.1-3.4-2.1 0-2.4 1.6-2.4 3.3V21H9z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
 </body>
 </html>
