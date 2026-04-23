@@ -1,81 +1,168 @@
+/* ==========================================
+   1. CORE VARIABLES & SETUP
+   ========================================== */
 :root {
-    --bg: #000000;
+    --bg: #000000; /* Pure OLED Black */
     --text-main: #ffffff;
     --text-muted: rgba(255, 255, 255, 0.5);
+    
+    /* Typography */
     --serif: 'Playfair Display', serif;
     --mono: 'JetBrains Mono', monospace;
-    --glass: rgba(255, 255, 255, 0.03);
+    
+    /* iOS Glassmorphism Variables */
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-bg-hover: rgba(255, 255, 255, 0.08);
     --glass-border: rgba(255, 255, 255, 0.06);
-    --glass-border-light: rgba(255, 255, 255, 0.15);
+    --glass-border-light: rgba(255, 255, 255, 0.15); 
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { background: var(--bg); color: var(--text-main); font-family: var(--mono); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+html { scroll-behavior: smooth; }
 
-/* Desktop vs Mobile display logic */
-.desktop-only { display: flex; }
-.mobile-only { display: none; }
+body {
+    background-color: var(--bg);
+    color: var(--text-main);
+    font-family: var(--mono);
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Hide default cursor on desktop for custom fluid dot */
+@media (hover: hover) and (pointer: fine) { body, a, button { cursor: none !important; } }
+
+/* ==========================================
+   2. CUSTOM CURSOR & ANIMATION STATES
+   ========================================== */
+.cursor-dot {
+    width: 8px; height: 8px; background-color: var(--text-main); border-radius: 50%;
+    position: fixed; top: 0; left: 0; pointer-events: none; z-index: 10000;
+    transform: translate(-50%, -50%); transition: width 0.3s, height 0.3s;
+}
 
 .hidden-on-load { opacity: 0; visibility: hidden; }
 .gs-reveal { opacity: 0; transform: translateY(30px); }
 
-/* Custom Cursor */
-.cursor-dot { width: 8px; height: 8px; background: #fff; position: fixed; border-radius: 50%; pointer-events: none; z-index: 10000; transform: translate(-50%, -50%); }
+/* ==========================================
+   3. DESKTOP NAVIGATION
+   ========================================== */
+.nav {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 2rem 5vw; position: fixed; width: 100%; top: 0; z-index: 1000;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+}
 
-/* Navigation */
-.nav { display: flex; justify-content: space-between; align-items: center; padding: 2rem 5vw; position: fixed; width: 100%; top: 0; z-index: 1000; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); backdrop-filter: blur(10px); }
-.brand-logo { width: 220px; }
+.brand-logo { width: 220px; display: flex; align-items: center; }
 .signature-svg { width: 100%; height: auto; }
 .signature-dot { opacity: 0; transform-origin: center; }
 
-.nav-right { display: flex; gap: 12px; align-items: center; }
+.nav-links { display: flex; gap: 12px; align-items: center; }
 
-/* Glass Button Style */
-.glass-btn {
-    color: #fff; background: var(--glass); border: 1px solid var(--glass-border); border-top: 1px solid var(--glass-border-light);
-    padding: 10px 24px; border-radius: 100px; font-size: 0.8rem; text-transform: uppercase; text-decoration: none;
-    backdrop-filter: blur(20px); transition: 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+/* Desktop Glass Button Style */
+.nav-item {
+    color: var(--text-main); background: var(--glass-bg);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border); border-top: 1px solid var(--glass-border-light);
+    padding: 10px 24px; border-radius: 100px; font-family: var(--mono); font-size: 0.8rem;
+    font-weight: 500; text-transform: uppercase; text-decoration: none;
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
 }
-.glass-btn:hover { background: rgba(255,255,255,0.08); transform: translateY(-2px); }
-.glass-btn.highlight { background: #fff; color: #000; border: none; }
 
-/* Mobile Menu Toggle (Right Side) */
-.menu-toggle { display: none; flex-direction: column; gap: 6px; background: none; border: none; z-index: 2001; padding: 10px; }
-.menu-toggle span { width: 25px; height: 2px; background: #fff; transition: 0.3s; }
-.menu-toggle.active span:nth-child(1) { transform: translateY(4px) rotate(45deg); }
-.menu-toggle.active span:nth-child(2) { transform: translateY(-4px) rotate(-45deg); }
+.nav-item:hover { background: var(--glass-bg-hover); transform: translateY(-2px); }
+.nav-item.highlight { background: var(--text-main); color: var(--bg); border: none; }
 
-/* Mobile Overlay */
-.mobile-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.98); backdrop-filter: blur(30px); display: flex; align-items: center; justify-content: center; z-index: 2000; opacity: 0; visibility: hidden; transition: 0.5s; }
-.mobile-overlay.active { opacity: 1; visibility: visible; }
-.overlay-content { display: flex; flex-direction: column; gap: 1.5rem; width: 85%; text-align: center; }
-.overlay-link { font-family: var(--serif); font-size: 3rem; color: #fff; text-decoration: none; padding: 1.5rem; border-bottom: 1px solid var(--glass-border); transition: 0.4s; }
-
-/* Sections */
+/* ==========================================
+   4. CONTENT & TYPOGRAPHY
+   ========================================== */
 .section-padding { padding: 8rem 5vw; max-width: 1400px; margin: 0 auto; }
-.hero { padding: 20vh 5vw 10vh; max-width: 1400px; margin: 0 auto; }
-.hero-title { font-family: var(--serif); font-size: clamp(3.2rem, 8vw, 8rem); line-height: 1.05; margin: 2rem 0; letter-spacing: -0.03em; }
-.hero-title i { font-style: italic; opacity: 0.4; }
-.hero-desc { font-size: 1.15rem; color: var(--text-muted); line-height: 1.8; max-width: 650px; }
 
-/* Project List */
+.hero { padding: 20vh 5vw 10vh; max-width: 1400px; margin: 0 auto; }
+.sub-heading { font-size: 0.8rem; color: var(--text-muted); letter-spacing: 1px; margin-bottom: 2rem; }
+
+.hero-title {
+    font-family: var(--serif); font-size: clamp(3.2rem, 8vw, 8rem);
+    line-height: 1.05; font-weight: 400; margin-bottom: 4rem; letter-spacing: -0.03em;
+}
+.hero-title i { font-style: italic; opacity: 0.4; }
+
+.hero-text-grid { max-width: 650px; }
+.hero-desc { font-size: 1.15rem; color: var(--text-muted); line-height: 1.8; }
+.hero-desc strong { color: #fff; font-weight: 500; }
+
+/* Project Items */
+.project-list { list-style: none; }
 .project-item { display: flex; justify-content: space-between; align-items: center; padding: 3rem 0; border-bottom: 1px solid var(--glass-border); transition: 0.4s; }
-.p-info h2 { font-family: var(--serif); font-size: clamp(2.5rem, 5vw, 4.5rem); font-weight: 400; transition: 0.5s; }
+.project-list:hover .project-item:not(:hover) { opacity: 0.2; }
+
+.p-info h2 { font-family: var(--serif); font-size: clamp(2.5rem, 5vw, 4.5rem); font-weight: 400; transition: transform 0.5s; }
 .project-item:hover .p-info h2 { transform: translateX(30px); }
 .p-arrow { font-size: 2rem; font-family: var(--serif); color: var(--text-muted); }
 
 /* Footer */
-footer { padding: 5rem 5vw; text-align: center; border-top: 1px solid var(--glass-border); }
-.glass-social-box { display: inline-flex; align-items: center; gap: 20px; background: var(--glass); padding: 12px 24px; border-radius: 100px; border: 1px solid var(--glass-border); }
-.mini-logo { width: 40px; height: 40px; border-radius: 50%; }
-.social-item svg { width: 18px; height: 18px; fill: #fff; }
+footer { padding: 5rem 5vw; text-align: center; font-size: 0.8rem; color: var(--text-muted); letter-spacing: 1px; border-top: 1px solid var(--glass-border);}
+footer strong { color: #fff; }
 
-/* Mobile refinement */
+/* ==========================================
+   5. MOBILE REDESIGN (EDITORIAL ARROW INDEX)
+   ========================================== */
 @media (max-width: 768px) {
-    .desktop-only { display: none !important; }
-    .mobile-only { display: flex !important; }
-    .nav { padding: 1.5rem 5vw; }
-    .brand-logo { width: 140px; }
-    .hero-title { font-size: 3.2rem; }
-    .project-item { flex-direction: column; align-items: flex-start; }
+    /* Modify Nav Container */
+    .nav {
+        position: relative; /* Unfix it so it scrolls naturally with content */
+        flex-direction: column; 
+        align-items: flex-start; /* Left-align everything */
+        padding: 3rem 1.5rem 1rem;
+        background: none; backdrop-filter: none;
+    }
+    .brand-logo { width: 140px; margin-bottom: 2rem; }
+
+    /* Convert horizontal pill layout to a vertical list */
+    .nav-links {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px; 
+        width: 100%;
+    }
+
+    /* Strip glass styling, apply editorial text + arrow styling */
+    .nav-item {
+        background: transparent !important;
+        border: none !important;
+        backdrop-filter: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        color: #fff !important;
+        font-family: var(--mono);
+        font-size: 1.1rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+
+    /* Add the sophisticated right-arrow */
+    .nav-item::after {
+        content: '→';
+        font-family: var(--serif);
+        font-size: 1.3rem;
+        margin-left: 12px;
+        opacity: 0.6;
+        transition: opacity 0.3s;
+    }
+
+    .nav-item:active::after { opacity: 1; }
+
+    /* General Mobile Polish */
+    .hero { padding: 4rem 1.5rem; }
+    .hero-title { font-size: 3.2rem; margin-bottom: 2rem; }
+    .section-padding { padding: 4rem 1.5rem; }
+    
+    .project-item { flex-direction: column; align-items: flex-start; gap: 1rem; }
+    .p-arrow { align-self: flex-end; margin-top: -2.5rem; font-size: 1.5rem; }
+
+    /* Kill custom cursor */
+    .cursor-dot { display: none !important; }
+    * { cursor: auto !important; }
 }
