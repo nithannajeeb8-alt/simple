@@ -1,171 +1,264 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Nithan (Portfolio)</title>
-  <meta name="description" content="Portfolio of Nithan: web experiments, Mind Atlas, and creative projects." />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Nithan Najeeb - building intelligent systems, web infrastructure, and creative digital modules." />
+  <title>Nithan | Portfolio</title>
 
-  <link rel="icon" type="image/png" href="/favicon.PNG">
-  <link rel="apple-touch-icon" href="/favicon.PNG">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@100;300;400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="icon.PNG" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
-  <div class="cursor-dot"></div>
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="bg-orb orb-3"></div>
+  <div class="cursor-dot" aria-hidden="true"></div>
 
-  <nav class="nav">
-    <div class="brand-logo">
-      <svg class="signature-svg" viewBox="0 0 500 150" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path
-          class="signature-word"
-          stroke="#ffffff"
-          stroke-width="5"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M50,100 C70,20 100,20 90,100 C80,140 120,60 140,80 C150,90 140,110 160,110 C180,110 180,60 190,60 C200,60 190,110 210,110 C230,110 240,40 240,40 C240,40 230,110 250,110 C270,110 290,70 300,70 C310,70 300,110 320,110 C340,110 350,80 360,80 C370,80 370,110 390,110 C410,110 420,80 430,80 C440,80 430,110 450,110"
-        />
-        <circle class="signature-dot" cx="470" cy="105" r="6" fill="#ffffff" />
-      </svg>
-    </div>
+  <div class="page-shell">
+    <header class="nav">
+      <a class="brand-logo signature-wrap hidden-on-load" href="#top" aria-label="Nithan home">
+        <svg
+          class="signature-svg"
+          viewBox="0 0 540 150"
+          xmlns="http://www.w3.org/2000/svg"
+          role="img"
+          aria-labelledby="sigTitle sigDesc"
+        >
+          <title id="sigTitle">Nithan signature mark</title>
+          <desc id="sigDesc">Animated handwritten signature logo</desc>
 
-    <div class="nav-right hidden-on-load">
-      <a href="#about" class="glass-btn magnetic">Data</a>
-      <a href="#projects" class="glass-btn magnetic">Modules</a>
-      <a href="blog.html" class="glass-btn magnetic">Logs</a>
-      <a href="game.html" class="glass-btn magnetic">Game</a>
-    </div>
-  </nav>
+          <defs>
+            <linearGradient id="sigGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#ffffff" />
+              <stop offset="100%" stop-color="rgba(255,255,255,0.72)" />
+            </linearGradient>
 
-  <main class="hidden-on-load">
-    <section class="hero">
-      <p class="sub-heading gs-reveal">(01) SYSTEM INITIALIZED</p>
+            <filter id="sigGlow" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="1.1" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
 
-      <h1 class="hero-title gs-reveal">
-        Building <i>intelligent</i> <br>infrastructure.
-      </h1>
+          <text x="18" y="94" class="signature-text" filter="url(#sigGlow)">Nithan</text>
 
-      <div class="hero-text-grid gs-reveal">
-        <p class="hero-desc">
-          I’m <strong>Nithan Najeeb</strong>. I build and experiment with intelligent systems, web infrastructure, and emerging technologies. I’m currently pursuing a B.Com degree in India, combining my academic foundation in commerce with a deep interest in digital architecture.
-        </p>
+          <path
+            class="signature-flourish"
+            d="M20 112
+               C 66 96, 108 95, 145 105
+               C 183 115, 221 129, 267 123
+               C 316 116, 342 90, 392 88
+               C 441 86, 477 111, 520 93"
+          />
 
-        <p class="hero-desc">
-          This platform showcases projects focused on turning ideas into practical implementations — from AI-powered tools to structured knowledge systems. The goal is simple: build useful things, document progress, and evolve.
-        </p>
-      </div>
+          <circle class="signature-dot" cx="356" cy="31" r="4.6" />
+        </svg>
+      </a>
 
-      <div class="hero-actions gs-reveal">
-        <a href="#projects" class="glass-btn large magnetic">Access Modules</a>
-      </div>
-    </section>
+      <nav class="nav-right hidden-on-load">
+        <a class="glass-btn magnetic" href="#data">Data</a>
+        <a class="glass-btn magnetic" href="#modules">Modules</a>
+        <a class="glass-btn magnetic" href="#logs">Logs</a>
+        <a class="glass-btn magnetic highlight" href="#game">Game</a>
+      </nav>
+    </header>
 
-    <section id="about" class="section-padding">
-      <div class="section-header gs-reveal">
-        <p>(02) ARCHIVE_DATA</p>
-      </div>
+    <main id="top">
+      <section class="hero section-padding">
+        <p class="sub-heading hidden-on-load">(01) SYSTEM INITIALIZED</p>
 
-      <div class="profile-grid gs-reveal">
-        <div class="glass-card profile-stats">
-          <div class="stat-row"><span>ID:</span> <strong>RUBIN STELLAR</strong></div>
-          <div class="stat-row"><span>CLS:</span> <strong>Student (B.Com)</strong></div>
-          <div class="stat-row"><span>CLG:</span> <strong>MES College</strong></div>
-          <div class="stat-row"><span>LOC:</span> <strong>India</strong></div>
-          <div class="stat-row"><span>DOB:</span> <strong>2004</strong></div>
-          <div class="stat-row"><span>PROJ:</span> <strong>MIND ATLAS</strong></div>
+        <h1 class="hero-title hidden-on-load">
+          Building <i>intelligent</i><br />
+          infrastructure.
+        </h1>
+
+        <div class="hero-text-grid">
+          <p class="hero-desc hidden-on-load">
+            I’m Nithan Najeeb. I build and experiment with intelligent systems, web infrastructure, and emerging technologies.
+            I’m currently pursuing a B.Com degree in India, combining my academic foundation in commerce with a deep interest in digital architecture.
+          </p>
+
+          <p class="hero-desc hidden-on-load">
+            This platform showcases projects focused on turning ideas into practical implementations, from AI-powered tools to structured knowledge systems.
+            The goal is simple: build useful things, document progress, and evolve without making everything look like a desperate startup pitch.
+          </p>
         </div>
 
-        <div class="profile-info">
-          <div class="info-block">
-            <h3>Biography</h3>
-            <p>I blend code, content, and craft. Beyond the business degree, my real playground is the web. I build tools to remember, reflect, and create.</p>
+        <div class="hero-actions hidden-on-load">
+          <a class="glass-btn large highlight magnetic" href="#modules">Access Modules</a>
+          <a class="glass-btn large magnetic" href="#data">View Archive</a>
+        </div>
+      </section>
+
+      <section id="data" class="section-padding gs-reveal">
+        <div class="section-header">(02) ARCHIVE_DATA</div>
+
+        <div class="profile-grid">
+          <div class="glass-card profile-card">
+            <div class="stat-row"><span>ID</span><strong>RUBIN STELLAR</strong></div>
+            <div class="stat-row"><span>CLS</span><strong>Student (B.Com)</strong></div>
+            <div class="stat-row"><span>CLG</span><strong>MES College</strong></div>
+            <div class="stat-row"><span>LOC</span><strong>India</strong></div>
+            <div class="stat-row"><span>DOB</span><strong>2004</strong></div>
+            <div class="stat-row"><span>PROJ</span><strong>MIND ATLAS</strong></div>
           </div>
 
-          <div class="info-block" style="margin-top: 2rem;">
-            <h3>Tech Specs</h3>
+          <div class="info-block">
+            <h3>Biography</h3>
+            <p>
+              I blend code, content, and craft. Beyond the business degree, the real playground is the web.
+              I build tools to remember, reflect, and create.
+            </p>
+
+            <h3 style="margin-top: 2.5rem;">Tech Specs</h3>
             <ul class="tech-list">
               <li><strong>Core:</strong> HTML5, CSS3, Vanilla JS</li>
               <li><strong>Motion:</strong> GSAP, Lottie, Canvas API</li>
-              <li><strong>R&D:</strong> Ollama (Local LLMs)</li>
+              <li><strong>R&amp;D:</strong> Ollama (Local LLMs)</li>
+              <li><strong>Design:</strong> Glassmorphism, editorial spacing, soft motion</li>
             </ul>
           </div>
         </div>
+      </section>
+
+      <section id="modules" class="section-padding gs-reveal">
+        <div class="section-header">(03) ACTIVE_MODULES</div>
+
+        <ul class="project-list">
+          <li class="project-item glass-card">
+            <div class="p-info">
+              <span>01 / Knowledge system</span>
+              <h2>Mind Atlas</h2>
+              <p>Personalized knowledge node tracking science, code logic, and long-form thinking.</p>
+            </div>
+            <a class="p-arrow" href="mind-atlas.html" aria-label="Open Mind Atlas">↗</a>
+          </li>
+
+          <li class="project-item glass-card">
+            <div class="p-info">
+              <span>02 / Storefront architecture</span>
+              <h2>Forenexa</h2>
+              <p>Storefront architecture optimized for physical hardware and clean product presentation.</p>
+            </div>
+            <a class="p-arrow" href="blog.html" aria-label="Open Forenexa">↗</a>
+          </li>
+
+          <li class="project-item glass-card">
+            <div class="p-info">
+              <span>03 / Creative databank</span>
+              <h2>Born Legend</h2>
+              <p>Fantasy narrative arcs, worldbuilding fragments, and text systems with memory.</p>
+            </div>
+            <a class="p-arrow" href="blog.html" aria-label="Open Born Legend">↗</a>
+          </li>
+
+          <li class="project-item glass-card">
+            <div class="p-info">
+              <span>04 / Local AI bridge</span>
+              <h2>Ollama Uplink</h2>
+              <p>Protocol tethering local AI instances to seamless frontends and practical workflows.</p>
+            </div>
+            <a class="p-arrow" href="#" aria-label="Open Ollama Uplink">↗</a>
+          </li>
+        </ul>
+      </section>
+
+      <section id="logs" class="section-padding gs-reveal">
+        <div class="section-header">(04) SYSTEM_LOGS</div>
+
+        <div class="blog-grid">
+          <article class="blog-card">
+            <div class="blog-meta">
+              <span>LOG 01</span>
+              <span>ACTIVE</span>
+            </div>
+            <h3 class="blog-title">Design Language</h3>
+            <p class="blog-excerpt">
+              A darker, calmer visual system with stronger hierarchy, cleaner spacing, and fewer effects competing for attention.
+            </p>
+            <a class="blog-link" href="#top">Read node <span>→</span></a>
+          </article>
+
+          <article class="blog-card">
+            <div class="blog-meta">
+              <span>LOG 02</span>
+              <span>ACTIVE</span>
+            </div>
+            <h3 class="blog-title">Motion Control</h3>
+            <p class="blog-excerpt">
+              Signature draw, scroll reveals, and magnetic motion kept subtle so the interface feels expensive instead of noisy.
+            </p>
+            <a class="blog-link" href="#modules">Read node <span>→</span></a>
+          </article>
+
+          <article class="blog-card">
+            <div class="blog-meta">
+              <span>LOG 03</span>
+              <span>ACTIVE</span>
+            </div>
+            <h3 class="blog-title">Content Focus</h3>
+            <p class="blog-excerpt">
+              Project cards now carry outcomes, not just labels, because empty flexing is the laziest kind of design.
+            </p>
+            <a class="blog-link" href="#data">Read node <span>→</span></a>
+          </article>
+        </div>
+      </section>
+
+      <section id="game" class="section-padding gs-reveal">
+        <div class="section-header">(05) INTERACTIVE_NODE</div>
+
+        <div class="glass-card contact-center">
+          <h2 class="hero-title" style="margin-bottom: 1.5rem; font-size: clamp(2.8rem, 6vw, 5.5rem);">
+            Build, ship, repeat.
+          </h2>
+          <p class="hero-desc" style="max-width: 760px; margin: 0 auto 2rem;">
+            A site should feel deliberate. This one now behaves like a focused portfolio, not a demo page that lost the plot.
+          </p>
+
+          <div class="hero-actions" style="justify-content: center;">
+            <a class="glass-btn large highlight magnetic" href="game.html">Open Game</a>
+            <a class="glass-btn large magnetic" href="reaction-time-test.html">Run Test</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p class="footer-status">NODE HOSTED AT NITHAN.IN // <span id="year"></span></p>
+
+      <div class="glass-social-box">
+        <img class="mini-logo" src="icon.PNG" alt="Nithan logo" />
+        <div class="social-links">
+          <a class="social-item" href="https://www.instagram.com" target="_blank" rel="noreferrer noopener" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7zm5 3.5A4.5 4.5 0 1 1 7.5 12 4.5 4.5 0 0 1 12 7.5zm0 2A2.5 2.5 0 1 0 14.5 12 2.5 2.5 0 0 0 12 9.5zM17.8 6.2a1.2 1.2 0 1 1-1.2 1.2 1.2 1.2 0 0 1 1.2-1.2z"/></svg>
+          </a>
+
+          <a class="social-item" href="https://www.threads.net" target="_blank" rel="noreferrer noopener" aria-label="Threads">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.7 8.6c-.4-2.8-2.6-4.6-5.6-4.6-3.5 0-6 2.4-6 5.8 0 3.5 2.5 5.7 6.2 5.7 2.8 0 4.8-1.3 5.8-3.6l-2.2-.6c-.7 1.5-1.9 2.2-3.6 2.2-2.3 0-3.9-1.3-3.9-3.7 0-2.4 1.7-3.9 4-3.9 1.8 0 3.1 1 3.4 2.6h-3.4v1.7h6.1c.1-.6.1-1.1 0-1.6-.1-2.6-1.6-4.9-4.4-5.8 3.6.5 6.2 3 6.2 7 0 4.6-3.1 8.2-8 8.2-5.3 0-8.9-3.6-8.9-8.8C4.5 6.5 8.6 2.5 14 2.5c4.2 0 7.2 2.4 8.1 5.8l-5.4.3z"/></svg>
+          </a>
+
+          <a class="social-item" href="https://www.facebook.com" target="_blank" rel="noreferrer noopener" aria-label="Facebook">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 22v-8.5h2.8l.4-3.4h-3.2V8c0-1 .3-1.7 1.8-1.7h1.6V3.2c-.7-.1-1.7-.2-3-.2-2.9 0-4.9 1.8-4.9 5v2.1H6v3.4h2.9V22h4.6z"/></svg>
+          </a>
+
+          <a class="social-item" href="https://www.linkedin.com" target="_blank" rel="noreferrer noopener" aria-label="LinkedIn">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.4 8.6H3.8V21h2.6V8.6zM5.1 3.1A1.5 1.5 0 1 0 5.1 6a1.5 1.5 0 0 0 0-3zM20.2 21h-2.6v-6.1c0-1.5 0-3.4-2.1-3.4s-2.4 1.6-2.4 3.2V21h-2.6V8.6h2.5v1.7h.1c.4-.8 1.5-1.9 3.1-1.9 3.3 0 3.9 2.2 3.9 5.1V21z"/></svg>
+          </a>
+        </div>
       </div>
-    </section>
+    </footer>
+  </div>
 
-    <section id="projects" class="section-padding">
-      <div class="section-header gs-reveal">
-        <p>(03) ACTIVE_MODULES</p>
-      </div>
-
-      <ul class="project-list">
-        <li class="project-item gs-reveal">
-          <div class="p-info">
-            <h2>Mind Atlas</h2>
-            <span>Personalized knowledge node tracking science & code logic.</span>
-          </div>
-          <div class="p-arrow">↗</div>
-        </li>
-
-        <li class="project-item gs-reveal">
-          <div class="p-info">
-            <h2>Forenexa</h2>
-            <span>Storefront architecture optimized for physical hardware.</span>
-          </div>
-          <div class="p-arrow">↗</div>
-        </li>
-
-        <li class="project-item gs-reveal">
-          <div class="p-info">
-            <h2>Born Legend</h2>
-            <span>Creative text databanks exploring fantasy narrative arcs.</span>
-          </div>
-          <div class="p-arrow">↗</div>
-        </li>
-
-        <li class="project-item gs-reveal">
-          <div class="p-info">
-            <h2>Ollama Uplink</h2>
-            <span>Protocol tethering local AI instances to seamless frontends.</span>
-          </div>
-          <div class="p-arrow">↗</div>
-        </li>
-      </ul>
-    </section>
-  </main>
-
-  <footer class="hidden-on-load gs-reveal">
-    <div class="footer-status">
-      <p>NODE HOSTED AT <strong>NITHAN.IN</strong> // SYSTEM YEAR <span id="year"></span></p>
-    </div>
-
-    <div class="glass-social-box">
-      <img src="/icon.PNG" alt="Nithan logo" class="mini-logo">
-
-      <div class="social-links">
-        <a class="social-item magnetic" href="https://instagram.com/nithannajeeb_" target="_blank">
-          <svg viewBox="0 0 24 24"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7zm5 3.5a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9zm0 2a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM17.5 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" /></svg>
-        </a>
-
-        <a class="social-item magnetic" href="https://www.threads.net/@nithannajeeb_" target="_blank">
-          <svg viewBox="0 0 24 24"><path d="M12 2C7.6 2 4 5.6 4 10s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 2c3.9 0 7 3.1 7 7s-3.1 7-7 7c-2.6 0-4.9-1.4-6.1-3.6 1.1 0.7 2.4 1.1 3.7 1.1 3.9 0 7-3.1 7-7 0-1.3-0.4-2.6-1.1-3.7C16.6 4.6 14.3 4 12 4z"/></svg>
-        </a>
-
-        <a class="social-item magnetic" href="https://www.facebook.com/nithan.najeeb" target="_blank">
-          <svg viewBox="0 0 24 24"><path d="M22 12a10 10 0 1 0-11.5 9.9v-7h-2.2v-2.9h2.2V9.3c0-2.2 1.3-3.4 3.2-3.4.9 0 1.9.1 1.9.1v2.1h-1.1c-1.1 0-1.4.7-1.4 1.4v1.7h2.4l-.4 2.9h-2v7A10 10 0 0 0 22 12z"/></svg>
-        </a>
-
-        <a class="social-item magnetic" href="https://www.linkedin.com/in/nithannajeeb" target="_blank">
-          <svg viewBox="0 0 24 24"><path d="M4.98 3.5a2.5 2.5 0 1 1-.001 5.001A2.5 2.5 0 0 1 4.98 3.5zM3 9h4v12H3zM9 9h3.6v1.7h.1c.5-.9 1.8-1.7 3.7-1.7 4 0 4.7 2.6 4.7 6v7h-4v-6.2c0-1.5 0-3.4-2.1-3.4-2.1 0-2.4 1.6-2.4 3.3V21H9z"/></svg>
-        </a>
-      </div>
-    </div>
-  </footer>
-
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
