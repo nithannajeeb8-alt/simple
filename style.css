@@ -129,7 +129,7 @@ body {
 .hidden-on-load { opacity: 0; visibility: hidden; }
 .gs-reveal { opacity: 0; transform: translateY(30px); }
 
-/* Utility classes to center the hero content */
+/* Utility classes */
 .text-center { text-align: center; }
 .justify-center { display: flex; justify-content: center; }
 
@@ -150,7 +150,6 @@ body {
     align-items: center;
 }
 
-/* Clean text replacement for the top nav logo */
 .brand-text {
     font-family: var(--serif);
     font-size: 1.5rem;
@@ -175,7 +174,6 @@ body {
     margin: 0 auto;
 }
 
-/* Wrapper to hold the massive central signature */
 .hero-signature-section {
     display: flex;
     justify-content: center;
@@ -186,7 +184,6 @@ body {
     margin: 0 auto;
 }
 
-/* Scale the SVG */
 .signature-svg.massive {
     width: 100%;
     max-width: 900px;
@@ -196,7 +193,6 @@ body {
 
 .signature-dot { opacity: 0; transform-origin: center; }
 
-/* Adjust the padding so the hero texts align tightly under the signature */
 .hero-content-adjusted {
     padding-top: 4vh; 
 }
@@ -340,6 +336,7 @@ body {
     color: var(--text-main);
     text-decoration: none;
     transition: color 0.3s ease;
+    word-break: break-all; /* Ensures long emails don't overflow on small screens */
 }
 .massive-link:hover { color: var(--text-muted); }
 
@@ -407,74 +404,14 @@ footer {
 .social-item:hover svg { fill: var(--bg); }
 
 /* ==========================================
-   10. LEGACY BLOG SUPPORT (UPGRADED)
+   10. REFINED MOBILE & RESPONSIVENESS
    ========================================== */
-.blog-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 32px;
+@media (max-width: 1024px) {
+    .profile-grid { grid-template-columns: 1fr; gap: 3rem; }
 }
 
-.blog-card {
-    background: var(--glass-bg);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--glass-border);
-    border-top: 1px solid var(--glass-border-light);
-    border-radius: 20px;
-    padding: 32px;
-    display: flex;
-    flex-direction: column;
-    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-.blog-card:hover {
-    transform: translateY(-10px);
-    background: var(--glass-bg-hover);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-}
-
-.blog-meta {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    margin-bottom: 24px;
-    border-bottom: 1px solid var(--glass-border);
-    padding-bottom: 12px;
-}
-
-.blog-title {
-    font-family: var(--serif);
-    font-size: 1.8rem;
-    font-weight: 400;
-    margin-bottom: 16px;
-}
-
-.blog-excerpt {
-    color: var(--text-muted);
-    font-size: 0.95rem;
-    margin-bottom: 32px;
-    flex-grow: 1;
-}
-
-.blog-link {
-    color: var(--text-main);
-    text-decoration: none;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    transition: gap 0.3s ease;
-}
-
-.blog-card:hover .blog-link { gap: 16px; }
-
-/* ==========================================
-   11. REFINED MOBILE & RESPONSIVENESS
-   ========================================== */
 @media (max-width: 768px) {
-    /* Navbar Mobile Polish - Swipable Buttons */
+    /* Navbar Mobile Polish - Elegant Scrolling Row */
     .nav { 
         flex-direction: column; 
         align-items: flex-start;
@@ -485,59 +422,67 @@ footer {
     
     .nav-right { 
         justify-content: flex-start; 
-        gap: 8px; 
+        gap: 10px; 
         width: 100%;
-        flex-wrap: nowrap; /* Prevent wrapping */
-        overflow-x: auto; /* Enable horizontal scrolling */
-        padding-bottom: 5px; /* Slight padding for smooth scroll */
-        -ms-overflow-style: none; /* Hide scrollbar IE/Edge */
-        scrollbar-width: none; /* Hide scrollbar Firefox */
+        flex-wrap: nowrap; 
+        overflow-x: auto; 
+        padding-bottom: 5px; 
+        padding-right: 1.5rem; /* Allows scrolling past the last item elegantly */
+        -ms-overflow-style: none; 
+        scrollbar-width: none; 
     }
     
-    /* Hide scrollbar for Chrome, Safari and Opera */
     .nav-right::-webkit-scrollbar {
         display: none; 
     }
 
     .glass-btn { 
-        padding: 8px 16px; 
+        padding: 8px 18px; 
         font-size: 0.75rem; 
-        flex-shrink: 0; /* Prevent buttons from squishing */
+        flex-shrink: 0; 
     }
 
     /* Global Spacing Mobile */
     .section-padding { padding: 4rem 1.5rem; }
 
-    /* Hero & Signature Mobile Polish - Tighter Spacing */
-    .hero { padding: 2rem 1.5rem 4rem; } /* Reduced top padding */
+    /* Hero Layout Fixes */
+    .hero { padding: 1rem 1.5rem 4rem; } 
     
     .hero-signature-section {
-        padding: 1rem 1.5rem 0; /* Massively reduced top padding */
-        margin-top: 1rem;
+        padding: 0 1.5rem; 
+        margin-top: 0.5rem;
     }
 
     .signature-svg.massive {
-        margin-bottom: -1.5rem; /* Pulls the text below it upwards */
+        max-width: 90%; /* Let it breathe slightly */
+        margin-bottom: -1rem; 
     }
     
     .hero-content-adjusted {
-        padding-top: 0; /* Let the negative margin handle the spacing */
+        padding-top: 0; 
     }
     
     .hero-title { 
         font-size: clamp(3rem, 12vw, 4rem); 
         text-align: left; 
-        margin-bottom: 2rem; 
+        margin-bottom: 2.5rem; 
     }
     
     .hero-title.text-center, 
     .sub-heading.text-center {
-        text-align: left; /* Keep left alignment on mobile for readability */
+        text-align: left; 
     }
     
+    /* THE FIX: Stop text from squeezing into two columns */
+    .hero-text-grid { 
+        grid-template-columns: 1fr; /* Single column on mobile */
+        gap: 2rem; 
+        margin-bottom: 3rem;
+    }
+
     .hero-desc { 
         text-align: left; 
-        font-size: 1.05rem; 
+        font-size: 1.1rem; 
     }
     
     .hero-actions, 
@@ -567,18 +512,25 @@ footer {
     } 
 
     /* Contact & Footer Mobile Polish */
-    .massive-link { font-size: clamp(2rem, 8vw, 3rem); }
+    .contact-center { padding: 2rem 0; }
+    .massive-link { font-size: clamp(2.2rem, 8vw, 3rem); }
     
-    footer { padding: 3rem 1.5rem; align-items: flex-start; text-align: left; }
+    footer { 
+        padding: 3rem 1.5rem; 
+        align-items: center; /* Center footer contents gracefully */
+        text-align: center; 
+    }
     .footer-status { line-height: 1.6; }
     
     .glass-social-box { 
         flex-direction: column; 
         width: 100%; 
+        max-width: 300px; /* Constrain width for aesthetic centering */
         border-radius: 20px; 
-        padding: 20px;
-        gap: 16px;
-        align-items: flex-start;
+        padding: 24px;
+        gap: 20px;
+        align-items: center; /* Center the logo and icons perfectly */
+        justify-content: center;
     }
     
     /* Disable custom cursor on touch devices */
