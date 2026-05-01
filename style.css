@@ -473,13 +473,8 @@ footer {
 /* ==========================================
    11. REFINED MOBILE & RESPONSIVENESS
    ========================================== */
-@media (max-width: 1024px) {
-    .hero-text-grid { grid-template-columns: 1fr; gap: 2rem; }
-    .profile-grid { grid-template-columns: 1fr; gap: 3rem; }
-}
-
 @media (max-width: 768px) {
-    /* Navbar Mobile Polish */
+    /* Navbar Mobile Polish - Swipable Buttons */
     .nav { 
         flex-direction: column; 
         align-items: flex-start;
@@ -487,28 +482,46 @@ footer {
         gap: 1.5rem; 
     }
     .brand-logo { width: 150px; }
+    
     .nav-right { 
         justify-content: flex-start; 
         gap: 8px; 
         width: 100%;
+        flex-wrap: nowrap; /* Prevent wrapping */
+        overflow-x: auto; /* Enable horizontal scrolling */
+        padding-bottom: 5px; /* Slight padding for smooth scroll */
+        -ms-overflow-style: none; /* Hide scrollbar IE/Edge */
+        scrollbar-width: none; /* Hide scrollbar Firefox */
     }
+    
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    .nav-right::-webkit-scrollbar {
+        display: none; 
+    }
+
     .glass-btn { 
         padding: 8px 16px; 
         font-size: 0.75rem; 
+        flex-shrink: 0; /* Prevent buttons from squishing */
     }
 
     /* Global Spacing Mobile */
     .section-padding { padding: 4rem 1.5rem; }
 
-    /* Hero Mobile Polish */
-    .hero { padding: 12vh 1.5rem 4rem; }
+    /* Hero & Signature Mobile Polish - Tighter Spacing */
+    .hero { padding: 2rem 1.5rem 4rem; } /* Reduced top padding */
     
     .hero-signature-section {
-        padding: 4vh 1.5rem 0;
+        padding: 1rem 1.5rem 0; /* Massively reduced top padding */
+        margin-top: 1rem;
+    }
+
+    .signature-svg.massive {
+        margin-bottom: -1.5rem; /* Pulls the text below it upwards */
     }
     
     .hero-content-adjusted {
-        padding-top: 3vh;
+        padding-top: 0; /* Let the negative margin handle the spacing */
     }
     
     .hero-title { 
@@ -568,7 +581,7 @@ footer {
         align-items: flex-start;
     }
     
-    /* Disable custom cursor on touch devices to prevent sticky hover bugs */
+    /* Disable custom cursor on touch devices */
     .cursor-dot { display: none !important; }
     * { cursor: auto !important; }
 }
