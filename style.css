@@ -48,8 +48,25 @@ body {
     pointer-events: none; z-index: 9999; opacity: 0.035; mix-blend-mode: overlay;
 }
 
-.gs-reveal { opacity: 0; filter: blur(10px); will-change: transform, opacity, filter; }
-.line-wrapper { overflow: hidden; display: block; }
+/* FIXED: Removed Blur, optimized for smooth slide reveals */
+.gs-reveal { 
+    opacity: 0; 
+    transform: translateY(40px);
+    will-change: transform, opacity; 
+}
+
+/* The Invisible Mask for the staggered text */
+.line-wrapper { 
+    overflow: hidden; 
+    display: inline-block; 
+    vertical-align: top;
+    padding-bottom: 0.2em; /* Prevents cutting off bottom of letters like g and p */
+    margin-bottom: -0.2em;
+}
+.line-inner { 
+    display: inline-block;
+    will-change: transform;
+}
 
 /* ==========================================
    3. LUXURY GLASSMORPHISM UTILITIES
@@ -70,7 +87,6 @@ body {
 .glass-btn.highlight { background: var(--text-main); color: var(--bg); border: none; }
 .glass-btn.highlight:hover { background: #ffffff; transform: scale(1.03); }
 
-/* 3D Tilt Setup for Glass Card */
 .perspective-container { perspective: 1000px; }
 .tilt-card { transform-style: preserve-3d; will-change: transform; }
 
@@ -106,8 +122,8 @@ body {
 .mobile-menu-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(10, 10, 11, 0.98); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); z-index: 99; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1); }
 .mobile-menu-overlay.active { opacity: 1; pointer-events: all; }
 .mobile-links { display: flex; flex-direction: column; align-items: center; gap: 2.5rem; }
-.mobile-link { font-family: var(--serif); font-size: 2.2rem; color: var(--text-main); text-decoration: none; letter-spacing: 1px; transform: translateY(40px) scale(0.95); filter: blur(5px); opacity: 0; transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1); }
-.mobile-menu-overlay.active .mobile-link { opacity: 1; transform: translateY(0) scale(1); filter: blur(0px); }
+.mobile-link { font-family: var(--serif); font-size: 2.2rem; color: var(--text-main); text-decoration: none; letter-spacing: 1px; transform: translateY(40px) scale(0.95); opacity: 0; transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1); }
+.mobile-menu-overlay.active .mobile-link { opacity: 1; transform: translateY(0) scale(1); }
 .mobile-menu-overlay.active .mobile-link:nth-child(1) { transition-delay: 0.1s; } .mobile-menu-overlay.active .mobile-link:nth-child(2) { transition-delay: 0.2s; } .mobile-menu-overlay.active .mobile-link:nth-child(3) { transition-delay: 0.3s; } .mobile-menu-overlay.active .mobile-link:nth-child(4) { transition-delay: 0.4s; } .mobile-menu-overlay.active .mobile-link:nth-child(5) { transition-delay: 0.5s; }
 .highlight-text { color: var(--accent-gold); }
 
@@ -150,27 +166,20 @@ body {
 .project-item { display: flex; justify-content: space-between; align-items: center; padding: 4rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.08); transition: opacity 0.7s cubic-bezier(0.25, 1, 0.5, 1); cursor: pointer; }
 .project-list:hover .project-item:not(:hover) { opacity: 0.15; }
 .p-info h2 { font-family: var(--serif); font-size: clamp(3rem, 6vw, 5rem); font-weight: 400; margin-bottom: 0.5rem; transition: transform 0.7s cubic-bezier(0.25, 1, 0.5, 1); pointer-events: none; }
-.project-item:hover .p-info h2 { transform: translateX(30px) skewX(-2deg); } /* Added elegant skew on hover */
+.project-item:hover .p-info h2 { transform: translateX(30px) skewX(-2deg); }
 .p-info span { font-size: 0.95rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; pointer-events: none; }
 .p-arrow { font-size: 2.5rem; font-family: var(--serif); color: var(--text-muted); transition: transform 0.7s cubic-bezier(0.25, 1, 0.5, 1), color 0.5s ease; pointer-events: none; }
 .project-item:hover .p-arrow { transform: translateX(15px); color: var(--text-main); }
 
-/* FLOATING IMAGE REVEAL (Environmental Animation) */
+/* FLOATING IMAGE REVEAL */
 .hover-image-reveal {
     position: fixed; top: 0; left: 0; width: 350px; height: 450px;
-    pointer-events: none; z-index: 1; /* Below text, above background */
-    opacity: 0; transform: scale(0.8);
+    pointer-events: none; z-index: 1; opacity: 0; transform: scale(0.8);
     transition: opacity 0.4s ease, transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
     border-radius: 10px; overflow: hidden;
 }
-
 .hover-image-reveal.active { opacity: 0.6; transform: scale(1); }
-
-.hover-image-inner {
-    width: 100%; height: 100%;
-    background-size: cover; background-position: center;
-    transition: background-image 0.2s ease;
-}
+.hover-image-inner { width: 100%; height: 100%; background-size: cover; background-position: center; transition: background-image 0.2s ease; }
 
 /* ==========================================
    9. COMM & FOOTER
@@ -193,7 +202,7 @@ footer { display: flex; flex-direction: column; align-items: center; padding: 6r
    ========================================== */
 @media (max-width: 1024px) {
     .profile-grid { grid-template-columns: 1fr; gap: 4rem; }
-    .hover-image-reveal { display: none !important; } /* Disable floating image on tablets/mobile */
+    .hover-image-reveal { display: none !important; }
 }
 
 @media (max-width: 768px) {
@@ -220,5 +229,5 @@ footer { display: flex; flex-direction: column; align-items: center; padding: 6r
     .glass-social-box { flex-direction: column; width: 100%; max-width: 320px; border-radius: 24px; padding: 32px; gap: 24px; justify-content: center; }
     .cursor-dot { display: none !important; }
     * { cursor: auto !important; }
-    .tilt-card { transform: none !important; } /* Disable tilt on mobile */
+    .tilt-card { transform: none !important; } 
 }
