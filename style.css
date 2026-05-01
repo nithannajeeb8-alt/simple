@@ -129,8 +129,12 @@ body {
 .hidden-on-load { opacity: 0; visibility: hidden; }
 .gs-reveal { opacity: 0; transform: translateY(30px); }
 
+/* Utility classes to center the hero content */
+.text-center { text-align: center; }
+.justify-center { display: flex; justify-content: center; }
+
 /* ==========================================
-   5. NAVIGATION & SIGNATURE
+   5. NAVIGATION
    ========================================== */
 .nav {
     display: flex;
@@ -142,13 +146,18 @@ body {
 }
 
 .brand-logo {
-    width: 220px;
     display: flex;
     align-items: center;
 }
 
-.signature-svg { width: 100%; height: auto; }
-.signature-dot { opacity: 0; transform-origin: center; }
+/* Clean text replacement for the top nav logo */
+.brand-text {
+    font-family: var(--serif);
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-main);
+    letter-spacing: 1px;
+}
 
 .nav-right {
     display: flex;
@@ -158,12 +167,38 @@ body {
 }
 
 /* ==========================================
-   6. HERO SECTION
+   6. HERO SECTION & MASSIVE SIGNATURE
    ========================================== */
 .hero {
     padding: 12vh 6vw 6vh;
     max-width: 1400px;
     margin: 0 auto;
+}
+
+/* Wrapper to hold the massive central signature */
+.hero-signature-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 6vh 6vw 0; 
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Scale the SVG */
+.signature-svg.massive {
+    width: 100%;
+    max-width: 900px;
+    height: auto;
+    overflow: visible;
+}
+
+.signature-dot { opacity: 0; transform-origin: center; }
+
+/* Adjust the padding so the hero texts align tightly under the signature */
+.hero-content-adjusted {
+    padding-top: 4vh; 
 }
 
 .sub-heading {
@@ -467,16 +502,33 @@ footer {
 
     /* Hero Mobile Polish */
     .hero { padding: 12vh 1.5rem 4rem; }
+    
+    .hero-signature-section {
+        padding: 4vh 1.5rem 0;
+    }
+    
+    .hero-content-adjusted {
+        padding-top: 3vh;
+    }
+    
     .hero-title { 
         font-size: clamp(3rem, 12vw, 4rem); 
         text-align: left; 
         margin-bottom: 2rem; 
     }
+    
+    .hero-title.text-center, 
+    .sub-heading.text-center {
+        text-align: left; /* Keep left alignment on mobile for readability */
+    }
+    
     .hero-desc { 
         text-align: left; 
         font-size: 1.05rem; 
     }
-    .hero-actions { 
+    
+    .hero-actions, 
+    .justify-center { 
         display: flex; 
         justify-content: flex-start; 
     }
