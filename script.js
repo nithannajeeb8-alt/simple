@@ -1,177 +1,155 @@
+// Register GSAP plugins
 gsap.registerPlugin(ScrollTrigger);
 
-const yearSpan = document.getElementById("year");
-if (yearSpan) yearSpan.textContent = new Date().getFullYear();
-
 document.addEventListener("DOMContentLoaded", () => {
-  const hiddenElements = document.querySelectorAll(".hidden-on-load");
-  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const cursor = document.querySelector(".cursor-dot");
-  const signatureText = document.querySelector(".signature-text");
-  const signatureFlourish = document.querySelector(".signature-flourish");
-  const signatureDot = document.querySelector(".signature-dot");
+    
+    // 1. DYNAMIC FOOTER YEAR
+    const yearSpan = document.getElementById('year');
+    if (yearSpan) yearSpan.textContent = new Date().getFullYear();
 
-  let hasTouch = false;
-  window.addEventListener(
-    "touchstart",
-    () => {
-      hasTouch = true;
-    },
-    { once: true, passive: true }
-  );
+    // 2. DETECT TOUCH CAPABILITY
+    let hasTouch = false;
+    window.addEventListener('touchstart', () => { hasTouch = true; }, { once: true, passive: true });
 
-  function initScrollReveals() {
-    gsap.utils.toArray(".gs-reveal").forEach((elem) => {
-      gsap.fromTo(
-        elem,
-        { y: 42, opacity: 0 },
-        {
-          scrollTrigger: {
-            trigger: elem,
-            start: "top 85%",
-            toggleActions: "play none none reverse",
-          },
-          y: 0,
-          opacity: 1,
-          duration: 1,
-          ease: "power3.out",
-        }
-      );
-    });
-  }
+    // ==========================================
+    // 3. MASTER INTRO: SIGNATURE & REVEAL
+    // ==========================================
+    const wordPath = document.querySelector('.signature-word');
+    const dot = document.querySelector('.signature-dot');
+    const hiddenElements = document.querySelectorAll('.hidden-on-load');
 
-  function revealInstant() {
-    gsap.set(hiddenElements, { autoAlpha: 1, y: 0 });
-    gsap.set(".gs-reveal", { opacity: 1, y: 0 });
-    if (signatureDot) gsap.set(signatureDot, { opacity: 1, scale: 1 });
-    initScrollReveals();
-  }
+    if (wordPath && dot) {
+        const length = wordPath.getTotalLength();
 
-  if (reduceMotion) {
-    revealInstant();
-  } else {
-    if (signatureFlourish) {
-      const length = signatureFlourish.getTotalLength();
-      gsap.set(signatureFlourish, {
-        strokeDasharray: length,
-        strokeDashoffset: length,
-      });
+        // Setup initial states
+        gsap.set(wordPath, { strokeDasharray: length, strokeDashoffset: length });
+        gsap.set(dot, { scale: 0, opacity: 0, transformOrigin: "center center" });
+        gsap.set(hiddenElements, { y: 20, autoAlpha: 0 });
+
+        const tl = gsap.timeline();
+
+        // Step A: Draw letters
+        tl.to(wordPath, {
+            strokeDashoffset: 0,
+            duration: 2.2, 
+            ease: "power2.inOut"
+        })
+        // Step B: Pop the dot
+        .to(dot, {
+            scale: 1,
+            opacity: 1,
+            duration: 0.4,
+            ease: "back.out(2)"
+        })
+        // Step C: Reveal the rest of the UI
+        .to(hiddenElements, {
+            autoAlpha: 1, 
+            y: 0,
+            duration: 1,
+            stagger: 0.1,
+            ease: "power3.out",
+            onComplete: () => {
+                // Initialize scroll animations once intro is finished
+                initScrollAnimations();
+            }
+        }, "+=0.2"); 
+    } else {
+        // Fallback if signature isn't on the page
+        gsap.set('.hidden-on-load', { autoAlpha: 1 });
+        initScrollAnimations();
     }
 
-    gsap.set(signatureText, {
-      autoAlpha: 0,
-      y: 10,
-      rotate: -1,
-      transformOrigin: "left center",
-    });
-
-    gsap.set(signatureDot, {
-      autoAlpha: 0,
-      scale: 0,
-      transformOrigin: "center center",
-    });
-
-    gsap.set(hiddenElements, {
-      y: 18,
-      autoAlpha: 0,
-    });
-
-    const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
-
-    if (signatureFlourish) {
-      tl.to(signatureFlourish, {
-        strokeDashoffset: 0,
-        duration: 1.4,
-      });
+    // ==========================================
+    // 4. SCROLL ANIMATION LOGIC
+    // ==========================================
+    function initScrollAnimations() {
+        gsap.utils.toArray('.gs-reveal').forEach(elem => {
+            gsap.fromTo(elem, 
+                { y: 30, opacity: 0 },
+                {
+                    scrollTrigger: {
+                        trigger: elem,
+                        start: "top 90%",
+                        toggleActions: "play none none reverse"
+                    },
+                    y: 0,
+                    opacity: 1,
+                    duration: 1,
+                    ease: "power3.out"
+                }
+            );
+        });
     }
 
-    tl.to(
-      signatureText,
-      {
-        autoAlpha: 1,
-        y: 0,
-        rotate: 0,
-        duration: 0.65,
-      },
-      "-=0.82"
-    )
-      .to(
-        signatureDot,
-        {
-          autoAlpha: 1,
-          scale: 1,
-          duration: 0.34,
-          ease: "back.out(2.4)",
-        },
-        "-=0.22"
-      )
-      .to(
-        hiddenElements,
-        {
-          autoAlpha: 1,
-          y: 0,
-          duration: 0.9,
-          stagger: 0.12,
-        },
-        "-=0.12"
-      )
-      .add(initScrollReveals, "-=0.18");
-  }
+    // ==========================================
+    // 5. MOBILE MENU LOGIC (RIGHT SIDE)
+    // ==========================================
+    const menuToggle = document.getElementById('menuToggle');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const overlayLinks = document.querySelectorAll('.overlay-link');
 
-  if (cursor && window.innerWidth > 768 && !hasTouch) {
-    const cursorX = gsap.quickSetter(cursor, "x", "px");
-    const cursorY = gsap.quickSetter(cursor, "y", "px");
-
-    window.addEventListener("mousemove", (e) => {
-      cursorX(e.clientX);
-      cursorY(e.clientY);
-    });
-
-    const interactives = document.querySelectorAll("a, button, .project-item, .blog-card");
-    interactives.forEach((el) => {
-      el.addEventListener("mouseenter", () => {
-        gsap.to(cursor, {
-          scale: 2.3,
-          backgroundColor: "#fff",
-          duration: 0.25,
+    if (menuToggle && mobileMenu) {
+        menuToggle.addEventListener('click', () => {
+            menuToggle.classList.toggle('active');
+            mobileMenu.classList.toggle('active');
+            
+            // Prevent scrolling when menu is open
+            document.body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : 'auto';
         });
-      });
 
-      el.addEventListener("mouseleave", () => {
-        gsap.to(cursor, {
-          scale: 1,
-          backgroundColor: "#fff",
-          duration: 0.25,
+        // Close menu when a link is clicked
+        overlayLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                menuToggle.classList.remove('active');
+                mobileMenu.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
         });
-      });
-    });
-  }
+    }
 
-  document.querySelectorAll(".magnetic").forEach((btn) => {
-    btn.addEventListener("mousemove", (e) => {
-      if (hasTouch || window.innerWidth <= 768) return;
+    // ==========================================
+    // 6. MAGNETIC BUTTONS EFFECT (DESKTOP)
+    // ==========================================
+    const magnets = document.querySelectorAll('.magnetic');
+    
+    if (window.innerWidth > 768 && !hasTouch) {
+        magnets.forEach(btn => {
+            btn.addEventListener('mousemove', (e) => {
+                const rect = btn.getBoundingClientRect();
+                const x = (e.clientX - rect.left - rect.width / 2) * 0.35;
+                const y = (e.clientY - rect.top - rect.height / 2) * 0.35;
+                gsap.to(btn, { x: x, y: y, duration: 0.3, ease: "power2.out" });
+            });
+            
+            btn.addEventListener('mouseleave', () => {
+                gsap.to(btn, { x: 0, y: 0, duration: 0.8, ease: "elastic.out(1, 0.3)" });
+            });
+        });
+    }
 
-      const rect = btn.getBoundingClientRect();
-      const x = (e.clientX - rect.left - rect.width / 2) * 0.28;
-      const y = (e.clientY - rect.top - rect.height / 2) * 0.28;
+    // ==========================================
+    // 7. FLUID CURSOR TRACKING
+    // ==========================================
+    const cursor = document.querySelector(".cursor-dot");
+    
+    if (cursor && window.innerWidth > 768 && !hasTouch) {
+        const xSetter = gsap.quickSetter(cursor, "x", "px");
+        const ySetter = gsap.quickSetter(cursor, "y", "px");
 
-      gsap.to(btn, {
-        x,
-        y,
-        duration: 0.28,
-        ease: "power2.out",
-      });
-    });
+        window.addEventListener("mousemove", (e) => {
+            xSetter(e.clientX);
+            ySetter(e.clientY);
+        });
 
-    btn.addEventListener("mouseleave", () => {
-      if (hasTouch || window.innerWidth <= 768) return;
-
-      gsap.to(btn, {
-        x: 0,
-        y: 0,
-        duration: 0.7,
-        ease: "elastic.out(1, 0.32)",
-      });
-    });
-  });
+        // Cursor scale on hover
+        const activeHover = document.querySelectorAll('a, button, .project-item');
+        activeHover.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                gsap.to(cursor, { scale: 3, mixBlendMode: "difference", duration: 0.3 });
+            });
+            el.addEventListener('mouseleave', () => {
+                gsap.to(cursor, { scale: 1, mixBlendMode: "normal", duration: 0.3 });
+            });
+        });
+    }
 });
