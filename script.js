@@ -5,6 +5,20 @@ gsap.registerPlugin(ScrollTrigger);
 const yearSpan = document.getElementById('year');
 if (yearSpan) yearSpan.textContent = new Date().getFullYear();
 
+// ==========================================
+// 0. ASSET PRELOADING (Performance)
+// ==========================================
+// Preload hover images silently in the background so they are instant on interaction
+window.addEventListener('load', () => {
+    document.querySelectorAll('.hover-trigger').forEach(item => {
+        const imgUrl = item.getAttribute('data-img');
+        if (imgUrl) {
+            const img = new Image();
+            img.src = imgUrl;
+        }
+    });
+});
+
 document.addEventListener("DOMContentLoaded", () => {
     let hasTouch = false;
     window.addEventListener('touchstart', () => { hasTouch = true; }, { once: true, passive: true });
@@ -87,7 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // ==========================================
     const wordPath = document.querySelector('.signature-word');
     const dot = document.querySelector('.signature-dot');
-    const navElements = document.querySelectorAll('.nav-left.hidden-on-load, .nav-right.hidden-on-load');
+    const navElements = document.querySelectorAll('.nav-left.hidden-on-load, .nav-right.hidden-on-load, .brand-logo.hidden-on-load, .mobile-menu-btn.hidden-on-load');
 
     if (wordPath && dot) {
         const length = wordPath.getTotalLength();
@@ -207,4 +221,67 @@ document.addEventListener("DOMContentLoaded", () => {
 
         return () => { gsap.set(".cursor-dot", { opacity: 0 }); };
     });
+
+    // ==========================================
+    // 6. NEOFETCH EASTER EGG LOGIC
+    // ==========================================
+    const terminalOverlay = document.querySelector('.terminal-overlay');
+    const terminalInput = document.getElementById('terminal-input');
+    const terminalOutput = document.getElementById('terminal-output');
+
+    if (terminalOverlay && terminalInput && terminalOutput) {
+        // Listen for the Backtick (`) key globally
+        window.addEventListener('keydown', (e) => {
+            if (e.key === '`') {
+                const isActive = terminalOverlay.classList.toggle('active');
+                if (isActive) {
+                    document.body.style.overflow = 'hidden';
+                    setTimeout(() => terminalInput.focus(), 100);
+                } else {
+                    document.body.style.overflow = '';
+                    terminalInput.blur();
+                }
+            }
+        });
+
+        // Handle Terminal Commands
+        terminalInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const cmd = terminalInput.value.trim().toLowerCase();
+                terminalInput.value = ''; // Clear input
+                
+                let response = '';
+                
+                if (cmd === 'whoami') {
+                    response = 'Nithan Najeeb (alias: Rubin Stellar).\nWeb Architect. Student (B.Com).';
+                } else if (cmd === 'projects') {
+                    response = 'Active Modules:\n- Mind Atlas\n- Forenexa\n- Born Legend\n- Ollama Uplink';
+                } else if (cmd === 'clear') {
+                    terminalOutput.innerHTML = '';
+                    return;
+                } else if (cmd === 'neofetch' || cmd === 'sysinfo') {
+                    response = `
+       /\\         OS: Arch Linux x86_64 
+      /  \\        Host: Mind Atlas Node
+     /\\   \\       Uptime: Active
+    /      \\      User: Rubin Stellar
+   /   ,,   \\     Shell: bash
+  /   |  |   \\    DE: Hyprland / Openbox
+ /_-''    ''-_\\   Theme: Alabaster Glass
+                    `;
+                } else if (cmd !== '') {
+                    response = `Command not found: ${cmd}. Try 'whoami', 'projects', 'neofetch', or 'clear'.`;
+                }
+
+                // Render output to screen
+                if (response) {
+                    terminalOutput.innerHTML += `<div><span style="color:var(--accent-gold)">rubin@stellar</span>:~$ ${cmd}</div>`;
+                    terminalOutput.innerHTML += `<div style="margin-bottom: 15px; white-space: pre-wrap; font-family: var(--mono);">${response}</div>`;
+                    
+                    // Auto-scroll to bottom
+                    terminalOutput.scrollTop = terminalOutput.scrollHeight;
+                }
+            }
+        });
+    }
 });
