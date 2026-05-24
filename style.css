@@ -1,5 +1,5 @@
 /* ==========================================
-   1. CORE VARIABLES & SETUP (OBSIDIAN/ALABASTER)
+   1. CORE VARIABLES & SETUP
    ========================================== */
 :root {
     --bg: #0a0a0b; 
@@ -12,8 +12,6 @@
     
     --glass-bg: rgba(255, 255, 255, 0.02);
     --glass-bg-hover: rgba(255, 255, 255, 0.05);
-    --glass-border: rgba(255, 255, 255, 0.03);
-    --glass-border-light: rgba(255, 255, 255, 0.08); 
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -34,8 +32,36 @@ body {
 }
 
 /* ==========================================
-   2. CUSTOM CURSOR & TACTILE NOISE
+   2. AMBIENT LIGHTING & NOISE
    ========================================== */
+.ambient-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(100px);
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+.orb-1 {
+    width: 40vw; height: 40vw;
+    background: radial-gradient(circle, rgba(230, 204, 152, 0.15) 0%, transparent 70%);
+    top: 10%; left: -10%;
+    animation: drift 25s infinite alternate ease-in-out;
+}
+
+.orb-2 {
+    width: 35vw; height: 35vw;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+    top: 60%; right: -10%;
+    animation: drift 30s infinite alternate-reverse ease-in-out;
+}
+
+@keyframes drift {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(15vw, 15vh) scale(1.1); }
+}
+
 .cursor-dot {
     width: 8px; height: 8px; background-color: var(--accent-gold);
     border-radius: 50%; position: fixed; top: 0; left: 0;
@@ -48,19 +74,17 @@ body {
     pointer-events: none; z-index: 9999; opacity: 0.035; mix-blend-mode: overlay;
 }
 
-/* FIXED: Removed Blur, optimized for smooth slide reveals */
 .gs-reveal { 
     opacity: 0; 
     transform: translateY(40px);
     will-change: transform, opacity; 
 }
 
-/* The Invisible Mask for the staggered text */
 .line-wrapper { 
     overflow: hidden; 
     display: inline-block; 
     vertical-align: top;
-    padding-bottom: 0.2em; /* Prevents cutting off bottom of letters like g and p */
+    padding-bottom: 0.2em; 
     margin-bottom: -0.2em;
 }
 .line-inner { 
@@ -69,12 +93,17 @@ body {
 }
 
 /* ==========================================
-   3. LUXURY GLASSMORPHISM UTILITIES
+   3. PREMIUM HARDWARE GLASSMORPHISM
    ========================================== */
 .glass-btn {
-    color: var(--text-main); background: var(--glass-bg);
+    color: var(--text-main); 
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
     backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
-    border: 1px solid var(--glass-border); border-top: 1px solid var(--glass-border-light);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 
+        inset 0px 1px 1px rgba(255, 255, 255, 0.15),
+        inset 0px -1px 1px rgba(0, 0, 0, 0.2),
+        0 20px 40px rgba(0, 0, 0, 0.4);
     padding: 10px 24px; border-radius: 100px;
     font-family: var(--mono); font-size: 0.85rem; font-weight: 400;
     text-transform: uppercase; letter-spacing: 1px;
@@ -82,18 +111,30 @@ body {
     text-decoration: none; transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-.glass-btn:hover { background: var(--glass-bg-hover); transform: translateY(-2px); box-shadow: 0 10px 40px rgba(255, 255, 255, 0.03); }
+.glass-btn:hover { 
+    background: var(--glass-bg-hover); 
+    transform: translateY(-2px); 
+    box-shadow: 
+        inset 0px 1px 1px rgba(255, 255, 255, 0.2),
+        inset 0px -1px 1px rgba(0, 0, 0, 0.2),
+        0 25px 45px rgba(0, 0, 0, 0.5); 
+}
+
 .glass-btn.large { padding: 18px 44px; font-size: 0.95rem; }
-.glass-btn.highlight { background: var(--text-main); color: var(--bg); border: none; }
+.glass-btn.highlight { background: var(--text-main); color: var(--bg); border: none; box-shadow: none; }
 .glass-btn.highlight:hover { background: #ffffff; transform: scale(1.03); }
 
 .perspective-container { perspective: 1000px; }
 .tilt-card { transform-style: preserve-3d; will-change: transform; }
 
 .glass-card {
-    background: var(--glass-bg);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
     backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
-    border: 1px solid var(--glass-border); border-top: 1px solid var(--glass-border-light);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 
+        inset 0px 1px 1px rgba(255, 255, 255, 0.15),
+        inset 0px -1px 1px rgba(0, 0, 0, 0.2),
+        0 20px 40px rgba(0, 0, 0, 0.4);
     border-radius: 20px; padding: 40px;
 }
 
@@ -139,8 +180,9 @@ body {
 .scroll-line { width: 1px; height: 50px; background: linear-gradient(to bottom, rgba(255,255,255,0.5), transparent); transform-origin: top; animation: scrollHairline 2.5s cubic-bezier(0.25, 1, 0.5, 1) infinite; }
 @keyframes scrollHairline { 0% { transform: scaleY(0); opacity: 0; } 50% { transform: scaleY(1); opacity: 1; } 100% { transform: translateY(30px) scaleY(0); opacity: 0; } }
 
-.sub-heading { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 2.5rem; letter-spacing: 3px; text-transform: uppercase; display: inline-block; }
-.hero-title { font-family: var(--serif); font-size: clamp(3.5rem, 8vw, 8.5rem); line-height: 1.05; font-weight: 400; margin-bottom: 5rem; letter-spacing: -0.02em; }
+/* TYPOGRAPHY CONTRAST UPGRADES */
+.sub-heading { font-size: 0.75rem; color: var(--accent-gold); margin-bottom: 2.5rem; letter-spacing: 6px; text-transform: uppercase; display: inline-block; }
+.hero-title { font-family: var(--serif); font-size: clamp(3.5rem, 8vw, 8.5rem); line-height: 1.05; font-weight: 300; margin-bottom: 5rem; letter-spacing: -0.04em; }
 .hero-title i { font-style: italic; color: var(--text-muted); }
 .hero-text-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; }
 .hero-desc { font-size: 1.15rem; color: var(--text-muted); line-height: 2; font-weight: 300; }
@@ -150,12 +192,12 @@ body {
    7. DATA ARCHIVE (ABOUT)
    ========================================== */
 .section-header { border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 1.5rem; margin-bottom: 6rem; overflow: hidden; }
-.section-header p { font-size: 0.85rem; color: var(--text-muted); letter-spacing: 2px; text-transform: uppercase; display: inline-block; }
+.section-header p { font-size: 0.75rem; color: var(--accent-gold); letter-spacing: 6px; text-transform: uppercase; display: inline-block; }
 .profile-grid { display: grid; grid-template-columns: 350px 1fr; gap: 6rem; align-items: start; }
 .stat-row { display: flex; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05); font-size: 0.9rem; }
 .stat-row:last-child { border-bottom: none; }
 .stat-row span { color: var(--text-muted); } .stat-row strong { color: var(--text-main); font-weight: 400; }
-.info-block h3 { font-family: var(--serif); font-size: 2.2rem; font-weight: 400; margin-bottom: 1.5rem; }
+.info-block h3 { font-family: var(--serif); font-size: 2.2rem; font-weight: 300; margin-bottom: 1.5rem; letter-spacing: -0.02em; }
 .info-block p, .tech-list li { color: var(--text-muted); font-size: 1.15rem; line-height: 2; }
 .tech-list { list-style: none; } .tech-list li { margin-bottom: 0.8rem; } .tech-list strong { color: var(--text-main); font-weight: 400;}
 
@@ -165,7 +207,7 @@ body {
 .project-list { list-style: none; position: relative; z-index: 2; }
 .project-item { display: flex; justify-content: space-between; align-items: center; padding: 4rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.08); transition: opacity 0.7s cubic-bezier(0.25, 1, 0.5, 1); cursor: pointer; }
 .project-list:hover .project-item:not(:hover) { opacity: 0.15; }
-.p-info h2 { font-family: var(--serif); font-size: clamp(3rem, 6vw, 5rem); font-weight: 400; margin-bottom: 0.5rem; transition: transform 0.7s cubic-bezier(0.25, 1, 0.5, 1); pointer-events: none; }
+.p-info h2 { font-family: var(--serif); font-size: clamp(3rem, 6vw, 5rem); font-weight: 300; letter-spacing: -0.04em; margin-bottom: 0.5rem; transition: transform 0.7s cubic-bezier(0.25, 1, 0.5, 1); pointer-events: none; }
 .project-item:hover .p-info h2 { transform: translateX(30px) skewX(-2deg); }
 .p-info span { font-size: 0.95rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; pointer-events: none; }
 .p-arrow { font-size: 2.5rem; font-family: var(--serif); color: var(--text-muted); transition: transform 0.7s cubic-bezier(0.25, 1, 0.5, 1), color 0.5s ease; pointer-events: none; }
@@ -189,7 +231,17 @@ body {
 .massive-link:hover { color: var(--accent-gold); }
 footer { display: flex; flex-direction: column; align-items: center; padding: 6rem 6vw; gap: 3rem; }
 .footer-status { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; }
-.glass-social-box { display: flex; align-items: center; gap: 24px; background: var(--glass-bg); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); border: 1px solid var(--glass-border); padding: 16px 32px 16px 16px; border-radius: 100px; }
+
+/* Updating footer social box to match the premium glass styling */
+.glass-social-box { 
+    display: flex; align-items: center; gap: 24px; 
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+    backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); 
+    border: 1px solid rgba(255, 255, 255, 0.05); 
+    box-shadow: inset 0px 1px 1px rgba(255, 255, 255, 0.15), inset 0px -1px 1px rgba(0, 0, 0, 0.2), 0 20px 40px rgba(0, 0, 0, 0.4);
+    padding: 16px 32px 16px 16px; border-radius: 100px; 
+}
+
 .mini-logo { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; }
 .social-links { display: flex; gap: 16px; }
 .social-item { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.03); transition: all 0.4s ease; }
@@ -198,7 +250,7 @@ footer { display: flex; flex-direction: column; align-items: center; padding: 6r
 .social-item:hover svg { fill: var(--bg); }
 
 /* ==========================================
-   10. MOBILE & EDITORIAL RESPONSIVENESS
+   10. MOBILE RESPONSIVENESS
    ========================================== */
 @media (max-width: 1024px) {
     .profile-grid { grid-template-columns: 1fr; gap: 4rem; }
@@ -230,4 +282,16 @@ footer { display: flex; flex-direction: column; align-items: center; padding: 6r
     .cursor-dot { display: none !important; }
     * { cursor: auto !important; }
     .tilt-card { transform: none !important; } 
+}
+
+/* ==========================================
+   11. ACCESSIBILITY: REDUCED MOTION
+   ========================================== */
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .gs-reveal, .line-inner, .nav-left.hidden-on-load, .nav-right.hidden-on-load, .scroll-indicator {
+        opacity: 1 !important; transform: none !important; visibility: visible !important;
+    }
+    .noise-overlay, .cursor-dot, .ambient-orb { display: none !important; }
+    * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
 }
