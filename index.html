@@ -2,7 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://nithan.in/" />
+    <meta property="og:title" content="Nithan (Portfolio)" />
+    <meta property="og:description" content="Building intelligent infrastructure. Web experiments, Mind Atlas, and creative projects." />
+    
     <title>Nithan (Portfolio)</title>
     <meta name="description" content="Portfolio of Nithan: web experiments, Mind Atlas, and creative projects." />
     
@@ -31,13 +37,8 @@
     </svg>
 
     <nav class="nav">
-        <div class="nav-left hidden-on-load">
-            <button class="mobile-menu-btn" aria-label="Toggle Menu" aria-expanded="false">
-                <div class="menu-lines" aria-hidden="true"></div>
-            </button>
-            <div class="brand-logo">
-                <span class="brand-text">NITHAN.</span>
-            </div>
+        <div class="brand-logo hidden-on-load">
+            <span class="brand-text">NITHAN.</span>
         </div>
 
         <div class="nav-right desktop-nav hidden-on-load">
@@ -47,6 +48,10 @@
             <a href="game.html" class="glass-btn magnetic">Game</a>
             <a href="#contact" class="glass-btn magnetic highlight">Comm</a>
         </div>
+
+        <button class="mobile-menu-btn hidden-on-load" aria-label="Toggle Menu" aria-expanded="false">
+            <div class="menu-lines" aria-hidden="true"></div>
+        </button>
     </nav>
 
     <div class="mobile-menu-overlay" aria-hidden="true">
@@ -59,7 +64,8 @@
         </div>
     </div>
 
-    <main>
+    <main class="main-container">
+        
         <div class="ambient-orb orb-1"></div>
         <div class="ambient-orb orb-2"></div>
 
@@ -159,7 +165,7 @@
             </ul>
         </section>
 
-        <footer class="gs-reveal">
+        <footer class="gs-reveal" id="contact">
             <div class="footer-status">
                 <p>NODE HOSTED AT <strong>NITHAN.IN</strong> // SYSTEM YEAR <time id="year"></time></p>
             </div>
