@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://nithan.in/gallery.html" />
+    <meta property="og:title" content="Nithan // Visual Archives" />
+    <meta property="og:description" content="Documenting structural forms, natural canopies, and urban environments." />
+    
+    <title>Nithan // Visual Archives</title>
+    <meta name="description" content="Documenting structural forms, natural canopies, and urban environments." />
+    
+    <link rel="icon" type="image/png" href="/favicon.PNG">
+    <link rel="apple-touch-icon" href="/favicon.PNG">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@100;300;400;500&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
+    
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script defer src="script.js"></script>
+</head>
+<body>
+
+    <div class="cursor-dot" aria-hidden="true"></div>
+
+    <svg class="noise-overlay" aria-hidden="true" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <filter id="noiseFilter">
+            <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/>
+        </filter>
+        <rect width="100%" height="100%" filter="url(#noiseFilter)"/>
+    </svg>
+
+    <nav class="nav">
+        <a href="index.html" class="brand-logo hidden-on-load" style="text-decoration: none;">
+            <span class="brand-text">NITHAN.</span>
+        </a>
+
+        <div class="nav-right desktop-nav hidden-on-load">
+            <a href="blog.html" class="glass-btn magnetic">Logs</a>
+            <a href="game.html" class="glass-btn magnetic">Game</a>
+            <a href="gallery.html" class="glass-btn magnetic highlight">Gallery</a>
+        </div>
+
+        <button class="mobile-menu-btn hidden-on-load" aria-label="Toggle Menu" aria-expanded="false">
+            <div class="menu-lines" aria-hidden="true"></div>
+        </button>
+    </nav>
+
+    <div class="mobile-menu-overlay" aria-hidden="true">
+        <div class="mobile-links">
+            <a href="index.html" class="mobile-link">Home Base</a>
+            <a href="blog.html" class="mobile-link">Logs</a>
+            <a href="game.html" class="mobile-link">Game</a>
+            <a href="gallery.html" class="mobile-link highlight-text">Gallery</a>
+        </div>
+    </div>
+
+    <main class="main-container">
+        
+        <div class="ambient-orb orb-1"></div>
+        <div class="ambient-orb orb-2"></div>
+
+        <section class="hero-text-section section-padding" style="padding-top: 14rem; min-height: 60vh;">
+            <p class="sub-heading text-center gs-reveal parallax-text">(03) VISUAL_DATA</p>
+            <h1 class="hero-title text-center gs-reveal">Captured <i>Architecture</i>.</h1>
+            
+            <div class="hero-text-grid" style="grid-template-columns: 1fr; max-width: 800px; margin: 0 auto; text-align: center;">
+                <p class="hero-desc">Documenting structural forms, natural canopies, and urban environments. From the dense biological networks of Kerala to the rigid concrete grids of international architecture. Scroll to initiate the horizontal tracking array.</p>
+            </div>
+        </section>
+
+        <!-- The GSAP Horizontal Scroll Section -->
+        <section class="gallery-section">
+            <div class="gallery-pin-wrap">
+                <div class="gallery-track">
+                    
+                    <!-- ARCHIVE NODE 01: Natural Form (Kerala / Sahya) -->
+                    <div class="gallery-item tilt-card">
+                        <div class="glass-card gallery-glass">
+                            <div class="g-img-wrap">
+                                <img src="https://images.unsplash.com/photo-1623869675781-80aa31012a5a?q=80&w=1200&auto=format&fit=crop" class="parallax-img" alt="Kerala Tea Plantations and Forest Canopies">
+                                <div class="g-stamp">SYS.ARCHIVE // 01</div>
+                            </div>
+                            <div class="g-meta">
+                                <div class="g-meta-top">
+                                    <h3 class="g-title">Sahya <i>Terrain</i>.</h3>
+                                    <span class="g-date">2024.08</span>
+                                </div>
+                                <div class="g-meta-bottom">
+                                    <span>CLASS: BIO_NETWORK</span>
+                                    <strong>NATURAL_CANOPY</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ARCHIVE NODE 02: Structural Heritage (Mysuru / Srirangapatna) -->
+                    <div class="gallery-item tilt-card">
+                        <div class="glass-card gallery-glass">
+                            <div class="g-img-wrap">
+                                <img src="https://images.unsplash.com/photo-1582672060624-913a1005bc14?q=80&w=1200&auto=format&fit=crop" class="parallax-img" alt="Mysuru Heritage Architecture">
+                                <div class="g-stamp">SYS.ARCHIVE // 02</div>
+                            </div>
+                            <div class="g-meta">
+                                <div class="g-meta-top">
+                                    <h3 class="g-title">Mysuru <i>Heritage</i>.</h3>
+                                    <span class="g-date">2025.02.18</span>
+                                </div>
+                                <div class="g-meta-bottom">
+                                    <span>CLASS: HERITAGE_FORM</span>
+                                    <strong>STRUCTURAL_HISTORY</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ARCHIVE NODE 03: Urban Infrastructure (Saudi / Jeddah) -->
+                    <div class="gallery-item tilt-card">
+                        <div class="glass-card gallery-glass">
+                            <div class="g-img-wrap">
+                                <img src="https://images.unsplash.com/photo-1580273916550-e323be2ae537?q=80&w=1200&auto=format&fit=crop" class="parallax-img" alt="Urban Jeddah Infrastructure">
+                                <div class="g-stamp">SYS.ARCHIVE // 03</div>
+                            </div>
+                            <div class="g-meta">
+                                <div class="g-meta-top">
+                                    <h3 class="g-title">Jeddah <i>Grid</i>.</h3>
+                                    <span class="g-date">2024.05.03</span>
+                                </div>
+                                <div class="g-meta-bottom">
+                                    <span>CLASS: URBAN_INFRA</span>
+                                    <strong>CITY_ARCHITECTURE</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Exit Block -->
+        <section class="section-padding" style="min-height: 50vh; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 2rem;">
+            <p class="sub-heading text-center gs-reveal">(04) SYSTEM_STATUS</p>
+            <h2 class="hero-title text-center gs-reveal" style="font-size: 3rem;">End of Array.</h2>
+        </section>
+
+        <footer class="gs-reveal" id="contact">
+            <div class="footer-status">
+                <p>NODE HOSTED AT <strong>NITHAN.IN</strong> // SYSTEM YEAR <time id="year"></time></p>
+            </div>
+        </footer>
+    </main>
+
+</body>
+</html>
