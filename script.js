@@ -121,7 +121,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // ==========================================
     let mm = gsap.matchMedia();
 
-    // --- ALL DEVICES ---
     mm.add("all", () => {
         gsap.utils.toArray('.gs-reveal:not(.parallax-text, .parallax-header)').forEach(elem => {
             gsap.fromTo(elem, 
@@ -129,7 +128,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 {
                     scrollTrigger: { trigger: elem, start: "top 85%", toggleActions: "play none none reverse" },
                     y: 0, opacity: 1, duration: 1.4, ease: "power3.out",
-                    clearProps: "will-change" // OPTIMIZED: Clears GPU memory after animating
+                    clearProps: "will-change"
                 }
             );
         });
@@ -139,12 +138,11 @@ document.addEventListener("DOMContentLoaded", () => {
             {
                 scrollTrigger: { trigger: ".hero-text-section", start: "top 80%" },
                 y: "0%", opacity: 1, duration: 1.2, stagger: 0.1, ease: "power4.out",
-                clearProps: "will-change" // OPTIMIZED: Clears GPU memory after animating
+                clearProps: "will-change" 
             }
         );
     });
 
-    // --- DESKTOP ONLY ---
     mm.add("(min-width: 1025px)", () => {
         gsap.utils.toArray('.parallax-header').forEach(header => {
             gsap.to(header, {
@@ -159,7 +157,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         if (!hasTouch) {
-            // Tilt Card
             const tiltCard = document.querySelector('.tilt-card');
             const handleTilt = (e) => {
                 const rect = tiltCard.getBoundingClientRect();
@@ -174,7 +171,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 tiltCard.addEventListener('mouseleave', resetTilt);
             }
 
-            // Hover Image Reveal
             const hoverWrapper = document.querySelector('.hover-image-reveal');
             const hoverInner = document.querySelector('.hover-image-inner');
             const setX = gsap.quickSetter(hoverWrapper, "x", "px");
@@ -196,7 +192,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
             });
 
-            // Magnetic Buttons
             document.querySelectorAll('.magnetic').forEach(btn => {
                 btn.addEventListener('mousemove', (e) => {
                     const rect = btn.getBoundingClientRect();
@@ -207,7 +202,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
             });
 
-            // Fluid Cursor
             const cursor = document.querySelector(".cursor-dot");
             const cursorX = gsap.quickSetter(cursor, "x", "px");
             const cursorY = gsap.quickSetter(cursor, "y", "px");
@@ -279,8 +273,9 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
-        // ==========================================
-    // 7. HORIZONTAL GALLERY SCROLL & PARALLAX
+
+    // ==========================================
+    // 7. HORIZONTAL GALLERY SCROLL (BULLETPROOF)
     // ==========================================
     const gallerySection = document.querySelector('.gallery-section');
     const galleryTrack = document.querySelector('.gallery-track');
@@ -288,21 +283,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (gallerySection && galleryTrack) {
         
+        // Dynamically calculates exact width to prevent empty scroll space
         function getScrollAmount() {
             let trackWidth = galleryTrack.scrollWidth;
-            return -(trackWidth - window.innerWidth);
+            return trackWidth - window.innerWidth;
         }
 
-        const tween = gsap.to(galleryTrack, {
-            x: getScrollAmount,
-            duration: 3,
+        let tween = gsap.to(galleryTrack, {
+            x: () => -getScrollAmount(),
             ease: "none"
         });
 
         ScrollTrigger.create({
             trigger: gallerySection,
             start: "top top",
-            end: () => `+=${getScrollAmount() * -1}`,
+            end: () => `+=${getScrollAmount()}`,
             pin: true,
             animation: tween,
             scrub: 1, 
@@ -316,11 +311,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 scrollTrigger: {
                     trigger: gallerySection,
                     start: "top top",
-                    end: () => `+=${getScrollAmount() * -1}`,
+                    end: () => `+=${getScrollAmount()}`,
                     scrub: 1,
                     invalidateOnRefresh: true
                 }
             });
+        });
+
+        window.addEventListener("load", () => {
+            ScrollTrigger.refresh();
         });
     }
 });
