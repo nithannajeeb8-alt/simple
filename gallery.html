@@ -61,6 +61,7 @@
         </div>
     </div>
 
+    <!-- main-container handles the cinematic scale-down when the lightbox opens -->
     <main class="main-container">
         
         <div class="ambient-orb orb-1"></div>
@@ -75,13 +76,16 @@
             </div>
         </section>
 
+        <!-- The GSAP Horizontal Scroll Section -->
         <section class="gallery-section">
             <div class="gallery-pin-wrap">
                 <div class="gallery-track">
                     
+                    <!-- ARCHIVE NODE 01: Natural Form -->
                     <div class="gallery-item tilt-card">
-                        <div class="glass-card gallery-glass">
+                        <div class="glass-card gallery-glass" style="cursor: pointer;">
                             <div class="g-img-wrap">
+                                <!-- Swap src with your Raw GitHub image URLs when ready -->
                                 <img src="https://images.unsplash.com/photo-1623869675781-80aa31012a5a?q=80&w=1200&auto=format&fit=crop" class="parallax-img" alt="Kerala Tea Plantations and Forest Canopies">
                                 <div class="g-stamp">SYS.ARCHIVE // 01</div>
                             </div>
@@ -98,8 +102,9 @@
                         </div>
                     </div>
 
+                    <!-- ARCHIVE NODE 02: Structural Heritage -->
                     <div class="gallery-item tilt-card">
-                        <div class="glass-card gallery-glass">
+                        <div class="glass-card gallery-glass" style="cursor: pointer;">
                             <div class="g-img-wrap">
                                 <img src="https://images.unsplash.com/photo-1582672060624-913a1005bc14?q=80&w=1200&auto=format&fit=crop" class="parallax-img" alt="Mysuru Heritage Architecture">
                                 <div class="g-stamp">SYS.ARCHIVE // 02</div>
@@ -117,8 +122,9 @@
                         </div>
                     </div>
 
+                    <!-- ARCHIVE NODE 03: Urban Infrastructure -->
                     <div class="gallery-item tilt-card">
-                        <div class="glass-card gallery-glass">
+                        <div class="glass-card gallery-glass" style="cursor: pointer;">
                             <div class="g-img-wrap">
                                 <img src="https://images.unsplash.com/photo-1580273916550-e323be2ae537?q=80&w=1200&auto=format&fit=crop" class="parallax-img" alt="Urban Jeddah Infrastructure">
                                 <div class="g-stamp">SYS.ARCHIVE // 03</div>
@@ -137,9 +143,16 @@
                     </div>
 
                 </div>
+
+                <!-- Array Progress HUD -->
+                <div class="archive-progress" aria-hidden="true">
+                    <div class="archive-progress-fill"></div>
+                </div>
+
             </div>
         </section>
 
+        <!-- Exit Block (Padding Fixed) -->
         <section style="padding: 6rem 8vw 2rem 8vw; min-height: 30vh; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 1.5rem; position: relative; z-index: 10;">
             <p class="sub-heading text-center gs-reveal">(04) SYSTEM_STATUS</p>
             <h2 class="hero-title text-center gs-reveal" style="font-size: clamp(2rem, 5vw, 3rem); margin-bottom: 0;">End of Array.</h2>
@@ -161,6 +174,12 @@
             </div>
         </footer>
     </main>
+
+    <!-- FULL SCREEN LIGHTBOX PROTOCOL -->
+    <div class="lightbox-overlay" aria-hidden="true">
+        <div class="lightbox-close">CLOSE_VIEW [X]</div>
+        <img src="" alt="Full Resolution Archive" class="lightbox-img">
+    </div>
 
 </body>
 </html>
