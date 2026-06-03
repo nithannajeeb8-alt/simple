@@ -301,18 +301,23 @@ footer { display: flex; flex-direction: column; align-items: center; padding: 6r
 }
 
 /* ==========================================
-   12. HORIZONTAL VISUAL ARCHIVE (ELEGANT)
+   12. HORIZONTAL VISUAL ARCHIVE (ELEGANT & FIXED)
    ========================================== */
 .gallery-section {
     position: relative;
     width: 100%;
-    height: 400vh;
+    /* FIX 1: Removed 'height: 400vh;'. 
+       GSAP will now dynamically calculate the exact height 
+       based on how many images you actually have! No more black voids.
+    */
 }
 
 .gallery-pin-wrap {
     position: sticky;
     top: 0;
+    /* FIX 2: Using 'dvh' (dynamic viewport height) prevents layout jumping on mobile when the URL bar hides/shows */
     height: 100vh;
+    height: 100dvh; 
     width: 100vw;
     overflow: hidden;
     display: flex;
@@ -323,6 +328,8 @@ footer { display: flex; flex-direction: column; align-items: center; padding: 6r
     display: flex;
     gap: 5rem;
     padding: 0 10vw;
+    /* FIX 3: Forces the track to wrap tightly around the images so the math is 100% accurate */
+    width: max-content; 
     will-change: transform;
     transform: translateZ(0);
 }
@@ -440,7 +447,8 @@ footer { display: flex; flex-direction: column; align-items: center; padding: 6r
 @media (max-width: 768px) {
     .gallery-track {
         gap: 2rem;
-        padding: 0 5vw;
+        /* Balanced mobile padding so the last image doesn't hug the edge */
+        padding: 0 1.5rem; 
     }
     .gallery-item {
         flex: 0 0 85vw;
