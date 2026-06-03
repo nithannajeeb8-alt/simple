@@ -2,81 +2,211 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Nithan // Game Arcade</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://nithan.in/game.html" />
+    <meta property="og:title" content="Nithan // System Trials" />
+    <meta property="og:description" content="Interactive simulations, logic trials, and digital playgrounds built from scratch." />
+    
+    <title>Nithan // System Trials</title>
+    <meta name="description" content="Interactive simulations, logic trials, and digital playgrounds built from scratch." />
+    
     <link rel="icon" type="image/png" href="/favicon.PNG">
     <link rel="apple-touch-icon" href="/favicon.PNG">
     
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@100;300;400;500&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@100;300;400;500&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="style.css">
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script defer src="script.js"></script>
+
+    <!-- Specific Styles for the Arcade Grid & Mobile Fixes -->
+    <style>
+        .arcade-hero-spacing {
+            padding-top: 14rem;
+        }
+
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 3rem;
+            perspective: 1000px;
+        }
+
+        .blog-card {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 3.5rem 3rem;
+            border-radius: 16px; 
+            height: 100%;
+        }
+
+        .blog-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 1.5rem;
+        }
+
+        .blog-date {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .blog-tag {
+            font-size: 0.75rem;
+            color: var(--accent-gold);
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            padding: 4px 12px;
+            border-radius: 100px;
+            letter-spacing: 1px;
+        }
+
+        .blog-title {
+            font-family: var(--serif);
+            font-size: 2.2rem;
+            font-weight: 300;
+            color: var(--text-main);
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+
+        .blog-excerpt {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            line-height: 1.9;
+            margin-bottom: 3rem;
+            flex-grow: 1;
+        }
+
+        @media (max-width: 768px) {
+            .arcade-hero-spacing {
+                padding-top: 7rem; /* Mobile spacing fix */
+            }
+            .blog-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            .blog-card {
+                padding: 2.5rem 2rem;
+            }
+            .blog-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+        }
+    </style>
 </head>
 <body>
 
-    <div class="cursor-dot"></div>
+    <div class="cursor-dot" aria-hidden="true"></div>
+
+    <svg class="noise-overlay" aria-hidden="true" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <filter id="noiseFilter">
+            <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/>
+        </filter>
+        <rect width="100%" height="100%" filter="url(#noiseFilter)"/>
+    </svg>
 
     <nav class="nav">
-        <div class="brand-logo">
-            <svg class="signature-svg" viewBox="0 0 500 150" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path class="signature-word" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" 
-                d="M50,100 C70,20 100,20 90,100 C80,140 120,60 140,80 C150,90 140,110 160,110 C180,110 180,60 190,60 C200,60 190,110 210,110 C230,110 240,40 240,40 C240,40 230,110 250,110 C270,110 290,70 300,70 C310,70 300,110 320,110 C340,110 350,80 360,80 C370,80 370,110 390,110 C410,110 420,80 430,80 C440,80 430,110 450,110" />
-                <circle class="signature-dot" cx="470" cy="105" r="6" fill="#ffffff" />
-            </svg>
+        <!-- Logo acts as a back button for mobile -->
+        <a href="index.html" class="brand-logo hidden-on-load" style="text-decoration: none;">
+            <span class="brand-text">NITHAN.</span>
+        </a>
+
+        <div class="nav-right desktop-nav hidden-on-load">
+            <a href="blog.html" class="glass-btn magnetic">Dev Logs</a>
+            <a href="index.html" class="glass-btn magnetic highlight">Home Base</a>
         </div>
 
-        <div class="nav-right hidden-on-load">
-            <a href="index.html" class="glass-btn magnetic highlight">Home Base</a>
-            <a href="blog.html" class="glass-btn magnetic">Dev Logs</a>
-        </div>
+        <button class="mobile-menu-btn hidden-on-load" aria-label="Toggle Menu" aria-expanded="false">
+            <div class="menu-lines" aria-hidden="true"></div>
+        </button>
     </nav>
 
-    <main class="hidden-on-load">
+    <div class="mobile-menu-overlay" aria-hidden="true">
+        <div class="mobile-links">
+            <a href="blog.html" class="mobile-link">Dev Logs</a>
+            <a href="index.html" class="mobile-link highlight-text">Home Base</a>
+        </div>
+    </div>
+
+    <main class="main-container">
         
-        <section class="section-padding" style="padding-top: 4rem;">
-            <div style="margin-bottom: 6rem;">
-                <p class="sub-heading gs-reveal">(01) ARCADE</p>
-                <h1 class="hero-title gs-reveal">System <i>Trials</i>.</h1>
-                <p class="hero-desc gs-reveal">Interactive simulations, logic trials, and digital playgrounds built from scratch.</p>
-            </div>
+        <div class="ambient-orb orb-1"></div>
+        <div class="ambient-orb orb-2"></div>
+
+        <section class="hero-text-section section-padding arcade-hero-spacing">
+            <p class="sub-heading text-center gs-reveal parallax-text">(01) ARCADE</p>
+            <h1 class="hero-title text-center gs-reveal">System <i>Trials</i>.</h1>
             
-            <div class="blog-grid">
+            <div class="hero-text-grid">
+                <p class="hero-desc">Interactive simulations, logic trials, and digital playgrounds built from scratch. This sector is dedicated to experimental mechanics and browser-based processing.</p>
+                <p class="hero-desc">Every module is an isolated environment designed to test cognitive limits, timing precision, and active defense protocols without relying on heavy external engines.</p>
+            </div>
+        </section>
+
+        <section class="section-padding gs-reveal" style="padding-top: 0;">
+            <header class="section-header">
+                <p class="parallax-header">(02) ACTIVE_GAMES</p>
+            </header>
+            
+            <!-- Glassmorphic Grid Layout -->
+            <div class="blog-grid perspective-container">
                 
-                <article class="blog-card gs-reveal">
+                <article class="blog-card glass-card tilt-card gs-reveal">
                     <div class="blog-meta">
                         <span class="blog-date">STATUS: ONLINE</span>
                         <span class="blog-tag">LOGIC_TRIAL</span>
                     </div>
                     <h3 class="blog-title">10 Second Challenge</h3>
                     <p class="blog-excerpt">Think you have the elite internal timing of a Formula 1 driver? Once you hit start, the display vanishes into a stream of digital noise, leaving you completely blind. Trust your instincts and kill the timer at exactly 10.000 milliseconds.</p>
-                    <a href="reaction-time-test.html" class="blog-link magnetic">INITIATE_GAME ↗</a>
+                    <a href="reaction-time-test.html" class="glass-btn magnetic">INITIATE_GAME ↗</a>
                 </article>
 
-                <article class="blog-card gs-reveal">
+                <article class="blog-card glass-card tilt-card gs-reveal">
                     <div class="blog-meta">
                         <span class="blog-date">STATUS: ONLINE</span>
                         <span class="blog-tag">DEFENSE_PROTOCOL</span>
                     </div>
                     <h3 class="blog-title">SYS_DEFEND</h3>
                     <p class="blog-excerpt">Defend the central core against relentless waves of anomalies. Strategic resource allocation and rapid reflexes are key to system survival.</p>
-                    <a href="SYS_DEFEND.html" class="blog-link magnetic">INITIATE_GAME ↗</a>
+                    <a href="SYS_DEFEND.html" class="glass-btn magnetic">INITIATE_GAME ↗</a>
                 </article>
 
-            </div> 
+            </div>
         </section>
 
+        <footer class="gs-reveal" id="contact">
+            <div class="footer-status">
+                <p>NODE HOSTED AT <strong>NITHAN.IN</strong> // SYSTEM YEAR <time id="year"></time></p>
+            </div>
+
+            <div class="glass-social-box">
+                <img src="/icon.PNG" alt="Nithan logo" class="mini-logo">
+                <div class="social-links">
+                    <a class="social-item magnetic" href="https://instagram.com/nithannajeeb_" target="_blank" aria-label="Instagram"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7zm5 3.5a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9zm0 2a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM17.5 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" /></svg></a>
+                    <a class="social-item magnetic" href="https://www.threads.net/@nithannajeeb_" target="_blank" aria-label="Threads"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C7.6 2 4 5.6 4 10s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 2c3.9 0 7 3.1 7 7s-3.1 7-7 7c-2.6 0-4.9-1.4-6.1-3.6 1.1 0.7 2.4 1.1 3.7 1.1 3.9 0 7-3.1 7-7 0-1.3-0.4-2.6-1.1-3.7C16.6 4.6 14.3 4 12 4z"/></svg></a>
+                    <a class="social-item magnetic" href="https://www.facebook.com/nithan.najeeb" target="_blank" aria-label="Facebook"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12a10 10 0 1 0-11.5 9.9v-7h-2.2v-2.9h2.2V9.3c0-2.2 1.3-3.4 3.2-3.4.9 0 1.9.1 1.9.1v2.1h-1.1c-1.1 0-1.4.7-1.4 1.4v1.7h2.4l-.4 2.9h-2v7A10 10 0 0 0 22 12z"/></svg></a>
+                    <a class="social-item magnetic" href="https://www.linkedin.com/in/nithannajeeb" target="_blank" aria-label="LinkedIn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.98 3.5a2.5 2.5 0 1 1-.001 5.001A2.5 2.5 0 0 1 4.98 3.5zM3 9h4v12H3zM9 9h3.6v1.7h.1c.5-.9 1.8-1.7 3.7-1.7 4 0 4.7 2.6 4.7 6v7h-4v-6.2c0-1.5 0-3.4-2.1-3.4-2.1 0-2.4 1.6-2.4 3.3V21H9z"/></svg></a>
+                </div>
+            </div>
+        </footer>
     </main>
-
-    <footer class="hidden-on-load gs-reveal">
-        <div class="footer-status">
-            <p>NODE HOSTED AT <strong>NITHAN.IN</strong> // SYSTEM YEAR <span id="year"></span></p>
-        </div>
-    </footer>
-
-    <script src="script.js"></script>
 
 </body>
 </html>
