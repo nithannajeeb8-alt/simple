@@ -6,7 +6,7 @@ const yearSpan = document.getElementById('year');
 if (yearSpan) yearSpan.textContent = new Date().getFullYear();
 
 // ==========================================
-// 0. ASSET PRELOADING (Performance)
+// 0. ASSET PRELOADING 
 // ==========================================
 window.addEventListener('load', () => {
     document.querySelectorAll('.hover-trigger').forEach(item => {
@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
     window.addEventListener('touchstart', () => { hasTouch = true; }, { once: true, passive: true });
 
     // ==========================================
-    // 1. MOBILE VELVET MENU TOGGLE
+    // 1. MOBILE MENU TOGGLE
     // ==========================================
     const menuBtn = document.querySelector('.mobile-menu-btn');
     const menuOverlay = document.querySelector('.mobile-menu-overlay');
@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ==========================================
-    // 2. TEXT SPLITTING (Awwwards Mask Reveal)
+    // 2. TEXT SPLITTING REVEAL
     // ==========================================
     const heroDescs = document.querySelectorAll('.hero-desc');
     heroDescs.forEach(desc => {
@@ -95,7 +95,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // ==========================================
-    // 4. SIGNATURE & INTRO TIMELINE
+    // 4. SIGNATURE TIMELINE
     // ==========================================
     const wordPath = document.querySelector('.signature-word');
     const dot = document.querySelector('.signature-dot');
@@ -117,7 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ==========================================
-    // 5. GSAP MATCHMEDIA (Responsive Animations)
+    // 5. GSAP MATCHMEDIA
     // ==========================================
     let mm = gsap.matchMedia();
 
@@ -221,7 +221,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // ==========================================
-    // 6. NEOFETCH EASTER EGG LOGIC
+    // 6. NEOFETCH EASTER EGG
     // ==========================================
     const terminalOverlay = document.querySelector('.terminal-overlay');
     const terminalInput = document.getElementById('terminal-input');
@@ -247,15 +247,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 terminalInput.value = ''; 
                 
                 let response = '';
-                
-                if (cmd === 'whoami') {
-                    response = 'Nithan Najeeb (alias: Rubin Stellar).\nWeb Architect. Student (B.Com).';
-                } else if (cmd === 'projects') {
-                    response = 'Active Modules:\n- Mind Atlas\n- Forenexa\n- Born Legend\n- Ollama Uplink';
-                } else if (cmd === 'clear') {
-                    terminalOutput.innerHTML = '';
-                    return;
-                } else if (cmd === 'neofetch' || cmd === 'sysinfo') {
+                if (cmd === 'whoami') response = 'Nithan Najeeb (alias: Rubin Stellar).\nWeb Architect. Student (B.Com).';
+                else if (cmd === 'projects') response = 'Active Modules:\n- Mind Atlas\n- Forenexa\n- Born Legend\n- Ollama Uplink';
+                else if (cmd === 'clear') { terminalOutput.innerHTML = ''; return; }
+                else if (cmd === 'neofetch' || cmd === 'sysinfo') {
                     response = `
        /\\         OS: Arch Linux x86_64 
       /  \\        Host: Mind Atlas Node
@@ -265,9 +260,7 @@ document.addEventListener("DOMContentLoaded", () => {
   /   |  |   \\    DE: Hyprland / Openbox
  /_-''    ''-_\\   Theme: Alabaster Glass
                     `;
-                } else if (cmd !== '') {
-                    response = `Command not found: ${cmd}. Try 'whoami', 'projects', 'neofetch', or 'clear'.`;
-                }
+                } else if (cmd !== '') response = `Command not found: ${cmd}. Try 'whoami', 'projects', 'neofetch', or 'clear'.`;
 
                 if (response) {
                     terminalOutput.innerHTML += `<div><span style="color:var(--accent-gold)">rubin@stellar</span>:~$ ${cmd}</div>`;
@@ -279,7 +272,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ==========================================
-    // 7. HORIZONTAL GALLERY SCROLL & PARALLAX
+    // 7. GALLERY SCROLL (GLITCH FREE)
     // ==========================================
     const gallerySection = document.querySelector('.gallery-section');
     const galleryTrack = document.querySelector('.gallery-track');
@@ -287,7 +280,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (gallerySection && galleryTrack) {
         
-        // Dynamically calculates exact width to prevent empty scroll space
         function getScrollAmount() {
             let trackWidth = galleryTrack.scrollWidth;
             return trackWidth - window.innerWidth;
@@ -304,7 +296,8 @@ document.addEventListener("DOMContentLoaded", () => {
             end: () => `+=${getScrollAmount()}`,
             pin: true,
             animation: tween,
-            scrub: 1.8, // Heavy Machinery Momentum 
+            scrub: 1, 
+            anticipatePin: 1, // Stops jitter on trackpads when pinning
             invalidateOnRefresh: true,
             onUpdate: (self) => {
                 gsap.to('.archive-progress-fill', { 
@@ -361,7 +354,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (clickedImg) {
                     lightboxImg.src = clickedImg.src;
                     lightbox.classList.add('active');
-                    
                     if(mainContainer) mainContainer.classList.add('lightbox-active-push');
                     if(cursor) cursor.style.display = 'none';
                 }
@@ -370,29 +362,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const closeLightbox = () => {
             lightbox.classList.remove('active');
-            
             if(mainContainer) mainContainer.classList.remove('lightbox-active-push');
-            
             if(cursor) {
                 cursor.style.display = 'flex';
                 cursor.classList.remove('view-mode');
             }
-            
             setTimeout(() => { lightboxImg.src = ''; }, 400); 
         };
 
         lightboxClose.addEventListener('click', closeLightbox);
-
-        lightbox.addEventListener('click', (e) => {
-            if (e.target === lightbox) {
-                closeLightbox();
-            }
-        });
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && lightbox.classList.contains('active')) {
-                closeLightbox();
-            }
-        });
+        lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && lightbox.classList.contains('active')) closeLightbox(); });
     }
 });
