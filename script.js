@@ -157,40 +157,42 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         if (!hasTouch) {
-            const tiltCard = document.querySelector('.tilt-card');
-            const handleTilt = (e) => {
-                const rect = tiltCard.getBoundingClientRect();
-                const x = e.clientX - rect.left, y = e.clientY - rect.top;
-                const centerX = rect.width / 2, centerY = rect.height / 2;
-                gsap.to(tiltCard, { rotationX: ((y - centerY) / centerY) * -10, rotationY: ((x - centerX) / centerX) * 10, duration: 0.4, ease: "power2.out" });
-            };
-            const resetTilt = () => gsap.to(tiltCard, { rotationX: 0, rotationY: 0, duration: 0.8, ease: "elastic.out(1, 0.4)" });
-            
-            if(tiltCard) {
-                tiltCard.addEventListener('mousemove', handleTilt);
-                tiltCard.addEventListener('mouseleave', resetTilt);
-            }
+            const tiltCard = document.querySelectorAll('.tilt-card');
+            tiltCard.forEach(card => {
+                const handleTilt = (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left, y = e.clientY - rect.top;
+                    const centerX = rect.width / 2, centerY = rect.height / 2;
+                    gsap.to(card, { rotationX: ((y - centerY) / centerY) * -10, rotationY: ((x - centerX) / centerX) * 10, duration: 0.4, ease: "power2.out" });
+                };
+                const resetTilt = () => gsap.to(card, { rotationX: 0, rotationY: 0, duration: 0.8, ease: "elastic.out(1, 0.4)" });
+                
+                card.addEventListener('mousemove', handleTilt);
+                card.addEventListener('mouseleave', resetTilt);
+            });
 
             const hoverWrapper = document.querySelector('.hover-image-reveal');
             const hoverInner = document.querySelector('.hover-image-inner');
-            const setX = gsap.quickSetter(hoverWrapper, "x", "px");
-            const setY = gsap.quickSetter(hoverWrapper, "y", "px");
-            
-            const moveImage = (e) => { setX(e.clientX + 20); setY(e.clientY + 20); };
-            window.addEventListener('mousemove', moveImage);
+            if (hoverWrapper && hoverInner) {
+                const setX = gsap.quickSetter(hoverWrapper, "x", "px");
+                const setY = gsap.quickSetter(hoverWrapper, "y", "px");
+                
+                const moveImage = (e) => { setX(e.clientX + 20); setY(e.clientY + 20); };
+                window.addEventListener('mousemove', moveImage);
 
-            document.querySelectorAll('.hover-trigger').forEach(item => {
-                item.addEventListener('mouseenter', () => {
-                    const imgUrl = item.getAttribute('data-img');
-                    if (imgUrl) hoverInner.style.backgroundImage = `url(${imgUrl})`;
-                    hoverWrapper.classList.add('active');
-                    gsap.to(".cursor-dot", { opacity: 0, duration: 0.2 });
+                document.querySelectorAll('.hover-trigger').forEach(item => {
+                    item.addEventListener('mouseenter', () => {
+                        const imgUrl = item.getAttribute('data-img');
+                        if (imgUrl) hoverInner.style.backgroundImage = `url(${imgUrl})`;
+                        hoverWrapper.classList.add('active');
+                        gsap.to(".cursor-dot", { opacity: 0, duration: 0.2 });
+                    });
+                    item.addEventListener('mouseleave', () => {
+                        hoverWrapper.classList.remove('active');
+                        gsap.to(".cursor-dot", { opacity: 1, duration: 0.2 });
+                    });
                 });
-                item.addEventListener('mouseleave', () => {
-                    hoverWrapper.classList.remove('active');
-                    gsap.to(".cursor-dot", { opacity: 1, duration: 0.2 });
-                });
-            });
+            }
 
             document.querySelectorAll('.magnetic').forEach(btn => {
                 btn.addEventListener('mousemove', (e) => {
@@ -283,7 +285,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (gallerySection && galleryTrack) {
         
-        // Dynamically calculates exact width to prevent empty scroll space
         function getScrollAmount() {
             let trackWidth = galleryTrack.scrollWidth;
             return trackWidth - window.innerWidth;
@@ -300,8 +301,15 @@ document.addEventListener("DOMContentLoaded", () => {
             end: () => `+=${getScrollAmount()}`,
             pin: true,
             animation: tween,
-            scrub: 1, 
-            invalidateOnRefresh: true
+            scrub: 1.8, // Heavy Machinery Momentum 
+            invalidateOnRefresh: true,
+            onUpdate: (self) => {
+                gsap.to('.archive-progress-fill', { 
+                    width: `${self.progress * 100}%`, 
+                    duration: 0.1, 
+                    ease: "none" 
+                });
+            }
         });
 
         galleryImages.forEach(img => {
@@ -320,6 +328,68 @@ document.addEventListener("DOMContentLoaded", () => {
 
         window.addEventListener("load", () => {
             ScrollTrigger.refresh();
+        });
+    }
+
+    // ==========================================
+    // 8. LIGHTBOX & CUSTOM CURSOR PROTOCOL
+    // ==========================================
+    const galleryCards = document.querySelectorAll('.gallery-glass');
+    const lightbox = document.querySelector('.lightbox-overlay');
+    const lightboxImg = document.querySelector('.lightbox-img');
+    const lightboxClose = document.querySelector('.lightbox-close');
+    const mainContainer = document.querySelector('.main-container');
+    const cursor = document.querySelector('.cursor-dot');
+
+    if (lightbox && galleryCards.length > 0) {
+        
+        galleryCards.forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                if(cursor) cursor.classList.add('view-mode');
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                if(cursor) cursor.classList.remove('view-mode');
+            });
+
+            card.addEventListener('click', () => {
+                const clickedImg = card.querySelector('.parallax-img');
+                
+                if (clickedImg) {
+                    lightboxImg.src = clickedImg.src;
+                    lightbox.classList.add('active');
+                    
+                    if(mainContainer) mainContainer.classList.add('lightbox-active-push');
+                    if(cursor) cursor.style.display = 'none';
+                }
+            });
+        });
+
+        const closeLightbox = () => {
+            lightbox.classList.remove('active');
+            
+            if(mainContainer) mainContainer.classList.remove('lightbox-active-push');
+            
+            if(cursor) {
+                cursor.style.display = 'flex';
+                cursor.classList.remove('view-mode');
+            }
+            
+            setTimeout(() => { lightboxImg.src = ''; }, 400); 
+        };
+
+        lightboxClose.addEventListener('click', closeLightbox);
+
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox) {
+                closeLightbox();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && lightbox.classList.contains('active')) {
+                closeLightbox();
+            }
         });
     }
 });
