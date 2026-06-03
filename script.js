@@ -279,4 +279,48 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
+        // ==========================================
+    // 7. HORIZONTAL GALLERY SCROLL & PARALLAX
+    // ==========================================
+    const gallerySection = document.querySelector('.gallery-section');
+    const galleryTrack = document.querySelector('.gallery-track');
+    const galleryImages = document.querySelectorAll('.parallax-img');
+
+    if (gallerySection && galleryTrack) {
+        
+        function getScrollAmount() {
+            let trackWidth = galleryTrack.scrollWidth;
+            return -(trackWidth - window.innerWidth);
+        }
+
+        const tween = gsap.to(galleryTrack, {
+            x: getScrollAmount,
+            duration: 3,
+            ease: "none"
+        });
+
+        ScrollTrigger.create({
+            trigger: gallerySection,
+            start: "top top",
+            end: () => `+=${getScrollAmount() * -1}`,
+            pin: true,
+            animation: tween,
+            scrub: 1, 
+            invalidateOnRefresh: true
+        });
+
+        galleryImages.forEach(img => {
+            gsap.to(img, {
+                xPercent: 10,
+                ease: "none",
+                scrollTrigger: {
+                    trigger: gallerySection,
+                    start: "top top",
+                    end: () => `+=${getScrollAmount() * -1}`,
+                    scrub: 1,
+                    invalidateOnRefresh: true
+                }
+            });
+        });
+    }
 });
