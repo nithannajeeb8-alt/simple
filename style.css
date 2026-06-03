@@ -250,11 +250,19 @@ html, body {
 /* ==========================================
    9. DEV LOGS GRID (BLOG & ARCADE)
    ========================================== */
-.blog-hero-spacing, .arcade-hero-spacing { padding-top: 14rem; }
-.blog-grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-    gap: 3rem; perspective: 1000px;
+/* Unified Subpage Header Spacing */
+.subpage-hero {
+    padding-top: 12rem;
+    min-height: auto;
 }
+
+/* Add this inside your @media (max-width: 768px) block */
+@media (max-width: 768px) {
+    .subpage-hero {
+        padding-top: 6rem; /* Cuts the blank space exactly in half on mobile */
+    }
+}
+
 .blog-card {
     display: flex; flex-direction: column; align-items: flex-start;
     padding: 3.5rem 3rem; border-radius: 16px; height: 100%;
