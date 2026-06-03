@@ -1,5 +1,5 @@
 /* ==========================================
-   1. CORE VARIABLES & MOBILE OVERFLOW FIX
+   1. CORE VARIABLES & SETUP
    ========================================== */
 :root {
     --bg: #0a0a0b; 
@@ -18,7 +18,7 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 
-/* FIX: Strict overflow hidden to prevent mobile zooming out */
+/* Strict overflow hidden to prevent mobile zooming out */
 html, body {
     overflow-x: hidden;
     width: 100%;
@@ -31,7 +31,6 @@ html, body {
     -webkit-font-smoothing: antialiased;
 }
 
-/* FIX: Ensure content inside main cannot push page width */
 .main-container {
     overflow: hidden;
     width: 100%;
@@ -39,11 +38,11 @@ html, body {
 }
 
 @media (hover: hover) and (pointer: fine) {
-    body, a, button { cursor: none !important; }
+    body, a, button, .hover-trigger { cursor: none !important; }
 }
 
 /* ==========================================
-   2. AMBIENT LIGHTING & NOISE (OPTIMIZED)
+   2. AMBIENT LIGHTING & NOISE (GPU OPTIMIZED)
    ========================================== */
 .ambient-orb {
     position: absolute;
@@ -220,247 +219,9 @@ html, body {
 .tech-list { list-style: none; } .tech-list li { margin-bottom: 0.8rem; } .tech-list strong { color: var(--text-main); font-weight: 400;}
 
 /* ==========================================
-   8. ACTIVE MODULES (PROJECTS)
+   8. ACTIVE MODULES (PROJECTS LIST)
    ========================================== */
 .project-list { list-style: none; position: relative; z-index: 2; }
 .project-item { display: flex; justify-content: space-between; align-items: center; padding: 4rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.08); transition: opacity 0.7s cubic-bezier(0.25, 1, 0.5, 1); cursor: pointer; }
 .project-list:hover .project-item:not(:hover) { opacity: 0.15; }
-.p-info h2 { font-family: var(--serif); font-size: clamp(3rem, 6vw, 5rem); font-weight: 300; letter-spacing: -0.04em; margin-bottom: 0.5rem; transition: transform 0.7s cubic-bezier(0.25, 1, 0.5, 1); pointer-events: none; }
-.project-item:hover .p-info h2 { transform: translateX(30px) skewX(-2deg); }
-.p-info span { font-size: 0.95rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; pointer-events: none; }
-.p-arrow { font-size: 2.5rem; font-family: var(--serif); color: var(--text-muted); transition: transform 0.7s cubic-bezier(0.25, 1, 0.5, 1), color 0.5s ease; pointer-events: none; }
-.project-item:hover .p-arrow { transform: translateX(15px); color: var(--text-main); }
-
-/* FLOATING IMAGE REVEAL */
-.hover-image-reveal { position: fixed; top: 0; left: 0; width: 350px; height: 450px; pointer-events: none; z-index: 1; opacity: 0; transform: scale(0.8); transition: opacity 0.4s ease, transform 0.6s cubic-bezier(0.25, 1, 0.5, 1); border-radius: 10px; overflow: hidden; will-change: transform, opacity; }
-.hover-image-reveal.active { opacity: 0.6; transform: scale(1); }
-.hover-image-inner { width: 100%; height: 100%; background-size: cover; background-position: center; transition: background-image 0.2s ease; transform: translateZ(0); }
-
-/* ==========================================
-   9. COMM & FOOTER
-   ========================================== */
-footer { display: flex; flex-direction: column; align-items: center; padding: 6rem 6vw; gap: 3rem; }
-.footer-status { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; }
-.glass-social-box { 
-    display: flex; align-items: center; gap: 24px; 
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
-    backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); border: 1px solid var(--glass-border); 
-    box-shadow: inset 0px 1px 1px rgba(255, 255, 255, 0.15), inset 0px -1px 1px rgba(0, 0, 0, 0.2), 0 20px 40px rgba(0, 0, 0, 0.4);
-    padding: 16px 32px 16px 16px; border-radius: 100px; 
-    transform: translateZ(0);
-}
-.mini-logo { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; }
-.social-links { display: flex; gap: 16px; }
-.social-item { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.03); transition: all 0.4s ease; transform: translateZ(0); }
-.social-item svg { width: 18px; height: 18px; fill: var(--text-main); }
-.social-item:hover { background: var(--text-main); transform: translateY(-3px) translateZ(0); }
-.social-item:hover svg { fill: var(--bg); }
-
-/* ==========================================
-   10. MOBILE RESPONSIVENESS
-   ========================================== */
-@media (max-width: 1024px) {
-    .profile-grid { grid-template-columns: 1fr; gap: 4rem; }
-    .hover-image-reveal { display: none !important; }
-}
-
-@media (max-width: 768px) {
-    .nav { padding: 1.5rem 8vw; }
-    .nav.scrolled { padding: 1rem 8vw; }
-    .desktop-nav { display: none !important; }
-    .mobile-menu-btn { display: block; }
-    .section-padding { padding: 5rem 8vw; }
-    .hero-signature-section { min-height: 90vh; padding: 0 8vw; position: relative; }
-    .signature-svg.massive { max-width: 85%; }
-    .hero-title { font-size: 3.2rem; line-height: 1.1; margin-bottom: 2rem; text-align: left; }
-    .hero-title.text-center, .sub-heading.text-center { text-align: left; }
-    .hero-text-grid { grid-template-columns: 1fr; gap: 2rem; }
-    .hero-desc { font-size: 1.05rem; line-height: 1.8; text-align: left; }
-    .hero-actions, .justify-center { justify-content: flex-start; }
-    .glass-card { padding: 28px 20px; }
-    .info-block h3 { font-size: 1.8rem; }
-    .project-item { flex-direction: column; align-items: flex-start; padding: 3rem 0; gap: 0.5rem; }
-    .p-info h2 { font-size: 2.2rem; }
-    .p-info span { font-size: 0.85rem; letter-spacing: 1px; }
-    .p-arrow { margin-top: -2.5rem; font-size: 1.5rem; align-self: flex-end; } 
-    footer { padding: 4rem 1.5rem; text-align: center; }
-    .glass-social-box { flex-direction: column; width: 100%; max-width: 320px; border-radius: 24px; padding: 32px; gap: 24px; justify-content: center; }
-    .cursor-dot { display: none !important; }
-    * { cursor: auto !important; }
-    .tilt-card { transform: none !important; } 
-}
-
-/* ==========================================
-   11. ACCESSIBILITY: REDUCED MOTION
-   ========================================== */
-@media (prefers-reduced-motion: reduce) {
-    html { scroll-behavior: auto; }
-    .gs-reveal, .line-inner, .nav-left.hidden-on-load, .nav-right.hidden-on-load, .scroll-indicator { opacity: 1 !important; transform: none !important; visibility: visible !important; }
-    .noise-overlay, .cursor-dot, .ambient-orb { display: none !important; }
-    * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
-}
-
-/* ==========================================
-   12. HORIZONTAL VISUAL ARCHIVE (ELEGANT & FIXED)
-   ========================================== */
-.gallery-section {
-    position: relative;
-    width: 100%;
-    /* FIX 1: Removed 'height: 400vh;'. 
-       GSAP will now dynamically calculate the exact height 
-       based on how many images you actually have! No more black voids.
-    */
-}
-
-.gallery-pin-wrap {
-    position: sticky;
-    top: 0;
-    /* FIX 2: Using 'dvh' (dynamic viewport height) prevents layout jumping on mobile when the URL bar hides/shows */
-    height: 100vh;
-    height: 100dvh; 
-    width: 100vw;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-}
-
-.gallery-track {
-    display: flex;
-    gap: 5rem;
-    padding: 0 10vw;
-    /* FIX 3: Forces the track to wrap tightly around the images so the math is 100% accurate */
-    width: max-content; 
-    will-change: transform;
-    transform: translateZ(0);
-}
-
-.gallery-item {
-    flex: 0 0 550px; 
-}
-
-.gallery-glass {
-    padding: 20px; 
-    border-radius: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-}
-
-.g-img-wrap {
-    width: 100%;
-    height: 500px;
-    border-radius: 14px;
-    overflow: hidden;
-    position: relative;
-    box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
-    transform: translateZ(0);
-}
-
-.g-img-wrap img {
-    width: 115%; 
-    height: 100%;
-    object-fit: cover;
-    filter: grayscale(80%) brightness(0.8);
-    transition: filter 0.8s cubic-bezier(0.25, 1, 0.5, 1), transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
-    transform: translateX(-5%); 
-    will-change: transform;
-}
-
-.gallery-glass:hover .g-img-wrap img {
-    filter: grayscale(0%) brightness(1.05);
-    transform: translateX(-5%) scale(1.03); 
-}
-
-.g-stamp {
-    position: absolute;
-    top: 1.5rem;
-    left: 1.5rem;
-    background: rgba(10, 10, 11, 0.6);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid var(--glass-border);
-    color: var(--text-main);
-    font-family: var(--mono);
-    font-size: 0.65rem;
-    padding: 6px 14px;
-    border-radius: 100px;
-    letter-spacing: 2px;
-    z-index: 2;
-    transition: all 0.4s ease;
-}
-
-.gallery-glass:hover .g-stamp {
-    background: var(--text-main);
-    color: var(--bg);
-}
-
-.g-meta {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    padding: 0 10px 10px 10px;
-}
-
-.g-meta-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    padding-bottom: 1.2rem;
-}
-
-.g-title {
-    font-family: var(--serif);
-    font-size: 2.2rem;
-    font-weight: 300;
-    color: var(--text-main);
-    line-height: 1;
-    letter-spacing: -0.02em;
-}
-
-.g-title i {
-    color: var(--text-muted);
-}
-
-.g-date {
-    font-family: var(--mono);
-    font-size: 0.85rem;
-    color: var(--accent-gold);
-    letter-spacing: 1px;
-}
-
-.g-meta-bottom {
-    display: flex;
-    justify-content: space-between;
-    font-family: var(--mono);
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 2px;
-}
-
-.g-meta-bottom strong {
-    color: var(--text-main);
-    font-weight: 400;
-}
-
-@media (max-width: 768px) {
-    .gallery-track {
-        gap: 2rem;
-        /* Balanced mobile padding so the last image doesn't hug the edge */
-        padding: 0 1.5rem; 
-    }
-    .gallery-item {
-        flex: 0 0 85vw;
-    }
-    .g-img-wrap {
-        height: 380px;
-    }
-    .g-title {
-        font-size: 1.8rem;
-    }
-    .g-meta-bottom {
-        flex-direction: column;
-        gap: 8px;
-    }
-}
+.p-
