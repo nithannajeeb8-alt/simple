@@ -41,10 +41,18 @@ html, body {
     overflow: hidden;
     width: 100%;
     position: relative;
+    transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.6s ease;
+    transform-origin: center center;
+}
+
+/* Cinematic Background Push for Lightbox */
+.main-container.lightbox-active-push {
+    transform: scale(0.95);
+    opacity: 0.3;
 }
 
 @media (hover: hover) and (pointer: fine) {
-    body, a, button, .hover-trigger { cursor: none !important; }
+    body, a, button, .hover-trigger, .gallery-glass { cursor: none !important; }
 }
 
 /* ==========================================
@@ -79,11 +87,37 @@ html, body {
     100% { transform: translate3d(15vw, 15vh, 0) scale(1.1); }
 }
 
+/* Base Custom Cursor */
 .cursor-dot {
     width: 8px; height: 8px; background-color: var(--accent-gold);
     border-radius: 50%; position: fixed; top: 0; left: 0;
-    pointer-events: none; z-index: 10000; transform: translate(-50%, -50%);
+    pointer-events: none; z-index: 100000; transform: translate(-50%, -50%);
     transition: width 0.3s cubic-bezier(0.25, 1, 0.5, 1), height 0.3s cubic-bezier(0.25, 1, 0.5, 1), mix-blend-mode 0.3s;
+    display: flex; justify-content: center; align-items: center;
+}
+
+/* 'VIEW' Custom Cursor State */
+.cursor-dot::after {
+    content: "VIEW";
+    position: absolute;
+    font-family: var(--mono);
+    font-size: 0.55rem;
+    color: var(--bg);
+    letter-spacing: 2px;
+    opacity: 0;
+    font-weight: 500;
+    transition: opacity 0.3s ease;
+}
+
+.cursor-dot.view-mode {
+    width: 70px !important;
+    height: 70px !important;
+    background-color: var(--text-main) !important;
+    mix-blend-mode: normal !important;
+}
+
+.cursor-dot.view-mode::after {
+    opacity: 1;
 }
 
 .noise-overlay {
@@ -147,6 +181,9 @@ html, body {
 .hidden-on-load { opacity: 0; visibility: hidden; }
 .text-center { text-align: center; }
 .justify-center { display: flex; justify-content: center; }
+
+/* Unified Subpage Header Spacing */
+.subpage-hero { padding-top: 12rem; min-height: auto; }
 
 /* ==========================================
    5. NAVIGATION
@@ -250,19 +287,10 @@ html, body {
 /* ==========================================
    9. DEV LOGS GRID (BLOG & ARCADE)
    ========================================== */
-/* Unified Subpage Header Spacing */
-.subpage-hero {
-    padding-top: 12rem;
-    min-height: auto;
+.blog-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+    gap: 3rem; perspective: 1000px;
 }
-
-/* Add this inside your @media (max-width: 768px) block */
-@media (max-width: 768px) {
-    .subpage-hero {
-        padding-top: 6rem; /* Cuts the blank space exactly in half on mobile */
-    }
-}
-
 .blog-card {
     display: flex; flex-direction: column; align-items: flex-start;
     padding: 3.5rem 3rem; border-radius: 16px; height: 100%;
@@ -334,10 +362,32 @@ blockquote {
     will-change: transform; transform: translateZ(0);
 }
 .gallery-item { flex: 0 0 550px; }
-.gallery-glass { padding: 20px; border-radius: 24px; display: flex; flex-direction: column; gap: 1.5rem; }
+
+/* 3D Depth on Tilt Cards */
+.gallery-glass { 
+    padding: 20px; border-radius: 24px; display: flex; flex-direction: column; gap: 1.5rem; 
+    transform-style: preserve-3d;
+}
+
+/* Dim all cards on track hover */
+.gallery-track:hover .gallery-glass { opacity: 0.5; transform: scale(0.98); }
+/* But keep the hovered card bright */
+.gallery-track .gallery-glass:hover { opacity: 1; transform: scale(1); z-index: 10; }
+
+/* Push image and meta OUT from the glass background */
+.gallery-glass .g-img-wrap, 
+.gallery-glass .g-meta,
+.gallery-glass .g-stamp {
+    transform: translateZ(40px);
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.gallery-glass:hover .g-img-wrap { transform: translateZ(60px); }
+.gallery-glass:hover .g-meta { transform: translateZ(50px); }
+
 .g-img-wrap {
     width: 100%; height: 500px; border-radius: 14px; overflow: hidden;
-    position: relative; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); transform: translateZ(0);
+    position: relative; box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
 }
 .g-img-wrap img {
     width: 115%; height: 100%; object-fit: cover;
@@ -368,8 +418,39 @@ blockquote {
 }
 .g-meta-bottom strong { color: var(--text-main); font-weight: 400; }
 
+/* Progress HUD */
+.archive-progress {
+    position: absolute; bottom: 40px; left: 10vw; width: 80vw; height: 1px; 
+    background: rgba(255, 255, 255, 0.1); z-index: 10;
+}
+.archive-progress-fill {
+    height: 100%; width: 0%; background: var(--accent-gold);
+    box-shadow: 0 0 10px var(--accent-gold); will-change: width;
+}
+
 /* ==========================================
-   12. COMM & FOOTER
+   12. LIGHTBOX PROTOCOL (FULL IMAGE VIEW)
+   ========================================== */
+.lightbox-overlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(10, 10, 11, 0.95); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+    z-index: 99999; display: flex; justify-content: center; align-items: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.lightbox-overlay.active { opacity: 1; pointer-events: all; }
+.lightbox-close {
+    position: absolute; top: 2.5rem; right: 4vw; font-family: var(--mono);
+    color: var(--text-muted); font-size: 0.85rem; letter-spacing: 2px; cursor: pointer; transition: color 0.3s ease; z-index: 2;
+}
+.lightbox-close:hover { color: var(--accent-gold); }
+.lightbox-img {
+    max-width: 90vw; max-height: 85vh; border-radius: 8px; box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
+    transform: scale(0.95); transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1); object-fit: contain;
+}
+.lightbox-overlay.active .lightbox-img { transform: scale(1); }
+
+/* ==========================================
+   13. COMM & FOOTER
    ========================================== */
 footer { display: flex; flex-direction: column; align-items: center; padding: 6rem 6vw; gap: 3rem; }
 .footer-status { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; }
@@ -388,7 +469,7 @@ footer { display: flex; flex-direction: column; align-items: center; padding: 6r
 .social-item:hover svg { fill: var(--bg); }
 
 /* ==========================================
-   13. MOBILE RESPONSIVENESS
+   14. MOBILE RESPONSIVENESS
    ========================================== */
 @media (max-width: 1024px) {
     .profile-grid { grid-template-columns: 1fr; gap: 4rem; }
@@ -421,13 +502,15 @@ footer { display: flex; flex-direction: column; align-items: center; padding: 6r
     * { cursor: auto !important; }
     .tilt-card { transform: none !important; } 
 
+    /* Unified Header Mobile */
+    .subpage-hero { padding-top: 6rem; }
+
     /* Blog & Arcade Grid Mobile */
-    .blog-hero-spacing, .arcade-hero-spacing { padding-top: 7rem; }
     .blog-grid { grid-template-columns: 1fr; gap: 2rem; }
     .blog-card { padding: 2.5rem 2rem; }
     .blog-meta { flex-direction: column; align-items: flex-start; gap: 12px; }
 
-    /* Reader (Mind Atlas) Mobile */
+    /* Reader Mobile */
     .article-main { padding-top: 6rem; padding-bottom: 4rem; }
     .reader-wrapper { padding: 0 1.5rem; }
     .reader-box { background: transparent; border: none; box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; padding: 0; }
@@ -443,10 +526,11 @@ footer { display: flex; flex-direction: column; align-items: center; padding: 6r
     .g-img-wrap { height: 380px; }
     .g-title { font-size: 1.8rem; }
     .g-meta-bottom { flex-direction: column; gap: 8px; }
+    .archive-progress { bottom: 20px; }
 }
 
 /* ==========================================
-   14. ACCESSIBILITY: REDUCED MOTION
+   15. ACCESSIBILITY: REDUCED MOTION
    ========================================== */
 @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
