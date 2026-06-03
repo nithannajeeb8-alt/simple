@@ -26,12 +26,19 @@
     <script defer src="script.js"></script>
 
     <style>
+        /* Responsive Top Spacing */
+        .article-main {
+            padding-top: 12rem;
+            padding-bottom: 8rem;
+        }
+
         .reader-wrapper {
             max-width: 900px;
             margin: 0 auto;
             padding: 0 2vw;
         }
 
+        /* Desktop Glass Box */
         .reader-box {
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
             backdrop-filter: blur(40px);
@@ -40,12 +47,12 @@
             box-shadow: inset 0px 1px 1px rgba(255, 255, 255, 0.15), inset 0px -1px 1px rgba(0, 0, 0, 0.2), 0 20px 40px rgba(0, 0, 0, 0.4);
             border-radius: 20px;
             padding: 5rem;
-            margin-top: 4rem;
         }
 
         .reader-meta {
             display: flex;
             align-items: center;
+            flex-wrap: wrap;
             gap: 24px;
             margin-bottom: 3rem;
             font-size: 0.85rem;
@@ -60,7 +67,7 @@
             color: var(--accent-gold);
             border: 1px solid var(--glass-border);
             background: rgba(255, 255, 255, 0.02);
-            padding: 4px 16px;
+            padding: 6px 16px;
             border-radius: 100px;
             font-weight: 400;
         }
@@ -77,13 +84,13 @@
 
         .reader-body {
             font-family: var(--mono);
-            font-size: 1.05rem;
+            font-size: 1.1rem;
             line-height: 2;
             color: var(--text-muted);
         }
 
         .lead-text {
-            font-size: 1.25rem;
+            font-size: 1.35rem;
             color: var(--text-main);
             font-weight: 300;
             margin-bottom: 3rem;
@@ -100,28 +107,75 @@
         }
 
         .reader-body p {
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
         }
 
         blockquote {
             margin: 5rem 0;
             padding: 2.5rem 3.5rem;
             background: rgba(255, 255, 255, 0.01);
-            border-left: 1px solid var(--accent-gold);
+            border-left: 2px solid var(--accent-gold);
             border-radius: 0 12px 12px 0;
             font-family: var(--serif);
             font-style: italic;
             color: var(--text-main);
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             line-height: 1.7;
             box-shadow: inset 10px 0 20px rgba(0,0,0,0.2);
         }
 
+        /* ==========================================
+           MOBILE ELEGANCE FIXES
+           ========================================== */
         @media (max-width: 768px) {
-            .reader-box { padding: 32px 20px; border-radius: 20px; margin-top: 2rem; }
-            .reader-meta { flex-direction: column; align-items: flex-start; gap: 12px; padding-bottom: 1rem; }
-            .reader-title { margin-bottom: 2.5rem; letter-spacing: -0.01em; }
-            blockquote { padding: 1.5rem; font-size: 1.25rem; margin: 3rem 0; }
+            .article-main {
+                padding-top: 6rem; /* Fixes massive top gap */
+                padding-bottom: 4rem;
+            }
+            
+            .reader-wrapper {
+                padding: 0 1.5rem;
+            }
+
+            /* Strip the cramping box on mobile to let text breathe */
+            .reader-box { 
+                background: transparent;
+                border: none;
+                box-shadow: none;
+                backdrop-filter: none;
+                -webkit-backdrop-filter: none;
+                padding: 0; 
+            }
+
+            .reader-meta { 
+                gap: 12px; 
+                padding-bottom: 1.5rem; 
+                margin-bottom: 2rem;
+            }
+            
+            .reader-title { 
+                font-size: 2.8rem; /* Keeps it highly legible */
+                margin-bottom: 2.5rem; 
+                letter-spacing: -0.01em; 
+            }
+            
+            .lead-text {
+                font-size: 1.2rem;
+                margin-bottom: 2.5rem;
+            }
+
+            .reader-body p {
+                font-size: 1.05rem;
+                margin-bottom: 2rem;
+            }
+
+            blockquote { 
+                padding: 1.5rem 1.5rem 1.5rem 2rem; 
+                font-size: 1.35rem; 
+                margin: 3.5rem 0; 
+                box-shadow: none;
+                background: transparent;
+            }
         }
     </style>
 </head>
@@ -137,9 +191,10 @@
     </svg>
 
     <nav class="nav">
-        <div class="brand-logo hidden-on-load">
+        <!-- Logo acts as back button -->
+        <a href="index.html" class="brand-logo hidden-on-load" style="text-decoration: none;">
             <span class="brand-text">NITHAN.</span>
-        </div>
+        </a>
 
         <div class="nav-right desktop-nav hidden-on-load">
             <a href="blog.html" class="glass-btn magnetic highlight">← Back to Logs</a>
@@ -153,10 +208,12 @@
     <div class="mobile-menu-overlay" aria-hidden="true">
         <div class="mobile-links">
             <a href="blog.html" class="mobile-link highlight-text">← Back to Logs</a>
+            <a href="index.html" class="mobile-link">Home Base</a>
         </div>
     </div>
 
-    <main class="main-container" style="padding-top: 10rem; padding-bottom: 8rem;">
+    <!-- Replaced inline styles with responsive class .article-main -->
+    <main class="main-container article-main">
         
         <div class="ambient-orb orb-1"></div>
         <div class="ambient-orb orb-2"></div>
@@ -175,16 +232,17 @@
                 <div class="reader-body">
                     <p class="lead-text">The concept of a "Secondary Brain" isn't new, but the execution usually falls flat. We rely on bloated SaaS applications that trap our thoughts in proprietary databases.</p>
 
-                    <p class="hero-desc">The Mind Atlas is an attempt to build a localized, markdown-driven node that I fully control. By mapping ideas via graph theory rather than linear folders, the architecture mimics actual neural pathways.</p>
+                    <!-- Removed unnecessary .hero-desc classes to standardize the article text -->
+                    <p>The Mind Atlas is an attempt to build a localized, markdown-driven node that I fully control. By mapping ideas via graph theory rather than linear folders, the architecture mimics actual neural pathways.</p>
 
                     <h2>The Architecture</h2>
-                    <p class="hero-desc">A thought logged on a Tuesday about hardware constraints can effortlessly bridge to a Friday note on UI rendering. Data without structure is noise; structure without access is an archive.</p>
+                    <p>A thought logged on a Tuesday about hardware constraints can effortlessly bridge to a Friday note on UI rendering. Data without structure is noise; structure without access is an archive.</p>
 
                     <blockquote>
                         "The goal is to build an engine of active recall, not just a digital warehouse for forgotten ideas."
                     </blockquote>
 
-                    <p class="hero-desc">Moving forward, the primary objective is tethering this frontend to an Ollama instance, allowing me to query my own localized knowledge base seamlessly through this exact terminal interface.</p>
+                    <p>Moving forward, the primary objective is tethering this frontend to an Ollama instance, allowing me to query my own localized knowledge base seamlessly through this exact terminal interface.</p>
                 </div>
 
             </article>
