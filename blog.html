@@ -25,8 +25,12 @@
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <script defer src="script.js"></script>
 
-    <!-- Specific Styles for the Dev Logs Grid -->
     <style>
+        /* Responsive Top Spacing Fix */
+        .blog-hero-spacing {
+            padding-top: 14rem;
+        }
+
         .blog-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
@@ -39,7 +43,6 @@
             flex-direction: column;
             align-items: flex-start;
             padding: 3.5rem 3rem;
-            /* Overriding default glass-card border-radius for slightly sharper log boxes */
             border-radius: 16px; 
             height: 100%;
         }
@@ -89,8 +92,11 @@
             flex-grow: 1;
         }
 
-        /* Responsive adjustments for the grid */
+        /* Responsive adjustments */
         @media (max-width: 768px) {
+            .blog-hero-spacing {
+                padding-top: 7rem; /* Fixes the massive top space on mobile */
+            }
             .blog-grid {
                 grid-template-columns: 1fr;
                 gap: 2rem;
@@ -118,9 +124,9 @@
     </svg>
 
     <nav class="nav">
-        <div class="brand-logo hidden-on-load">
+        <a href="index.html" class="brand-logo hidden-on-load" style="text-decoration: none;">
             <span class="brand-text">NITHAN.</span>
-        </div>
+        </a>
 
         <div class="nav-right desktop-nav hidden-on-load">
             <a href="index.html" class="glass-btn magnetic highlight">Home Base</a>
@@ -142,7 +148,7 @@
         <div class="ambient-orb orb-1"></div>
         <div class="ambient-orb orb-2"></div>
 
-        <section class="hero-text-section section-padding" style="padding-top: 14rem;">
+        <section class="hero-text-section section-padding blog-hero-spacing">
             <p class="sub-heading text-center gs-reveal parallax-text">(01) ARCHIVES</p>
             <h1 class="hero-title text-center gs-reveal">Dev <i>Logs</i>.</h1>
             
@@ -157,7 +163,6 @@
                 <p class="parallax-header">(02) SYSTEM_ENTRIES</p>
             </header>
             
-            <!-- Glassmorphic Grid Layout -->
             <div class="blog-grid perspective-container">
                 
                 <article class="blog-card glass-card tilt-card gs-reveal">
