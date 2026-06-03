@@ -24,6 +24,87 @@
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <script defer src="script.js"></script>
+
+    <!-- Specific Styles for the Dev Logs Grid -->
+    <style>
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 3rem;
+            perspective: 1000px;
+        }
+
+        .blog-card {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 3.5rem 3rem;
+            /* Overriding default glass-card border-radius for slightly sharper log boxes */
+            border-radius: 16px; 
+            height: 100%;
+        }
+
+        .blog-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 1.5rem;
+        }
+
+        .blog-date {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .blog-tag {
+            font-size: 0.75rem;
+            color: var(--accent-gold);
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            padding: 4px 12px;
+            border-radius: 100px;
+            letter-spacing: 1px;
+        }
+
+        .blog-title {
+            font-family: var(--serif);
+            font-size: 2.2rem;
+            font-weight: 300;
+            color: var(--text-main);
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+
+        .blog-excerpt {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            line-height: 1.9;
+            margin-bottom: 3rem;
+            flex-grow: 1;
+        }
+
+        /* Responsive adjustments for the grid */
+        @media (max-width: 768px) {
+            .blog-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            .blog-card {
+                padding: 2.5rem 2rem;
+            }
+            .blog-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+        }
+    </style>
 </head>
 <body>
 
@@ -76,39 +157,50 @@
                 <p class="parallax-header">(02) SYSTEM_ENTRIES</p>
             </header>
             
-            <ul class="project-list">
-                <li class="project-item hover-trigger" data-img="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop" onclick="window.location.href='nithan.html'">
-                    <div class="p-info">
-                        <h2>Who is Nithan</h2>
-                        <span>SYS.DATE: 2026.02.25 // CORE.IDENTITY // Independent systems researcher tracking digital architecture.</span>
-                    </div>
-                    <div class="p-arrow" aria-hidden="true">↗</div>
-                </li>
+            <!-- Glassmorphic Grid Layout -->
+            <div class="blog-grid perspective-container">
                 
-                <li class="project-item hover-trigger" data-img="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=1000&auto=format&fit=crop" onclick="window.location.href='mind-atlas.html'">
-                    <div class="p-info">
-                        <h2>Constructing the Mind Atlas</h2>
-                        <span>SYS.DATE: 2026.02.24 // UI_ENGINE // Localized secondary brain configurations using markdown paradigms.</span>
+                <article class="blog-card glass-card tilt-card gs-reveal">
+                    <div class="blog-meta">
+                        <span class="blog-date">2026.02.25</span>
+                        <span class="blog-tag">CORE.IDENTITY</span>
                     </div>
-                    <div class="p-arrow" aria-hidden="true">↗</div>
-                </li>
-                
-                <li class="project-item hover-trigger" data-img="https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1000&auto=format&fit=crop" onclick="window.location.href='#'">
-                    <div class="p-info">
-                        <h2>Forenexa Architecture</h2>
-                        <span>SYS.DATE: 2026.01.15 // HARDWARE // Engineering optimized storefront variants absent from modern system bloat.</span>
+                    <h3 class="blog-title">WHO IS NITHAN</h3>
+                    <p class="blog-excerpt">Independent creator and systems researcher focused on the intersection of digital architecture, applied AI, and cognitive mapping.</p>
+                    <a href="nithan.html" class="glass-btn magnetic">READ_FILE ↗</a>
+                </article>
+
+                <article class="blog-card glass-card tilt-card gs-reveal">
+                    <div class="blog-meta">
+                        <span class="blog-date">2026.02.24</span>
+                        <span class="blog-tag">UI_ENGINE</span>
                     </div>
-                    <div class="p-arrow" aria-hidden="true">↗</div>
-                </li>
-                
-                <li class="project-item hover-trigger" data-img="https://images.unsplash.com/photo-1620121692029-d088224ddc74?q=80&w=1000&auto=format&fit=crop" onclick="window.location.href='#'">
-                    <div class="p-info">
-                        <h2>Ollama Uplink Protocols</h2>
-                        <span>SYS.DATE: 2025.11.02 // LOCAL_AI // Private framework telemetry connecting local LLMs to clean UI nodes.</span>
+                    <h3 class="blog-title">Constructing the Mind Atlas</h3>
+                    <p class="blog-excerpt">Documenting the architectural decisions behind building a localized secondary brain using markdown, graph theory, and vanilla JS.</p>
+                    <a href="mind-atlas.html" class="glass-btn magnetic">READ_FILE ↗</a>
+                </article>
+
+                <article class="blog-card glass-card tilt-card gs-reveal">
+                    <div class="blog-meta">
+                        <span class="blog-date">2026.01.15</span>
+                        <span class="blog-tag">HARDWARE</span>
                     </div>
-                    <div class="p-arrow" aria-hidden="true">↗</div>
-                </li>
-            </ul>
+                    <h3 class="blog-title">Forenexa Architecture</h3>
+                    <p class="blog-excerpt">Engineering a bespoke digital storefront optimized for physical, handcrafted drops without relying on bloated web frameworks.</p>
+                    <a href="#" class="glass-btn magnetic">READ_FILE ↗</a>
+                </article>
+
+                <article class="blog-card glass-card tilt-card gs-reveal">
+                    <div class="blog-meta">
+                        <span class="blog-date">2025.11.02</span>
+                        <span class="blog-tag">LOCAL_AI</span>
+                    </div>
+                    <h3 class="blog-title">Ollama Uplink Protocols</h3>
+                    <p class="blog-excerpt">Tethering a localized, private LLM instance to a frontend interface. Exploring privacy-first querying and dynamic prompt injection.</p>
+                    <a href="#" class="glass-btn magnetic">READ_FILE ↗</a>
+                </article>
+
+            </div>
         </section>
 
         <footer class="gs-reveal" id="contact">
@@ -127,10 +219,6 @@
             </div>
         </footer>
     </main>
-
-    <div class="hover-image-reveal" aria-hidden="true">
-        <div class="hover-image-inner"></div>
-    </div>
 
 </body>
 </html>
