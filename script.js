@@ -8,7 +8,6 @@ if (yearSpan) yearSpan.textContent = new Date().getFullYear();
 // ==========================================
 // 0. ASSET PRELOADING (Performance)
 // ==========================================
-// Preload hover images silently in the background so they are instant on interaction
 window.addEventListener('load', () => {
     document.querySelectorAll('.hover-trigger').forEach(item => {
         const imgUrl = item.getAttribute('data-img');
@@ -66,7 +65,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // ==========================================
     const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*";
     document.querySelectorAll(".desktop-nav a").forEach(link => {
-        // Store the original text on load so we can reference it
         link.dataset.text = link.innerText;
 
         link.addEventListener("mouseenter", event => {
@@ -89,9 +87,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 
                 if (iterations >= originalText.length) {
                     clearInterval(target.scrambleInterval);
-                    target.innerText = originalText; // Final fallback to exact original
+                    target.innerText = originalText; 
                 }
-                iterations += 1 / 3; // Speed of deciphering
+                iterations += 1 / 3; 
             }, 30);
         });
     });
@@ -130,7 +128,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 { y: 60, opacity: 0 },
                 {
                     scrollTrigger: { trigger: elem, start: "top 85%", toggleActions: "play none none reverse" },
-                    y: 0, opacity: 1, duration: 1.4, ease: "power3.out"
+                    y: 0, opacity: 1, duration: 1.4, ease: "power3.out",
+                    clearProps: "will-change" // OPTIMIZED: Clears GPU memory after animating
                 }
             );
         });
@@ -139,7 +138,8 @@ document.addEventListener("DOMContentLoaded", () => {
             { y: "120%", opacity: 0 }, 
             {
                 scrollTrigger: { trigger: ".hero-text-section", start: "top 80%" },
-                y: "0%", opacity: 1, duration: 1.2, stagger: 0.1, ease: "power4.out"
+                y: "0%", opacity: 1, duration: 1.2, stagger: 0.1, ease: "power4.out",
+                clearProps: "will-change" // OPTIMIZED: Clears GPU memory after animating
             }
         );
     });
@@ -213,7 +213,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const cursorY = gsap.quickSetter(cursor, "y", "px");
             window.addEventListener("mousemove", (e) => { cursorX(e.clientX); cursorY(e.clientY); });
 
-            document.querySelectorAll("a, button").forEach(el => {
+            document.querySelectorAll("a, button, .hover-trigger").forEach(el => {
                 el.addEventListener("mouseenter", () => gsap.to(cursor, { scale: 2.5, mixBlendMode: "difference", backgroundColor: "#fff", duration: 0.4 }));
                 el.addEventListener("mouseleave", () => gsap.to(cursor, { scale: 1, mixBlendMode: "normal", backgroundColor: "var(--accent-gold)", duration: 0.4 }));
             });
@@ -230,7 +230,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const terminalOutput = document.getElementById('terminal-output');
 
     if (terminalOverlay && terminalInput && terminalOutput) {
-        // Listen for the Backtick (`) key globally
         window.addEventListener('keydown', (e) => {
             if (e.key === '`') {
                 const isActive = terminalOverlay.classList.toggle('active');
@@ -244,11 +243,10 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
-        // Handle Terminal Commands
         terminalInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 const cmd = terminalInput.value.trim().toLowerCase();
-                terminalInput.value = ''; // Clear input
+                terminalInput.value = ''; 
                 
                 let response = '';
                 
@@ -273,12 +271,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     response = `Command not found: ${cmd}. Try 'whoami', 'projects', 'neofetch', or 'clear'.`;
                 }
 
-                // Render output to screen
                 if (response) {
                     terminalOutput.innerHTML += `<div><span style="color:var(--accent-gold)">rubin@stellar</span>:~$ ${cmd}</div>`;
                     terminalOutput.innerHTML += `<div style="margin-bottom: 15px; white-space: pre-wrap; font-family: var(--mono);">${response}</div>`;
-                    
-                    // Auto-scroll to bottom
                     terminalOutput.scrollTop = terminalOutput.scrollHeight;
                 }
             }
