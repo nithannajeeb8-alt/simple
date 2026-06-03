@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
     window.addEventListener('touchstart', () => { hasTouch = true; }, { once: true, passive: true });
 
     // ==========================================
-    // 1. MOBILE VELVET MENU TOGGLE (With A11y)
+    // 1. MOBILE VELVET MENU TOGGLE
     // ==========================================
     const menuBtn = document.querySelector('.mobile-menu-btn');
     const menuOverlay = document.querySelector('.mobile-menu-overlay');
@@ -205,14 +205,16 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             const cursor = document.querySelector(".cursor-dot");
-            const cursorX = gsap.quickSetter(cursor, "x", "px");
-            const cursorY = gsap.quickSetter(cursor, "y", "px");
-            window.addEventListener("mousemove", (e) => { cursorX(e.clientX); cursorY(e.clientY); });
+            if (cursor) {
+                const cursorX = gsap.quickSetter(cursor, "x", "px");
+                const cursorY = gsap.quickSetter(cursor, "y", "px");
+                window.addEventListener("mousemove", (e) => { cursorX(e.clientX); cursorY(e.clientY); });
 
-            document.querySelectorAll("a, button, .hover-trigger").forEach(el => {
-                el.addEventListener("mouseenter", () => gsap.to(cursor, { scale: 2.5, mixBlendMode: "difference", backgroundColor: "#fff", duration: 0.4 }));
-                el.addEventListener("mouseleave", () => gsap.to(cursor, { scale: 1, mixBlendMode: "normal", backgroundColor: "var(--accent-gold)", duration: 0.4 }));
-            });
+                document.querySelectorAll("a, button, .hover-trigger").forEach(el => {
+                    el.addEventListener("mouseenter", () => gsap.to(cursor, { scale: 2.5, mixBlendMode: "difference", backgroundColor: "#fff", duration: 0.4 }));
+                    el.addEventListener("mouseleave", () => gsap.to(cursor, { scale: 1, mixBlendMode: "normal", backgroundColor: "var(--accent-gold)", duration: 0.4 }));
+                });
+            }
         }
 
         return () => { gsap.set(".cursor-dot", { opacity: 0 }); };
@@ -277,7 +279,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ==========================================
-    // 7. HORIZONTAL GALLERY SCROLL (BULLETPROOF)
+    // 7. HORIZONTAL GALLERY SCROLL & PARALLAX
     // ==========================================
     const gallerySection = document.querySelector('.gallery-section');
     const galleryTrack = document.querySelector('.gallery-track');
@@ -285,6 +287,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (gallerySection && galleryTrack) {
         
+        // Dynamically calculates exact width to prevent empty scroll space
         function getScrollAmount() {
             let trackWidth = galleryTrack.scrollWidth;
             return trackWidth - window.innerWidth;
