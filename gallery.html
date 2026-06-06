@@ -137,12 +137,12 @@
             </div>
         </section>
 
-        <section style="padding: 2rem 8vw 6rem 8vw; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 1.5rem; position: relative; z-index: 10;">
+        <section class="system-status-section">
             <p class="sub-heading text-center gs-reveal spaced-text">(04) SYSTEM_STATUS</p>
             <h2 class="hero-title text-center gs-reveal" style="font-size: clamp(2rem, 5vw, 3rem); margin-bottom: 0;">End of Album.</h2>
         </section>
 
-        <footer class="gs-reveal" id="contact" style="padding-top: 2rem;">
+        <footer class="gs-reveal main-footer" id="contact">
             <div class="footer-status">
                 <p class="spaced-text">NODE HOSTED AT <strong>NITHAN.IN</strong> // SYSTEM YEAR <time id="year"></time></p>
             </div>
@@ -160,12 +160,14 @@
     </main>
 
     <div class="lightbox-overlay" aria-hidden="true">
-        <div class="lightbox-close spaced-text">CLOSE_VIEW [X]</div>
-        <div class="lightbox-layout">
-            <div class="lightbox-img-wrapper">
+        <div class="lightbox-panel">
+            <div class="lightbox-close spaced-text">CLOSE [X]</div>
+            
+            <div class="l-image-container">
                 <img src="" alt="Expanded Resolution" class="lightbox-img">
             </div>
-            <div class="lightbox-details glass-card">
+            
+            <div class="l-data-container">
                 <div class="l-stamp spaced-text">SYS.DATA</div>
                 <h2 class="l-title">Title Here</h2>
                 <p class="l-date spaced-text">Date Here</p>
