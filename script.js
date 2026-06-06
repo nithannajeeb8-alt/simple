@@ -5,9 +5,6 @@ gsap.registerPlugin(ScrollTrigger);
 const yearSpan = document.getElementById('year');
 if (yearSpan) yearSpan.textContent = new Date().getFullYear();
 
-// ==========================================
-// 0. ASSET PRELOADING 
-// ==========================================
 window.addEventListener('load', () => {
     document.querySelectorAll('.hover-trigger').forEach(item => {
         const imgUrl = item.getAttribute('data-img');
@@ -361,7 +358,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ==========================================
-    // 8. SPLIT-SCREEN LIGHTBOX
+    // 8. UNIFIED GLASS LIGHTBOX
     // ==========================================
     const lightbox = document.querySelector('.lightbox-overlay');
     const lightboxImg = document.querySelector('.lightbox-img');
@@ -429,7 +426,12 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
         lightboxClose.addEventListener('click', closeLightbox);
-        lightbox.addEventListener('click', (e) => { if (e.target === lightbox || e.target.classList.contains('lightbox-layout')) closeLightbox(); });
+        
+        // Clicking anywhere outside the panel closes it
+        lightbox.addEventListener('click', (e) => { 
+            if (e.target === lightbox) closeLightbox(); 
+        });
+        
         document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && lightbox.classList.contains('active')) closeLightbox(); });
     }
 });
