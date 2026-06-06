@@ -272,106 +272,143 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ==========================================
-    // 7. GALLERY SCROLL (GLITCH FREE)
+    // 7. DYNAMIC 3D COVER FLOW & MASONRY GALLERY
     // ==========================================
-    const gallerySection = document.querySelector('.gallery-section');
-    const galleryTrack = document.querySelector('.gallery-track');
-    const galleryImages = document.querySelectorAll('.parallax-img');
-
-    if (gallerySection && galleryTrack) {
+    const albumCards = document.querySelectorAll('.album-card');
+    const coverFlowContainer = document.getElementById('coverflow');
+    
+    if (coverFlowContainer && albumCards.length > 0) {
         
-        function getScrollAmount() {
-            let trackWidth = galleryTrack.scrollWidth;
-            return trackWidth - window.innerWidth;
+        // 1. Pick up to 5 random images from the masonry grid
+        const shuffled = Array.from(albumCards).sort(() => 0.5 - Math.random());
+        const selected = shuffled.slice(0, Math.min(5, albumCards.length));
+        
+        // 2. Inject them into Cover Flow
+        selected.forEach((card, index) => {
+            const imgSrc = card.querySelector('.parallax-img').src;
+            const titleHTML = card.querySelector('.g-title').innerHTML;
+            const dateText = card.querySelector('.g-date').innerText;
+            const metaHTML = card.querySelector('.g-meta-bottom').innerHTML;
+
+            const cfItem = document.createElement('div');
+            cfItem.classList.add('cf-item');
+            cfItem.innerHTML = `<img src="${imgSrc}" alt="Cover Flow Image">`;
+            
+            // Store data for lightbox
+            cfItem.dataset.img = imgSrc;
+            cfItem.dataset.title = titleHTML;
+            cfItem.dataset.date = dateText;
+            cfItem.dataset.meta = metaHTML;
+
+            coverFlowContainer.appendChild(cfItem);
+        });
+
+        // 3. Cover Flow Math Logic
+        const cfItems = document.querySelectorAll('.cf-item');
+        let currentIndex = Math.floor(cfItems.length / 2);
+
+        function updateCoverFlow() {
+            cfItems.forEach((item, i) => {
+                item.className = 'cf-item'; // Reset
+                if (i === currentIndex) item.classList.add('active');
+                else if (i === currentIndex - 1) item.classList.add('prev');
+                else if (i === currentIndex + 1) item.classList.add('next');
+                else if (i < currentIndex - 1) item.classList.add('hidden-left');
+                else if (i > currentIndex + 1) item.classList.add('hidden-right');
+            });
         }
 
-        let tween = gsap.to(galleryTrack, {
-            x: () => -getScrollAmount(),
-            ease: "none"
+        updateCoverFlow();
+
+        // 4. Controls
+        document.getElementById('cf-prev').addEventListener('click', () => {
+            if (currentIndex > 0) { currentIndex--; updateCoverFlow(); }
         });
 
-        ScrollTrigger.create({
-            trigger: gallerySection,
-            start: "top top",
-            end: () => `+=${getScrollAmount()}`,
-            pin: true,
-            animation: tween,
-            scrub: 1, 
-            anticipatePin: 1, // Stops jitter on trackpads when pinning
-            invalidateOnRefresh: true,
-            onUpdate: (self) => {
-                gsap.to('.archive-progress-fill', { 
-                    width: `${self.progress * 100}%`, 
-                    duration: 0.1, 
-                    ease: "none" 
-                });
-            }
+        document.getElementById('cf-next').addEventListener('click', () => {
+            if (currentIndex < cfItems.length - 1) { currentIndex++; updateCoverFlow(); }
         });
 
-        galleryImages.forEach(img => {
-            gsap.to(img, {
-                xPercent: 10,
-                ease: "none",
-                scrollTrigger: {
-                    trigger: gallerySection,
-                    start: "top top",
-                    end: () => `+=${getScrollAmount()}`,
-                    scrub: 1,
-                    invalidateOnRefresh: true
+        cfItems.forEach((item, index) => {
+            item.addEventListener('click', () => {
+                if (index !== currentIndex) {
+                    currentIndex = index;
+                    updateCoverFlow();
                 }
             });
-        });
-
-        window.addEventListener("load", () => {
-            ScrollTrigger.refresh();
         });
     }
 
     // ==========================================
-    // 8. LIGHTBOX & CUSTOM CURSOR PROTOCOL
+    // 8. DETAILED SPLIT-SCREEN LIGHTBOX
     // ==========================================
-    const galleryCards = document.querySelectorAll('.gallery-glass');
     const lightbox = document.querySelector('.lightbox-overlay');
     const lightboxImg = document.querySelector('.lightbox-img');
+    const lightboxTitle = document.querySelector('.l-title');
+    const lightboxDate = document.querySelector('.l-date');
+    const lightboxMeta = document.querySelector('.l-meta-bottom');
     const lightboxClose = document.querySelector('.lightbox-close');
     const mainContainer = document.querySelector('.main-container');
     const cursor = document.querySelector('.cursor-dot');
 
-    if (lightbox && galleryCards.length > 0) {
+    if (lightbox) {
         
-        galleryCards.forEach(card => {
-            card.addEventListener('mouseenter', () => {
-                if(cursor) cursor.classList.add('view-mode');
-            });
+        const openLightbox = (imgSrc, title, date, meta) => {
+            lightboxImg.src = imgSrc;
+            lightboxTitle.innerHTML = title;
+            lightboxDate.innerText = date;
+            lightboxMeta.innerHTML = meta;
             
-            card.addEventListener('mouseleave', () => {
-                if(cursor) cursor.classList.remove('view-mode');
-            });
+            lightbox.classList.add('active');
+            if(mainContainer) mainContainer.classList.add('lightbox-active-push');
+            if(cursor) cursor.style.display = 'none';
+        };
+
+        // Wire up Masonry Grid
+        document.querySelectorAll('.album-card').forEach(card => {
+            card.addEventListener('mouseenter', () => { if(cursor) cursor.classList.add('view-mode'); });
+            card.addEventListener('mouseleave', () => { if(cursor) cursor.classList.remove('view-mode'); });
 
             card.addEventListener('click', () => {
-                const clickedImg = card.querySelector('.parallax-img');
-                
-                if (clickedImg) {
-                    lightboxImg.src = clickedImg.src;
-                    lightbox.classList.add('active');
-                    if(mainContainer) mainContainer.classList.add('lightbox-active-push');
-                    if(cursor) cursor.style.display = 'none';
-                }
+                const img = card.querySelector('.parallax-img').src;
+                const title = card.querySelector('.g-title').innerHTML;
+                const date = card.querySelector('.g-date').innerText;
+                const meta = card.querySelector('.g-meta-bottom').innerHTML;
+                openLightbox(img, title, date, meta);
             });
         });
+
+        // Wire up Cover Flow
+        if (coverFlowContainer) {
+            coverFlowContainer.addEventListener('click', (e) => {
+                const clickedItem = e.target.closest('.cf-item');
+                if (clickedItem && clickedItem.classList.contains('active')) {
+                    openLightbox(
+                        clickedItem.dataset.img, 
+                        clickedItem.dataset.title, 
+                        clickedItem.dataset.date, 
+                        clickedItem.dataset.meta
+                    );
+                }
+            });
+
+            coverFlowContainer.addEventListener('mouseenter', (e) => {
+                if(e.target.closest('.cf-item.active') && cursor) cursor.classList.add('view-mode');
+            }, true);
+            coverFlowContainer.addEventListener('mouseleave', (e) => {
+                if(cursor) cursor.classList.remove('view-mode');
+            }, true);
+        }
 
         const closeLightbox = () => {
             lightbox.classList.remove('active');
             if(mainContainer) mainContainer.classList.remove('lightbox-active-push');
-            if(cursor) {
-                cursor.style.display = 'flex';
-                cursor.classList.remove('view-mode');
-            }
-            setTimeout(() => { lightboxImg.src = ''; }, 400); 
+            if(cursor) { cursor.style.display = 'flex'; cursor.classList.remove('view-mode'); }
+            setTimeout(() => { lightboxImg.src = ''; }, 500); 
         };
 
         lightboxClose.addEventListener('click', closeLightbox);
-        lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
+        lightbox.addEventListener('click', (e) => { if (e.target === lightbox || e.target.classList.contains('lightbox-layout')) closeLightbox(); });
         document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && lightbox.classList.contains('active')) closeLightbox(); });
     }
 });
