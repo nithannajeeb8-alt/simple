@@ -122,7 +122,7 @@ html, body {
 .hero-desc strong { color: var(--text-main); font-weight: 400; }
 
 /* ==========================================
-   5. NAVIGATION
+   5. NAVIGATION (EDGE-TO-EDGE FROSTED BAR)
    ========================================== */
 .nav { 
     display: flex; justify-content: space-between; align-items: center; 
@@ -162,60 +162,6 @@ html, body {
 .hero-text-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; }
 
 /* ==========================================
-   7. DATA ARCHIVE (ABOUT)
-   ========================================== */
-.section-header { border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 1.5rem; margin-bottom: 6rem; overflow: hidden; }
-.section-header p { font-size: 0.75rem; color: var(--accent-gold); display: inline-block; }
-.profile-grid { display: grid; grid-template-columns: 350px 1fr; gap: 6rem; align-items: start; }
-.stat-row { display: flex; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05); font-size: 0.9rem; }
-.stat-row:last-child { border-bottom: none; }
-.stat-row span { color: var(--text-muted); } .stat-row strong { color: var(--text-main); font-weight: 400; }
-.info-block h3 { font-family: var(--serif); font-size: 2.2rem; font-weight: 300; margin-bottom: 1.5rem; letter-spacing: -0.02em; }
-.tech-list { list-style: none; } .tech-list li { margin-bottom: 0.8rem; color: var(--text-muted); font-size: 1.15rem; line-height: 2; } .tech-list strong { color: var(--text-main); font-weight: 400;}
-
-/* ==========================================
-   8. ACTIVE MODULES (PROJECTS LIST)
-   ========================================== */
-.project-list { list-style: none; position: relative; z-index: 2; }
-.project-item { display: flex; justify-content: space-between; align-items: center; padding: 4rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.08); transition: opacity 0.7s cubic-bezier(0.25, 1, 0.5, 1); cursor: pointer; }
-.project-list:hover .project-item:not(:hover) { opacity: 0.15; }
-.p-info h2 { font-family: var(--serif); font-size: clamp(3rem, 6vw, 5rem); font-weight: 300; letter-spacing: -0.04em; margin-bottom: 0.5rem; transition: transform 0.7s cubic-bezier(0.25, 1, 0.5, 1); pointer-events: none; }
-.project-item:hover .p-info h2 { transform: translateX(30px) skewX(-2deg); }
-.p-info span { font-size: 0.95rem; color: var(--text-muted); display: block; pointer-events: none; }
-.p-arrow { font-size: 2.5rem; font-family: var(--serif); color: var(--text-muted); transition: transform 0.7s cubic-bezier(0.25, 1, 0.5, 1), color 0.5s ease; pointer-events: none; }
-.project-item:hover .p-arrow { transform: translateX(15px); color: var(--text-main); }
-
-.hover-image-reveal { position: fixed; top: 0; left: 0; width: 350px; height: 450px; pointer-events: none; z-index: 1; opacity: 0; transform: scale(0.8); transition: opacity 0.4s ease, transform 0.6s cubic-bezier(0.25, 1, 0.5, 1); border-radius: 10px; overflow: hidden; will-change: transform, opacity; }
-.hover-image-reveal.active { opacity: 0.6; transform: scale(1); }
-.hover-image-inner { width: 100%; height: 100%; background-size: cover; background-position: center; transition: background-image 0.2s ease; transform: translateZ(0); }
-
-/* ==========================================
-   9. DEV LOGS GRID (BLOG)
-   ========================================== */
-.blog-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 3rem; perspective: 1000px; }
-.blog-card { display: flex; flex-direction: column; align-items: flex-start; padding: 3.5rem 3rem; border-radius: 16px; height: 100%; }
-.blog-meta { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-bottom: 2rem; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 1.5rem; }
-.blog-date { font-size: 0.8rem; color: var(--text-muted); }
-.blog-tag { font-size: 0.75rem; color: var(--accent-gold); background: rgba(255, 255, 255, 0.02); border: 1px solid var(--glass-border); padding: 4px 12px; border-radius: 100px; }
-.blog-title { font-family: var(--serif); font-size: 2.2rem; font-weight: 300; color: var(--text-main); margin-bottom: 1.5rem; line-height: 1.2; letter-spacing: -0.02em; }
-.blog-excerpt { font-size: 1.05rem; color: var(--text-muted); line-height: 1.9; margin-bottom: 3rem; flex-grow: 1; }
-
-/* ==========================================
-   10. ARTICLE READER (MIND ATLAS)
-   ========================================== */
-.article-main { padding-top: 12rem; padding-bottom: 8rem; }
-.reader-wrapper { max-width: 900px; margin: 0 auto; padding: 0 2vw; }
-.reader-box { background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); border: 1px solid var(--glass-border); box-shadow: inset 0px 1px 1px rgba(255, 255, 255, 0.15), inset 0px -1px 1px rgba(0, 0, 0, 0.2), 0 20px 40px rgba(0, 0, 0, 0.4); border-radius: 20px; padding: 5rem; }
-.reader-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 24px; margin-bottom: 3rem; font-size: 0.85rem; color: var(--text-muted); border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 1.5rem; }
-.tag { color: var(--accent-gold); border: 1px solid var(--glass-border); background: rgba(255, 255, 255, 0.02); padding: 6px 16px; border-radius: 100px; font-weight: 400; }
-.reader-title { font-family: var(--serif); font-size: clamp(2.5rem, 5vw, 4.5rem); line-height: 1.1; font-weight: 300; margin-bottom: 4rem; letter-spacing: -0.03em; color: var(--text-main); }
-.reader-body { font-family: var(--mono); font-size: 1.1rem; line-height: 2; color: var(--text-muted); }
-.lead-text { font-size: 1.35rem; color: var(--text-main); font-weight: 300; margin-bottom: 3rem; line-height: 1.9; }
-.reader-body h2 { font-family: var(--serif); color: var(--text-main); font-size: 2.2rem; margin: 5rem 0 1.5rem 0; font-weight: 300; letter-spacing: -0.02em; }
-.reader-body p { margin-bottom: 2.5rem; }
-blockquote { margin: 5rem 0; padding: 2.5rem 3.5rem; background: rgba(255, 255, 255, 0.01); border-left: 2px solid var(--accent-gold); border-radius: 0 12px 12px 0; font-family: var(--serif); font-style: italic; color: var(--text-main); font-size: 1.6rem; line-height: 1.7; box-shadow: inset 10px 0 20px rgba(0,0,0,0.2); }
-
-/* ==========================================
    11. DYNAMIC AUTO COVER FLOW 
    ========================================== */
 .coverflow-section { width: 100%; padding: 2rem 0; display: flex; flex-direction: column; align-items: center; position: relative; overflow: hidden; }
@@ -233,10 +179,15 @@ blockquote { margin: 5rem 0; padding: 2.5rem 3.5rem; background: rgba(255, 255, 
 /* ==========================================
    12. TIGHT MASONRY ALBUM GRID
    ========================================== */
-.album-section { width: 100%; }
+.album-section { 
+    width: 100%; 
+    padding-bottom: 4rem; 
+    position: relative; 
+    z-index: 1; /* Keep grid below the end sections */
+}
+
 .album-grid { column-count: 3; column-gap: 2rem; width: 100%; }
 
-/* Image inside glass and bigger: 12px padding */
 .album-card {
     break-inside: avoid; column-break-inside: avoid; -webkit-column-break-inside: avoid;
     display: inline-block; width: 100%; margin-bottom: 2rem; padding: 12px; border-radius: 20px; 
@@ -246,7 +197,6 @@ blockquote { margin: 5rem 0; padding: 2.5rem 3.5rem; background: rgba(255, 255, 
 .album-card:hover .g-img-wrap { transform: translateZ(50px); }
 .album-card:hover .g-meta { transform: translateZ(40px); }
 
-/* Aspect ratio forces images to scale beautifully */
 .g-img-wrap { width: 100%; aspect-ratio: 3/4; border-radius: 12px; overflow: hidden; position: relative; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); margin-bottom: 1rem; }
 .g-img-wrap img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(50%) brightness(0.9); transition: filter 0.8s ease, transform 0.8s ease; transform: scale(1.05); }
 .album-card:hover .g-img-wrap img { filter: grayscale(0%) brightness(1.05); transform: scale(1); }
@@ -254,7 +204,6 @@ blockquote { margin: 5rem 0; padding: 2.5rem 3.5rem; background: rgba(255, 255, 
 .g-stamp { position: absolute; top: 1rem; left: 1rem; background: rgba(10, 10, 11, 0.6); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid var(--glass-border); color: var(--text-main); font-family: var(--mono); font-size: 0.6rem; padding: 4px 10px; border-radius: 100px; z-index: 2; transition: all 0.4s ease; }
 .album-card:hover .g-stamp { background: var(--text-main); color: var(--bg); }
 
-/* Small section for details */
 .g-meta { display: flex; flex-direction: column; gap: 0.75rem; padding: 0 4px 4px 4px; }
 .g-meta-top { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 0.75rem; }
 .g-title { font-family: var(--serif); font-size: 1.6rem; font-weight: 300; color: var(--text-main); line-height: 1; letter-spacing: -0.02em; }
@@ -264,40 +213,71 @@ blockquote { margin: 5rem 0; padding: 2.5rem 3.5rem; background: rgba(255, 255, 
 .g-meta-bottom strong { color: var(--text-main); font-weight: 400; }
 
 /* ==========================================
-   13. PERFECT SPLIT-SCREEN LIGHTBOX 
+   13. THE CURTAIN FIX (Prevents Scroll Bleed)
+   ========================================== */
+.system-status-section {
+    padding: 4rem 8vw; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    flex-direction: column; 
+    gap: 1.5rem; 
+    position: relative; 
+    z-index: 50; /* Sits HIGHER than the gallery grid */
+    background-color: var(--bg); /* Opaque black curtain */
+    width: 100%;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.main-footer {
+    position: relative;
+    z-index: 50; 
+    background-color: var(--bg); /* Extends the curtain */
+    width: 100%;
+}
+
+/* ==========================================
+   14. UNIFIED GLASS LIGHTBOX (IMAGE INSIDE)
    ========================================== */
 .lightbox-overlay {
     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-    background: rgba(10, 10, 11, 0.95); backdrop-filter: blur(35px); -webkit-backdrop-filter: blur(35px);
+    background: rgba(10, 10, 11, 0.85); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
     z-index: 99999; display: flex; justify-content: center; align-items: center;
     opacity: 0; pointer-events: none; transition: opacity 0.5s cubic-bezier(0.25, 1, 0.5, 1);
 }
 .lightbox-overlay.active { opacity: 1; pointer-events: all; }
 
+/* ONE Massive Glass Box */
+.lightbox-panel {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
+    backdrop-filter: blur(50px); -webkit-backdrop-filter: blur(50px); border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
+    border-radius: 24px; padding: 20px;
+    display: flex; flex-direction: row; gap: 2rem;
+    width: 85vw; max-width: 1200px; height: 85vh;
+    transform: scale(0.95) translateY(20px); transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+    position: relative;
+}
+.lightbox-overlay.active .lightbox-panel { transform: scale(1) translateY(0); }
+
 .lightbox-close {
-    position: absolute; top: 2.5rem; right: 4vw; font-family: var(--mono);
-    color: var(--text-muted); font-size: 0.75rem; cursor: pointer; transition: color 0.3s ease; z-index: 100;
+    position: absolute; top: 1.5rem; right: 2rem; font-family: var(--mono);
+    color: var(--text-muted); font-size: 0.75rem; cursor: pointer; transition: color 0.3s ease; z-index: 10;
 }
 .lightbox-close:hover { color: var(--accent-gold); }
 
-.lightbox-layout {
-    display: flex; width: 90vw; max-width: 1400px; height: 80vh; gap: 2rem;
-    align-items: center; transform: scale(0.95) translateY(20px); transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-}
-.lightbox-overlay.active .lightbox-layout { transform: scale(1) translateY(0); }
+.l-image-container { flex: 6; height: 100%; border-radius: 16px; overflow: hidden; background: #000; }
+.lightbox-img { width: 100%; height: 100%; object-fit: contain; }
 
-.lightbox-img-wrapper { flex: 3; height: 100%; display: flex; justify-content: center; align-items: center; position: relative; }
-.lightbox-img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 12px; box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6); }
-
-.lightbox-details { flex: 1; padding: 2.5rem; display: flex; flex-direction: column; justify-content: center; gap: 1.5rem; }
+.l-data-container { flex: 3; display: flex; flex-direction: column; justify-content: center; padding: 2rem; gap: 1.5rem; }
 .l-stamp { font-family: var(--mono); font-size: 0.75rem; color: var(--text-muted); border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 1rem; }
 .l-title { font-family: var(--serif); font-size: 2.5rem; font-weight: 300; line-height: 1.1; color: var(--text-main); }
 .l-title i { color: var(--text-muted); }
-.l-date { font-family: var(--mono); font-size: 0.85rem; color: var(--accent-gold); }
+.l-date { font-family: var(--mono); font-size: 0.9rem; color: var(--accent-gold); }
 .l-meta-bottom { font-family: var(--mono); font-size: 0.8rem; color: var(--text-muted); line-height: 2; margin-top: 1rem; }
 
 /* ==========================================
-   14. COMM & FOOTER
+   15. COMM & FOOTER
    ========================================== */
 footer { display: flex; flex-direction: column; align-items: center; padding: 6rem 6vw; gap: 3rem; }
 .footer-status { font-size: 0.85rem; color: var(--text-muted); }
@@ -316,7 +296,7 @@ footer { display: flex; flex-direction: column; align-items: center; padding: 6r
 .social-item:hover svg { fill: var(--bg); }
 
 /* ==========================================
-   15. MOBILE RESPONSIVENESS (PERFECTED)
+   16. MOBILE RESPONSIVENESS (PERFECTED)
    ========================================== */
 @media (max-width: 1024px) {
     .profile-grid { grid-template-columns: 1fr; gap: 4rem; }
@@ -343,50 +323,32 @@ footer { display: flex; flex-direction: column; align-items: center; padding: 6r
     .cursor-dot { display: none !important; } * { cursor: auto !important; } .tilt-card { transform: none !important; } 
 
     .subpage-hero { padding-top: 7rem; }
-    .blog-grid { grid-template-columns: 1fr; gap: 2rem; }
-    .blog-card { padding: 2.5rem 2rem; }
-    .blog-meta { flex-direction: column; align-items: flex-start; gap: 12px; }
 
-    .article-main { padding-top: 7rem; padding-bottom: 4rem; }
-    .reader-wrapper { padding: 0 1.5rem; }
-    .reader-box { background: transparent; border: none; box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; padding: 0; }
-    .reader-meta { gap: 12px; padding-bottom: 1.5rem; margin-bottom: 2rem; }
-    .reader-title { font-size: 2.8rem; margin-bottom: 2.5rem; letter-spacing: -0.01em; }
-    .lead-text { font-size: 1.2rem; margin-bottom: 2.5rem; }
-    .reader-body p { font-size: 1.05rem; margin-bottom: 2rem; }
-    blockquote { padding: 1.5rem 1.5rem 1.5rem 2rem; font-size: 1.35rem; margin: 3.5rem 0; box-shadow: none; background: transparent; }
-
-    /* MOBILE: TWO COLUMN MASONRY */
+    /* MOBILE: TWO COLUMN MASONRY FIX */
     .album-grid { column-count: 2; column-gap: 1rem; }
-    .album-card { margin-bottom: 1rem; padding: 10px; border-radius: 16px; gap: 0.75rem; }
-    .g-img-wrap { border-radius: 10px; margin-bottom: 0.5rem; }
-    .g-stamp { font-size: 0.5rem; padding: 4px 8px; top: 0.75rem; left: 0.75rem; }
-    .g-meta { gap: 0.5rem; }
-    .g-meta-top { padding-bottom: 0.5rem; flex-direction: column; align-items: flex-start; gap: 4px; }
-    .g-title { font-size: 1.1rem; }
-    .g-date { font-size: 0.65rem; }
-    .g-meta-bottom { flex-direction: column; gap: 4px; font-size: 0.6rem; }
+    .album-card { margin-bottom: 1rem; padding: 8px; border-radius: 16px; gap: 0.5rem; }
+    .g-img-wrap { border-radius: 10px; margin-bottom: 0.25rem; }
+    .g-stamp { font-size: 0.5rem; padding: 4px 8px; top: 0.5rem; left: 0.5rem; }
+    .g-meta { gap: 0.5rem; padding: 0 4px; }
+    .g-meta-top { padding-bottom: 0.5rem; flex-direction: column; align-items: flex-start; gap: 2px; }
+    .g-title { font-size: 1.2rem; }
+    .g-date { font-size: 0.6rem; }
+    .g-meta-bottom { flex-direction: column; gap: 2px; font-size: 0.55rem; }
 
     /* MOBILE: COVER FLOW */
     .cf-container { height: 350px; }
     .cf-item { width: 65vw; height: 350px; }
 
-    /* MOBILE: PERFECT SPLIT LIGHTBOX */
-    .lightbox-layout { 
-        flex-direction: column; height: 100vh; max-height: 100vh; gap: 0; margin: 0; 
-        width: 100vw; transform: none !important; border-radius: 0; padding: 0;
+    /* MOBILE: UNIFIED LIGHTBOX */
+    .lightbox-overlay { padding: 1.5rem; overflow-y: auto; align-items: flex-start; }
+    .lightbox-panel { 
+        flex-direction: column; height: auto; max-height: none; gap: 0; padding: 12px;
+        width: 100%; border-radius: 20px;
     }
-    .lightbox-img-wrapper { height: 60vh; width: 100%; padding: 1.5rem; align-items: center; }
-    .lightbox-img { max-height: 100%; width: 100%; object-fit: contain; }
-    
-    .lightbox-details { 
-        height: 40vh; width: 100%; padding: 2rem 1.5rem; gap: 1rem; 
-        border-radius: 30px 30px 0 0; justify-content: flex-start; 
-        background: rgba(20, 20, 22, 0.95);
-    }
-    .l-title { font-size: 2rem; }
-    .l-stamp { padding-bottom: 0.5rem; }
-    .lightbox-close { top: 1.5rem; right: 1.5rem; z-index: 1000; background: rgba(0,0,0,0.5); padding: 8px 12px; border-radius: 100px; }
+    .lightbox-close { top: 1.5rem; right: 1.5rem; background: rgba(0,0,0,0.5); padding: 8px 12px; border-radius: 100px; z-index: 20;}
+    .l-image-container { height: 50vh; width: 100%; border-radius: 12px; }
+    .l-data-container { padding: 1.5rem 0.5rem; gap: 1rem; }
+    .l-title { font-size: 1.8rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
