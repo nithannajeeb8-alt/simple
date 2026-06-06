@@ -272,18 +272,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ==========================================
-    // 7. DYNAMIC 3D COVER FLOW & MASONRY GALLERY
+    // 7. AUTO-PLAY TOUCH COVER FLOW
     // ==========================================
     const albumCards = document.querySelectorAll('.album-card');
     const coverFlowContainer = document.getElementById('coverflow');
     
     if (coverFlowContainer && albumCards.length > 0) {
         
-        // 1. Pick up to 5 random images from the masonry grid
+        // 1. Setup Random Images
         const shuffled = Array.from(albumCards).sort(() => 0.5 - Math.random());
         const selected = shuffled.slice(0, Math.min(5, albumCards.length));
         
-        // 2. Inject them into Cover Flow
         selected.forEach((card, index) => {
             const imgSrc = card.querySelector('.parallax-img').src;
             const titleHTML = card.querySelector('.g-title').innerHTML;
@@ -294,7 +293,6 @@ document.addEventListener("DOMContentLoaded", () => {
             cfItem.classList.add('cf-item');
             cfItem.innerHTML = `<img src="${imgSrc}" alt="Cover Flow Image">`;
             
-            // Store data for lightbox
             cfItem.dataset.img = imgSrc;
             cfItem.dataset.title = titleHTML;
             cfItem.dataset.date = dateText;
@@ -303,13 +301,13 @@ document.addEventListener("DOMContentLoaded", () => {
             coverFlowContainer.appendChild(cfItem);
         });
 
-        // 3. Cover Flow Math Logic
+        // 2. Cover Flow Math
         const cfItems = document.querySelectorAll('.cf-item');
         let currentIndex = Math.floor(cfItems.length / 2);
 
         function updateCoverFlow() {
             cfItems.forEach((item, i) => {
-                item.className = 'cf-item'; // Reset
+                item.className = 'cf-item'; 
                 if (i === currentIndex) item.classList.add('active');
                 else if (i === currentIndex - 1) item.classList.add('prev');
                 else if (i === currentIndex + 1) item.classList.add('next');
@@ -317,18 +315,38 @@ document.addEventListener("DOMContentLoaded", () => {
                 else if (i > currentIndex + 1) item.classList.add('hidden-right');
             });
         }
-
         updateCoverFlow();
 
-        // 4. Controls
-        document.getElementById('cf-prev').addEventListener('click', () => {
-            if (currentIndex > 0) { currentIndex--; updateCoverFlow(); }
+        // 3. Auto-Play & Swipe Logic
+        function nextSlide() {
+            if (currentIndex < cfItems.length - 1) currentIndex++;
+            else currentIndex = 0; // Loop back
+            updateCoverFlow();
+        }
+
+        function prevSlide() {
+            if (currentIndex > 0) currentIndex--;
+            else currentIndex = cfItems.length - 1; // Loop to end
+            updateCoverFlow();
+        }
+
+        let autoPlayInterval = setInterval(nextSlide, 3500);
+
+        // Mobile Swiping
+        let startX = 0;
+        coverFlowContainer.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            clearInterval(autoPlayInterval);
+        }, {passive: true});
+
+        coverFlowContainer.addEventListener('touchend', (e) => {
+            let endX = e.changedTouches[0].clientX;
+            if (startX - endX > 50) nextSlide();
+            else if (endX - startX > 50) prevSlide();
+            autoPlayInterval = setInterval(nextSlide, 3500);
         });
 
-        document.getElementById('cf-next').addEventListener('click', () => {
-            if (currentIndex < cfItems.length - 1) { currentIndex++; updateCoverFlow(); }
-        });
-
+        // Desktop Click / Hover Pause
         cfItems.forEach((item, index) => {
             item.addEventListener('click', () => {
                 if (index !== currentIndex) {
@@ -337,10 +355,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             });
         });
+
+        coverFlowContainer.addEventListener('mouseenter', () => clearInterval(autoPlayInterval));
+        coverFlowContainer.addEventListener('mouseleave', () => autoPlayInterval = setInterval(nextSlide, 3500));
     }
 
     // ==========================================
-    // 8. DETAILED SPLIT-SCREEN LIGHTBOX
+    // 8. SPLIT-SCREEN LIGHTBOX
     // ==========================================
     const lightbox = document.querySelector('.lightbox-overlay');
     const lightboxImg = document.querySelector('.lightbox-img');
