@@ -5,6 +5,9 @@ gsap.registerPlugin(ScrollTrigger);
 const yearSpan = document.getElementById('year');
 if (yearSpan) yearSpan.textContent = new Date().getFullYear();
 
+// ==========================================
+// 0. ASSET PRELOADING 
+// ==========================================
 window.addEventListener('load', () => {
     document.querySelectorAll('.hover-trigger').forEach(item => {
         const imgUrl = item.getAttribute('data-img');
@@ -207,7 +210,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const cursorY = gsap.quickSetter(cursor, "y", "px");
                 window.addEventListener("mousemove", (e) => { cursorX(e.clientX); cursorY(e.clientY); });
 
-                document.querySelectorAll("a, button, .hover-trigger").forEach(el => {
+                document.querySelectorAll("a, button, .hover-trigger, .album-card, .cf-item").forEach(el => {
                     el.addEventListener("mouseenter", () => gsap.to(cursor, { scale: 2.5, mixBlendMode: "difference", backgroundColor: "#fff", duration: 0.4 }));
                     el.addEventListener("mouseleave", () => gsap.to(cursor, { scale: 1, mixBlendMode: "normal", backgroundColor: "var(--accent-gold)", duration: 0.4 }));
                 });
@@ -358,7 +361,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ==========================================
-    // 8. UNIFIED GLASS LIGHTBOX
+    // 8. UNIFIED GLASS LIGHTBOX (STABLE)
     // ==========================================
     const lightbox = document.querySelector('.lightbox-overlay');
     const lightboxImg = document.querySelector('.lightbox-img');
@@ -382,11 +385,8 @@ document.addEventListener("DOMContentLoaded", () => {
             if(cursor) cursor.style.display = 'none';
         };
 
-        // Wire up Masonry Grid
+        // Standard Grid Click Handler
         document.querySelectorAll('.album-card').forEach(card => {
-            card.addEventListener('mouseenter', () => { if(cursor) cursor.classList.add('view-mode'); });
-            card.addEventListener('mouseleave', () => { if(cursor) cursor.classList.remove('view-mode'); });
-
             card.addEventListener('click', () => {
                 const img = card.querySelector('.parallax-img').src;
                 const title = card.querySelector('.g-title').innerHTML;
@@ -396,7 +396,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
 
-        // Wire up Cover Flow
+        // Cover Flow Click Handler
         if (coverFlowContainer) {
             coverFlowContainer.addEventListener('click', (e) => {
                 const clickedItem = e.target.closest('.cf-item');
@@ -409,15 +409,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     );
                 }
             });
-
-            coverFlowContainer.addEventListener('mouseenter', (e) => {
-                if(e.target.closest('.cf-item.active') && cursor) cursor.classList.add('view-mode');
-            }, true);
-            coverFlowContainer.addEventListener('mouseleave', (e) => {
-                if(cursor) cursor.classList.remove('view-mode');
-            }, true);
         }
 
+        // Close Logic
         const closeLightbox = () => {
             lightbox.classList.remove('active');
             if(mainContainer) mainContainer.classList.remove('lightbox-active-push');
@@ -427,11 +421,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
         lightboxClose.addEventListener('click', closeLightbox);
         
-        // Clicking anywhere outside the panel closes it
         lightbox.addEventListener('click', (e) => { 
+            // Close if clicking outside the glass panel
             if (e.target === lightbox) closeLightbox(); 
         });
         
-        document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && lightbox.classList.contains('active')) closeLightbox(); });
+        document.addEventListener('keydown', (e) => { 
+            if (e.key === 'Escape' && lightbox.classList.contains('active')) closeLightbox(); 
+        });
     }
 });
