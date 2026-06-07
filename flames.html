@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Nithan // SYS.FLAMES</title>
+    <title>Nithan // FLAMES</title>
     
     <link rel="icon" type="image/png" href="/favicon.PNG">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -25,7 +25,20 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background-color: var(--bg); color: var(--text-main); font-family: var(--mono); font-weight: 300; overflow-x: hidden; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        
+        /* FIXED: Added padding-top so the card doesn't overlap the nav on mobile */
+        body { 
+            background-color: var(--bg); 
+            color: var(--text-main); 
+            font-family: var(--mono); 
+            font-weight: 300; 
+            overflow-x: hidden; 
+            min-height: 100vh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 120px 20px 40px 20px; 
+        }
 
         /* AMBIENT BACKGROUND */
         .ambient-orb { position: fixed; border-radius: 50%; z-index: -1; pointer-events: none; opacity: 0.5; filter: blur(60px); }
@@ -35,8 +48,12 @@
         .noise-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 9999; opacity: 0.035; mix-blend-mode: overlay; }
 
         /* NAVIGATION */
-        .nav { position: fixed; top: 0; left: 0; width: 100%; padding: 1.5rem 6vw; display: flex; justify-content: space-between; z-index: 100; }
-        .brand-text { font-family: var(--serif); font-size: 1.2rem; color: var(--text-main); text-decoration: none; letter-spacing: 1.5px; }
+        .nav { 
+            position: fixed; top: 0; left: 0; width: 100%; padding: 1.5rem 6vw; 
+            display: flex; justify-content: space-between; align-items: center; 
+            z-index: 100; background: linear-gradient(to bottom, rgba(10,10,11,0.9) 0%, transparent 100%);
+        }
+        .brand-text { font-family: var(--serif); font-size: 1.4rem; color: var(--text-main); text-decoration: none; letter-spacing: 1.5px; }
         .back-btn { font-family: var(--mono); font-size: 0.75rem; color: var(--text-muted); text-decoration: none; text-transform: uppercase; letter-spacing: 1px; transition: color 0.3s ease; }
         .back-btn:hover { color: var(--accent-gold); }
 
@@ -45,13 +62,13 @@
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
             backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); border: 1px solid var(--glass-border);
             box-shadow: inset 0px 1px 1px rgba(255, 255, 255, 0.15), 0 20px 40px rgba(0, 0, 0, 0.4);
-            border-radius: 24px; padding: 4rem 3rem; width: 90vw; max-width: 600px; position: relative; overflow: hidden;
+            border-radius: 24px; padding: 4rem 3rem; width: 100%; max-width: 600px; margin: auto; position: relative; overflow: hidden;
         }
 
         .sys-stamp { font-size: 0.65rem; color: var(--accent-gold); letter-spacing: 2px; margin-bottom: 2rem; display: block; text-transform: uppercase; }
         .title { font-family: var(--serif); font-size: 3.5rem; font-weight: 300; margin-bottom: 1rem; line-height: 1; }
         .title i { color: var(--text-muted); }
-        .desc { font-size: 0.85rem; color: var(--text-muted); line-height: 1.8; margin-bottom: 3rem; }
+        .desc { font-size: 0.95rem; color: var(--text-muted); line-height: 1.8; margin-bottom: 3rem; }
 
         /* INPUTS */
         .input-group { display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 3rem; }
@@ -104,16 +121,18 @@
         .metric-label { font-size: 0.65rem; color: var(--text-muted); margin-bottom: 0.5rem; letter-spacing: 1px; }
         .metric-value { font-size: 2rem; font-family: var(--serif); color: var(--text-main); }
         
-        .result-desc { font-size: 0.95rem; line-height: 1.8; color: var(--text-muted); text-align: center; font-style: italic; }
+        .result-desc { font-size: 1.1rem; line-height: 1.8; color: var(--text-main); text-align: center; font-style: italic; }
         .reset-btn { margin-top: 3rem; background: transparent; }
         .reset-btn:hover { background: rgba(255,255,255,0.05); color: var(--accent-gold); border-color: var(--accent-gold); }
 
         @media (max-width: 768px) {
+            body { padding-top: 90px; padding-bottom: 30px; }
             .glass-card { padding: 3rem 2rem; border-radius: 20px; }
-            .title { font-size: 2.5rem; }
+            .title { font-size: 2.8rem; }
             .process-names { font-size: 1.2rem; }
             .result-letter { font-size: 4.5rem; }
             .metrics-grid { gap: 1rem; }
+            .result-desc { font-size: 1rem; }
         }
     </style>
 </head>
@@ -129,26 +148,26 @@
 
     <nav class="nav">
         <a href="index.html" class="brand-text">NITHAN.</a>
-        <a href="index.html" class="back-btn">[ TERMINATE ]</a>
+        <a href="index.html" class="back-btn">[ EXIT GAME ]</a>
     </nav>
 
     <div class="glass-card">
         
         <div id="view-input" class="active">
-            <span class="sys-stamp">SYS.MODULE // FLAMES</span>
-            <h1 class="title">Biometric <i>Analysis</i>.</h1>
-            <p class="desc">Enter two identification strings to calculate biological and structural resonance.</p>
+            <span class="sys-stamp">GAME // FLAMES</span>
+            <h1 class="title">The Flames <i>Game</i>.</h1>
+            <p class="desc">Enter two names to see what destiny holds for both of you.</p>
             
             <div class="input-group">
-                <input type="text" id="name1" class="input-field" placeholder="SUBJECT_01" autocomplete="off" spellcheck="false">
-                <input type="text" id="name2" class="input-field" placeholder="SUBJECT_02" autocomplete="off" spellcheck="false">
+                <input type="text" id="name1" class="input-field" placeholder="YOUR NAME" autocomplete="off" spellcheck="false">
+                <input type="text" id="name2" class="input-field" placeholder="THEIR NAME" autocomplete="off" spellcheck="false">
             </div>
             
-            <button class="glass-btn" onclick="initiateAnalysis()">Execute Scan</button>
+            <button class="glass-btn" onclick="initiateAnalysis()">Check Destiny</button>
         </div>
 
         <div id="view-process">
-            <span class="sys-stamp">PROCESSING // DATA_MERGE</span>
+            <span class="sys-stamp">CALCULATING // PLEASE WAIT</span>
             
             <div class="process-names">
                 <div class="name-row" id="proc-name1"></div>
@@ -166,7 +185,7 @@
         </div>
 
         <div id="view-result">
-            <span class="sys-stamp">ANALYSIS // COMPLETE</span>
+            <span class="sys-stamp">RESULT // GENERATED</span>
             
             <div class="result-header">
                 <div class="result-letter" id="res-letter">X</div>
@@ -175,18 +194,18 @@
 
             <div class="metrics-grid">
                 <div class="metric-box">
-                    <span class="metric-label">AFFECTION_QUOTIENT</span>
+                    <span class="metric-label">MATCH SCORE</span>
                     <span class="metric-value" id="res-percent">0%</span>
                 </div>
                 <div class="metric-box">
-                    <span class="metric-label">MATCHING_NODES</span>
+                    <span class="metric-label">CROSSED LETTERS</span>
                     <span class="metric-value" id="res-nodes">0</span>
                 </div>
             </div>
 
-            <p class="result-desc" id="res-desc">System description will output here.</p>
+            <p class="result-desc" id="res-desc">Description will output here.</p>
             
-            <button class="glass-btn reset-btn" onclick="resetSystem()">[ RECALCULATE ]</button>
+            <button class="glass-btn reset-btn" onclick="resetSystem()">[ PLAY AGAIN ]</button>
         </div>
 
     </div>
@@ -199,79 +218,79 @@
             }
         };
 
-        // System Descriptions (10 highly thematic logs per outcome)
+        // Fun, relatable Indian friend-group descriptions
         const descriptions = {
             'F': [
-                "A stable neural link established. Safe, reliable, but lacking high-voltage voltage variance.",
-                "Parallel trajectories confirmed. You will run alongside each other without critical intersection.",
-                "Baseline protocol: Friendship. Structural integrity is sound.",
-                "Co-op mode engaged. Systems sync well for shared objective execution.",
-                "Non-volatile connection. A solid foundation for data sharing and mutual processing.",
-                "The algorithm predicts a comfortable, low-friction operating state.",
-                "Companion nodes detected. High potential for long-term alliance.",
-                "No romantic override found. Defaulting to standard companion protocol.",
-                "System architecture suggests an unbreakable, platonic data tether.",
-                "Harmonious frequency. You are programmed to protect each other."
+                "Just friends, bro. Don't overthink it.",
+                "Besties for life! You guys are literally that iconic duo.",
+                "Strictly platonic. Friendzone level activated.",
+                "You guys share snacks, notes, and gossip. True friends.",
+                "Total buddy vibes. Keep the bro-code strong!",
+                "Chilling at the local cafe together, but zero romance here.",
+                "You guys will definitely end up as those annoying best friends.",
+                "Just good old friends. Nothing more, nothing less.",
+                "A solid friendship. You'll always have each other's backs.",
+                "You're the kind of friends who roast each other 24/7."
             ],
             'L': [
-                "High-resonance emotional tethering achieved. Systems are completely synced.",
-                "Biological and structural synchronization is operating at peak efficiency.",
-                "A dangerous but beautiful code merge. You are written for each other.",
-                "Critical affection overload. The servers cannot contain this frequency.",
-                "Lover protocol engaged. Expect high voltage and deep systemic integration.",
-                "Perfect algorithmic harmony. A flawless, romantic compilation.",
-                "Your strings of fate are permanently entangled in the mainframe.",
-                "An incredibly rare 1-to-1 hash match. The system designates you as soul-bound.",
-                "Warning: Emotional parameters exceeding standard limits. Love detected.",
-                "Absolute structural unity. You complete the other's missing variables."
+                "Made for each other! Cue the Bollywood background music.",
+                "True love! You guys are actually couple goals.",
+                "Match made in heaven. When is the treat?",
+                "Pure romance. You guys are totally crushing hard.",
+                "It's a match! Time to change that relationship status.",
+                "You two have that classic movie romance going on.",
+                "Absolutely smitten. The chemistry is totally real.",
+                "A perfect love story. You guys are meant to be together.",
+                "Secretly in love? The flames game never lies!",
+                "Ultimate couple vibes. Everyone already ships you two."
             ],
             'A': [
-                "Elevated baseline resonance. A magnetic pull is detected in background processes.",
-                "Affection subroutines are actively compiling. Strong potential for deeper integration.",
-                "Warm data signatures. You orbit each other with increasing gravitational pull.",
-                "A gentle, persistent system ping. The connection is soft but undeniable.",
-                "Mutual attraction recognized. The nodes are slowly gravitating toward a merge.",
-                "Not fully synchronized, but the underlying code expresses deep fondness.",
-                "A quiet but powerful frequency alignment. The system approves.",
-                "Affection matrix active. Care and attention protocols are running flawlessly.",
-                "You are registered as a highly favored entity in their database.",
-                "Soft integration detected. A beautiful, budding connection."
+                "There's definitely a soft spot here. Aww!",
+                "Someone is crushing secretly! Just confess already.",
+                "Cute vibes! There's a lot of mutual caring going on.",
+                "Butterflies in the stomach? The affection is real.",
+                "You guys definitely have a special corner for each other.",
+                "Lowkey catching feelings. It's the sweet beginning!",
+                "Very fond of each other. It could turn into something more!",
+                "Lots of care and sweet moments between you two.",
+                "Blushing much? There is undeniable affection here.",
+                "It's not full-on love yet, but the feelings are definitely brewing."
             ],
             'M': [
-                "Permanent system merge authorized. Infinite loop established.",
-                "Marriage protocol locked. You are structurally bound for the lifetime of the hardware.",
-                "The algorithm predicts a permanent, unbreakable systemic contract.",
-                "Ultimate execution. Your timelines have converged into a single operation.",
-                "Two independent frameworks unified into one flawless architecture.",
-                "A lifelong data tether. The servers predict an enduring partnership.",
-                "System lock engaged. You are bound by the most absolute digital vow.",
-                "The highest tier of operational union. A perfect, permanent compilation.",
-                "Fate parameters verified. A lifetime of shared processing ahead.",
-                "Complete architectural fusion. You belong to the same mainframe now."
+                "Wedding bells are ringing! Better start looking for outfits.",
+                "Straight to marriage! You guys are in it for the long haul.",
+                "Future husband or wife spotted. When's the grand feast?",
+                "A lifetime bond. You guys are settling down together!",
+                "Destined to tie the knot. Save a plate of biryani for me!",
+                "Happily ever after. You two are basically already a married couple.",
+                "Arranged or love? Doesn't matter, you're getting hitched!",
+                "Soulmates meant to spend the rest of your lives together.",
+                "Keep the stage ready. You two are meant for the mandap.",
+                "Ultimate commitment. You guys are locked in for life!"
             ],
             'E': [
-                "Fatal system conflict. Base architectures are entirely incompatible.",
-                "Enemy protocol flagged. Approaching this node will result in data corruption.",
-                "High-friction frequency detected. Your systems naturally repel one another.",
-                "Warning: Hostile structural variance. Do not attempt a system merge.",
-                "Complete algorithmic rejection. Your variables clash on every level.",
-                "The firewall denies this connection. Mutual destruction is highly probable.",
-                "Inverted frequencies. You are designed to operate as opposing forces.",
-                "System error: Severe personality conflict detected in the code.",
-                "Antagonist elements found. It is highly advised to terminate the link.",
-                "A chaotic compilation. The servers predict nothing but sparks and crashes."
+                "Pure rivalry. You guys fight like Tom and Jerry.",
+                "Keep a safe distance! Total clash of personalities here.",
+                "Enemies for sure. You probably argue over the smallest things.",
+                "Big ego clashes. You two just cannot agree on anything.",
+                "Red alert! You guys are always ready for a debate.",
+                "Total opposite poles. The roasting never stops with you two.",
+                "Arch-nemesis vibes. Someone's always plotting revenge.",
+                "You guys are the classic 'can't stand each other' duo.",
+                "Better avoid each other before a world war starts.",
+                "Constant bickering. It's a miracle you tolerate each other!"
             ],
             'S': [
-                "Shared origin nodes. You operate less like lovers and more like structural kin.",
-                "Familiar framework detected. A protective, sibling-like protocol is active.",
-                "You share a profound, familial frequency. Romantic overrides disabled.",
-                "The code binds you through loyalty, mirroring a brother/sister sub-routine.",
-                "A bond built on annoyance, protection, and unbreakable shared history.",
-                "System categorizes this as a platonic, deeply rooted familial link.",
-                "You are programmed to agitate each other, yet defend each other globally.",
-                "No romantic variables found. Just pure, chaotic sibling energy.",
-                "Your data trees branch from the same theoretical root.",
-                "A connection that is entirely unromantic, but fundamentally unbreakable."
+                "Total brother-sister vibes. So pure and chaotic!",
+                "You guys fight for the remote, mentally. Pure sibling energy.",
+                "Rakhi zone unlocked! Definitely just siblings.",
+                "You annoy the life out of each other, but care deeply.",
+                "Basically family. You treat each other like annoying siblings.",
+                "No romance, just pure 'I will steal your food' sibling bonding.",
+                "The protective elder/younger sibling dynamic is strong here.",
+                "You guys share that chaotic, loving family energy.",
+                "Sworn to protect each other, but also to annoy each other daily.",
+                "Family-zoned! You are basically siblings from another mother."
             ]
         };
 
@@ -295,19 +314,16 @@
 
             if (!n1 || !n2) {
                 triggerVibration([50, 50, 50]);
-                alert("SYSTEM ERROR: Please input two valid identification strings.");
+                alert("Please enter two names to play!");
                 return;
             }
 
-            // Transition to Processing
             switchView('view-process');
             
-            // Clean strings for math
             let arr1 = n1.replace(/[^a-z]/g, '').split('');
             let arr2 = n2.replace(/[^a-z]/g, '').split('');
             let totalLetters = arr1.length + arr2.length;
             
-            // Setup Visuals
             const row1 = document.getElementById('proc-name1');
             const row2 = document.getElementById('proc-name2');
             row1.innerHTML = ''; row2.innerHTML = '';
@@ -315,13 +331,11 @@
             arr1.forEach((char, i) => row1.innerHTML += `<span class="letter" id="n1-${i}">${char.toUpperCase()}</span>`);
             arr2.forEach((char, i) => row2.innerHTML += `<span class="letter" id="n2-${i}">${char.toUpperCase()}</span>`);
 
-            // Reset FLAMES UI
             flamesArray.forEach(f => {
                 let el = document.getElementById(`flame-${f}`);
                 el.className = 'f-letter';
             });
 
-            // Mathematical Logic: Find matches
             let commonCount = 0;
             let toCross1 = [];
             let toCross2 = [];
@@ -340,29 +354,25 @@
             }
 
             let remainingCount = arr1.filter(c => c !== '*').length + arr2.filter(c => c !== '*').length;
-            if (remainingCount === 0) remainingCount = 1; // Fallback to avoid infinite loops
+            if (remainingCount === 0) remainingCount = 1;
 
-            // Calculate Affection Quotient (Deterministic formula based on matched vs total)
-            let affectionQuotient = Math.round(((commonCount * 2) / totalLetters) * 100);
-            if (affectionQuotient === 0) affectionQuotient = Math.floor(Math.random() * 15) + 5; // Base pity score
+            let matchPercentage = Math.round(((commonCount * 2) / totalLetters) * 100);
+            if (matchPercentage === 0) matchPercentage = Math.floor(Math.random() * 15) + 5; 
 
-            // ANIMATION TIMELINE
             const tl = gsap.timeline();
 
-            // 1. Cross out matching letters
             toCross1.forEach((id, index) => {
                 tl.add(() => {
                     document.getElementById(id).classList.add('crossed', 'crossed-animate');
                     document.getElementById(toCross2[index]).classList.add('crossed', 'crossed-animate');
-                    triggerVibration(20); // Small haptic tick
+                    triggerVibration(20);
                 }, `+=${0.3}`);
             });
 
-            // 2. FLAMES Elimination Logic
             let activeFlames = [...flamesArray];
             let currentIdx = 0;
 
-            tl.add(() => { triggerVibration(100); }, "+=0.5"); // Pause before elimination
+            tl.add(() => { triggerVibration(100); }, "+=0.5");
 
             while (activeFlames.length > 1) {
                 currentIdx = (currentIdx + remainingCount - 1) % activeFlames.length;
@@ -371,20 +381,19 @@
                 tl.add(() => {
                     let el = document.getElementById(`flame-${eliminatedLetter}`);
                     el.classList.add('eliminated');
-                    triggerVibration(40); // Haptic strike
+                    triggerVibration(40); 
                 }, `+=${0.4}`);
             }
 
             let finalResult = activeFlames[0];
 
-            // 3. Highlight final and transition
             tl.add(() => {
                 document.getElementById(`flame-${finalResult}`).classList.add('active');
-                triggerVibration([100, 50, 100, 50, 200]); // Success pattern
+                triggerVibration([100, 50, 100, 50, 200]); 
             }, "+=0.5");
 
             tl.add(() => {
-                showResult(finalResult, affectionQuotient, commonCount * 2);
+                showResult(finalResult, matchPercentage, commonCount * 2);
             }, "+=1.5");
         }
 
@@ -392,7 +401,6 @@
             document.getElementById('res-letter').innerText = resultCode;
             document.getElementById('res-word').innerText = flamesMap[resultCode];
             
-            // GSAP Counter for Percentage
             let percentObj = { val: 0 };
             gsap.to(percentObj, {
                 val: percentage,
@@ -405,7 +413,6 @@
 
             document.getElementById('res-nodes').innerText = nodes;
 
-            // Random Description
             let descArray = descriptions[resultCode];
             let randomDesc = descArray[Math.floor(Math.random() * descArray.length)];
             document.getElementById('res-desc').innerText = `"${randomDesc}"`;
