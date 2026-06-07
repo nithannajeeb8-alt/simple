@@ -13,13 +13,15 @@
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
     <style>
-        /* CORE SYSTEM VARIABLES */
+        /* ==========================================
+           1. CORE SYSTEM VARIABLES
+           ========================================== */
         :root {
             --bg: #0a0a0b; 
             --text-main: #f4f4f5; 
             --text-muted: rgba(244, 244, 245, 0.45);
             --accent-gold: #e6cc98; 
-            --accent-cyan: #88c0d0; /* Used for auto-generated chain reactions */
+            --accent-cyan: #88c0d0; 
             --serif: 'Playfair Display', serif;
             --mono: 'JetBrains Mono', monospace;
             --glass-border: rgba(255, 255, 255, 0.08);
@@ -31,45 +33,56 @@
             background-color: var(--bg); color: var(--text-main); font-family: var(--mono); 
             font-weight: 300; overflow-x: hidden; min-height: 100vh; 
             display: flex; align-items: center; justify-content: center; 
-            padding: 100px 20px 40px 20px; user-select: none;
+            /* Added heavy padding to prevent nav overlap */
+            padding: 120px 20px 40px 20px; user-select: none;
         }
 
-        /* AMBIENT BACKGROUND */
+        /* ==========================================
+           2. AMBIENT BACKGROUND
+           ========================================== */
         .ambient-orb { position: fixed; border-radius: 50%; z-index: -1; pointer-events: none; opacity: 0.4; filter: blur(60px); }
         .orb-1 { width: 50vw; height: 50vw; background: radial-gradient(circle, rgba(230, 204, 152, 0.1) 0%, transparent 70%); top: 10%; left: -10%; }
         .orb-2 { width: 40vw; height: 40vw; background: radial-gradient(circle, rgba(136, 192, 208, 0.05) 0%, transparent 70%); bottom: -10%; right: -10%; }
         .noise-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 9999; opacity: 0.035; mix-blend-mode: overlay; }
 
-        /* NAVIGATION */
+        /* ==========================================
+           3. NAVIGATION
+           ========================================== */
         .nav { 
             position: fixed; top: 0; left: 0; width: 100%; padding: 1.5rem 6vw; 
             display: flex; justify-content: space-between; align-items: center; 
-            z-index: 100; background: linear-gradient(to bottom, rgba(10,10,11,0.9) 0%, transparent 100%);
+            z-index: 100; background: linear-gradient(to bottom, rgba(10,10,11,0.95) 0%, transparent 100%);
         }
         .brand-text { font-family: var(--serif); font-size: 1.4rem; color: var(--text-main); text-decoration: none; letter-spacing: 1.5px; }
         .back-btn { font-family: var(--mono); font-size: 0.75rem; color: var(--text-muted); text-decoration: none; text-transform: uppercase; letter-spacing: 1px; transition: color 0.3s ease; }
         .back-btn:hover { color: var(--accent-gold); }
 
-        /* MAIN INTERFACE */
+        /* ==========================================
+           4. MAIN INTERFACE
+           ========================================== */
         .glass-card {
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
             backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); border: 1px solid var(--glass-border);
             box-shadow: inset 0px 1px 1px rgba(255, 255, 255, 0.15), 0 20px 40px rgba(0, 0, 0, 0.4);
-            border-radius: 24px; padding: 3rem; width: 100%; max-width: 500px; position: relative;
+            border-radius: 24px; padding: 3rem; width: 100%; max-width: 480px; position: relative; margin: auto;
         }
 
-        .sys-stamp { font-size: 0.65rem; color: var(--text-muted); letter-spacing: 2px; margin-bottom: 2rem; display: flex; justify-content: space-between; text-transform: uppercase; }
+        .sys-stamp { font-size: 0.65rem; color: var(--text-muted); letter-spacing: 2px; margin-bottom: 2.5rem; display: flex; justify-content: space-between; text-transform: uppercase; }
         .lvl-counter { color: var(--accent-gold); }
 
-        /* TARGET HEADER */
-        .target-container { text-align: center; margin-bottom: 3rem; }
+        /* ==========================================
+           5. TARGET HEADER
+           ========================================== */
+        .target-container { text-align: center; margin-bottom: 2.5rem; }
         .target-label { font-size: 0.75rem; color: var(--text-muted); letter-spacing: 3px; margin-bottom: 0.5rem; }
-        .target-number { font-family: var(--serif); font-size: 5rem; color: var(--text-main); line-height: 1; text-shadow: 0 0 30px rgba(255, 255, 255, 0.1); }
-        .target-number.win { color: var(--accent-gold); text-shadow: 0 0 40px rgba(230, 204, 152, 0.4); }
+        .target-number { font-family: var(--serif); font-size: 4.5rem; color: var(--text-main); line-height: 1; text-shadow: 0 0 30px rgba(255, 255, 255, 0.1); transition: all 0.4s ease; }
+        .target-number.win { color: var(--accent-gold); text-shadow: 0 0 40px rgba(230, 204, 152, 0.4); transform: scale(1.05); }
 
-        /* 3x3 GRID */
+        /* ==========================================
+           6. 3x3 GRID
+           ========================================== */
         .grid-container {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 3rem;
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 2.5rem;
         }
         
         .cell {
@@ -86,42 +99,59 @@
 
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(230, 204, 152, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(230, 204, 152, 0); } 100% { box-shadow: 0 0 0 0 rgba(230, 204, 152, 0); } }
 
-        /* CONTROLS (KEYPAD) */
+        /* ==========================================
+           7. CONTROLS (SYMMETRIC KEYPAD)
+           ========================================== */
         .controls-container { border-top: 1px solid var(--glass-border); padding-top: 2rem; }
-        .keypad { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 1rem; }
+        
+        /* Changed from 5-columns to a perfect 3x3 layout */
+        .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.5rem; }
         
         .key {
-            padding: 12px 0; border-radius: 12px; background: rgba(255, 255, 255, 0.03);
+            padding: 14px 0; border-radius: 12px; background: rgba(255, 255, 255, 0.03);
             border: 1px solid var(--glass-border); color: var(--text-muted); font-family: var(--mono); font-size: 1.2rem;
-            cursor: pointer; transition: all 0.2s ease;
+            cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center;
         }
         .key:hover { background: rgba(255, 255, 255, 0.08); color: var(--text-main); }
-        .key.active { background: var(--text-main); color: var(--bg); font-weight: 600; box-shadow: 0 4px 15px rgba(255,255,255,0.2); transform: translateY(-2px); }
+        .key.active { background: var(--text-main); color: var(--bg); font-weight: 600; box-shadow: 0 4px 15px rgba(255,255,255,0.2); transform: translateY(-2px); border-color: var(--text-main); }
 
-        .action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .action-btn {
             padding: 14px 0; border-radius: 12px; background: transparent; border: 1px solid var(--glass-border);
             color: var(--text-main); font-family: var(--mono); font-size: 0.8rem; letter-spacing: 1px; cursor: pointer; transition: all 0.2s ease;
         }
-        .action-btn:hover { background: rgba(255, 255, 255, 0.05); }
+        .action-btn:hover { background: rgba(255, 255, 255, 0.05); color: var(--accent-gold); border-color: rgba(255,255,255,0.15);}
         .action-btn.erase.active { background: #bf616a; color: #fff; border-color: #bf616a; }
 
-        /* OVERLAYS */
+        /* ==========================================
+           8. OVERLAYS
+           ========================================== */
         .win-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(10, 10, 11, 0.9); backdrop-filter: blur(10px);
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            background: rgba(10, 10, 11, 0.95); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            display: flex; flex-direction: column; justify-content: center; align-items: center; border-radius: 24px;
             opacity: 0; pointer-events: none; transition: opacity 0.5s ease; z-index: 10;
         }
         .win-overlay.active { opacity: 1; pointer-events: all; }
-        .win-title { font-family: var(--serif); font-size: 3rem; color: var(--accent-gold); margin-bottom: 2rem; }
+        .win-title { font-family: var(--serif); font-size: 3rem; color: var(--accent-gold); margin-bottom: 2rem; font-weight: 300;}
 
+        /* ==========================================
+           9. MOBILE RESPONSIVENESS
+           ========================================== */
         @media (max-width: 768px) {
-            body { padding-top: 80px; }
-            .glass-card { padding: 2rem 1.5rem; }
-            .target-number { font-size: 4rem; }
+            body { padding-top: 90px; padding-bottom: 30px; }
+            .nav { padding: 1.25rem 5vw; }
+            .glass-card { padding: 2.5rem 1.5rem; border-radius: 20px; }
+            
+            .target-number { font-size: 3.5rem; }
+            .grid-container { gap: 8px; margin-bottom: 2rem; }
             .cell { font-size: 1.8rem; border-radius: 12px; }
-            .key { padding: 10px 0; font-size: 1.1rem; }
+            
+            .controls-container { padding-top: 1.5rem; }
+            .keypad { gap: 8px; margin-bottom: 1rem; }
+            .key { padding: 12px 0; font-size: 1.1rem; }
+            .action-row { gap: 8px; }
+            .action-btn { padding: 12px 0; font-size: 0.75rem; }
         }
     </style>
 </head>
@@ -180,10 +210,10 @@
         const state = {
             target: 0,
             level: 1,
-            difficultyCap: 3, // Starts easy (numbers 1-3)
+            difficultyCap: 3, 
             selectedNumber: null,
             isEraseMode: false,
-            playerCells: new Array(9).fill(null), // Only tracks numbers the player clicked
+            playerCells: new Array(9).fill(null), 
             boardLocked: false
         };
 
@@ -231,7 +261,6 @@
         }
 
         // --- LEVEL GENERATOR ---
-        // Generates a mathematically guaranteed solvable puzzle
         function generateLevel() {
             state.boardLocked = false;
             state.playerCells.fill(null);
@@ -242,8 +271,6 @@
             if (state.level > 3) state.difficultyCap = 5;
             if (state.level > 7) state.difficultyCap = 9;
 
-            // To guarantee a solvable chain reaction, we simulate placing numbers 
-            // in specific "seed" spots (Top-Left, Top-Mid, Mid-Left, Mid-Mid)
             let simGrid = new Array(9).fill(null);
             const seedIndices = [0, 1, 3, 4]; 
             
@@ -251,14 +278,11 @@
                 simGrid[idx] = Math.floor(Math.random() * state.difficultyCap) + 1;
             });
 
-            // Calculate the theoretical outcome
             let simResult = calculateLogic(simGrid);
-            
-            // Set target to the bottom-right corner (Index 8), which is the final chain product
-            state.target = simResult.grid[8] || (simResult.grid[0] * 2); // Fallback if math fails somehow
+            state.target = simResult.grid[8] || (simResult.grid[0] * 2); 
             
             targetEl.innerText = state.target;
-            renderBoard(new Array(9).fill(null), []); // Clear physical board
+            renderBoard(new Array(9).fill(null), []); 
         }
 
         // --- CORE MATH ENGINE ---
@@ -268,11 +292,10 @@
             let changed = true;
 
             const lines = [
-                [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
-                [0, 3, 6], [1, 4, 7], [2, 5, 8]  // Cols
+                [0, 1, 2], [3, 4, 5], [6, 7, 8], 
+                [0, 3, 6], [1, 4, 7], [2, 5, 8]  
             ];
 
-            // Loop until no new chain reactions happen
             while (changed) {
                 changed = false;
                 for (let line of lines) {
@@ -319,7 +342,6 @@
         function handleCellClick(idx) {
             if (state.boardLocked) return;
 
-            // ERASE LOGIC
             if (state.isEraseMode) {
                 if (state.playerCells[idx] !== null) {
                     state.playerCells[idx] = null;
@@ -329,19 +351,16 @@
                 return;
             }
 
-            // PLACE LOGIC
             if (state.selectedNumber !== null && state.playerCells[idx] === null) {
-                // Prevent placing over auto-generated cells
                 const currentVisualState = calculateLogic(state.playerCells);
                 if (currentVisualState.grid[idx] !== null && currentVisualState.grid[idx] !== state.playerCells[idx]) {
-                    vibrate([50, 50]); // Error vibration
+                    vibrate([50, 50]); 
                     return; 
                 }
 
                 state.playerCells[idx] = state.selectedNumber;
                 vibrate(20);
                 
-                // Animate physical tap
                 gsap.from(gridEl.children[idx], { scale: 0.8, duration: 0.3, ease: 'back.out(2)' });
                 processBoard();
             }
@@ -361,7 +380,6 @@
                 let cell = cells[i];
                 let val = fullGrid[i];
                 
-                // Reset Classes
                 cell.className = 'cell';
                 cell.innerText = val !== null ? val : '';
 
@@ -370,7 +388,6 @@
                         cell.classList.add('player-input');
                     } else {
                         cell.classList.add('auto-gen');
-                        // Animate new auto-generated cells
                         if (!cell.dataset.renderedVal || cell.dataset.renderedVal != val) {
                             gsap.from(cell, { scale: 0, rotationX: 90, duration: 0.5, ease: 'back.out(1.5)' });
                             vibrate(40);
@@ -382,12 +399,11 @@
         }
 
         function checkWin(fullGrid) {
-            // Find if the target exists anywhere in the grid
             const targetIdx = fullGrid.findIndex(val => val === state.target);
             
             if (targetIdx !== -1) {
                 state.boardLocked = true;
-                vibrate([100, 50, 100, 50, 200]); // Win pattern
+                vibrate([100, 50, 100, 50, 200]); 
                 
                 const winCell = gridEl.children[targetIdx];
                 winCell.classList.add('target-match');
@@ -414,9 +430,7 @@
             });
         }
 
-        // Start Game
         initGame();
-
     </script>
 </body>
 </html>
