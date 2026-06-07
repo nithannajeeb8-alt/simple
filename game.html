@@ -25,7 +25,6 @@
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <script defer src="script.js"></script>
 
-    <!-- Specific Styles for the Arcade Grid & Mobile Fixes -->
     <style>
         .arcade-hero-spacing {
             padding-top: 14rem;
@@ -123,14 +122,14 @@
     </svg>
 
     <nav class="nav">
-        <!-- Logo acts as a back button for mobile -->
         <a href="index.html" class="brand-logo hidden-on-load" style="text-decoration: none;">
             <span class="brand-text">NITHAN.</span>
         </a>
 
         <div class="nav-right desktop-nav hidden-on-load">
-            <a href="blog.html" class="glass-btn magnetic">Dev Logs</a>
-            <a href="index.html" class="glass-btn magnetic highlight">Home Base</a>
+            <a href="blog.html" class="glass-btn magnetic">Logs</a>
+            <a href="game.html" class="glass-btn magnetic highlight">Game</a>
+            <a href="gallery.html" class="glass-btn magnetic">Gallery</a>
         </div>
 
         <button class="mobile-menu-btn hidden-on-load" aria-label="Toggle Menu" aria-expanded="false">
@@ -140,8 +139,10 @@
 
     <div class="mobile-menu-overlay" aria-hidden="true">
         <div class="mobile-links">
-            <a href="blog.html" class="mobile-link">Dev Logs</a>
-            <a href="index.html" class="mobile-link highlight-text">Home Base</a>
+            <a href="index.html" class="mobile-link">Home Base</a>
+            <a href="blog.html" class="mobile-link">Logs</a>
+            <a href="game.html" class="mobile-link highlight-text">Game</a>
+            <a href="gallery.html" class="mobile-link">Gallery</a>
         </div>
     </div>
 
@@ -165,9 +166,18 @@
                 <p class="parallax-header">(02) ACTIVE_GAMES</p>
             </header>
             
-            <!-- Glassmorphic Grid Layout -->
             <div class="blog-grid perspective-container">
                 
+                <article class="blog-card glass-card tilt-card gs-reveal">
+                    <div class="blog-meta">
+                        <span class="blog-date">STATUS: ONLINE</span>
+                        <span class="blog-tag">BIOMETRIC_ANALYSIS</span>
+                    </div>
+                    <h3 class="blog-title">SYS_FLAMES</h3>
+                    <p class="blog-excerpt">A digital execution of the classic childhood compatibility algorithm. Input two identification strings to run a full biometric and structural resonance scan. Will it predict friendship, marriage, or absolute chaos?</p>
+                    <a href="flames.html" class="glass-btn magnetic">INITIATE_GAME ↗</a>
+                </article>
+
                 <article class="blog-card glass-card tilt-card gs-reveal">
                     <div class="blog-meta">
                         <span class="blog-date">STATUS: ONLINE</span>
