@@ -38,7 +38,7 @@
         
         body { 
             background-color: var(--bg); color: var(--text-main); font-family: var(--mono); 
-            font-weight: 300; min-height: 100vh; line-height: 1.8; overflow-x: hidden;
+            font-weight: 300; min-height: 100vh; overflow-x: hidden;
         }
 
         /* ==========================================
@@ -65,48 +65,47 @@
            4. HERO SECTION & SIGNATURE
            ========================================== */
         .hero-section {
-            min-height: 90vh; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            min-height: 95vh; display: flex; flex-direction: column; justify-content: center; align-items: center;
             text-align: center; padding: 0 6vw; position: relative;
         }
-        .intro-text { font-size: 0.75rem; color: var(--accent-gold); letter-spacing: 3px; margin-bottom: 2rem; text-transform: uppercase; }
+        .intro-text { font-size: 0.75rem; color: var(--accent-gold); letter-spacing: 3px; margin-bottom: 1rem; text-transform: uppercase; }
         
-        .hero-title { font-family: var(--serif); font-size: clamp(3rem, 8vw, 5.5rem); font-weight: 300; line-height: 1.1; margin-bottom: 2rem; color: var(--text-main); }
-        .hero-title i { color: var(--text-muted); }
-        
-        .hero-desc { font-size: 1.1rem; color: var(--text-muted); max-width: 650px; line-height: 1.9; margin-bottom: 3rem; }
-
-        .signature-wrapper {
-            position: relative; display: inline-block; margin-bottom: 2rem;
-            visibility: hidden; /* Hidden safely until script boots */
+        /* The SVG Signature Animation */
+        .signature-svg {
+            width: 100%; max-width: 500px; height: 120px; overflow: visible; margin-bottom: 2rem;
         }
         .signature-text {
-            font-family: var(--signature); font-size: 4.5rem; color: var(--text-main); font-weight: 400;
-            white-space: nowrap; overflow: hidden; display: inline-block;
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+            font-family: var(--signature); font-size: 5.5rem;
+            fill: transparent; /* Starts empty */
+            stroke: var(--text-main); stroke-width: 1.5px;
+            stroke-dasharray: 1000; stroke-dashoffset: 1000; /* Prepares drawing effect */
         }
-        .signature-pen {
-            position: absolute; bottom: 15px; left: 0; width: 4px; height: 4px; 
-            background: var(--accent-gold); border-radius: 50%; box-shadow: 0 0 15px 4px rgba(230, 204, 152, 0.6);
-            visibility: hidden;
+        
+        /* Neatly aligned paragraph */
+        .hero-desc { 
+            font-size: 1.05rem; color: var(--text-muted); 
+            max-width: 480px; margin: 0 auto; line-height: 2; 
+            text-align: center; text-align-last: center;
         }
 
-        .gs-hero { visibility: hidden; } /* Prepares text for fade in */
+        .gs-hero { visibility: hidden; }
 
         /* ==========================================
-           5. THE TIMELINE (HARDWARE ACCELERATED)
+           5. THE TIMELINE
            ========================================== */
         .timeline-container {
             max-width: 900px; margin: 0 auto 10rem auto; padding: 0 6vw; position: relative;
         }
         
+        /* Dynamic scroll line */
         .timeline-track {
             position: absolute; top: 0; bottom: 0; left: 50%; width: 2px;
-            background: rgba(255, 255, 255, 0.05); transform: translateX(-50%); z-index: 0;
+            transform: translateX(-50%); z-index: 0;
         }
         .timeline-progress {
             position: absolute; top: 0; left: 0; width: 100%; height: 0%;
-            background: linear-gradient(to bottom, transparent, var(--accent-gold), rgba(230,204,152,0.5));
-            box-shadow: 0 0 15px rgba(230, 204, 152, 0.5);
+            background: linear-gradient(to bottom, transparent, var(--accent-gold), rgba(230,204,152,0.4));
+            box-shadow: 0 0 20px rgba(230, 204, 152, 0.6);
         }
 
         .node {
@@ -121,10 +120,7 @@
             border: 1px solid var(--glass-border); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
             position: relative; transition: border-color 0.4s ease, transform 0.4s ease;
             
-            /* Forces mobile GPU to render animations smoothly */
-            will-change: transform, opacity, filter;
-            transform: translateZ(0); 
-            visibility: hidden; 
+            will-change: transform, opacity, filter; transform: translateZ(0); visibility: hidden; 
         }
         .node-card:hover { border-color: rgba(230, 204, 152, 0.3); transform: translateY(-5px) translateZ(0); }
 
@@ -134,7 +130,7 @@
 
         .node-dot {
             position: absolute; left: 50%; width: 12px; height: 12px; background: var(--bg);
-            border: 2px solid rgba(255,255,255,0.2); border-radius: 50%; transform: translateX(-50%);
+            border: 2px solid rgba(255,255,255,0.15); border-radius: 50%; transform: translateX(-50%);
             transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
         }
         .node.active .node-dot { 
@@ -146,19 +142,21 @@
            6. MOBILE RESPONSIVENESS
            ========================================== */
         @media (max-width: 768px) {
-            .hero-section { min-height: 80vh; padding-top: 6rem; }
-            .hero-title { font-size: 2.8rem; }
-            .signature-text { font-size: 3.5rem; }
+            .hero-section { min-height: 85vh; padding-top: 5rem; }
+            .hero-desc { max-width: 320px; font-size: 1rem; }
             
+            .signature-svg { height: 90px; margin-bottom: 1rem; }
+            .signature-text { font-size: 4.5rem; }
+
             .timeline-container { padding: 0 6vw; }
-            .timeline-track { left: 24px; transform: none; }
+            .timeline-track { left: 24px; transform: translateX(-50%); }
             
             .node, .node:nth-child(even) { flex-direction: column; align-items: flex-start; margin-bottom: 4rem; padding-left: 50px; }
             .node-card, .node:nth-child(even) .node-card { width: 100%; padding: 2rem 1.5rem; }
             .card-title { font-size: 1.8rem; }
             
-            .node-dot { left: 24px; transform: translateX(-5px); top: 30px; }
-            .node.active .node-dot { transform: translateX(-5px) scale(1.4); }
+            .node-dot { left: 24px; transform: translateX(-50%); top: 30px; }
+            .node.active .node-dot { transform: translateX(-50%) scale(1.4); }
         }
     </style>
 </head>
@@ -179,14 +177,13 @@
 
     <main>
         <section class="hero-section">
+            <h1 style="display: none;">Nithan Najeeb // Web Developer & Creator</h1>
+            
             <p class="intro-text gs-hero">Identity & Trajectory</p>
             
-            <h1 class="hero-title gs-hero" style="display: none;">Nithan Najeeb // Web Developer & Creator</h1>
-            
-            <div class="signature-wrapper" id="sig-wrap">
-                <div class="signature-text" id="signature">Nithan Najeeb.</div>
-                <div class="signature-pen" id="pen"></div>
-            </div>
+            <svg class="signature-svg gs-hero" viewBox="0 0 500 120" preserveAspectRatio="xMidYMid meet">
+                <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" class="signature-text">Nithan Najeeb.</text>
+            </svg>
 
             <p class="hero-desc gs-hero">
                 Born in Kerala in 2004, I am currently pursuing a Bachelor of Commerce (B.Com) with a specialization in Computer Applications. I am not looking to follow a conventional path. I am building a life around curiosity, creativity, and continuous growth.
@@ -239,32 +236,46 @@
     </main>
 
     <script>
-        // --- BULLETPROOF INITIALIZER ---
-        // Waits until HTML, CSS, libraries, and Fonts are 100% loaded before executing
         window.addEventListener("load", () => {
             gsap.registerPlugin(ScrollTrigger);
 
-            // --- 1. SIGNATURE ANIMATION ---
-            const sigWrap = document.getElementById("sig-wrap");
-            const sigText = document.getElementById("signature");
-            const pen = document.getElementById("pen");
-
-            // Unhide elements using autoAlpha (handles visibility & opacity)
-            gsap.set(sigWrap, { autoAlpha: 1 });
-            gsap.set(sigText, { width: 0 });
+            // --- 1. SVG SIGNATURE DRAWING ANIMATION ---
+            // Unhide the hero elements
+            gsap.set('.gs-hero', { autoAlpha: 1 });
             
-            const tl = gsap.timeline({ delay: 0.3 });
+            const tl = gsap.timeline({ delay: 0.2 });
             
-            tl.to(sigText, { width: "100%", duration: 2.5, ease: "power2.inOut" });
-            tl.to(pen, { autoAlpha: 1, duration: 0.2 }, "<"); 
-            tl.to(pen, { left: "100%", duration: 2.5, ease: "power2.inOut" }, "<");
-            tl.to(pen, { autoAlpha: 0, duration: 0.3 });
+            // Draws the outline of the letters
+            tl.to('.signature-text', { 
+                strokeDashoffset: 0, 
+                duration: 2.8, 
+                ease: "power2.inOut" 
+            });
 
-            // --- 2. HERO TEXT FADE IN ---
-            gsap.fromTo('.gs-hero', 
-                { y: 30, autoAlpha: 0 },
-                { y: 0, autoAlpha: 1, duration: 1, stagger: 0.2, ease: "power2.out", delay: 1.0 } 
+            // Fades in the solid white fill gracefully
+            tl.to('.signature-text', { 
+                fill: "var(--text-main)", 
+                duration: 1 
+            }, "-=0.8");
+
+            // Fades in the rest of the text
+            tl.fromTo(['.intro-text', '.hero-desc'], 
+                { y: 20, autoAlpha: 0 },
+                { y: 0, autoAlpha: 1, duration: 1, stagger: 0.3, ease: "power2.out" },
+                "-=1.5"
             );
+
+            // --- 2. THE DYNAMIC TIMELINE LINE ---
+            // The golden line only appears and draws itself down AS you scroll
+            gsap.to('#progress-line', {
+                height: "100%",
+                scrollTrigger: {
+                    trigger: ".timeline-container",
+                    start: "top 60%", // Line starts drawing when timeline hits middle of screen
+                    end: "bottom 80%",
+                    scrub: true
+                }
+            });
 
             // --- 3. MOBILE-SAFE SCROLL ANIMATIONS ---
             document.querySelectorAll('.node').forEach((node) => {
@@ -277,9 +288,8 @@
                     onLeaveBack: () => node.classList.remove('active')
                 });
 
-                // Uses autoAlpha and force3D to ensure it renders flawlessly on iPhone/Android
                 gsap.fromTo(card,
-                    { y: 80, autoAlpha: 0, filter: "blur(8px)", "-webkit-filter": "blur(8px)" },
+                    { y: 60, autoAlpha: 0, filter: "blur(8px)", "-webkit-filter": "blur(8px)" },
                     {
                         scrollTrigger: {
                             trigger: node,
@@ -297,18 +307,7 @@
                 );
             });
 
-            // --- 4. SCROLL TRACKER ---
-            gsap.to('#progress-line', {
-                height: "100%",
-                scrollTrigger: {
-                    trigger: ".timeline-container",
-                    start: "top center",
-                    end: "bottom center",
-                    scrub: true
-                }
-            });
-
-            // --- 5. AMBIENT PARALLAX ---
+            // --- 4. AMBIENT PARALLAX ---
             gsap.to('#orb1', {
                 y: 200, scrollTrigger: { trigger: "body", start: "top top", end: "bottom bottom", scrub: 2 }
             });
