@@ -26,7 +26,6 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
-        /* FIXED: Added padding-top so the card doesn't overlap the nav on mobile */
         body { 
             background-color: var(--bg); 
             color: var(--text-main); 
@@ -63,10 +62,11 @@
             backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); border: 1px solid var(--glass-border);
             box-shadow: inset 0px 1px 1px rgba(255, 255, 255, 0.15), 0 20px 40px rgba(0, 0, 0, 0.4);
             border-radius: 24px; padding: 4rem 3rem; width: 100%; max-width: 600px; margin: auto; position: relative; overflow: hidden;
+            will-change: transform, opacity;
         }
 
-        .sys-stamp { font-size: 0.65rem; color: var(--accent-gold); letter-spacing: 2px; margin-bottom: 2rem; display: block; text-transform: uppercase; }
-        .title { font-family: var(--serif); font-size: 3.5rem; font-weight: 300; margin-bottom: 1rem; line-height: 1; }
+        .sys-stamp { font-size: 0.65rem; color: var(--accent-gold); letter-spacing: 2px; margin-bottom: 2rem; display: block; text-transform: uppercase; transition: color 0.3s; }
+        .title { font-family: var(--serif); font-size: 3.5rem; font-weight: 300; margin-bottom: 1rem; line-height: 1; transition: color 0.3s; }
         .title i { color: var(--text-muted); }
         .desc { font-size: 0.95rem; color: var(--text-muted); line-height: 1.8; margin-bottom: 3rem; }
 
@@ -148,15 +148,15 @@
 
     <nav class="nav">
         <a href="index.html" class="brand-text">NITHAN.</a>
-        <a href="index.html" class="back-btn">[ EXIT GAME ]</a>
+        <a href="index.html" class="back-btn" id="exit-btn">[ EXIT GAME ]</a>
     </nav>
 
-    <div class="glass-card">
+    <div class="glass-card" id="main-card">
         
         <div id="view-input" class="active">
-            <span class="sys-stamp">GAME // FLAMES</span>
-            <h1 class="title">The Flames <i>Game</i>.</h1>
-            <p class="desc">Enter two names to see what destiny holds for both of you.</p>
+            <span class="sys-stamp" id="sys-stamp">GAME // FLAMES</span>
+            <h1 class="title" id="main-title">The Flames <i>Game</i>.</h1>
+            <p class="desc" id="main-desc">Enter two names to see what destiny holds for both of you.</p>
             
             <div class="input-group">
                 <input type="text" id="name1" class="input-field" placeholder="YOUR NAME" autocomplete="off" spellcheck="false">
@@ -218,7 +218,6 @@
             }
         };
 
-        // Fun, relatable Indian friend-group descriptions
         const descriptions = {
             'F': [
                 "Just friends, bro. Don't overthink it.",
@@ -318,6 +317,14 @@
                 return;
             }
 
+            // --- THE CREATOR EASTER EGG ---
+            const creatorAliases = ['nithan', 'nithan najeeb', 'nidhan', 'nidan', 'rubin', 'rubin stellar'];
+            if (creatorAliases.includes(n1) || creatorAliases.includes(n2)) {
+                triggerEasterEgg();
+                return;
+            }
+
+            // Normal Execution
             switchView('view-process');
             
             let arr1 = n1.replace(/[^a-z]/g, '').split('');
@@ -418,6 +425,90 @@
             document.getElementById('res-desc').innerText = `"${randomDesc}"`;
 
             switchView('view-result');
+        }
+
+        // --- THE CREATOR EASTER EGG ANIMATION ---
+        function triggerEasterEgg() {
+            triggerVibration([50, 50, 50, 50, 300]); // Aggressive error vibration
+            
+            // 1. Change text in the card to alert state
+            const stamp = document.getElementById('sys-stamp');
+            const title = document.getElementById('main-title');
+            
+            stamp.innerText = "SYS.OVERRIDE // CREATOR_DETECTED";
+            stamp.style.color = "#bf616a"; // Red alert color
+            
+            title.innerHTML = "Access <i>Granted</i>.";
+            title.style.color = "var(--accent-gold)";
+            
+            const tl = gsap.timeline();
+
+            // Brief pause so they read "Creator Detected"
+            tl.to({}, {duration: 1.2});
+
+            // 2. Card aggressively swipes left and drops
+            tl.to('#main-card', {
+                x: "-120vw",
+                rotationZ: -15,
+                scale: 0.8,
+                opacity: 0,
+                duration: 0.8,
+                ease: "power3.in"
+            });
+
+            // 3. Complete System Blackout
+            tl.to(['.ambient-orb', '.nav', '.noise-overlay', 'body'], { 
+                opacity: 0, 
+                backgroundColor: "#000000", 
+                duration: 0.5 
+            }, "-=0.3");
+
+            // 4. Generate the Starfield Nebula
+            tl.add(() => {
+                const starContainer = document.createElement('div');
+                starContainer.id = 'starfield';
+                starContainer.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;pointer-events:none;overflow:hidden;background:#000;';
+                document.body.appendChild(starContainer);
+
+                for(let i=0; i<120; i++) {
+                    let star = document.createElement('div');
+                    let size = Math.random() * 3 + 1; // 1px to 4px
+                    
+                    // Mix of white and gold stars
+                    let color = Math.random() > 0.8 ? 'var(--accent-gold)' : '#ffffff'; 
+                    let shadowBlur = size * 3;
+                    
+                    star.className = 'easter-star';
+                    star.style.cssText = `position:absolute;width:${size}px;height:${size}px;background:${color};border-radius:50%;top:${Math.random()*100}vh;left:${Math.random()*100}vw;opacity:0;box-shadow:0 0 ${shadowBlur}px ${color};`;
+                    starContainer.appendChild(star);
+                    
+                    // Twinkle effect
+                    gsap.to(star, {
+                        opacity: Math.random() * 0.7 + 0.3,
+                        duration: Math.random() * 1.5 + 0.5,
+                        yoyo: true,
+                        repeat: 2, // Twinkles a few times before warp
+                        ease: "sine.inOut"
+                    });
+                }
+            });
+
+            // 5. Let the user watch the stars twinkle
+            tl.to({}, {duration: 3.5});
+
+            // 6. Warp speed! Stars aggressively scale up and vanish towards the camera
+            tl.to('.easter-star', {
+                scale: 40,
+                opacity: 0,
+                duration: 1.2,
+                stagger: 0.005,
+                ease: "power4.in"
+            });
+
+            // 7. Instant Redirect
+            tl.add(() => {
+                window.location.href = "https://www.instagram.com/p/DJAGP16zWwv/?igsh=a2EzNXpnbzc5bnFo";
+            }, "+=0.2");
         }
     </script>
 </body>
