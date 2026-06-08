@@ -94,7 +94,7 @@
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* PROCESSING VIEW */
+        /* PROCESSING VIEW (CROSSING OUT) */
         .process-names { font-family: var(--mono); font-size: 1.5rem; letter-spacing: 4px; text-align: center; margin: 3rem 0; display: flex; flex-direction: column; gap: 2rem; }
         .name-row { display: flex; justify-content: center; flex-wrap: wrap; gap: 4px; }
         .letter { position: relative; display: inline-block; color: var(--text-main); transition: color 0.3s ease; }
@@ -359,7 +359,7 @@
             switchView('view-result');
         }
 
-        // --- THE FALLING STARS METEOR SHOWER ---
+        // --- PERFECTED MAGICAL FALLING STARS EASTER EGG ---
         function triggerEasterEgg() {
             triggerVibration([50, 50, 50, 50, 300]); 
             
@@ -374,68 +374,68 @@
             
             const tl = gsap.timeline();
 
-            // 1. Initial Glitch / Pause
+            // 1. Initial Pause
             tl.to({}, {duration: 1.0});
 
-            // 2. Card Swipes Left
+            // 2. Swipe Card Away
             tl.to('#main-card', {
-                x: "-120vw",
-                rotationZ: -15,
-                scale: 0.8,
-                opacity: 0,
-                duration: 0.8,
-                ease: "power3.in"
+                x: "-120vw", rotationZ: -15, scale: 0.8,
+                opacity: 0, duration: 0.8, ease: "power3.in"
             });
 
-            // 3. System Blackout
-            tl.to(['.ambient-orb', '.nav', '.noise-overlay'], { 
-                opacity: 0, 
-                duration: 0.5 
-            }, "-=0.3");
+            // 3. Complete System Blackout
+            tl.to(['.ambient-orb', '.nav', '.noise-overlay'], { opacity: 0, duration: 0.5 }, "-=0.3");
             tl.to('body', { backgroundColor: "#000000", duration: 0.5 }, "-=0.5");
 
-            // 4. Generate the Meteor Shower
+            // 4. Generate Soft, Falling Orbs
             tl.add(() => {
                 const starContainer = document.createElement('div');
                 starContainer.id = 'starfield';
                 starContainer.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;pointer-events:none;overflow:hidden;';
                 document.body.appendChild(starContainer);
 
-                for(let i=0; i<150; i++) {
+                for(let i = 0; i < 120; i++) {
                     let star = document.createElement('div');
                     
-                    // Creates a "shooting star" shape
-                    let width = Math.random() * 2 + 1;
-                    let height = Math.random() * 80 + 30; 
+                    // Creates perfect soft circles
+                    let size = Math.random() * 3 + 1.5; 
                     let color = Math.random() > 0.7 ? 'var(--accent-gold)' : '#ffffff'; 
+                    let shadowBlur = size * 3;
                     
                     star.className = 'easter-star';
                     
-                    // Start them way above the screen, spread across the width
-                    let startX = Math.random() * 150 - 25 + 'vw'; 
-                    let startY = -(Math.random() * 100 + 50) + 'vh'; 
+                    let startX = Math.random() * 100 + 'vw'; 
+                    let startY = -(Math.random() * 50 + 10) + 'vh'; 
                     
-                    star.style.cssText = `position:absolute;width:${width}px;height:${height}px;background:linear-gradient(to bottom, transparent, ${color});border-radius:100px;top:${startY};left:${startX};opacity:0;transform:rotate(20deg);`;
+                    star.style.cssText = `position:absolute;width:${size}px;height:${size}px;background:${color};border-radius:50%;top:${startY};left:${startX};opacity:0;box-shadow:0 0 ${shadowBlur}px ${color}, 0 0 ${shadowBlur * 2}px ${color};`;
                     starContainer.appendChild(star);
                     
-                    // The falling animation loop
+                    // Gentle falling animation
                     gsap.to(star, {
-                        top: "150vh", // Fall far past the bottom
-                        left: "+=25vw", // Slight diagonal drift
-                        opacity: Math.random() * 0.8 + 0.2,
-                        duration: Math.random() * 1.5 + 0.6,
-                        delay: Math.random() * 2.5, // Stagger their entry
+                        top: "110vh", // Float past the bottom
+                        left: `+=${(Math.random() - 0.5) * 20}vw`, // Subtle horizontal sway
+                        duration: Math.random() * 3 + 3, // 3 to 6 seconds (slow & dreamy)
+                        delay: Math.random() * 2, // Staggered entry
                         ease: "none",
-                        repeat: -1 // Loop seamlessly
+                        repeat: -1 
+                    });
+
+                    // Soft twinkling opacity
+                    gsap.to(star, {
+                        opacity: Math.random() * 0.7 + 0.3,
+                        duration: Math.random() * 1 + 0.5,
+                        yoyo: true,
+                        repeat: -1,
+                        ease: "sine.inOut"
                     });
                 }
             });
 
-            // 5. Let the user watch the meteor shower for a few seconds
-            tl.to({}, {duration: 3.5});
+            // 5. Watch the stars fall
+            tl.to({}, {duration: 5.0});
 
-            // 6. Flash to white for transition
-            tl.to('body', { backgroundColor: "#ffffff", opacity: 0, duration: 1.0, ease: "power2.in" });
+            // 6. Fade to white portal transition
+            tl.to('body', { backgroundColor: "#ffffff", opacity: 0, duration: 1.5, ease: "power2.in" });
 
             // 7. Instant Redirect
             tl.add(() => {
