@@ -75,9 +75,10 @@
         
         .hero-desc { font-size: 1.1rem; color: var(--text-muted); max-width: 650px; line-height: 1.9; margin-bottom: 3rem; }
 
-        /* The Signature Animation Container */
+        /* Signature Styling */
         .signature-wrapper {
             position: relative; display: inline-block; margin-bottom: 2rem;
+            opacity: 0; /* Hidden until fonts load */
         }
         .signature-text {
             font-family: var(--signature); font-size: 4.5rem; color: var(--text-main); font-weight: 400;
@@ -91,13 +92,12 @@
         }
 
         /* ==========================================
-           5. THE POETIC TIMELINE (MOBILE OPTIMIZED)
+           5. THE TIMELINE (HARDWARE ACCELERATED)
            ========================================== */
         .timeline-container {
             max-width: 900px; margin: 0 auto 10rem auto; padding: 0 6vw; position: relative;
         }
         
-        /* The glowing track */
         .timeline-track {
             position: absolute; top: 0; bottom: 0; left: 50%; width: 2px;
             background: rgba(255, 255, 255, 0.05); transform: translateX(-50%); z-index: 0;
@@ -113,21 +113,24 @@
         }
         .node:nth-child(even) { flex-direction: row-reverse; }
 
-        /* The Glass Story Card */
         .node-card {
             width: 45%; padding: 3rem; border-radius: 20px;
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0.005) 100%);
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
             position: relative; transition: all 0.4s ease;
+            
+            /* Forces mobile GPU to handle the animation smoothly */
+            will-change: transform, opacity, filter;
+            transform: translateZ(0); 
+            opacity: 0; /* Handled by GSAP */
         }
-        .node-card:hover { border-color: rgba(230, 204, 152, 0.3); transform: translateY(-5px); }
+        .node-card:hover { border-color: rgba(230, 204, 152, 0.3); transform: translateY(-5px) translateZ(0); }
 
         .card-tag { font-family: var(--mono); font-size: 0.75rem; color: var(--accent-gold); letter-spacing: 1px; margin-bottom: 1rem; display: block; opacity: 0.9;}
         .card-title { font-family: var(--serif); font-size: 2rem; font-weight: 300; margin-bottom: 1.5rem; color: var(--text-main); line-height: 1.2; }
         .card-text { font-size: 0.95rem; color: var(--text-muted); line-height: 1.9; }
 
-        /* The traveling node dot */
         .node-dot {
             position: absolute; left: 50%; width: 12px; height: 12px; background: var(--bg);
             border: 2px solid rgba(255,255,255,0.2); border-radius: 50%; transform: translateX(-50%);
@@ -153,7 +156,6 @@
             .node-card, .node:nth-child(even) .node-card { width: 100%; padding: 2rem 1.5rem; }
             .card-title { font-size: 1.8rem; }
             
-            /* Mobile Dot Alignment */
             .node-dot { left: 24px; transform: translateX(-5px); top: 30px; }
             .node.active .node-dot { transform: translateX(-5px) scale(1.4); }
         }
@@ -180,7 +182,7 @@
             
             <h1 class="hero-title gs-hero" style="display: none;">Nithan Najeeb // Web Developer & Creator</h1>
             
-            <div class="signature-wrapper gs-hero">
+            <div class="signature-wrapper" id="sig-wrap">
                 <div class="signature-text" id="signature">Nithan Najeeb.</div>
                 <div class="signature-pen" id="pen"></div>
             </div>
@@ -232,80 +234,74 @@
                     <p class="card-text">Beyond academics and business, I am a creator. Whether I am writing stories, building minimalist websites, or designing applications, the motivation is always the same. I am driven by the desire to learn, create, and contribute something meaningful to the web.</p>
                 </div>
             </div>
-
         </section>
     </main>
 
     <script>
         gsap.registerPlugin(ScrollTrigger);
 
-        // --- 1. The Handwriting Signature Animation ---
-        const sigText = document.getElementById("signature");
-        const pen = document.getElementById("pen");
+        // --- 1. FONT-SAFE SIGNATURE ANIMATION ---
+        document.fonts.ready.then(function() {
+            const sigWrap = document.getElementById("sig-wrap");
+            const sigText = document.getElementById("signature");
+            const pen = document.getElementById("pen");
 
-        // Start width at 0
-        gsap.set(sigText, { width: 0 });
-        
-        const tl = gsap.timeline({ delay: 0.5 });
-        
-        // Reveal the text (like writing)
-        tl.to(sigText, { 
-            width: "100%", 
-            duration: 2.5, 
-            ease: "power2.inOut" 
+            // Make wrapper visible now that font is loaded
+            gsap.set(sigWrap, { opacity: 1 });
+            gsap.set(sigText, { width: 0 });
+            
+            const tl = gsap.timeline({ delay: 0.3 });
+            
+            tl.to(sigText, { 
+                width: "100%", 
+                duration: 2.5, 
+                ease: "power2.inOut" 
+            });
+
+            tl.to(pen, { opacity: 1, duration: 0.2 }, "<"); 
+            tl.to(pen, { left: "100%", duration: 2.5, ease: "power2.inOut" }, "<");
+            tl.to(pen, { opacity: 0, duration: 0.3 });
+
+            // Hero Text Fade In (Triggers after signature starts)
+            gsap.fromTo('.gs-hero', 
+                { y: 30, opacity: 0 },
+                { y: 0, opacity: 1, duration: 1, stagger: 0.2, ease: "power2.out", delay: 1.0 } 
+            );
         });
 
-        // Make the glowing pen tip follow the edge of the text being revealed
-        tl.to(pen, {
-            opacity: 1,
-            duration: 0.2
-        }, "<"); // Starts at the same time
-        
-        tl.to(pen, {
-            left: "100%",
-            duration: 2.5,
-            ease: "power2.inOut"
-        }, "<");
-
-        // Fade out the pen tip when done
-        tl.to(pen, { opacity: 0, duration: 0.3 });
-
-        // --- 2. Hero Text Fade In ---
-        gsap.fromTo('.gs-hero', 
-            { y: 30, opacity: 0 },
-            { y: 0, opacity: 1, duration: 1, stagger: 0.2, ease: "power2.out", delay: 1.5 } // Plays after signature starts
-        );
-
-        // --- 3. Flawless Mobile Scroll Animations ---
-        // We use intersection observer logic via GSAP to trigger cards reliably on all phones.
+        // --- 2. MOBILE-SAFE SCROLL ANIMATIONS ---
         document.querySelectorAll('.node').forEach((node) => {
             const card = node.querySelector('.mobile-animate');
             
-            // Highlight the dot
+            // Dot Highlight
             ScrollTrigger.create({
                 trigger: node,
-                start: "top 60%", // Triggers when the top of the node hits 60% down the screen
+                start: "top 65%", 
                 onEnter: () => node.classList.add('active'),
                 onLeaveBack: () => node.classList.remove('active')
             });
 
-            // Slide up and fade in the card (Uses proper webkit blur)
+            // Card Reveal (Forced GPU rendering for mobile)
             gsap.fromTo(card,
-                { y: 60, opacity: 0, filter: "blur(10px)", "-webkit-filter": "blur(10px)" },
+                { y: 80, opacity: 0, filter: "blur(8px)", "-webkit-filter": "blur(8px)" },
                 {
                     scrollTrigger: {
                         trigger: node,
                         start: "top 85%", 
                         toggleActions: "play none none reverse"
                     },
-                    y: 0, opacity: 1, filter: "blur(0px)", "-webkit-filter": "blur(0px)",
-                    duration: 1.2, ease: "power2.out"
+                    y: 0, 
+                    opacity: 1, 
+                    filter: "blur(0px)", 
+                    "-webkit-filter": "blur(0px)",
+                    duration: 1.2, 
+                    ease: "power3.out",
+                    force3D: true // Forces mobile GPU to handle it
                 }
             );
         });
 
-        // --- 4. The Glowing Scroll Tracker ---
-        // Fills the timeline line with gold exactly as you scroll
+        // --- 3. SCROLL TRACKER ---
         gsap.to('#progress-line', {
             height: "100%",
             scrollTrigger: {
@@ -316,7 +312,7 @@
             }
         });
 
-        // --- 5. Ambient Parallax Orbs ---
+        // --- 4. AMBIENT PARALLAX ---
         gsap.to('#orb1', {
             y: 200, scrollTrigger: { trigger: "body", start: "top top", end: "bottom bottom", scrub: 2 }
         });
