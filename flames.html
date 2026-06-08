@@ -128,24 +128,37 @@
         .reset-btn:hover { background: rgba(255,255,255,0.05); color: var(--accent-gold); border-color: var(--accent-gold); }
 
         /* ==========================================
-           EASTER EGG SIGNATURE STYLES (FIXED CUTOFF)
+           EASTER EGG SIGNATURE STYLES (NEW)
            ========================================== */
         .easter-sig-container {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 100vw; max-width: 600px; height: 200px; z-index: 10000;
-            display: none; pointer-events: none;
-            overflow: visible; /* Prevents zooming cutoff */
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
+            z-index: 10000; display: none; justify-content: center; align-items: center;
+            pointer-events: none; transform-origin: center center;
         }
         .easter-sig-svg { 
-            width: 100%; height: 100%; 
-            overflow: visible !important; /* Vital for massive scaling */
+            width: 100%; max-width: 500px; overflow: visible !important; 
+            position: relative; z-index: 1;
         }
-        .easter-sig-text {
+        .signature-word {
             font-family: var(--signature); font-size: 8rem;
             fill: transparent;
-            stroke: var(--accent-gold); stroke-width: 1.5px;
+            stroke: var(--accent-gold); stroke-width: 2px;
             stroke-dasharray: 1000; stroke-dashoffset: 1000;
+        }
+        .signature-dot {
+            fill: var(--accent-gold);
+            transform: scale(0);
+            opacity: 0;
             transform-origin: center;
+        }
+        
+        /* The magical orb that writes the name */
+        .writing-orb {
+            position: absolute; top: 50%; left: 50%;
+            width: 14px; height: 14px; background: var(--text-main); border-radius: 50%;
+            box-shadow: 0 0 30px 10px rgba(230, 204, 152, 0.8);
+            transform: translate(-50%, -50%) scale(0);
+            z-index: 2; opacity: 0;
         }
 
         @media (max-width: 768px) {
@@ -156,7 +169,7 @@
             .result-letter { font-size: 4.5rem; }
             .metrics-grid { gap: 1rem; }
             .result-desc { font-size: 1rem; }
-            .easter-sig-text { font-size: 5rem; }
+            .signature-word { font-size: 6rem; }
         }
     </style>
 </head>
@@ -177,8 +190,11 @@
 
     <div class="easter-sig-container" id="easter-sig-box">
         <svg class="easter-sig-svg" viewBox="0 0 500 150">
-            <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" class="easter-sig-text" id="easter-sig-text">Nithan</text>
+            <text x="45%" y="50%" dominant-baseline="middle" text-anchor="middle" class="signature-word">Nithan</text>
+            <circle cx="72%" cy="50%" r="8" class="signature-dot" />
         </svg>
+        
+        <div class="writing-orb" id="orb-pen"></div>
     </div>
 
     <div class="glass-card" id="main-card">
@@ -405,25 +421,24 @@
 
             tl.to({}, {duration: 1.0});
 
+            // 1. Swipe Card Away
             tl.to('#main-card', {
-                x: "-120vw",
-                rotationZ: -15,
-                scale: 0.8,
-                opacity: 0,
-                duration: 0.8,
-                ease: "power3.in"
+                x: "-120vw", rotationZ: -15, scale: 0.8,
+                opacity: 0, duration: 0.8, ease: "power3.in"
             });
 
+            // 2. Blackout
             tl.to(['.ambient-orb', '.nav', '.noise-overlay'], { opacity: 0, duration: 0.5 }, "-=0.3");
             tl.to('body', { backgroundColor: "#000000", duration: 0.5 }, "-=0.5");
 
+            // 3. Generate Stars
             tl.add(() => {
                 const starContainer = document.createElement('div');
                 starContainer.id = 'starfield';
                 starContainer.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;pointer-events:none;overflow:hidden;';
                 document.body.appendChild(starContainer);
 
-                for(let i=0; i<120; i++) {
+                for(let i=0; i<100; i++) {
                     let star = document.createElement('div');
                     let size = Math.random() * 3 + 1; 
                     let color = Math.random() > 0.8 ? 'var(--accent-gold)' : '#ffffff'; 
@@ -436,35 +451,57 @@
                     gsap.to(star, {
                         opacity: Math.random() * 0.7 + 0.3,
                         duration: Math.random() * 1.5 + 0.5,
-                        yoyo: true,
-                        repeat: 1, 
-                        ease: "sine.inOut"
+                        yoyo: true, repeat: 1, ease: "sine.inOut"
                     });
                 }
             });
 
-            tl.to({}, {duration: 2.0});
+            tl.to({}, {duration: 1.5});
 
+            // 4. Stars Collapse into a Single Point (The Black Hole Effect)
             tl.to('.easter-star', {
-                scale: 50,
-                opacity: 0,
-                duration: 1.0,
-                stagger: 0.003,
-                ease: "power4.in"
+                top: "50%", left: "50%",
+                duration: 1.2,
+                stagger: 0.005,
+                ease: "power3.in"
             });
 
-            // The Signature SVG Bridge
-            tl.add(() => { document.getElementById('easter-sig-box').style.display = 'block'; }, "-=0.5");
+            // Turn on the Signature Container
+            tl.add(() => { document.getElementById('easter-sig-box').style.display = 'flex'; }, "-=0.2");
 
-            // Draws the golden outline (exactly like your homepage)
-            tl.to('#easter-sig-text', { 
+            // 5. The stars vanish and the Orb bursts to life
+            tl.to('.easter-star', { opacity: 0, duration: 0.1 }, "-=0.1");
+            tl.to('#orb-pen', { scale: 1.5, opacity: 1, duration: 0.3, ease: "back.out(2)" }, "-=0.1");
+            tl.to('#orb-pen', { scale: 1, duration: 0.3 });
+
+            // 6. The Orb moves to the start of the signature
+            tl.to('#orb-pen', { 
+                left: "25%", // Move to left side of screen
+                duration: 0.8, 
+                ease: "power2.inOut" 
+            });
+
+            // 7. Combine: The Orb moves Right WHILE drawing the SVG text
+            tl.to('#orb-pen', { 
+                left: "70%", // Glides across text
+                duration: 2.5, 
+                ease: "power1.inOut" 
+            });
+            tl.to('.signature-word', { 
                 strokeDashoffset: 0, 
                 duration: 2.5, 
-                ease: "power2.inOut" 
-            }, "-=0.2");
+                ease: "power1.inOut" 
+            }, "<"); // Plays at the exact same time
 
-            // Fills with bright white and glows
-            tl.to('#easter-sig-text', {
+            // 8. Orb vanishes, standard golden dot pops into place
+            tl.to('#orb-pen', { scale: 0, opacity: 0, duration: 0.2 });
+            tl.to('.signature-dot', { 
+                scale: 1, opacity: 1, 
+                duration: 0.6, ease: "back.out(1.5)" 
+            }, "-=0.1");
+
+            // 9. Text Fills and Glows
+            tl.to(['.signature-word', '.signature-dot'], {
                 fill: "var(--text-main)",
                 stroke: "transparent",
                 textShadow: "0 0 40px rgba(230, 204, 152, 0.8)",
@@ -473,9 +510,9 @@
 
             tl.to({}, {duration: 1.0});
 
-            // THE FIX: Massive, unrestricted scale-up through the "portal"
-            tl.to('#easter-sig-text', {
-                scale: 25, /* Increased from 6 to 25 to fully envelope the screen */
+            // 10. The Portal scales up endlessly
+            tl.to('#easter-sig-box', {
+                scale: 30, 
                 opacity: 0,
                 duration: 1.2,
                 ease: "power3.in"
