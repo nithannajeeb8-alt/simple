@@ -6,8 +6,6 @@
     
     <title>Nithan Najeeb // Web Developer & Creator</title>
     <meta name="description" content="The official portfolio and biography of Nithan Najeeb (Rubin Stellar). A Kerala-based creative pursuing B.Com Computer Applications, blending commerce, technology, and storytelling." />
-    <meta name="keywords" content="Nithan Najeeb, Rubin Stellar, Web Developer, Kerala, B.Com Computer Applications, Remevess, Portfolio, Software, Creative" />
-    <meta name="author" content="Nithan Najeeb" />
     
     <link rel="icon" type="image/png" href="/favicon.PNG">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -31,9 +29,10 @@
             --mono: 'JetBrains Mono', monospace;
             --signature: 'Great Vibes', cursive;
             --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-bg: rgba(255, 255, 255, 0.02);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; /* Hide default cursor */ }
         html { scroll-behavior: smooth; }
         
         body { 
@@ -42,60 +41,105 @@
         }
 
         /* ==========================================
-           2. AMBIENT BACKGROUND
+           2. CUSTOM CURSOR
            ========================================== */
-        .ambient-orb { position: fixed; border-radius: 50%; z-index: -1; pointer-events: none; opacity: 0.25; filter: blur(80px); -webkit-filter: blur(80px); transition: transform 0.5s ease; }
-        .orb-1 { width: 50vw; height: 50vw; background: radial-gradient(circle, rgba(230, 204, 152, 0.15) 0%, transparent 70%); top: 10%; left: -10%; }
-        .orb-2 { width: 40vw; height: 40vw; background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%); bottom: 10%; right: -5%; }
-        .noise-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 9999; opacity: 0.03; mix-blend-mode: overlay; }
+        .cursor-dot, .cursor-outline {
+            position: fixed;
+            top: 0; left: 0;
+            border-radius: 50%;
+            z-index: 99999;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+        }
+        .cursor-dot {
+            width: 6px; height: 6px;
+            background: var(--accent-gold);
+            box-shadow: 0 0 10px var(--accent-gold);
+        }
+        .cursor-outline {
+            width: 40px; height: 40px;
+            border: 1px solid rgba(230, 204, 152, 0.5);
+            transition: width 0.3s ease, height 0.3s ease, background 0.3s ease;
+        }
+        .cursor-outline.hovering {
+            width: 60px; height: 60px;
+            background: rgba(230, 204, 152, 0.1);
+            border-color: transparent;
+            backdrop-filter: blur(2px);
+        }
 
         /* ==========================================
-           3. NAVIGATION
+           3. AMBIENT BACKGROUND
+           ========================================== */
+        .ambient-orb { 
+            position: fixed; border-radius: 50%; z-index: -1; pointer-events: none; 
+            opacity: 0.3; filter: blur(90px); -webkit-filter: blur(90px); 
+        }
+        .orb-1 { width: 45vw; height: 45vw; background: radial-gradient(circle, rgba(230, 204, 152, 0.2) 0%, transparent 70%); top: 5%; left: -5%; }
+        .orb-2 { width: 50vw; height: 50vw; background: radial-gradient(circle, rgba(100, 150, 255, 0.1) 0%, transparent 70%); bottom: -10%; right: -10%; }
+        
+        .noise-overlay { 
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
+            pointer-events: none; z-index: 9998; opacity: 0.04; mix-blend-mode: overlay; 
+        }
+
+        /* ==========================================
+           4. NAVIGATION (MAGNETIC)
            ========================================== */
         .nav { 
             position: fixed; top: 0; left: 0; width: 100%; padding: 1.5rem 6vw; 
             display: flex; justify-content: space-between; align-items: center; 
             z-index: 100; background: linear-gradient(to bottom, rgba(10,10,11,0.95) 0%, transparent 100%);
         }
-        .brand-text { font-family: var(--serif); font-size: 1.4rem; color: var(--text-main); text-decoration: none; letter-spacing: 1.5px; }
-        .back-btn { font-family: var(--mono); font-size: 0.75rem; color: var(--text-muted); text-decoration: none; text-transform: uppercase; letter-spacing: 1px; transition: color 0.3s ease; }
+        .magnetic-wrap { display: inline-block; padding: 10px; }
+        .brand-text { font-family: var(--serif); font-size: 1.4rem; color: var(--text-main); text-decoration: none; letter-spacing: 1.5px; display: inline-block;}
+        .back-btn { font-family: var(--mono); font-size: 0.75rem; color: var(--text-muted); text-decoration: none; text-transform: uppercase; letter-spacing: 1px; transition: color 0.3s ease; display: inline-block;}
         .back-btn:hover { color: var(--accent-gold); }
 
         /* ==========================================
-           4. HERO SECTION & SIGNATURE
+           5. HERO SECTION
            ========================================== */
         .hero-section {
-            min-height: 90vh; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center;
             text-align: center; padding: 0 6vw; position: relative;
         }
-        .intro-text { font-size: 0.75rem; color: var(--accent-gold); letter-spacing: 3px; margin-bottom: 2rem; text-transform: uppercase; }
+        .intro-text { 
+            font-size: 0.75rem; color: var(--accent-gold); letter-spacing: 4px; 
+            margin-bottom: 2rem; text-transform: uppercase; 
+            background: linear-gradient(90deg, transparent, var(--accent-gold), transparent);
+            background-size: 200% 100%;
+            -webkit-background-clip: text;
+            animation: shine 3s infinite linear;
+        }
         
+        @keyframes shine { 0% { background-position: 200% center; } 100% { background-position: -200% center; } }
+
         .hero-title { font-family: var(--serif); font-size: clamp(3rem, 8vw, 5.5rem); font-weight: 300; line-height: 1.1; margin-bottom: 2rem; color: var(--text-main); }
-        .hero-title i { color: var(--text-muted); }
-        
         .hero-desc { font-size: 1.1rem; color: var(--text-muted); max-width: 650px; line-height: 1.9; margin-bottom: 3rem; }
 
         /* Signature Styling */
         .signature-wrapper {
             position: relative; display: inline-block; margin-bottom: 2rem;
-            opacity: 0; /* Hidden until fonts load */
+            opacity: 0; 
         }
         .signature-text {
-            font-family: var(--signature); font-size: 4.5rem; color: var(--text-main); font-weight: 400;
+            font-family: var(--signature); font-size: 5.5rem; color: var(--text-main); font-weight: 400;
             white-space: nowrap; overflow: hidden; display: inline-block;
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+            text-shadow: 0 0 25px rgba(230, 204, 152, 0.3);
         }
         .signature-pen {
-            position: absolute; bottom: 15px; left: 0; width: 4px; height: 4px; 
-            background: var(--accent-gold); border-radius: 50%; box-shadow: 0 0 15px 4px rgba(230, 204, 152, 0.6);
+            position: absolute; bottom: 20px; left: 0; width: 4px; height: 4px; 
+            background: var(--accent-gold); border-radius: 50%; 
+            box-shadow: 0 0 20px 6px rgba(230, 204, 152, 0.8);
             opacity: 0;
         }
 
         /* ==========================================
-           5. THE TIMELINE (HARDWARE ACCELERATED)
+           6. THE TIMELINE (3D CARDS)
            ========================================== */
         .timeline-container {
-            max-width: 900px; margin: 0 auto 10rem auto; padding: 0 6vw; position: relative;
+            max-width: 1000px; margin: 0 auto 10rem auto; padding: 0 6vw; position: relative;
+            perspective: 1000px;
         }
         
         .timeline-track {
@@ -104,8 +148,8 @@
         }
         .timeline-progress {
             position: absolute; top: 0; left: 0; width: 100%; height: 0%;
-            background: linear-gradient(to bottom, transparent, var(--accent-gold), rgba(230,204,152,0.5));
-            box-shadow: 0 0 15px rgba(230, 204, 152, 0.5);
+            background: linear-gradient(to bottom, transparent, var(--accent-gold), #fff);
+            box-shadow: 0 0 20px rgba(230, 204, 152, 0.8);
         }
 
         .node {
@@ -114,47 +158,76 @@
         .node:nth-child(even) { flex-direction: row-reverse; }
 
         .node-card {
-            width: 45%; padding: 3rem; border-radius: 20px;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0.005) 100%);
+            width: 45%; padding: 3.5rem; border-radius: 24px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.005) 100%);
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
-            position: relative; transition: all 0.4s ease;
-            
-            /* Forces mobile GPU to handle the animation smoothly */
-            will-change: transform, opacity, filter;
-            transform: translateZ(0); 
-            opacity: 0; /* Handled by GSAP */
+            border: 1px solid var(--glass-border); 
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+            position: relative; 
+            will-change: transform, opacity;
+            transform-style: preserve-3d;
+            opacity: 0; 
         }
-        .node-card:hover { border-color: rgba(230, 204, 152, 0.3); transform: translateY(-5px) translateZ(0); }
 
-        .card-tag { font-family: var(--mono); font-size: 0.75rem; color: var(--accent-gold); letter-spacing: 1px; margin-bottom: 1rem; display: block; opacity: 0.9;}
-        .card-title { font-family: var(--serif); font-size: 2rem; font-weight: 300; margin-bottom: 1.5rem; color: var(--text-main); line-height: 1.2; }
-        .card-text { font-size: 0.95rem; color: var(--text-muted); line-height: 1.9; }
+        /* Interactive hover state via JS handling the 3D tilt */
+        .node-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: inherit; padding: 2px;
+            background: linear-gradient(135deg, rgba(230,204,152,0.4), transparent 50%, transparent);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor; mask-composite: exclude;
+            opacity: 0; transition: opacity 0.5s ease;
+            pointer-events: none;
+        }
+        .node-card:hover::before { opacity: 1; }
+
+        .card-tag { 
+            font-family: var(--mono); font-size: 0.75rem; color: var(--accent-gold); 
+            letter-spacing: 2px; margin-bottom: 1.5rem; display: inline-block; 
+            padding: 4px 12px; border-radius: 20px; background: rgba(230,204,152,0.1);
+            transform: translateZ(30px); /* Pops out in 3D */
+        }
+        .card-title { 
+            font-family: var(--serif); font-size: 2.2rem; font-weight: 300; margin-bottom: 1.5rem; 
+            color: var(--text-main); line-height: 1.2; transition: color 0.3s;
+            transform: translateZ(40px);
+        }
+        .node-card:hover .card-title {
+            background: linear-gradient(45deg, #fff, var(--accent-gold));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .card-text { 
+            font-size: 0.95rem; color: var(--text-muted); line-height: 1.9; 
+            transform: translateZ(20px);
+        }
 
         .node-dot {
-            position: absolute; left: 50%; width: 12px; height: 12px; background: var(--bg);
-            border: 2px solid rgba(255,255,255,0.2); border-radius: 50%; transform: translateX(-50%);
-            transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            position: absolute; left: 50%; width: 14px; height: 14px; background: var(--bg);
+            border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; transform: translateX(-50%);
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         .node.active .node-dot { 
-            background: var(--accent-gold); border-color: var(--accent-gold); 
-            box-shadow: 0 0 20px 5px rgba(230, 204, 152, 0.4); transform: translateX(-50%) scale(1.4); 
+            background: var(--accent-gold); border-color: #fff; 
+            box-shadow: 0 0 25px 8px rgba(230, 204, 152, 0.4); transform: translateX(-50%) scale(1.5); 
         }
 
         /* ==========================================
-           6. MOBILE RESPONSIVENESS
+           7. MOBILE RESPONSIVENESS
            ========================================== */
         @media (max-width: 768px) {
+            * { cursor: auto !important; }
+            .cursor-dot, .cursor-outline { display: none !important; }
             .hero-section { min-height: 80vh; padding-top: 6rem; }
             .hero-title { font-size: 2.8rem; }
             .signature-text { font-size: 3.5rem; }
             
-            .timeline-container { padding: 0 6vw; }
+            .timeline-container { padding: 0 6vw; perspective: none; }
             .timeline-track { left: 24px; transform: none; }
             
             .node, .node:nth-child(even) { flex-direction: column; align-items: flex-start; margin-bottom: 4rem; padding-left: 50px; }
-            .node-card, .node:nth-child(even) .node-card { width: 100%; padding: 2rem 1.5rem; }
-            .card-title { font-size: 1.8rem; }
+            .node-card, .node:nth-child(even) .node-card { width: 100%; padding: 2rem 1.5rem; transform: none !important; }
+            .card-title { font-size: 1.8rem; transform: none; }
+            .card-tag, .card-text { transform: none; }
             
             .node-dot { left: 24px; transform: translateX(-5px); top: 30px; }
             .node.active .node-dot { transform: translateX(-5px) scale(1.4); }
@@ -162,6 +235,10 @@
     </style>
 </head>
 <body>
+
+    <!-- Custom Cursor -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
 
     <svg class="noise-overlay" aria-hidden="true" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
         <filter id="noiseFilter"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/></filter>
@@ -172,8 +249,12 @@
     <div class="ambient-orb orb-2" id="orb2"></div>
 
     <nav class="nav">
-        <a href="index.html" class="brand-text">NITHAN.</a>
-        <a href="index.html" class="back-btn">[ RETURN ]</a>
+        <div class="magnetic-wrap hover-target">
+            <a href="index.html" class="brand-text">NITHAN.</a>
+        </div>
+        <div class="magnetic-wrap hover-target">
+            <a href="index.html" class="back-btn">[ RETURN ]</a>
+        </div>
     </nav>
 
     <main>
@@ -182,7 +263,7 @@
             
             <h1 class="hero-title gs-hero" style="display: none;">Nithan Najeeb // Web Developer & Creator</h1>
             
-            <div class="signature-wrapper" id="sig-wrap">
+            <div class="signature-wrapper hover-target" id="sig-wrap">
                 <div class="signature-text" id="signature">Nithan Najeeb.</div>
                 <div class="signature-pen" id="pen"></div>
             </div>
@@ -201,7 +282,7 @@
 
             <div class="node">
                 <div class="node-dot"></div>
-                <div class="node-card mobile-animate">
+                <div class="node-card mobile-animate hover-target">
                     <span class="card-tag">01 — The Search</span>
                     <h3 class="card-title">Beyond the Textbooks.</h3>
                     <p class="card-text">Much of my life has been spent searching for work that I genuinely enjoy. That search pulled me into online business early on, giving me practical knowledge of commerce. I learned how things actually operate in the real world, bypassing theory for true mechanics.</p>
@@ -210,7 +291,7 @@
 
             <div class="node">
                 <div class="node-dot"></div>
-                <div class="node-card mobile-animate">
+                <div class="node-card mobile-animate hover-target">
                     <span class="card-tag">02 — Purpose</span>
                     <h3 class="card-title">Building Remevess.</h3>
                     <p class="card-text">I wanted to create something with real purpose. This led me to start <strong>Remevess</strong>, a venture focused on promoting traditional handmade products and supporting skilled craftsmen. Though it ran briefly, it taught me invaluable lessons about entrepreneurship, people, and the true value of work.</p>
@@ -219,7 +300,7 @@
 
             <div class="node">
                 <div class="node-dot"></div>
-                <div class="node-card mobile-animate">
+                <div class="node-card mobile-animate hover-target">
                     <span class="card-tag">03 — Structure</span>
                     <h3 class="card-title">Commerce & Code.</h3>
                     <p class="card-text">I discovered a growing interest in how the foundation of a business holds together. I developed a deep appreciation for accounting and pursued a <strong>B.Com in Computer Applications</strong>. It beautifully bridges two things I love: the logic of numbers and the boundless potential of software technology.</p>
@@ -228,7 +309,7 @@
 
             <div class="node">
                 <div class="node-dot"></div>
-                <div class="node-card mobile-animate">
+                <div class="node-card mobile-animate hover-target">
                     <span class="card-tag">04 — The Present</span>
                     <h3 class="card-title">The Creator.</h3>
                     <p class="card-text">Beyond academics and business, I am a creator. Whether I am writing stories, building minimalist websites, or designing applications, the motivation is always the same. I am driven by the desire to learn, create, and contribute something meaningful to the web.</p>
@@ -240,40 +321,101 @@
     <script>
         gsap.registerPlugin(ScrollTrigger);
 
-        // --- 1. FONT-SAFE SIGNATURE ANIMATION ---
+        // --- 1. CUSTOM CURSOR & HOVER EFFECTS ---
+        const cursorDot = document.querySelector('.cursor-dot');
+        const cursorOutline = document.querySelector('.cursor-outline');
+        const hoverTargets = document.querySelectorAll('.hover-target, a');
+
+        // Center cursors on init via GSAP to prevent transform conflicts
+        gsap.set([cursorDot, cursorOutline], { xPercent: -50, yPercent: -50 });
+
+        window.addEventListener('mousemove', (e) => {
+            const posX = e.clientX;
+            const posY = e.clientY;
+            
+            // Instant dot
+            gsap.to(cursorDot, { x: posX, y: posY, duration: 0.1, ease: "power2.out" });
+            // Trailing outline
+            gsap.to(cursorOutline, { x: posX, y: posY, duration: 0.4, ease: "power3.out" });
+            
+            // Parallax Ambient Orbs (Moves slightly inversely to mouse)
+            gsap.to('.orb-1', { x: -posX * 0.05, y: -posY * 0.05, duration: 1, ease: "power1.out" });
+            gsap.to('.orb-2', { x: posX * 0.04, y: posY * 0.04, duration: 1, ease: "power1.out" });
+        });
+
+        hoverTargets.forEach(target => {
+            target.addEventListener('mouseenter', () => cursorOutline.classList.add('hovering'));
+            target.addEventListener('mouseleave', () => cursorOutline.classList.remove('hovering'));
+        });
+
+        // --- 2. MAGNETIC NAVIGATION LINKS ---
+        document.querySelectorAll('.magnetic-wrap').forEach(wrap => {
+            wrap.addEventListener('mousemove', (e) => {
+                const rect = wrap.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                
+                gsap.to(wrap.children[0], { x: x * 0.3, y: y * 0.3, duration: 0.4, ease: "power2.out" });
+            });
+            wrap.addEventListener('mouseleave', () => {
+                gsap.to(wrap.children[0], { x: 0, y: 0, duration: 0.6, ease: "elastic.out(1, 0.3)" });
+            });
+        });
+
+        // --- 3. 3D TILT EFFECT FOR TIMELINE CARDS ---
+        if (window.innerWidth > 768) {
+            document.querySelectorAll('.node-card').forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left; // x position within the element.
+                    const y = e.clientY - rect.top;  // y position within the element.
+                    
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    
+                    const rotateX = ((y - centerY) / centerY) * -8; // Max 8 deg
+                    const rotateY = ((x - centerX) / centerX) * 8;
+                    
+                    gsap.to(card, {
+                        rotationX: rotateX,
+                        rotationY: rotateY,
+                        duration: 0.4,
+                        ease: "power1.out"
+                    });
+                });
+                
+                card.addEventListener('mouseleave', () => {
+                    gsap.to(card, { rotationX: 0, rotationY: 0, duration: 0.8, ease: "power2.out" });
+                });
+            });
+        }
+
+        // --- 4. SIGNATURE & HERO ANIMATION ---
         document.fonts.ready.then(function() {
             const sigWrap = document.getElementById("sig-wrap");
             const sigText = document.getElementById("signature");
             const pen = document.getElementById("pen");
 
-            // Make wrapper visible now that font is loaded
             gsap.set(sigWrap, { opacity: 1 });
             gsap.set(sigText, { width: 0 });
             
-            const tl = gsap.timeline({ delay: 0.3 });
+            const tl = gsap.timeline({ delay: 0.2 });
             
-            tl.to(sigText, { 
-                width: "100%", 
-                duration: 2.5, 
-                ease: "power2.inOut" 
-            });
-
+            tl.to(sigText, { width: "100%", duration: 2.5, ease: "power2.inOut" });
             tl.to(pen, { opacity: 1, duration: 0.2 }, "<"); 
             tl.to(pen, { left: "100%", duration: 2.5, ease: "power2.inOut" }, "<");
             tl.to(pen, { opacity: 0, duration: 0.3 });
 
-            // Hero Text Fade In (Triggers after signature starts)
             gsap.fromTo('.gs-hero', 
-                { y: 30, opacity: 0 },
-                { y: 0, opacity: 1, duration: 1, stagger: 0.2, ease: "power2.out", delay: 1.0 } 
+                { y: 40, opacity: 0 },
+                { y: 0, opacity: 1, duration: 1.2, stagger: 0.2, ease: "power3.out", delay: 1.2 } 
             );
         });
 
-        // --- 2. MOBILE-SAFE SCROLL ANIMATIONS ---
+        // --- 5. SCROLL ANIMATIONS ---
         document.querySelectorAll('.node').forEach((node) => {
             const card = node.querySelector('.mobile-animate');
             
-            // Dot Highlight
             ScrollTrigger.create({
                 trigger: node,
                 start: "top 65%", 
@@ -281,43 +423,25 @@
                 onLeaveBack: () => node.classList.remove('active')
             });
 
-            // Card Reveal (Forced GPU rendering for mobile)
             gsap.fromTo(card,
-                { y: 80, opacity: 0, filter: "blur(8px)", "-webkit-filter": "blur(8px)" },
+                { y: 100, opacity: 0, rotationX: 10 },
                 {
-                    scrollTrigger: {
-                        trigger: node,
-                        start: "top 85%", 
-                        toggleActions: "play none none reverse"
-                    },
-                    y: 0, 
-                    opacity: 1, 
-                    filter: "blur(0px)", 
-                    "-webkit-filter": "blur(0px)",
-                    duration: 1.2, 
-                    ease: "power3.out",
-                    force3D: true // Forces mobile GPU to handle it
+                    scrollTrigger: { trigger: node, start: "top 85%", toggleActions: "play none none reverse" },
+                    y: 0, opacity: 1, rotationX: 0, duration: 1.2, ease: "power3.out", force3D: true 
                 }
             );
         });
 
-        // --- 3. SCROLL TRACKER ---
         gsap.to('#progress-line', {
             height: "100%",
-            scrollTrigger: {
-                trigger: ".timeline-container",
-                start: "top center",
-                end: "bottom center",
-                scrub: true
-            }
+            scrollTrigger: { trigger: ".timeline-container", start: "top center", end: "bottom center", scrub: 1 }
         });
 
-        // --- 4. AMBIENT PARALLAX ---
         gsap.to('#orb1', {
-            y: 200, scrollTrigger: { trigger: "body", start: "top top", end: "bottom bottom", scrub: 2 }
+            y: 300, scrollTrigger: { trigger: "body", start: "top top", end: "bottom bottom", scrub: 2 }
         });
         gsap.to('#orb2', {
-            y: -200, scrollTrigger: { trigger: "body", start: "top top", end: "bottom bottom", scrub: 2 }
+            y: -300, scrollTrigger: { trigger: "body", start: "top top", end: "bottom bottom", scrub: 2 }
         });
     </script>
 </body>
