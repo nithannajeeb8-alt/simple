@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nithan // Core Identity</title>
+    
+    <link rel="icon" type="image/png" href="/favicon.PNG">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@100;300;400;500&display=swap" rel="stylesheet">
+    
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+        /* ==========================================
+           1. CORE SYSTEM VARIABLES
+           ========================================== */
+        :root {
+            --bg: #0a0a0b; 
+            --text-main: #f4f4f5; 
+            --text-muted: rgba(244, 244, 245, 0.45);
+            --accent-gold: #e6cc98; 
+            --serif: 'Playfair Display', serif;
+            --mono: 'JetBrains Mono', monospace;
+            --glass-border: rgba(255, 255, 255, 0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
+        html { scroll-behavior: smooth; }
+        
+        body { 
+            background-color: var(--bg); color: var(--text-main); font-family: var(--mono); 
+            font-weight: 300; overflow-x: hidden; min-height: 100vh; line-height: 1.6;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 10px; }
+
+        /* ==========================================
+           2. AMBIENT BACKGROUND & CURSOR
+           ========================================== */
+        .ambient-orb { position: fixed; border-radius: 50%; z-index: -1; pointer-events: none; opacity: 0.35; filter: blur(70px); }
+        .orb-1 { width: 45vw; height: 45vw; background: radial-gradient(circle, rgba(230, 204, 152, 0.15) 0%, transparent 70%); top: 5%; left: -10%; }
+        .orb-2 { width: 35vw; height: 35vw; background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%); bottom: 10%; right: -5%; }
+        .noise-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 9999; opacity: 0.035; mix-blend-mode: overlay; }
+
+        .cursor-dot {
+            width: 8px; height: 8px; background-color: var(--accent-gold);
+            border-radius: 50%; position: fixed; top: 0; left: 0;
+            pointer-events: none; z-index: 100000; transform: translate(-50%, -50%);
+            transition: width 0.3s cubic-bezier(0.25, 1, 0.5, 1), height 0.3s cubic-bezier(0.25, 1, 0.5, 1), background-color 0.3s;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        /* ==========================================
+           3. NAVIGATION
+           ========================================== */
+        .nav { 
+            position: fixed; top: 0; left: 0; width: 100%; padding: 1.5rem 6vw; 
+            display: flex; justify-content: space-between; align-items: center; 
+            z-index: 100; background: linear-gradient(to bottom, rgba(10,10,11,0.95) 0%, transparent 100%);
+        }
+        .brand-text { font-family: var(--serif); font-size: 1.4rem; color: var(--text-main); text-decoration: none; letter-spacing: 1.5px; }
+        .back-btn { font-family: var(--mono); font-size: 0.75rem; color: var(--text-muted); text-decoration: none; text-transform: uppercase; letter-spacing: 1px; transition: color 0.3s ease; }
+        .back-btn:hover { color: var(--accent-gold); }
+
+        /* ==========================================
+           4. HERO SECTION
+           ========================================== */
+        .hero-section {
+            min-height: 80vh; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; padding: 0 6vw; position: relative; margin-top: 5rem;
+        }
+        .sys-stamp { font-size: 0.75rem; color: var(--accent-gold); letter-spacing: 3px; margin-bottom: 2rem; text-transform: uppercase; }
+        .hero-title { font-family: var(--serif); font-size: clamp(3.5rem, 8vw, 6rem); font-weight: 300; line-height: 1.1; margin-bottom: 2rem; }
+        .hero-title i { color: var(--text-muted); }
+        .hero-desc { font-size: 1.1rem; color: var(--text-muted); max-width: 600px; line-height: 1.9; }
+
+        /* ==========================================
+           5. INTERACTIVE TIMELINE (THE CORE)
+           ========================================== */
+        .timeline-container {
+            max-width: 1000px; margin: 0 auto 10rem auto; padding: 0 6vw; position: relative;
+        }
+        
+        /* The glowing center line */
+        .timeline-line {
+            position: absolute; top: 0; bottom: 0; left: 50%; width: 1px;
+            background: linear-gradient(to bottom, transparent, var(--glass-border) 10%, var(--glass-border) 90%, transparent);
+            transform: translateX(-50%); z-index: 0;
+        }
+
+        .node {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 8rem; position: relative; z-index: 10;
+        }
+        .node:nth-child(even) { flex-direction: row-reverse; }
+
+        .node-date {
+            width: 45%; text-align: right; font-family: var(--serif); font-size: 3rem; color: var(--text-muted); opacity: 0.3; transition: all 0.5s ease;
+        }
+        .node:nth-child(even) .node-date { text-align: left; }
+
+        /* The Spotlight Glass Card */
+        .node-card {
+            width: 45%; padding: 3rem; border-radius: 20px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0.005) 100%);
+            border: 1px solid var(--glass-border); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            position: relative; overflow: hidden; transition: transform 0.4s ease;
+        }
+        
+        /* Interactive Spotlight Layer */
+        .node-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(800px circle at var(--mouse-x) var(--mouse-y), rgba(230, 204, 152, 0.06), transparent 40%);
+            z-index: -1; opacity: 0; transition: opacity 0.5s ease;
+        }
+        .node-card:hover::before { opacity: 1; }
+        .node-card:hover { transform: translateY(-5px); border-color: rgba(230, 204, 152, 0.2); }
+
+        /* Card Content */
+        .card-tag { font-size: 0.65rem; color: var(--accent-gold); letter-spacing: 2px; margin-bottom: 1.5rem; display: inline-block; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem;}
+        .card-title { font-family: var(--serif); font-size: 2rem; font-weight: 300; margin-bottom: 1rem; color: var(--text-main); }
+        .card-text { font-size: 0.95rem; color: var(--text-muted); line-height: 1.9; }
+
+        /* Center Node Indicator */
+        .node-dot {
+            position: absolute; left: 50%; width: 12px; height: 12px; background: var(--bg);
+            border: 1px solid var(--accent-gold); border-radius: 50%; transform: translateX(-50%);
+            transition: all 0.4s ease; box-shadow: 0 0 10px rgba(230, 204, 152, 0);
+        }
+        .node.active .node-dot { background: var(--accent-gold); box-shadow: 0 0 20px rgba(230, 204, 152, 0.6); }
+        .node.active .node-date { color: var(--accent-gold); opacity: 1; }
+
+        /* ==========================================
+           6. MOBILE RESPONSIVENESS
+           ========================================== */
+        @media (max-width: 768px) {
+            .hero-section { padding-top: 5rem; min-height: 60vh; }
+            .hero-title { font-size: 2.8rem; }
+            
+            .timeline-container { padding: 0 5vw; }
+            /* Push timeline line to the left on mobile */
+            .timeline-line { left: 20px; transform: none; }
+            
+            .node, .node:nth-child(even) { flex-direction: column; align-items: flex-start; margin-bottom: 4rem; padding-left: 50px; }
+            .node-date, .node:nth-child(even) .node-date { width: 100%; text-align: left; font-size: 2rem; margin-bottom: 1rem; }
+            .node-card, .node:nth-child(even) .node-card { width: 100%; padding: 2rem 1.5rem; }
+            .node-dot { left: 20px; transform: translateX(-4px); top: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cursor-dot" id="cursor"></div>
+
+    <svg class="noise-overlay" aria-hidden="true" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <filter id="noiseFilter"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/></filter>
+        <rect width="100%" height="100%" filter="url(#noiseFilter)"/>
+    </svg>
+
+    <div class="ambient-orb orb-1"></div>
+    <div class="ambient-orb orb-2"></div>
+
+    <nav class="nav">
+        <a href="index.html" class="brand-text">NITHAN.</a>
+        <a href="index.html" class="back-btn">[ RETURN ]</a>
+    </nav>
+
+    <main>
+        <section class="hero-section">
+            <p class="sys-stamp gs-reveal">IDENTITY // COMPILED</p>
+            <h1 class="hero-title gs-reveal">Nithan <i>Najeeb</i>.</h1>
+            <p class="hero-desc gs-reveal">Alias: Rubin Stellar. <br>A life not bound by conventional parameters, but built around curiosity, creativity, and continuous growth.</p>
+        </section>
+
+        <section class="timeline-container">
+            <div class="timeline-line"></div>
+
+            <div class="node">
+                <div class="node-dot"></div>
+                <div class="node-date">2004</div>
+                <div class="node-card hover-spotlight">
+                    <span class="card-tag">SYS.INIT // ORIGIN</span>
+                    <h3 class="card-title decrypt-text" data-text="The Search for Meaning.">The Search for Meaning.</h3>
+                    <p class="card-text decrypt-text" data-text="Born in the lush landscapes of Kerala, my journey began with a fundamental question: how do systems work outside the confines of textbooks? I bypassed the theoretical and dove straight into online commerce, dissecting the raw mechanics of business. It was here I realized I didn't just want to participate in the world; I wanted to build something purposeful within it.">Born in the lush landscapes of Kerala, my journey began with a fundamental question: how do systems work outside the confines of textbooks? I bypassed the theoretical and dove straight into online commerce, dissecting the raw mechanics of business. It was here I realized I didn't just want to participate in the world; I wanted to build something purposeful within it.</p>
+                </div>
+            </div>
+
+            <div class="node">
+                <div class="node-dot"></div>
+                <div class="node-date">PROJECT_1</div>
+                <div class="node-card hover-spotlight">
+                    <span class="card-tag">MODULE // REMEVESS</span>
+                    <h3 class="card-title decrypt-text" data-text="Crafting Purpose.">Crafting Purpose.</h3>
+                    <p class="card-text decrypt-text" data-text="Remevess was a vision engineered to promote traditional handmade products. It was designed as a bridge between skilled craftsmen and the fair recognition they deserved. Though it ran for only a few months, it acted as a profound masterclass. It taught me the uncompromising truth about entrepreneurship, the complexity of people, and the weight of genuine purpose.">Remevess was a vision engineered to promote traditional handmade products. It was designed as a bridge between skilled craftsmen and the fair recognition they deserved. Though it ran for only a few months, it acted as a profound masterclass. It taught me the uncompromising truth about entrepreneurship, the complexity of people, and the weight of genuine purpose.</p>
+                </div>
+            </div>
+
+            <div class="node">
+                <div class="node-dot"></div>
+                <div class="node-date">THE_PIVOT</div>
+                <div class="node-card hover-spotlight">
+                    <span class="card-tag">CLASS // ARCHITECTURE</span>
+                    <h3 class="card-title decrypt-text" data-text="Ledgers & Logic.">Ledgers & Logic.</h3>
+                    <p class="card-text decrypt-text" data-text="Curiosity naturally mutated into a pursuit of structure. I developed a deep fascination with accounting, leading me to pursue a B.Com with a specialization in Computer Applications. I found an aesthetic balance between the strict laws of finance and the infinite possibilities of technology. Finding beauty in madness, and order in numbers.">Curiosity naturally mutated into a pursuit of structure. I developed a deep fascination with accounting, leading me to pursue a B.Com with a specialization in Computer Applications. I found an aesthetic balance between the strict laws of finance and the infinite possibilities of technology. Finding beauty in madness, and order in numbers.</p>
+                </div>
+            </div>
+
+            <div class="node">
+                <div class="node-dot"></div>
+                <div class="node-date">CURRENT</div>
+                <div class="node-card hover-spotlight">
+                    <span class="card-tag">STATUS // CREATING</span>
+                    <h3 class="card-title decrypt-text" data-text="The Architect.">The Architect.</h3>
+                    <p class="card-text decrypt-text" data-text="Beyond the commerce and the code, I am a storyteller at heart. Whether I am writing narratives, constructing minimalist web environments, or developing localized applications, the drive remains identical: to learn, to create, and to contribute. The goal is never a destination, but the perpetual motion of continuous evolution.">Beyond the commerce and the code, I am a storyteller at heart. Whether I am writing narratives, constructing minimalist web environments, or developing localized applications, the drive remains identical: to learn, to create, and to contribute. The goal is never a destination, but the perpetual motion of continuous evolution.</p>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // --- Custom Cursor ---
+        const cursor = document.getElementById("cursor");
+        window.addEventListener("mousemove", (e) => {
+            cursor.style.left = e.clientX + "px";
+            cursor.style.top = e.clientY + "px";
+        });
+        
+        document.querySelectorAll("a, button").forEach(el => {
+            el.addEventListener("mouseenter", () => {
+                cursor.style.width = "40px"; cursor.style.height = "40px";
+                cursor.style.backgroundColor = "transparent"; cursor.style.border = "1px solid var(--accent-gold)";
+            });
+            el.addEventListener("mouseleave", () => {
+                cursor.style.width = "8px"; cursor.style.height = "8px";
+                cursor.style.backgroundColor = "var(--accent-gold)"; cursor.style.border = "none";
+            });
+        });
+
+        // --- Dynamic Spotlight Effect on Cards ---
+        document.querySelectorAll('.hover-spotlight').forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+
+        // --- Hero Animations ---
+        gsap.fromTo('.gs-reveal', 
+            { y: 50, opacity: 0 },
+            { y: 0, opacity: 1, duration: 1.2, stagger: 0.2, ease: "power3.out", delay: 0.2 }
+        );
+
+        // --- Hacker Text Scramble Effect ---
+        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*";
+        
+        function scrambleText(element) {
+            const originalText = element.getAttribute('data-text');
+            let iterations = 0;
+            
+            const interval = setInterval(() => {
+                element.innerText = originalText.split("").map((letter, index) => {
+                    if (index < iterations || letter === " ") return originalText[index];
+                    return letters[Math.floor(Math.random() * letters.length)];
+                }).join("");
+                
+                if (iterations >= originalText.length) clearInterval(interval);
+                iterations += 1/2; // Speed of decode
+            }, 20);
+        }
+
+        // --- Timeline Scroll Triggers ---
+        document.querySelectorAll('.node').forEach((node) => {
+            
+            // Highlight the timeline dot
+            ScrollTrigger.create({
+                trigger: node,
+                start: "top 60%",
+                onEnter: () => node.classList.add('active'),
+                onLeaveBack: () => node.classList.remove('active')
+            });
+
+            // Slide in the card and trigger the scramble
+            const card = node.querySelector('.node-card');
+            const scrambleElements = node.querySelectorAll('.decrypt-text');
+            
+            // Hide text initially
+            scrambleElements.forEach(el => el.innerText = "");
+
+            gsap.fromTo(card,
+                { y: 80, opacity: 0 },
+                {
+                    scrollTrigger: {
+                        trigger: node,
+                        start: "top 75%",
+                        onEnter: () => {
+                            scrambleElements.forEach(el => scrambleText(el));
+                        }
+                    },
+                    y: 0, opacity: 1, duration: 1, ease: "power3.out"
+                }
+            );
+        });
+    </script>
+</body>
+</html>
