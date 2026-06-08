@@ -37,6 +37,7 @@
             align-items: center; 
             justify-content: center; 
             padding: 120px 20px 40px 20px; 
+            transition: background-color 0.5s ease;
         }
 
         /* AMBIENT BACKGROUND */
@@ -427,26 +428,23 @@
             switchView('view-result');
         }
 
-        // --- THE CREATOR EASTER EGG ANIMATION ---
+        // --- THE CREATOR EASTER EGG ANIMATION (FIXED) ---
         function triggerEasterEgg() {
-            triggerVibration([50, 50, 50, 50, 300]); // Aggressive error vibration
+            triggerVibration([50, 50, 50, 50, 300]); 
             
-            // 1. Change text in the card to alert state
             const stamp = document.getElementById('sys-stamp');
             const title = document.getElementById('main-title');
             
             stamp.innerText = "SYS.OVERRIDE // CREATOR_DETECTED";
-            stamp.style.color = "#bf616a"; // Red alert color
+            stamp.style.color = "#bf616a"; 
             
             title.innerHTML = "Access <i>Granted</i>.";
             title.style.color = "var(--accent-gold)";
             
             const tl = gsap.timeline();
 
-            // Brief pause so they read "Creator Detected"
             tl.to({}, {duration: 1.2});
 
-            // 2. Card aggressively swipes left and drops
             tl.to('#main-card', {
                 x: "-120vw",
                 rotationZ: -15,
@@ -456,25 +454,26 @@
                 ease: "power3.in"
             });
 
-            // 3. Complete System Blackout
-            tl.to(['.ambient-orb', '.nav', '.noise-overlay', 'body'], { 
+            // FIXED: Removed 'body' from the opacity array so the stars aren't hidden
+            tl.to(['.ambient-orb', '.nav', '.noise-overlay'], { 
                 opacity: 0, 
-                backgroundColor: "#000000", 
                 duration: 0.5 
             }, "-=0.3");
 
-            // 4. Generate the Starfield Nebula
+            // Turn background strictly black just in case
+            tl.to('body', { backgroundColor: "#000000", duration: 0.5 }, "-=0.5");
+
             tl.add(() => {
                 const starContainer = document.createElement('div');
                 starContainer.id = 'starfield';
-                starContainer.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;pointer-events:none;overflow:hidden;background:#000;';
+                // Added absolute positioning to guarantee it fills the viewport
+                starContainer.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;pointer-events:none;overflow:hidden;';
                 document.body.appendChild(starContainer);
 
                 for(let i=0; i<120; i++) {
                     let star = document.createElement('div');
-                    let size = Math.random() * 3 + 1; // 1px to 4px
+                    let size = Math.random() * 3 + 1; 
                     
-                    // Mix of white and gold stars
                     let color = Math.random() > 0.8 ? 'var(--accent-gold)' : '#ffffff'; 
                     let shadowBlur = size * 3;
                     
@@ -482,21 +481,18 @@
                     star.style.cssText = `position:absolute;width:${size}px;height:${size}px;background:${color};border-radius:50%;top:${Math.random()*100}vh;left:${Math.random()*100}vw;opacity:0;box-shadow:0 0 ${shadowBlur}px ${color};`;
                     starContainer.appendChild(star);
                     
-                    // Twinkle effect
                     gsap.to(star, {
                         opacity: Math.random() * 0.7 + 0.3,
                         duration: Math.random() * 1.5 + 0.5,
                         yoyo: true,
-                        repeat: 2, // Twinkles a few times before warp
+                        repeat: 2, 
                         ease: "sine.inOut"
                     });
                 }
             });
 
-            // 5. Let the user watch the stars twinkle
             tl.to({}, {duration: 3.5});
 
-            // 6. Warp speed! Stars aggressively scale up and vanish towards the camera
             tl.to('.easter-star', {
                 scale: 40,
                 opacity: 0,
@@ -505,7 +501,6 @@
                 ease: "power4.in"
             });
 
-            // 7. Instant Redirect
             tl.add(() => {
                 window.location.href = "https://www.instagram.com/p/DJAGP16zWwv/?igsh=a2EzNXpnbzc5bnFo";
             }, "+=0.2");
