@@ -8,7 +8,7 @@
     <link rel="icon" type="image/png" href="/favicon.PNG">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@100;300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@100;300;400;500&display=swap" rel="stylesheet">
     
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
@@ -21,7 +21,6 @@
             --accent-gold: #e6cc98; 
             --serif: 'Playfair Display', serif;
             --mono: 'JetBrains Mono', monospace;
-            --signature: 'Great Vibes', cursive;
             --glass-border: rgba(255, 255, 255, 0.05);
         }
 
@@ -127,33 +126,6 @@
         .reset-btn { margin-top: 3rem; background: transparent; }
         .reset-btn:hover { background: rgba(255,255,255,0.05); color: var(--accent-gold); border-color: var(--accent-gold); }
 
-        /* ==========================================
-           EASTER EGG SIGNATURE STYLES (FIXED CLIPPING)
-           ========================================== */
-        .easter-sig-container {
-            /* Changed to full screen flexbox to prevent ANY clipping during massive scale */
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
-            z-index: 10000; display: none; justify-content: center; align-items: center;
-            pointer-events: none; transform-origin: center center;
-        }
-        .easter-sig-svg { 
-            width: 100%; max-width: 500px; overflow: visible; 
-        }
-        
-        /* Styled to match your homepage's exact structure */
-        .signature-word {
-            font-family: var(--signature); font-size: 8rem;
-            fill: transparent;
-            stroke: var(--accent-gold); stroke-width: 2px;
-            stroke-dasharray: 1000; stroke-dashoffset: 1000;
-        }
-        .signature-dot {
-            fill: var(--accent-gold);
-            transform: scale(0);
-            opacity: 0;
-            transform-origin: center;
-        }
-
         @media (max-width: 768px) {
             body { padding-top: 90px; padding-bottom: 30px; }
             .glass-card { padding: 3rem 2rem; border-radius: 20px; }
@@ -162,7 +134,6 @@
             .result-letter { font-size: 4.5rem; }
             .metrics-grid { gap: 1rem; }
             .result-desc { font-size: 1rem; }
-            .signature-word { font-size: 6rem; }
         }
     </style>
 </head>
@@ -180,13 +151,6 @@
         <a href="index.html" class="brand-text">NITHAN.</a>
         <a href="index.html" class="back-btn" id="exit-btn">[ EXIT GAME ]</a>
     </nav>
-
-    <div class="easter-sig-container" id="easter-sig-box">
-        <svg class="easter-sig-svg" viewBox="0 0 500 150">
-            <text x="45%" y="50%" dominant-baseline="middle" text-anchor="middle" class="signature-word">Nithan</text>
-            <circle cx="72%" cy="50%" r="8" class="signature-dot" />
-        </svg>
-    </div>
 
     <div class="glass-card" id="main-card">
         
@@ -395,7 +359,7 @@
             switchView('view-result');
         }
 
-        // --- THE PERFECTED CINEMATIC EASTER EGG ---
+        // --- THE FALLING STARS METEOR SHOWER ---
         function triggerEasterEgg() {
             triggerVibration([50, 50, 50, 50, 300]); 
             
@@ -410,8 +374,10 @@
             
             const tl = gsap.timeline();
 
+            // 1. Initial Glitch / Pause
             tl.to({}, {duration: 1.0});
 
+            // 2. Card Swipes Left
             tl.to('#main-card', {
                 x: "-120vw",
                 rotationZ: -15,
@@ -421,84 +387,57 @@
                 ease: "power3.in"
             });
 
-            tl.to(['.ambient-orb', '.nav', '.noise-overlay'], { opacity: 0, duration: 0.5 }, "-=0.3");
+            // 3. System Blackout
+            tl.to(['.ambient-orb', '.nav', '.noise-overlay'], { 
+                opacity: 0, 
+                duration: 0.5 
+            }, "-=0.3");
             tl.to('body', { backgroundColor: "#000000", duration: 0.5 }, "-=0.5");
 
+            // 4. Generate the Meteor Shower
             tl.add(() => {
                 const starContainer = document.createElement('div');
                 starContainer.id = 'starfield';
                 starContainer.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;pointer-events:none;overflow:hidden;';
                 document.body.appendChild(starContainer);
 
-                for(let i=0; i<120; i++) {
+                for(let i=0; i<150; i++) {
                     let star = document.createElement('div');
-                    let size = Math.random() * 3 + 1; 
-                    let color = Math.random() > 0.8 ? 'var(--accent-gold)' : '#ffffff'; 
-                    let shadowBlur = size * 3;
+                    
+                    // Creates a "shooting star" shape
+                    let width = Math.random() * 2 + 1;
+                    let height = Math.random() * 80 + 30; 
+                    let color = Math.random() > 0.7 ? 'var(--accent-gold)' : '#ffffff'; 
                     
                     star.className = 'easter-star';
-                    star.style.cssText = `position:absolute;width:${size}px;height:${size}px;background:${color};border-radius:50%;top:${Math.random()*100}vh;left:${Math.random()*100}vw;opacity:0;box-shadow:0 0 ${shadowBlur}px ${color};`;
+                    
+                    // Start them way above the screen, spread across the width
+                    let startX = Math.random() * 150 - 25 + 'vw'; 
+                    let startY = -(Math.random() * 100 + 50) + 'vh'; 
+                    
+                    star.style.cssText = `position:absolute;width:${width}px;height:${height}px;background:linear-gradient(to bottom, transparent, ${color});border-radius:100px;top:${startY};left:${startX};opacity:0;transform:rotate(20deg);`;
                     starContainer.appendChild(star);
                     
+                    // The falling animation loop
                     gsap.to(star, {
-                        opacity: Math.random() * 0.7 + 0.3,
-                        duration: Math.random() * 1.5 + 0.5,
-                        yoyo: true,
-                        repeat: 1, 
-                        ease: "sine.inOut"
+                        top: "150vh", // Fall far past the bottom
+                        left: "+=25vw", // Slight diagonal drift
+                        opacity: Math.random() * 0.8 + 0.2,
+                        duration: Math.random() * 1.5 + 0.6,
+                        delay: Math.random() * 2.5, // Stagger their entry
+                        ease: "none",
+                        repeat: -1 // Loop seamlessly
                     });
                 }
             });
 
-            tl.to({}, {duration: 2.0});
+            // 5. Let the user watch the meteor shower for a few seconds
+            tl.to({}, {duration: 3.5});
 
-            tl.to('.easter-star', {
-                scale: 50,
-                opacity: 0,
-                duration: 1.0,
-                stagger: 0.003,
-                ease: "power4.in"
-            });
+            // 6. Flash to white for transition
+            tl.to('body', { backgroundColor: "#ffffff", opacity: 0, duration: 1.0, ease: "power2.in" });
 
-            // The Signature Bridge
-            tl.add(() => { 
-                const sigBox = document.getElementById('easter-sig-box');
-                sigBox.style.display = 'flex'; // Uses flex to center it perfectly
-            }, "-=0.5");
-
-            // 1. Draw the word (Matches your homepage style)
-            tl.to('.signature-word', { 
-                strokeDashoffset: 0, 
-                duration: 2.5, 
-                ease: "power2.inOut" 
-            }, "-=0.2");
-
-            // 2. Pop the dot (Matches your homepage style)
-            tl.to('.signature-dot', { 
-                scale: 1, 
-                opacity: 1, 
-                duration: 0.6, 
-                ease: "back.out(1.5)" 
-            }, "-=0.2");
-
-            // 3. Fill with bright white and glows
-            tl.to(['.signature-word', '.signature-dot'], {
-                fill: "var(--text-main)",
-                stroke: "transparent",
-                textShadow: "0 0 40px rgba(230, 204, 152, 0.8)",
-                duration: 0.8
-            });
-
-            tl.to({}, {duration: 1.0});
-
-            // THE FIX: We scale the FULL SCREEN CONTAINER, not the SVG. No more cutoffs.
-            tl.to('#easter-sig-box', {
-                scale: 30, 
-                opacity: 0,
-                duration: 1.2,
-                ease: "power3.in"
-            });
-
+            // 7. Instant Redirect
             tl.add(() => {
                 window.location.href = "https://www.instagram.com/p/DJAGP16zWwv/?igsh=a2EzNXpnbzc5bnFo";
             }, "+=0.1");
