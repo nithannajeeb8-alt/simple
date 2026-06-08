@@ -8,7 +8,7 @@
     <link rel="icon" type="image/png" href="/favicon.PNG">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@100;300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@100;300;400;500&display=swap" rel="stylesheet">
     
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
@@ -21,6 +21,7 @@
             --accent-gold: #e6cc98; 
             --serif: 'Playfair Display', serif;
             --mono: 'JetBrains Mono', monospace;
+            --signature: 'Great Vibes', cursive;
             --glass-border: rgba(255, 255, 255, 0.05);
         }
 
@@ -94,7 +95,7 @@
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* PROCESSING VIEW (CROSSING OUT) */
+        /* PROCESSING VIEW */
         .process-names { font-family: var(--mono); font-size: 1.5rem; letter-spacing: 4px; text-align: center; margin: 3rem 0; display: flex; flex-direction: column; gap: 2rem; }
         .name-row { display: flex; justify-content: center; flex-wrap: wrap; gap: 4px; }
         .letter { position: relative; display: inline-block; color: var(--text-main); transition: color 0.3s ease; }
@@ -126,6 +127,23 @@
         .reset-btn { margin-top: 3rem; background: transparent; }
         .reset-btn:hover { background: rgba(255,255,255,0.05); color: var(--accent-gold); border-color: var(--accent-gold); }
 
+        /* ==========================================
+           EASTER EGG SIGNATURE STYLES
+           ========================================== */
+        .easter-sig-container {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 100vw; max-width: 500px; height: 150px; z-index: 10000;
+            display: none; pointer-events: none;
+        }
+        .easter-sig-svg { width: 100%; height: 100%; overflow: visible; }
+        .easter-sig-text {
+            font-family: var(--signature); font-size: 6rem;
+            fill: transparent; /* Starts empty */
+            stroke: var(--accent-gold); stroke-width: 2px;
+            stroke-dasharray: 1000; stroke-dashoffset: 1000;
+            transform-origin: center;
+        }
+
         @media (max-width: 768px) {
             body { padding-top: 90px; padding-bottom: 30px; }
             .glass-card { padding: 3rem 2rem; border-radius: 20px; }
@@ -134,6 +152,7 @@
             .result-letter { font-size: 4.5rem; }
             .metrics-grid { gap: 1rem; }
             .result-desc { font-size: 1rem; }
+            .easter-sig-text { font-size: 5rem; }
         }
     </style>
 </head>
@@ -151,6 +170,12 @@
         <a href="index.html" class="brand-text">NITHAN.</a>
         <a href="index.html" class="back-btn" id="exit-btn">[ EXIT GAME ]</a>
     </nav>
+
+    <div class="easter-sig-container" id="easter-sig-box">
+        <svg class="easter-sig-svg" viewBox="0 0 500 150" preserveAspectRatio="xMidYMid meet">
+            <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" class="easter-sig-text" id="easter-sig-text">Nithan</text>
+        </svg>
+    </div>
 
     <div class="glass-card" id="main-card">
         
@@ -220,78 +245,12 @@
         };
 
         const descriptions = {
-            'F': [
-                "Just friends, bro. Don't overthink it.",
-                "Besties for life! You guys are literally that iconic duo.",
-                "Strictly platonic. Friendzone level activated.",
-                "You guys share snacks, notes, and gossip. True friends.",
-                "Total buddy vibes. Keep the bro-code strong!",
-                "Chilling at the local cafe together, but zero romance here.",
-                "You guys will definitely end up as those annoying best friends.",
-                "Just good old friends. Nothing more, nothing less.",
-                "A solid friendship. You'll always have each other's backs.",
-                "You're the kind of friends who roast each other 24/7."
-            ],
-            'L': [
-                "Made for each other! Cue the Bollywood background music.",
-                "True love! You guys are actually couple goals.",
-                "Match made in heaven. When is the treat?",
-                "Pure romance. You guys are totally crushing hard.",
-                "It's a match! Time to change that relationship status.",
-                "You two have that classic movie romance going on.",
-                "Absolutely smitten. The chemistry is totally real.",
-                "A perfect love story. You guys are meant to be together.",
-                "Secretly in love? The flames game never lies!",
-                "Ultimate couple vibes. Everyone already ships you two."
-            ],
-            'A': [
-                "There's definitely a soft spot here. Aww!",
-                "Someone is crushing secretly! Just confess already.",
-                "Cute vibes! There's a lot of mutual caring going on.",
-                "Butterflies in the stomach? The affection is real.",
-                "You guys definitely have a special corner for each other.",
-                "Lowkey catching feelings. It's the sweet beginning!",
-                "Very fond of each other. It could turn into something more!",
-                "Lots of care and sweet moments between you two.",
-                "Blushing much? There is undeniable affection here.",
-                "It's not full-on love yet, but the feelings are definitely brewing."
-            ],
-            'M': [
-                "Wedding bells are ringing! Better start looking for outfits.",
-                "Straight to marriage! You guys are in it for the long haul.",
-                "Future husband or wife spotted. When's the grand feast?",
-                "A lifetime bond. You guys are settling down together!",
-                "Destined to tie the knot. Save a plate of biryani for me!",
-                "Happily ever after. You two are basically already a married couple.",
-                "Arranged or love? Doesn't matter, you're getting hitched!",
-                "Soulmates meant to spend the rest of your lives together.",
-                "Keep the stage ready. You two are meant for the mandap.",
-                "Ultimate commitment. You guys are locked in for life!"
-            ],
-            'E': [
-                "Pure rivalry. You guys fight like Tom and Jerry.",
-                "Keep a safe distance! Total clash of personalities here.",
-                "Enemies for sure. You probably argue over the smallest things.",
-                "Big ego clashes. You two just cannot agree on anything.",
-                "Red alert! You guys are always ready for a debate.",
-                "Total opposite poles. The roasting never stops with you two.",
-                "Arch-nemesis vibes. Someone's always plotting revenge.",
-                "You guys are the classic 'can't stand each other' duo.",
-                "Better avoid each other before a world war starts.",
-                "Constant bickering. It's a miracle you tolerate each other!"
-            ],
-            'S': [
-                "Total brother-sister vibes. So pure and chaotic!",
-                "You guys fight for the remote, mentally. Pure sibling energy.",
-                "Rakhi zone unlocked! Definitely just siblings.",
-                "You annoy the life out of each other, but care deeply.",
-                "Basically family. You treat each other like annoying siblings.",
-                "No romance, just pure 'I will steal your food' sibling bonding.",
-                "The protective elder/younger sibling dynamic is strong here.",
-                "You guys share that chaotic, loving family energy.",
-                "Sworn to protect each other, but also to annoy each other daily.",
-                "Family-zoned! You are basically siblings from another mother."
-            ]
+            'F': ["Just friends, bro. Don't overthink it.", "Besties for life! You guys are literally that iconic duo.", "Strictly platonic. Friendzone level activated."],
+            'L': ["Made for each other! Cue the Bollywood background music.", "True love! You guys are actually couple goals.", "Match made in heaven. When is the treat?"],
+            'A': ["There's definitely a soft spot here. Aww!", "Someone is crushing secretly! Just confess already.", "Cute vibes! There's a lot of mutual caring going on."],
+            'M': ["Wedding bells are ringing! Better start looking for outfits.", "Straight to marriage! You guys are in it for the long haul.", "Destined to tie the knot. Save a plate of biryani for me!"],
+            'E': ["Pure rivalry. You guys fight like Tom and Jerry.", "Keep a safe distance! Total clash of personalities here.", "Enemies for sure. You probably argue over the smallest things."],
+            'S': ["Total brother-sister vibes. So pure and chaotic!", "Rakhi zone unlocked! Definitely just siblings.", "You annoy the life out of each other, but care deeply."]
         };
 
         const flamesMap = { 'F': 'Friends', 'L': 'Lovers', 'A': 'Affection', 'M': 'Marriage', 'E': 'Enemies', 'S': 'Siblings' };
@@ -428,7 +387,7 @@
             switchView('view-result');
         }
 
-        // --- THE CREATOR EASTER EGG ANIMATION (FIXED) ---
+        // --- THE CINEMATIC CREATOR EASTER EGG ---
         function triggerEasterEgg() {
             triggerVibration([50, 50, 50, 50, 300]); 
             
@@ -443,8 +402,10 @@
             
             const tl = gsap.timeline();
 
-            tl.to({}, {duration: 1.2});
+            // 1. Initial Glitch / Pause
+            tl.to({}, {duration: 1.0});
 
+            // 2. Card Swipes Left
             tl.to('#main-card', {
                 x: "-120vw",
                 rotationZ: -15,
@@ -454,26 +415,23 @@
                 ease: "power3.in"
             });
 
-            // FIXED: Removed 'body' from the opacity array so the stars aren't hidden
+            // 3. System Blackout
             tl.to(['.ambient-orb', '.nav', '.noise-overlay'], { 
                 opacity: 0, 
                 duration: 0.5 
             }, "-=0.3");
-
-            // Turn background strictly black just in case
             tl.to('body', { backgroundColor: "#000000", duration: 0.5 }, "-=0.5");
 
+            // 4. Generate Starfield
             tl.add(() => {
                 const starContainer = document.createElement('div');
                 starContainer.id = 'starfield';
-                // Added absolute positioning to guarantee it fills the viewport
                 starContainer.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;pointer-events:none;overflow:hidden;';
                 document.body.appendChild(starContainer);
 
                 for(let i=0; i<120; i++) {
                     let star = document.createElement('div');
                     let size = Math.random() * 3 + 1; 
-                    
                     let color = Math.random() > 0.8 ? 'var(--accent-gold)' : '#ffffff'; 
                     let shadowBlur = size * 3;
                     
@@ -481,29 +439,64 @@
                     star.style.cssText = `position:absolute;width:${size}px;height:${size}px;background:${color};border-radius:50%;top:${Math.random()*100}vh;left:${Math.random()*100}vw;opacity:0;box-shadow:0 0 ${shadowBlur}px ${color};`;
                     starContainer.appendChild(star);
                     
+                    // Stars twinkle
                     gsap.to(star, {
                         opacity: Math.random() * 0.7 + 0.3,
                         duration: Math.random() * 1.5 + 0.5,
                         yoyo: true,
-                        repeat: 2, 
+                        repeat: 1, 
                         ease: "sine.inOut"
                     });
                 }
             });
 
-            tl.to({}, {duration: 3.5});
+            // Let them watch the stars for a moment
+            tl.to({}, {duration: 2.0});
 
+            // 5. Warp Speed (Stars blast into the camera and vanish)
             tl.to('.easter-star', {
-                scale: 40,
+                scale: 50,
                 opacity: 0,
-                duration: 1.2,
-                stagger: 0.005,
+                duration: 1.0,
+                stagger: 0.003,
                 ease: "power4.in"
             });
 
+            // 6. The Signature Bridge (Appears from the void)
+            tl.add(() => {
+                document.getElementById('easter-sig-box').style.display = 'block';
+            }, "-=0.5");
+
+            // Draws the golden outline
+            tl.to('#easter-sig-text', { 
+                strokeDashoffset: 0, 
+                duration: 2.5, 
+                ease: "power2.inOut" 
+            }, "-=0.2");
+
+            // Fills with bright white and glows
+            tl.to('#easter-sig-text', {
+                fill: "var(--text-main)",
+                stroke: "transparent",
+                textShadow: "0 0 40px rgba(230, 204, 152, 0.8)",
+                duration: 0.8
+            });
+
+            // Holds so you can read it
+            tl.to({}, {duration: 1.0});
+
+            // 7. The Portal (Signature massive scale-up to transition)
+            tl.to('#easter-sig-text', {
+                scale: 6,
+                opacity: 0,
+                duration: 0.8,
+                ease: "power3.in"
+            });
+
+            // 8. Redirect
             tl.add(() => {
                 window.location.href = "https://www.instagram.com/p/DJAGP16zWwv/?igsh=a2EzNXpnbzc5bnFo";
-            }, "+=0.2");
+            }, "+=0.1");
         }
     </script>
 </body>
