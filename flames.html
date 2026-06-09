@@ -251,11 +251,15 @@
                 return;
             }
 
-            const creatorAliases = ['nithan', 'nithan najeeb', 'nidhan', 'nidan', 'rubin', 'rubin stellar'];
+            // --- EASTER EGG OVERRIDE CHECK ---
+            const creatorAliases = ['nithan', 'nithan najeeb', 'nidhan', 'nidan', 'rubin', 'rubin stellar', 'ambrutan', 'ambruten'];
             if (creatorAliases.includes(n1) || creatorAliases.includes(n2)) {
                 triggerEasterEgg();
                 return;
             }
+
+            // --- RAHILA & ZAHRAN COUPLE OVERRIDE ---
+            let isSpecialCouple = ((n1 === 'rahila' && n2 === 'zahran') || (n1 === 'zahran' && n2 === 'rahila'));
 
             switchView('view-process');
             
@@ -279,6 +283,7 @@
             let toCross1 = [];
             let toCross2 = [];
 
+            // Standard Math Logic for crossing out letters
             for (let i = 0; i < arr1.length; i++) {
                 if (arr1[i] !== '*') {
                     let matchIdx = arr2.indexOf(arr1[i]);
@@ -295,11 +300,16 @@
             let remainingCount = arr1.filter(c => c !== '*').length + arr2.filter(c => c !== '*').length;
             if (remainingCount === 0) remainingCount = 1;
 
+            // Score Calculation
             let matchPercentage = Math.round(((commonCount * 2) / totalLetters) * 100);
             if (matchPercentage === 0) matchPercentage = Math.floor(Math.random() * 15) + 5; 
+            
+            // Hardcode 100% Match for the special couple
+            if (isSpecialCouple) matchPercentage = 100;
 
             const tl = gsap.timeline();
 
+            // Animate the crossing out
             toCross1.forEach((id, index) => {
                 tl.add(() => {
                     document.getElementById(id).classList.add('crossed', 'crossed-animate');
@@ -308,35 +318,53 @@
                 }, `+=${0.3}`);
             });
 
-            let activeFlames = [...flamesArray];
-            let currentIdx = 0;
-
             tl.add(() => { triggerVibration(100); }, "+=0.5");
 
-            while (activeFlames.length > 1) {
-                currentIdx = (currentIdx + remainingCount - 1) % activeFlames.length;
-                let eliminatedLetter = activeFlames.splice(currentIdx, 1)[0];
-                
-                tl.add(() => {
-                    let el = document.getElementById(`flame-${eliminatedLetter}`);
-                    el.classList.add('eliminated');
-                    triggerVibration(40); 
-                }, `+=${0.4}`);
+            let activeFlames = [...flamesArray];
+            let currentIdx = 0;
+            let finalResult = '';
+
+            // --- THE MANIPULATED ELIMINATION ---
+            if (isSpecialCouple) {
+                // If it's Rahila and Zahran, force knock out F, A, M, E, S.
+                const eliminateOrder = ['F', 'A', 'M', 'E', 'S'];
+                eliminateOrder.forEach(letter => {
+                    tl.add(() => {
+                        document.getElementById(`flame-${letter}`).classList.add('eliminated');
+                        triggerVibration(40);
+                    }, `+=${0.3}`);
+                });
+                finalResult = 'L'; // Force final result to Lovers
+            } else {
+                // Standard honest math loop for everyone else
+                while (activeFlames.length > 1) {
+                    currentIdx = (currentIdx + remainingCount - 1) % activeFlames.length;
+                    let eliminatedLetter = activeFlames.splice(currentIdx, 1)[0];
+                    
+                    tl.add(() => {
+                        let el = document.getElementById(`flame-${eliminatedLetter}`);
+                        el.classList.add('eliminated');
+                        triggerVibration(40); 
+                    }, `+=${0.4}`);
+                }
+                finalResult = activeFlames[0];
             }
 
-            let finalResult = activeFlames[0];
-
+            // Highlight the final letter
             tl.add(() => {
                 document.getElementById(`flame-${finalResult}`).classList.add('active');
                 triggerVibration([100, 50, 100, 50, 200]); 
             }, "+=0.5");
 
+            // Display Results
             tl.add(() => {
-                showResult(finalResult, matchPercentage, commonCount * 2);
+                // If it's the special couple, pass the custom "Couple." description
+                showResult(finalResult, matchPercentage, commonCount * 2, isSpecialCouple ? "Couple." : null);
             }, "+=1.5");
         }
 
-        function showResult(resultCode, percentage, nodes) {
+        // Updated to accept custom descriptions
+        function showResult(resultCode, percentage, nodes, customDesc) {
             document.getElementById('res-letter').innerText = resultCode;
             document.getElementById('res-word').innerText = flamesMap[resultCode];
             
@@ -352,9 +380,14 @@
 
             document.getElementById('res-nodes').innerText = nodes;
 
-            let descArray = descriptions[resultCode];
-            let randomDesc = descArray[Math.floor(Math.random() * descArray.length)];
-            document.getElementById('res-desc').innerText = `"${randomDesc}"`;
+            // Output Description
+            if (customDesc) {
+                document.getElementById('res-desc').innerText = `"${customDesc}"`;
+            } else {
+                let descArray = descriptions[resultCode];
+                let randomDesc = descArray[Math.floor(Math.random() * descArray.length)];
+                document.getElementById('res-desc').innerText = `"${randomDesc}"`;
+            }
 
             switchView('view-result');
         }
@@ -374,20 +407,16 @@
             
             const tl = gsap.timeline();
 
-            // 1. Initial Pause
             tl.to({}, {duration: 1.0});
 
-            // 2. Swipe Card Away
             tl.to('#main-card', {
                 x: "-120vw", rotationZ: -15, scale: 0.8,
                 opacity: 0, duration: 0.8, ease: "power3.in"
             });
 
-            // 3. Complete System Blackout
             tl.to(['.ambient-orb', '.nav', '.noise-overlay'], { opacity: 0, duration: 0.5 }, "-=0.3");
             tl.to('body', { backgroundColor: "#000000", duration: 0.5 }, "-=0.5");
 
-            // 4. Generate Soft, Falling Orbs
             tl.add(() => {
                 const starContainer = document.createElement('div');
                 starContainer.id = 'starfield';
@@ -397,7 +426,6 @@
                 for(let i = 0; i < 120; i++) {
                     let star = document.createElement('div');
                     
-                    // Creates perfect soft circles
                     let size = Math.random() * 3 + 1.5; 
                     let color = Math.random() > 0.7 ? 'var(--accent-gold)' : '#ffffff'; 
                     let shadowBlur = size * 3;
@@ -410,17 +438,15 @@
                     star.style.cssText = `position:absolute;width:${size}px;height:${size}px;background:${color};border-radius:50%;top:${startY};left:${startX};opacity:0;box-shadow:0 0 ${shadowBlur}px ${color}, 0 0 ${shadowBlur * 2}px ${color};`;
                     starContainer.appendChild(star);
                     
-                    // Gentle falling animation
                     gsap.to(star, {
-                        top: "110vh", // Float past the bottom
-                        left: `+=${(Math.random() - 0.5) * 20}vw`, // Subtle horizontal sway
-                        duration: Math.random() * 3 + 3, // 3 to 6 seconds (slow & dreamy)
-                        delay: Math.random() * 2, // Staggered entry
+                        top: "110vh", 
+                        left: `+=${(Math.random() - 0.5) * 20}vw`, 
+                        duration: Math.random() * 3 + 3, 
+                        delay: Math.random() * 2, 
                         ease: "none",
                         repeat: -1 
                     });
 
-                    // Soft twinkling opacity
                     gsap.to(star, {
                         opacity: Math.random() * 0.7 + 0.3,
                         duration: Math.random() * 1 + 0.5,
@@ -431,13 +457,10 @@
                 }
             });
 
-            // 5. Watch the stars fall
             tl.to({}, {duration: 5.0});
 
-            // 6. Fade to white portal transition
             tl.to('body', { backgroundColor: "#ffffff", opacity: 0, duration: 1.5, ease: "power2.in" });
 
-            // 7. Instant Redirect
             tl.add(() => {
                 window.location.href = "https://www.instagram.com/p/DJAGP16zWwv/?igsh=a2EzNXpnbzc5bnFo";
             }, "+=0.1");
