@@ -5,12 +5,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-<title>10 Second Challenge - Test you're precision | F1 Reflex Game </title>
-<meta name="description" content="Test your reflexes with this 10-millisecond blind reaction time test. Stop the timer exactly at 10 seconds and see if you have the reaction speed of an F1 driver.">
-<meta name="keywords" content="reaction time test, 10 millisecond timer game, reflex test, f1 reaction time, stopwatch game">
+<title>10,000 Millisecond Challenge - Test your precision | F1 Reflex Game </title>
+<meta name="description" content="Test your reflexes with this blind reaction time test. Stop the timer exactly at 10,000 milliseconds and see if you have the reaction speed of an F1 driver.">
+<meta name="keywords" content="reaction time test, 10000 millisecond timer game, reflex test, f1 reaction time, stopwatch game">
 
-<meta property="og:title" content="10 Second Challenge">
-<meta property="og:description" content="Can you stop the clock exactly at 10.000 milliseconds? Test your reflexes against F1 driver benchmarks.">
+<meta property="og:title" content="10,000 Millisecond Challenge">
+<meta property="og:description" content="Can you stop the clock exactly at 10,000 milliseconds? Test your reflexes against F1 driver benchmarks.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://nithan.in/reaction-time-test">
 
@@ -18,8 +18,8 @@
 {
   "@context": "https://schema.org",
   "@type": "VideoGame",
-  "name": "10 Second Challenge",
-  "description": "A browser-based reaction time and internal clock test. Players must stop the blind timer exactly at 10.000 milliseconds to test their reflexes against Formula 1 driver benchmarks.",
+  "name": "10,000 Millisecond Challenge",
+  "description": "A browser-based reaction time and internal clock test. Players must stop the blind timer exactly at 10,000 milliseconds to test their reflexes against Formula 1 driver benchmarks.",
   "genre": "Action, Reflex Game",
   "playMode": "SinglePlayer",
   "applicationCategory": "Browser Game",
@@ -53,7 +53,6 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    /* MOBILE FIX: Dynamic viewport height and safe scrolling */
     min-height: 100dvh; 
     margin: 0;
     padding: 20px 0;
@@ -62,20 +61,18 @@
     touch-action: manipulation;
   }
 
-  /* CRT Screen Curvature Effect */
   body::after {
     content: " ";
     display: block;
-    position: fixed; /* Fixed so it stays over the screen even if scrolling */
+    position: fixed; 
     top: 0; left: 0; bottom: 0; right: 0;
     background: radial-gradient(circle, rgba(0,0,0,0) 60%, rgba(0,0,0,0.8) 100%);
     pointer-events: none;
     z-index: 50;
   }
 
-  /* Moving CRT Scanlines */
   .scanlines {
-    position: fixed; /* Fixed to cover whole viewport */
+    position: fixed; 
     inset: 0;
     background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.4) 51%);
     background-size: 100% 4px;
@@ -89,14 +86,13 @@
     100% { background-position: 0 100vh; }
   }
 
-  /* SEO Visible Text Block formatted to fit the aesthetic */
   .seo-header {
     z-index: 20;
     text-align: center;
     max-width: 500px;
     width: 90%;
     margin-bottom: 20px;
-    margin-top: auto; /* Pushes content to center naturally */
+    margin-top: auto; 
   }
 
   .seo-header h1 {
@@ -116,7 +112,6 @@
     letter-spacing: 0.5px;
   }
 
-  /* Cyberpunk Hard-Surface Framing */
   .hud-container {
     z-index: 20;
     width: 90%;
@@ -125,12 +120,11 @@
     padding: 2px;
     background: linear-gradient(45deg, var(--crimson), transparent 20%, transparent 80%, var(--crimson));
     clip-path: polygon(0 20px, 20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%);
-    margin-bottom: auto; /* Pushes content to center naturally */
+    margin-bottom: auto; 
   }
 
   .hud-inner {
     background: rgba(10, 0, 2, 0.95);
-    /* MOBILE FIX: Fluid padding so it doesn't crush narrow screens */
     padding: clamp(20px, 6vw, 30px);
     clip-path: polygon(0 18px, 18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%);
     position: relative;
@@ -171,7 +165,6 @@
   }
 
   .main-time {
-    /* MOBILE FIX: Fluid typography prevents overflow */
     font-size: clamp(2.5rem, 12vw, 3.5rem);
     color: #fff;
     text-shadow: 0 0 15px var(--crimson), 0 0 30px var(--crimson);
@@ -262,20 +255,20 @@
 <div class="scanlines"></div>
 
 <div class="seo-header">
-  <h1>10 Second Challenge</h1>
-  <p>Engage the sequence and halt precisely at 10.000 milliseconds. Test your internal clock against F1 driver reaction benchmarks.</p>
+  <h1>10,000 MS Challenge</h1>
+  <p>Engage the sequence and halt precisely at 10,000 milliseconds. Test your internal clock against F1 driver reaction benchmarks.</p>
 </div>
 
 <div class="hud-container">
   <div class="hud-inner">
     
     <div class="sys-header">
-      <span>Stop exactly at 10.000ms</span>
+      <span>Stop exactly at 10,000ms</span>
       <span><span class="status-dot" id="status-dot"></span> <span id="sys-status">Ready</span></span>
     </div>
 
     <div class="display-module">
-      <div class="main-time" id="main-display">00.000s</div>
+      <div class="main-time" id="main-display">0ms</div>
       <div class="noise-stream" id="noise-stream"></div>
     </div>
 
@@ -302,7 +295,7 @@
   let startTime = 0;
   let isRunning = false;
   let noiseInterval;
-  const targetTime = 10.000;
+  const targetTime = 10000; // Exact target in milliseconds
   
   const displayEl = document.getElementById('main-display');
   const noiseEl = document.getElementById('noise-stream');
@@ -313,40 +306,39 @@
   const profEl = document.getElementById('val-profile');
   const cacheEl = document.getElementById('memory-cache');
 
-  // Haptic feedback for mobile
   const haptic = (pattern) => { if (navigator.vibrate) navigator.vibrate(pattern); };
 
-  // F1 & Humorous Dialogue Matrix
+  // Error is now calculated purely in milliseconds
   const evaluateProfile = (error) => {
-    if (error <= 0.015) return "F1 Robot - Are you a machine?";
-    if (error <= 0.040) return "Valtteri Bottas - Jumped the lights!";
-    if (error <= 0.080) return "Max Verstappen - Absolutely clinical.";
-    if (error <= 0.120) return "Carlos Sainz - Smooth operator.";
-    if (error <= 0.180) return "Lewis Hamilton - Still got it, Champ.";
-    if (error <= 0.250) return "Charles Leclerc - Solid, but pushing it.";
-    if (error <= 0.350) return "Fernando Alonso - Veteran instincts.";
-    if (error <= 0.500) return "Yuki Tsunoda - Yelling on the team radio.";
-    if (error <= 0.750) return "Lance Stroll - Did you check your mirrors?";
-    if (error < 1.000) return "Safety Car Driver - Taking in the scenery.";
-    if (error < 2.000) return "Pit Lane Penalty - 5 Seconds to Ocon.";
-    if (error < 3.000) return "Ferrari Pit Wall - 'We are checking...'";
-    if (error < 4.000) return "Bono, my tires are gone!";
-    if (error < 5.000) return "Haas Upgrades - Still loading...";
-    if (error < 6.000) return "Kimi Räikkönen - 'Leave me alone!'";
-    if (error < 7.000) return "Red Bull Catering - Distracted by the buffet.";
-    if (error < 8.000) return "Monaco Hairpin - Stuck in traffic.";
-    if (error < 9.000) return "Daniel Ricciardo - Smiling in last place.";
-    if (error < 10.000) return "Alpine Management - Complete collapse.";
-    if (error < 11.000) return "Did you even see the lights go out?";
-    if (error < 12.000) return "Valtteri's Monaco Pitstop - Still taking the tire off.";
-    if (error < 13.000) return "Internet Explorer pacing.";
-    if (error < 14.000) return "Grandpa on a Sunday drive.";
-    if (error < 15.000) return "VSC Deployed - Way too slow.";
-    if (error < 16.000) return "Blue Flags! Let the leaders pass.";
-    if (error < 17.000) return "You fell asleep at the wheel. Wake up!";
-    if (error < 18.000) return "Are we still racing? Fans went home.";
-    if (error < 19.000) return "You missed the entire Grand Prix.";
-    if (error < 20.000) return "Engine failure on the formation lap.";
+    if (error <= 15) return "F1 Robot - Are you a machine?";
+    if (error <= 40) return "Valtteri Bottas - Jumped the lights!";
+    if (error <= 80) return "Max Verstappen - Absolutely clinical.";
+    if (error <= 120) return "Carlos Sainz - Smooth operator.";
+    if (error <= 180) return "Lewis Hamilton - Still got it, Champ.";
+    if (error <= 250) return "Charles Leclerc - Solid, but pushing it.";
+    if (error <= 350) return "Fernando Alonso - Veteran instincts.";
+    if (error <= 500) return "Yuki Tsunoda - Yelling on the team radio.";
+    if (error <= 750) return "Lance Stroll - Did you check your mirrors?";
+    if (error < 1000) return "Safety Car Driver - Taking in the scenery.";
+    if (error < 2000) return "Pit Lane Penalty - 5 Seconds to Ocon.";
+    if (error < 3000) return "Ferrari Pit Wall - 'We are checking...'";
+    if (error < 4000) return "Bono, my tires are gone!";
+    if (error < 5000) return "Haas Upgrades - Still loading...";
+    if (error < 6000) return "Kimi Räikkönen - 'Leave me alone!'";
+    if (error < 7000) return "Red Bull Catering - Distracted by the buffet.";
+    if (error < 8000) return "Monaco Hairpin - Stuck in traffic.";
+    if (error < 9000) return "Daniel Ricciardo - Smiling in last place.";
+    if (error < 10000) return "Alpine Management - Complete collapse.";
+    if (error < 11000) return "Did you even see the lights go out?";
+    if (error < 12000) return "Valtteri's Monaco Pitstop - Still taking the tire off.";
+    if (error < 13000) return "Internet Explorer pacing.";
+    if (error < 14000) return "Grandpa on a Sunday drive.";
+    if (error < 15000) return "VSC Deployed - Way too slow.";
+    if (error < 16000) return "Blue Flags! Let the leaders pass.";
+    if (error < 17000) return "You fell asleep at the wheel. Wake up!";
+    if (error < 18000) return "Are we still racing? Fans went home.";
+    if (error < 19000) return "You missed the entire Grand Prix.";
+    if (error < 20000) return "Engine failure on the formation lap.";
     return "Sir, this is a Wendy's. The race finished yesterday.";
   };
 
@@ -357,20 +349,20 @@
   };
 
   const renderCache = () => {
-    const memory = JSON.parse(localStorage.getItem('sys_chrono_memory') || '[]');
+    const memory = JSON.parse(localStorage.getItem('sys_chrono_memory_ms') || '[]');
     if(!memory.length) { cacheEl.innerHTML = "<li><span>No Data Yet</span></li>"; return; }
     
     cacheEl.innerHTML = memory.map((entry, index) => {
       const isNew = index === 0 ? "style='color: var(--alert);'" : "";
-      return `<li ${isNew}><span>${entry.time}s</span><span>±${entry.errMs}ms</span></li>`;
+      return `<li ${isNew}><span>${entry.time}ms</span><span>±${entry.errMs}ms</span></li>`;
     }).join('');
   };
 
   const logToMemory = (time, errMs) => {
-    const memory = JSON.parse(localStorage.getItem('sys_chrono_memory') || '[]');
+    const memory = JSON.parse(localStorage.getItem('sys_chrono_memory_ms') || '[]');
     memory.unshift({ time, errMs });
     if (memory.length > 5) memory.pop();
-    localStorage.setItem('sys_chrono_memory', JSON.stringify(memory));
+    localStorage.setItem('sys_chrono_memory_ms', JSON.stringify(memory));
     renderCache();
   };
 
@@ -409,20 +401,18 @@
     dotEl.style.backgroundColor = "var(--crimson)";
     dotEl.style.boxShadow = "0 0 10px var(--crimson)";
 
-    const elapsed = (endTime - startTime) / 1000;
+    // Calculation done directly in whole milliseconds
+    const elapsed = endTime - startTime; 
     const deviation = Math.abs(elapsed - targetTime); 
-    
-    const timeStr = elapsed.toFixed(3);
-    const devMs = Math.round(deviation * 1000); 
 
     noiseEl.style.display = "none";
     displayEl.style.display = "block";
     
-    displayEl.textContent = `${timeStr}s`;
-    devEl.textContent = `± ${devMs}ms`;
+    displayEl.textContent = `${elapsed}ms`;
+    devEl.textContent = `± ${deviation}ms`;
     profEl.textContent = evaluateProfile(deviation);
 
-    logToMemory(timeStr, devMs);
+    logToMemory(elapsed, deviation);
   };
 
   btnEl.addEventListener('click', () => isRunning ? terminateSequence() : initiateSequence());
