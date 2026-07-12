@@ -2,399 +2,800 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Shattered Book | V3</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Post-Shatter 3D Interactive Portfolio</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Inter:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
     <style>
+        /* ==========================================
+           CSS RESET & BASE STYLES
+           ========================================== */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg-color: #050505;
+            --text-color: #f4f4f4;
+            --accent-color: #d4af37;
+        }
+
         body, html {
-            margin: 0; padding: 0; overflow-x: hidden;
-            background-color: #0d0d0d; color: white;
-            cursor: default; /* Will change dynamically */
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            overscroll-behavior: none;
+            cursor: none; /* Custom cursor used */
         }
-        #webgl-canvas {
-            position: fixed; top: 0; left: 0;
-            width: 100vw; height: 100vh; z-index: 1;
+
+        /* ==========================================
+           WEBGL & SCROLL CONTAINERS
+           ========================================== */
+        #webgl-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+            pointer-events: none; /* Let scroll events pass through */
         }
-        #scroll-container {
-            position: absolute; top: 0; left: 0;
-            width: 100%; height: 700vh; z-index: 2;
+
+        /* The scroll proxy area - sets the total scrollable height */
+        #scroll-proxy {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 1200vh; /* Massive scroll area for pacing */
+            z-index: 2;
+        }
+
+        /* ==========================================
+           UI OVERLAY
+           ========================================== */
+        #ui-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
             pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 2rem;
+            mix-blend-mode: difference;
         }
-        .ui-layer {
-            position: fixed; top: 50%; left: 50%;
-            transform: translate(-50%, -50%); z-index: 10;
-            text-align: center; pointer-events: none;
-            transition: opacity 1s ease; font-family: 'Playfair Display', serif;
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'Cinzel', serif;
+            letter-spacing: 2px;
+            text-transform: uppercase;
         }
-        h1 { font-size: 3.5rem; font-weight: 700; margin-bottom: 5px; text-shadow: 0 4px 20px rgba(0,0,0,0.5); }
-        p { font-family: 'Inter', sans-serif; font-weight: 300; letter-spacing: 3px; opacity: 0.7; }
-        
+
+        .logo { font-size: 1.2rem; font-weight: 600; }
+        .nav-info { font-size: 0.8rem; opacity: 0.7; }
+
+        .scroll-indicator {
+            align-self: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.7rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            opacity: 0.6;
+        }
+
+        .mouse-icon {
+            width: 20px;
+            height: 30px;
+            border: 1px solid white;
+            border-radius: 15px;
+            position: relative;
+        }
+
+        .wheel {
+            width: 2px;
+            height: 6px;
+            background: white;
+            position: absolute;
+            top: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+            animation: scroll 2s infinite cubic-bezier(0.15, 0.41, 0.69, 0.94);
+        }
+
+        @keyframes scroll {
+            0% { opacity: 1; transform: translate(-50%, 0); }
+            100% { opacity: 0; transform: translate(-50%, 15px); }
+        }
+
+        /* ==========================================
+           LOADING SCREEN
+           ========================================== */
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-color);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 1s cubic-bezier(0.77, 0, 0.175, 1);
+        }
+
+        .loader-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            font-style: italic;
+            letter-spacing: 1px;
+        }
+
         .progress-bar {
-            position: fixed; top: 0; left: 0; height: 4px; background: #fff;
-            width: 0%; z-index: 20; transition: width 0.1s;
+            width: 200px;
+            height: 2px;
+            background: rgba(255,255,255,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0%;
+            background: var(--text-color);
+            transition: width 0.1s ease;
+        }
+
+        /* ==========================================
+           CUSTOM CURSOR
+           ========================================== */
+        .cursor-dot {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 6px;
+            height: 6px;
+            background: white;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10000;
+            transform: translate(-50%, -50%);
+        }
+
+        .cursor-outline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 40px;
+            height: 40px;
+            border: 1px solid rgba(255,255,255,0.5);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: width 0.2s, height 0.2s;
         }
     </style>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
 </head>
 <body>
 
-    <div class="progress-bar" id="progress"></div>
-    <canvas id="webgl-canvas"></canvas>
-    <div id="scroll-container"></div>
-    <div class="ui-layer" id="intro-text">
-        <h1>Creative Developer</h1>
-        <p>SCROLL TO EXPLORE</p>
+    <div id="loader">
+        <div class="loader-text">Curating Experience</div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+        </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <div class="cursor-dot" id="cursor-dot"></div>
+    <div class="cursor-outline" id="cursor-outline"></div>
 
-    <script>
+    <div id="ui-layer">
+        <header>
+            <div class="logo">Studio Void</div>
+            <div class="nav-info">WebGL Masterpiece Portfolio</div>
+        </header>
+        <div class="scroll-indicator">
+            <span>Discover</span>
+            <div class="mouse-icon"><div class="wheel"></div></div>
+        </div>
+    </div>
+
+    <div id="webgl-container"></div>
+    
+    <div id="scroll-proxy"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.4/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.4/ScrollTrigger.min.js"></script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+        import { FilmPass } from 'three/addons/postprocessing/FilmPass.js';
+
+        /* =====================================================================
+           PART 1: ARCHITECTURE & STATE
+           ===================================================================== */
+        
+        // Register GSAP plugins
         gsap.registerPlugin(ScrollTrigger);
 
-        // --- 1. ENGINE SETUP ---
-        const canvas = document.querySelector('#webgl-canvas');
-        const scene = new THREE.Scene();
-        scene.fog = new THREE.FogExp2(0x0d0d0d, 0.015);
+        const CONFIG = {
+            pages: 7, // Total pages (including covers)
+            pageWidth: 5,
+            pageHeight: 7,
+            pageSegments: 32, // High res for bending
+            textureWidth: 1024,
+            textureHeight: 1433,
+            bookDepth: 0.5,
+            cameraZ: 14, // How far the camera is
+            readZ: 8     // The Z-coordinate when a page is in the center screen for reading
+        };
 
-        const isMobile = window.innerWidth < 768;
-        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 0, isMobile ? 24 : 16);
+        const STATE = {
+            loaded: false,
+            pointer: new THREE.Vector2(),
+            targetPointer: new THREE.Vector2(),
+            windowWidth: window.innerWidth,
+            windowHeight: window.innerHeight
+        };
 
-        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        // Data for the procedural canvas layout generator
+        // Using high-end Unsplash URLs
+        const PAGE_DATA = [
+            { type: 'cover', title: 'PORTFOLIO', subtitle: 'VOL. I' },
+            { type: 'manifesto', title: 'THE VISION', body: 'Design is not just what it looks like and feels like. Design is how it works. In a sea of digital noise, we strive to create calm, functional, and aesthetically uncompromising interactive experiences.', img: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?q=80&w=1000' },
+            { type: 'project', title: 'AURAL', category: 'Sound Design', body: 'A study in acoustic architecture and digital frequency visualization.', img: 'https://images.unsplash.com/photo-1507146426996-ef05306b995a?q=80&w=1000' },
+            { type: 'project', title: 'LUMEN', category: 'Photography', body: 'Capturing the interplay of stark shadows and brutalist structures.', img: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1000' },
+            { type: 'project', title: 'NEXUS', category: 'Web App', body: 'A seamless, editorial-driven e-commerce platform for high-end fashion.', img: 'https://images.unsplash.com/photo-1449247709967-d4461a6a6103?q=80&w=1000' },
+            { type: 'project', title: 'VOID', category: 'Experiential', body: 'Embracing emptiness as a primary design canvas.', img: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000' },
+            { type: 'back_cover', title: 'END', subtitle: '2026' }
+        ];
 
-        // --- 2. CINEMATIC LIGHTING ---
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
-        scene.add(ambientLight);
-
-        const spotLight = new THREE.SpotLight(0xfff5e6, 1.5);
-        spotLight.position.set(10, 20, 15);
-        spotLight.castShadow = true;
-        spotLight.shadow.mapSize.width = 2048;
-        spotLight.shadow.mapSize.height = 2048;
-        spotLight.shadow.bias = -0.001;
-        scene.add(spotLight);
-
-        const fillLight = new THREE.DirectionalLight(0x4a7cff, 0.5); // Cool blue fill
-        fillLight.position.set(-10, 0, 5);
-        scene.add(fillLight);
-
-        // --- 3. RICH TEXTURE GENERATOR ---
-        function createRichPageTexture(title, text, hasImage, colorHex) {
-            const canvas = document.createElement('canvas');
-            canvas.width = 1024; canvas.height = 1448;
-            const ctx = canvas.getContext('2d');
-
-            // Base Paper
-            ctx.fillStyle = '#f0efe9';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // Subtle border
-            ctx.strokeStyle = '#dcdcc8';
-            ctx.lineWidth = 15;
-            ctx.strokeRect(30, 30, canvas.width - 60, canvas.height - 60);
-
-            // Optional Faux Image (Project Thumbnail)
-            let textStartY = 400;
-            if (hasImage) {
-                ctx.fillStyle = colorHex || '#333';
-                ctx.fillRect(100, 150, canvas.width - 200, 450);
-                
-                // Image frame
-                ctx.strokeStyle = '#fff';
-                ctx.lineWidth = 10;
-                ctx.strokeRect(100, 150, canvas.width - 200, 450);
-                textStartY = 750;
-            }
-
-            // Title
-            ctx.fillStyle = '#111';
-            ctx.textAlign = 'center';
-            ctx.font = 'bold 85px "Playfair Display", serif';
-            ctx.fillText(title, canvas.width / 2, textStartY);
-            
-            // Divider
-            ctx.beginPath();
-            ctx.moveTo(350, textStartY + 50); ctx.lineTo(674, textStartY + 50);
-            ctx.lineWidth = 3; ctx.stroke();
-
-            // Body Text
-            ctx.font = '40px "Inter", sans-serif';
-            ctx.fillStyle = '#444';
+        /* =====================================================================
+           PART 2: PROCEDURAL TEXTURE GENERATOR (CANVAS 2D API)
+           ===================================================================== */
+        
+        // Utility to wrap text on Canvas
+        function wrapText(context, text, x, y, maxWidth, lineHeight) {
             const words = text.split(' ');
-            let line = ''; let y = textStartY + 160;
-            
+            let line = '';
+            let currentY = y;
+
             for(let n = 0; n < words.length; n++) {
                 let testLine = line + words[n] + ' ';
-                let metrics = ctx.measureText(testLine);
-                if (metrics.width > 700 && n > 0) {
-                    ctx.fillText(line, canvas.width / 2, y);
+                let metrics = context.measureText(testLine);
+                let testWidth = metrics.width;
+                if (testWidth > maxWidth && n > 0) {
+                    context.fillText(line, x, currentY);
                     line = words[n] + ' ';
-                    y += 65;
-                } else {
+                    currentY += lineHeight;
+                }
+                else {
                     line = testLine;
                 }
             }
-            ctx.fillText(line, canvas.width / 2, y);
-
-            const tex = new THREE.CanvasTexture(canvas);
-            tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
-            return tex;
+            context.fillText(line, x, currentY);
+            return currentY + lineHeight;
         }
 
-        // --- 4. BOOK ARCHITECTURE ---
+        // Cache images to avoid CORS re-fetching
+        const imageCache = {};
+        async function loadImage(url) {
+            if (imageCache[url]) return imageCache[url];
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = "Anonymous"; // CRITICAL for WebGL
+                img.onload = () => { imageCache[url] = img; resolve(img); };
+                img.onerror = () => reject(new Error(`Failed to load ${url}`));
+                img.src = url;
+            });
+        }
+
+        async function createPageTexture(data, index) {
+            const canvas = document.createElement('canvas');
+            canvas.width = CONFIG.textureWidth;
+            canvas.height = CONFIG.textureHeight;
+            const ctx = canvas.getContext('2d');
+
+            // Base paper color (off-white/cream)
+            ctx.fillStyle = (data.type === 'cover' || data.type === 'back_cover') ? '#1a1a1a' : '#f0ece1';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Add procedural noise/grain to paper
+            const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const pixels = imgData.data;
+            for (let i = 0; i < pixels.length; i += 4) {
+                const noise = (Math.random() - 0.5) * 15;
+                pixels[i] = Math.max(0, Math.min(255, pixels[i] + noise));
+                pixels[i+1] = Math.max(0, Math.min(255, pixels[i+1] + noise));
+                pixels[i+2] = Math.max(0, Math.min(255, pixels[i+2] + noise));
+            }
+            ctx.putImageData(imgData, 0, 0);
+
+            // Draw based on page type
+            if (data.type === 'cover' || data.type === 'back_cover') {
+                ctx.fillStyle = '#d4af37'; // Gold foil accent
+                ctx.textAlign = 'center';
+                
+                // Border
+                ctx.strokeStyle = '#d4af37';
+                ctx.lineWidth = 4;
+                ctx.strokeRect(50, 50, canvas.width - 100, canvas.height - 100);
+                
+                ctx.font = '800 100px "Cinzel"';
+                ctx.fillText(data.title, canvas.width / 2, canvas.height / 2);
+                
+                ctx.font = '400 30px "Inter"';
+                ctx.letterSpacing = '10px';
+                ctx.fillText(data.subtitle, canvas.width / 2, canvas.height / 2 + 100);
+            } 
+            else if (data.type === 'manifesto') {
+                ctx.fillStyle = '#111';
+                ctx.textAlign = 'left';
+                
+                ctx.font = '700 80px "Playfair Display"';
+                ctx.fillText(data.title, 100, 200);
+
+                ctx.font = '300 40px "Inter"';
+                wrapText(ctx, data.body, 100, 350, canvas.width - 200, 60);
+
+                if (data.img) {
+                    try {
+                        const img = await loadImage(data.img);
+                        // Draw grayscale high-contrast
+                        ctx.filter = 'grayscale(100%) contrast(120%)';
+                        ctx.drawImage(img, 100, canvas.height - 600, canvas.width - 200, 500);
+                        ctx.filter = 'none';
+                    } catch(e) { console.warn(e); }
+                }
+                
+                // Page Number
+                ctx.font = '400 24px "Inter"';
+                ctx.fillText(`0${index}`, canvas.width - 120, canvas.height - 80);
+            }
+            else if (data.type === 'project') {
+                // Polaroid / Magazine layout
+                if (data.img) {
+                    try {
+                        const img = await loadImage(data.img);
+                        ctx.drawImage(img, 80, 80, canvas.width - 160, canvas.height * 0.55);
+                    } catch(e) { console.warn(e); }
+                }
+
+                ctx.fillStyle = '#111';
+                ctx.textAlign = 'left';
+                
+                ctx.font = '600 24px "Inter"';
+                ctx.fillText(data.category.toUpperCase(), 80, canvas.height * 0.55 + 140);
+
+                ctx.font = 'italic 700 90px "Playfair Display"';
+                ctx.fillText(data.title, 80, canvas.height * 0.55 + 230);
+
+                ctx.font = '300 32px "Inter"';
+                wrapText(ctx, data.body, 80, canvas.height * 0.55 + 300, canvas.width - 160, 48);
+
+                // Page Number
+                ctx.font = '400 24px "Inter"';
+                ctx.fillText(`0${index}`, canvas.width - 120, canvas.height - 80);
+            }
+
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.colorSpace = THREE.SRGBColorSpace;
+            texture.anisotropy = 16;
+            return texture;
+        }
+
+        /* =====================================================================
+           PART 3: THREE.JS SCENE SETUP
+           ===================================================================== */
+        
+        const container = document.getElementById('webgl-container');
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x050505, 0.02);
+
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 0, CONFIG.cameraZ);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Optimize performance
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        container.appendChild(renderer.domElement);
+
+        // Lighting (Cinematic Studio Setup)
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+
+        const spotLight = new THREE.SpotLight(0xfff0dd, 5);
+        spotLight.position.set(10, 15, 10);
+        spotLight.angle = Math.PI / 4;
+        spotLight.penumbra = 0.5;
+        spotLight.castShadow = true;
+        spotLight.shadow.mapSize.width = 2048;
+        spotLight.shadow.mapSize.height = 2048;
+        scene.add(spotLight);
+
+        const fillLight = new THREE.DirectionalLight(0xaabbff, 1.5);
+        fillLight.position.set(-10, -5, 10);
+        scene.add(fillLight);
+
+        /* =====================================================================
+           PART 4: POST-PROCESSING
+           ===================================================================== */
+        
+        const renderScene = new RenderPass(scene, camera);
+        
+        const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.3, 0.1, 0.8);
+        bloomPass.threshold = 0.2;
+        bloomPass.strength = 0.6; // High-end soft glow
+        bloomPass.radius = 0.5;
+
+        const filmPass = new FilmPass(0.35, 0.025, 648, false); // Grain
+
+        const composer = new EffectComposer(renderer);
+        composer.addPass(renderScene);
+        composer.addPass(bloomPass);
+        composer.addPass(filmPass);
+
+        /* =====================================================================
+           PART 5: MESH GENERATION (THE BOOK & PAGES)
+           ===================================================================== */
+        
         const bookGroup = new THREE.Group();
         scene.add(bookGroup);
-
-        const bW = 5.5, bH = 7.5, bD = 0.6;
-        const pivotX = -bW / 2; 
-
-        // Cover
-        const coverMat = new THREE.MeshStandardMaterial({ color: 0x151515, roughness: 0.6 });
-        const coverGeo = new THREE.BoxGeometry(bW, bH + 0.3, 0.15);
-        const coverMesh = new THREE.Mesh(coverGeo, coverMat);
-        coverMesh.position.x = bW / 2;
-        coverMesh.castShadow = true;
         
-        const coverPivot = new THREE.Group();
-        coverPivot.position.set(pivotX, 0, bD/2);
-        coverPivot.add(coverMesh);
-        bookGroup.add(coverPivot);
-
-        // Spine
-        const spineGeo = new THREE.BoxGeometry(0.3, bH + 0.3, bD + 0.3);
-        const spineMesh = new THREE.Mesh(spineGeo, coverMat);
-        spineMesh.position.set(pivotX, 0, 0);
-        spineMesh.castShadow = true;
-        bookGroup.add(spineMesh);
-
-        // Portfolio Data
-        const portfolioData = [
-            { title: "THE BEGINNING", text: "I blend code and design to create immersive digital experiences. Every pixel is intentional. Every animation is governed by physics.", img: false },
-            { title: "PROJECT ZERO", text: "An award-winning WebGL data visualization platform. Rendered 500,000 particles at 60FPS using custom GLSL compute shaders.", img: true, color: '#1a365d' },
-            { title: "PROJECT ECHO", text: "A physics-based e-commerce storefront. We threw away standard scrolling and replaced it with a tactile, drag-and-drop 3D space.", img: true, color: '#7b341e' },
-            { title: "SKILLS", text: "TypeScript • Three.js • React • GSAP • WebGL • Node.js • Creative Direction • UI/UX Design • 3D Modeling.", img: false }
-        ];
-
-        const pagePivots = [];
-        const pageMeshes = [];
+        // We need an array to hold the page groups for individual control later
+        const pageGroups = [];
         
-        // Wait for fonts
-        document.fonts.ready.then(() => {
-            portfolioData.forEach((data, i) => {
-                const pageMat = new THREE.MeshStandardMaterial({ 
-                    map: createRichPageTexture(data.title, data.text, data.img, data.color),
-                    roughness: 0.8, side: THREE.DoubleSide
+        // Common geometries
+        const pageGeometry = new THREE.PlaneGeometry(CONFIG.pageWidth, CONFIG.pageHeight, CONFIG.pageSegments, CONFIG.pageSegments);
+        const coverGeometry = new THREE.BoxGeometry(CONFIG.pageWidth, CONFIG.pageHeight, 0.1);
+
+        // Materials (Base materials, textures applied after loading)
+        const defaultMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, side: THREE.DoubleSide, roughness: 0.8 });
+        
+        async function buildBook() {
+            for (let i = 0; i < CONFIG.pages; i++) {
+                // Each page needs a pivot point at its left edge to act like a spine
+                const pivot = new THREE.Group();
+                // Position pivot initially at center, we will shift it
+                
+                let mesh;
+                if (i === 0 || i === CONFIG.pages - 1) {
+                    // Cover
+                    mesh = new THREE.Mesh(coverGeometry, defaultMaterial.clone());
+                    // Shift mesh so its left edge is at x=0 relative to pivot
+                    mesh.position.set(CONFIG.pageWidth / 2, 0, 0); 
+                } else {
+                    // Inside Page
+                    mesh = new THREE.Mesh(pageGeometry, defaultMaterial.clone());
+                    mesh.position.set(CONFIG.pageWidth / 2, 0, 0);
+                    mesh.castShadow = true;
+                    mesh.receiveShadow = true;
+                }
+
+                // Small Z offset to prevent Z-fighting when closed
+                const zOffset = (i - CONFIG.pages / 2) * -0.05;
+                pivot.position.set(-CONFIG.pageWidth / 2, 0, zOffset); // Move entire pivot left
+
+                pivot.add(mesh);
+                bookGroup.add(pivot);
+                pageGroups.push(pivot);
+
+                // Start loading texture concurrently
+                createPageTexture(PAGE_DATA[i], i).then(texture => {
+                    if (mesh.geometry.type === 'BoxGeometry') {
+                        const materials = [
+                            defaultMaterial, defaultMaterial, defaultMaterial, defaultMaterial,
+                            new THREE.MeshStandardMaterial({ map: texture, roughness: 0.4, metalness: 0.1 }), // Front
+                            defaultMaterial // Back
+                        ];
+                        mesh.material = materials;
+                    } else {
+                        mesh.material = new THREE.MeshStandardMaterial({ 
+                            map: texture, 
+                            side: THREE.DoubleSide,
+                            roughness: 0.9 
+                        });
+                    }
+                    updateProgress(i + 1, CONFIG.pages);
                 });
+            }
+            
+            // Adjust Book Group position to center it
+            bookGroup.rotation.y = -Math.PI / 8; // Angled slightly for depth
+            bookGroup.rotation.x = Math.PI / 12;
+        }
+
+        /* =====================================================================
+           PART 6: LOADING MANAGER
+           ===================================================================== */
+        
+        const progressBar = document.getElementById('progress-fill');
+        const loaderUI = document.getElementById('loader');
+        
+        function updateProgress(current, total) {
+            const percent = (current / total) * 100;
+            progressBar.style.width = percent + '%';
+            
+            if (current === total) {
+                setTimeout(() => {
+                    loaderUI.style.opacity = '0';
+                    setTimeout(() => {
+                        loaderUI.style.display = 'none';
+                        initAnimations(); // Start ScrollTrigger only after load
+                        STATE.loaded = true;
+                    }, 1000);
+                }, 800);
+            }
+        }
+
+        /* =====================================================================
+           PART 7: GSAP SCROLL & SHATTER LOGIC (THE MASTERPIECE)
+           ===================================================================== */
+        
+        function initAnimations() {
+            // Main Timeline tied to the scroll proxy
+            const tl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: "#scroll-proxy",
+                    start: "top top",
+                    end: "bottom bottom",
+                    scrub: 1.5, // Smooth, premium easing on scrub
+                }
+            });
+
+            // PHASE 1: 0% - 30% -> Book interaction (rotate, fan pages slightly)
+            tl.to(bookGroup.rotation, {
+                y: Math.PI / 6,
+                x: 0,
+                duration: 2,
+                ease: "power2.inOut"
+            }, 0);
+            
+            tl.to(bookGroup.position, {
+                z: 2, // Move closer
+                duration: 2,
+                ease: "power2.inOut"
+            }, 0);
+
+            // Fan out pages slightly
+            pageGroups.forEach((page, i) => {
+                if(i !== 0 && i !== CONFIG.pages - 1) {
+                    tl.to(page.rotation, {
+                        y: -Math.PI / (12 + i * 2),
+                        duration: 2,
+                        ease: "power2.inOut"
+                    }, 0);
+                }
+            });
+
+            // PHASE 2: 30% - 50% -> THE SHATTER
+            // Book explodes into the void
+            const shatterDuration = 3;
+            const shatterStartTime = 2; // Starts at timeline time 2
+
+            // Background dims
+            tl.to(scene.fog, { density: 0.05, duration: shatterDuration, ease: "power2.inOut" }, shatterStartTime);
+            
+            // Randomize scattered positions
+            const scatterData = [];
+            pageGroups.forEach((page, i) => {
+                const rx = (Math.random() - 0.5) * 15;
+                const ry = (Math.random() - 0.5) * 15;
+                const rz = -15 + (Math.random() - 0.5) * 10;
                 
-                const pageGeo = new THREE.BoxGeometry(bW - 0.2, bH - 0.1, 0.02);
-                const pageMesh = new THREE.Mesh(pageGeo, pageMat);
-                pageMesh.position.x = (bW - 0.2) / 2;
-                pageMesh.castShadow = true;
-                pageMesh.receiveShadow = true;
+                const rotX = Math.random() * Math.PI;
+                const rotY = Math.random() * Math.PI;
+                const rotZ = Math.random() * Math.PI;
+
+                scatterData.push({ x: rx, y: ry, z: rz, rotX, rotY, rotZ });
+
+                tl.to(page.position, {
+                    x: rx, y: ry, z: rz,
+                    duration: shatterDuration,
+                    ease: "expo.out" // Explosive easing
+                }, shatterStartTime);
+
+                tl.to(page.rotation, {
+                    x: rotX, y: rotY, z: rotZ,
+                    duration: shatterDuration,
+                    ease: "expo.out"
+                }, shatterStartTime);
                 
-                // Store original local transforms for re-assembly
-                pageMesh.userData = {
-                    originalPos: pageMesh.position.clone(),
-                    originalRot: pageMesh.rotation.clone(),
-                    isHovered: false
-                };
+                // Reset internal mesh position (remove spine offset)
+                const mesh = page.children[0];
+                tl.to(mesh.position, {
+                    x: 0, y: 0, z: 0,
+                    duration: shatterDuration,
+                    ease: "expo.out"
+                }, shatterStartTime);
+            });
+
+            // PHASE 3: 50% - 100% -> SEQUENTIAL FOCUS
+            // Bring each page to the center, readable, then push back.
+            const sequenceStartTime = shatterStartTime + shatterDuration; // Time = 5
+            const readDuration = 2; // How long it stays in center relative to timeline
+            const transitionDuration = 1.5;
+
+            pageGroups.forEach((page, i) => {
+                const stepStart = sequenceStartTime + (i * (readDuration + transitionDuration));
                 
-                const pagePivot = new THREE.Group();
-                pagePivot.position.set(pivotX + 0.15, 0, (bD/2) - 0.15 - (i * 0.12)); 
-                pagePivot.add(pageMesh);
-                bookGroup.add(pagePivot);
+                // Fly IN to center screen
+                tl.to(page.position, {
+                    x: 0,
+                    y: 0,
+                    z: CONFIG.readZ, // Bring close to camera
+                    duration: transitionDuration,
+                    ease: "power3.inOut" // Premium smooth ease
+                }, stepStart);
+
+                tl.to(page.rotation, {
+                    x: 0,
+                    y: 0,
+                    z: 0, // Face camera perfectly
+                    duration: transitionDuration,
+                    ease: "power3.inOut"
+                }, stepStart);
+
+                // Hold in center (implicit, as next animation starts later)
                 
-                pagePivots.push(pagePivot);
-                pageMeshes.push(pageMesh);
+                // Fly OUT (if not the very last page, or even the last page can fly out)
+                const stepOut = stepStart + transitionDuration + readDuration;
+                if (i < CONFIG.pages - 1) {
+                    tl.to(page.position, {
+                        x: 0,
+                        y: 10, // Fly up and away
+                        z: -5,
+                        duration: transitionDuration,
+                        ease: "power3.in"
+                    }, stepOut);
+                    
+                    tl.to(page.rotation, {
+                        x: Math.PI / 4,
+                        duration: transitionDuration,
+                        ease: "power3.in"
+                    }, stepOut);
+                } else {
+                    // Final page stays, or slowly drifts
+                    tl.to(page.position, {
+                        z: CONFIG.readZ - 1,
+                        duration: transitionDuration + readDuration,
+                        ease: "sine.inOut"
+                    }, stepOut);
+                }
+            });
+        }
+
+        /* =====================================================================
+           PART 8: MOUSE INTERACTION & CURSOR (PARALLAX + UI)
+           ===================================================================== */
+        
+        const cursorDot = document.getElementById('cursor-dot');
+        const cursorOutline = document.getElementById('cursor-outline');
+
+        window.addEventListener('mousemove', (e) => {
+            // Normalized Device Coordinates for Three.js Parallax
+            STATE.targetPointer.x = (e.clientX / STATE.windowWidth) * 2 - 1;
+            STATE.targetPointer.y = -(e.clientY / STATE.windowHeight) * 2 + 1;
+
+            // DOM Cursor updates
+            cursorDot.style.left = `${e.clientX}px`;
+            cursorDot.style.top = `${e.clientY}px`;
+            
+            // Lagging outline
+            cursorOutline.animate({
+                left: `${e.clientX}px`,
+                top: `${e.clientY}px`
+            }, { duration: 500, fill: "forwards", easing: "ease" });
+        });
+
+        // Hover effects for a premium feel
+        document.querySelectorAll('a, button, .mouse-icon').forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                cursorOutline.style.transform = 'translate(-50%, -50%) scale(1.5)';
+                cursorOutline.style.backgroundColor = 'rgba(255,255,255,0.1)';
+            });
+            el.addEventListener('mouseleave', () => {
+                cursorOutline.style.transform = 'translate(-50%, -50%) scale(1)';
+                cursorOutline.style.backgroundColor = 'transparent';
             });
         });
 
-        // Initial book rotation
-        bookGroup.rotation.set(0.3, -0.4, 0);
+        /* =====================================================================
+           PART 9: RESIZE HANDLER (RESPONSIVE CENTERING)
+           ===================================================================== */
+        
+        window.addEventListener('resize', () => {
+            STATE.windowWidth = window.innerWidth;
+            STATE.windowHeight = window.innerHeight;
 
-        // --- 5. MASTER SCROLL TIMELINE & LOGIC ---
-        const tl = gsap.timeline({
-            scrollTrigger: {
-                trigger: "#scroll-container",
-                start: "top top", end: "bottom bottom",
-                scrub: 1.2,
-                onUpdate: (self) => {
-                    document.getElementById('progress').style.width = `${self.progress * 100}%`;
-                    handleScrollEvents(self.progress);
-                }
+            camera.aspect = STATE.windowWidth / STATE.windowHeight;
+            camera.updateProjectionMatrix();
+
+            renderer.setSize(STATE.windowWidth, STATE.windowHeight);
+            composer.setSize(STATE.windowWidth, STATE.windowHeight);
+
+            // Dynamically adjust readZ for mobile to fit the portrait canvas
+            if (STATE.windowWidth < 768) {
+                // Move camera further back conceptually by making readZ lower
+                CONFIG.readZ = 5; 
+            } else {
+                CONFIG.readZ = 8;
             }
-        });
-
-        // 0-10%: Intro
-        tl.to("#intro-text", { opacity: 0, duration: 0.5 }, 0);
-        tl.to(bookGroup.rotation, { x: 0.1, y: -0.1, duration: 1 }, 0);
-        tl.to(camera.position, { z: isMobile ? 18 : 12, duration: 1 }, 0);
-
-        // 10-20%: Open Cover
-        tl.to(coverPivot.rotation, { y: -Math.PI + 0.1, duration: 1, ease: "power2.inOut" }, 1);
-
-        // 20-60%: Turn Pages sequentially
-        tl.to(pagePivots[0]?.rotation || {}, { y: -Math.PI + 0.15, duration: 1, ease: "power2.inOut" }, 2);
-        tl.to(pagePivots[1]?.rotation || {}, { y: -Math.PI + 0.20, duration: 1, ease: "power2.inOut" }, 3);
-        tl.to(pagePivots[2]?.rotation || {}, { y: -Math.PI + 0.25, duration: 1, ease: "power2.inOut" }, 4);
-        tl.to(pagePivots[3]?.rotation || {}, { y: -Math.PI + 0.30, duration: 1, ease: "power2.inOut" }, 5);
-
-        // --- 6. ADVANCED SHATTER & RE-ASSEMBLY ---
-        let isShattered = false;
-
-        function handleScrollEvents(progress) {
-            const shatterPoint = 0.75;
-
-            // Trigger Shatter
-            if (progress > shatterPoint && !isShattered) {
-                isShattered = true;
-                
-                // Dissolve cover and spine
-                gsap.to([coverMesh.material, spineMesh.material], { opacity: 0, transparent: true, duration: 0.5 });
-
-                // Vibrate the camera slightly before explosion
-                gsap.to(camera.position, { x: "+=0.2", y: "+=0.2", yoyo: true, repeat: 5, duration: 0.05, onComplete: () => {
-                    
-                    pageMeshes.forEach((mesh, i) => {
-                        // 1. Detach from pivot, attach to scene space seamlessly
-                        scene.attach(mesh);
-                        
-                        // 2. Animate to gallery formation
-                        const targetX = isMobile ? 0 : (i * 6) - 9;
-                        const targetY = isMobile ? (i * -8.5) + 12 : 0;
-                        const targetZ = isMobile ? -5 : 0;
-
-                        gsap.to(mesh.position, { x: targetX, y: targetY, z: targetZ, duration: 1.5, ease: "expo.out" });
-                        gsap.to(mesh.rotation, { x: 0, y: 0, z: 0, duration: 1.5, ease: "expo.out" });
-                    });
-
-                    // 3. Move camera to view the gallery
-                    gsap.to(camera.position, { x: 0, y: isMobile ? -5 : 0, z: isMobile ? 28 : 22, duration: 2, ease: "power3.out" });
-                }});
-            } 
             
-            // Trigger Re-assembly (Scrolling Back Up)
-            else if (progress <= shatterPoint && isShattered) {
-                isShattered = false;
-                document.body.style.cursor = 'default';
-
-                gsap.to([coverMesh.material, spineMesh.material], { opacity: 1, duration: 1, delay: 0.5 });
-
-                pageMeshes.forEach((mesh, i) => {
-                    // 1. Re-attach to its specific pivot in the book hierarchy
-                    pagePivots[i].attach(mesh);
-                    
-                    // 2. Animate back to its original local position and rotation inside the book
-                    gsap.to(mesh.position, {
-                        x: mesh.userData.originalPos.x,
-                        y: mesh.userData.originalPos.y,
-                        z: mesh.userData.originalPos.z,
-                        duration: 1.5, ease: "power3.inOut"
-                    });
-                    
-                    gsap.to(mesh.rotation, {
-                        x: mesh.userData.originalRot.x,
-                        y: mesh.userData.originalRot.y,
-                        z: mesh.userData.originalRot.z,
-                        duration: 1.5, ease: "power3.inOut"
-                    });
-                });
-
-                // Restore camera to book-view position
-                gsap.to(camera.position, {
-                    x: 0, y: 0, z: isMobile ? 18 : 12, duration: 2, ease: "power3.inOut"
-                });
-            }
-        }
-
-        // --- 7. INTERACTIVITY (Raycasting in Gallery Mode) ---
-        const raycaster = new THREE.Raycaster();
-        const mouse = new THREE.Vector2();
-        let hoveredMesh = null;
-
-        window.addEventListener('mousemove', (event) => {
-            // Normalize mouse coordinates (-1 to +1)
-            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-            if (isShattered) {
-                // Parallax for all pages slightly
-                pageMeshes.forEach(mesh => {
-                    if(!mesh.userData.isHovered) {
-                        gsap.to(mesh.rotation, {
-                            x: mouse.y * 0.1,
-                            y: mouse.x * 0.1,
-                            duration: 1
-                        });
-                    }
-                });
-
-                // Raycast for specific hover
-                raycaster.setFromCamera(mouse, camera);
-                const intersects = raycaster.intersectObjects(pageMeshes);
-
-                if (intersects.length > 0) {
-                    const object = intersects[0].object;
-                    if (hoveredMesh !== object) {
-                        if (hoveredMesh) resetHover(hoveredMesh);
-                        hoveredMesh = object;
-                        hoveredMesh.userData.isHovered = true;
-                        document.body.style.cursor = 'pointer';
-                        
-                        // Bring forward and scale up
-                        gsap.to(hoveredMesh.scale, { x: 1.1, y: 1.1, z: 1.1, duration: 0.4, ease: "back.out(1.5)" });
-                        gsap.to(hoveredMesh.position, { z: "+=2", duration: 0.4, ease: "power2.out" });
-                    }
-                } else if (hoveredMesh) {
-                    resetHover(hoveredMesh);
-                    hoveredMesh = null;
-                    document.body.style.cursor = 'default';
-                }
-            }
+            // Note: Since ScrollTrigger calculates based on timeline, 
+            // a full re-init of GSAP might be required for robust mobile rotation, 
+            // but ScrollTrigger.refresh() handles most proxy resizing perfectly.
+            ScrollTrigger.refresh();
         });
 
-        function resetHover(mesh) {
-            mesh.userData.isHovered = false;
-            gsap.to(mesh.scale, { x: 1, y: 1, z: 1, duration: 0.4 });
-            // Z position gets fixed by the next timeline scrub or parallax update
-            gsap.to(mesh.position, { z: isMobile ? -5 : 0, duration: 0.4 }); 
-        }
-
-        // --- 8. RENDER LOOP ---
+        /* =====================================================================
+           PART 10: RENDER LOOP
+           ===================================================================== */
+        
         const clock = new THREE.Clock();
+
         function animate() {
             requestAnimationFrame(animate);
-            const time = clock.getElapsedTime();
-            
-            // Subtle ambient float in gallery mode
-            if (isShattered && !hoveredMesh) {
-                pageMeshes.forEach((mesh, i) => {
-                    mesh.position.y += Math.sin(time * 2 + i) * 0.003;
-                });
-            }
-            
-            renderer.render(scene, camera);
-        }
-        animate();
 
-        // Responsive handling
-        window.addEventListener('resize', () => {
-            const newIsMobile = window.innerWidth < 768;
-            camera.aspect = window.innerWidth / window.innerHeight;
-            
-            // Only update base camera if book is NOT shattered
-            if(!isShattered) {
-                camera.position.z = newIsMobile ? 24 : 16;
+            const delta = clock.getDelta();
+
+            // Parallax camera movement based on mouse
+            if (STATE.loaded) {
+                // Smoothly interpolate pointer
+                STATE.pointer.x += (STATE.targetPointer.x - STATE.pointer.x) * 0.05;
+                STATE.pointer.y += (STATE.targetPointer.y - STATE.pointer.y) * 0.05;
+
+                // Subtle camera drift
+                camera.position.x = STATE.pointer.x * 0.5;
+                camera.position.y = STATE.pointer.y * 0.5;
+                camera.lookAt(0, 0, 0);
             }
-            
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
+
+            // Render post-processing instead of standard renderer
+            composer.render(delta);
+        }
+
+        // Initialize Everything
+        buildBook();
+        animate();
 
     </script>
 </body>
