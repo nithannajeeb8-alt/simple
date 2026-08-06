@@ -1,329 +1,758 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nithan Najeeb | Portfolio</title>
-    <style>
-        :root {
-            --bg-color: #0a0a0c;
-            --card-bg: rgba(255, 255, 255, 0.03);
-            --card-border: rgba(255, 255, 255, 0.08);
-            --text-main: #ffffff;
-            --text-muted: #a1a1aa;
-            --accent: #6366f1;
-            --accent-glow: rgba(99, 102, 241, 0.4);
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plume — Generative Atmosphere Studio</title>
+<meta name="description" content="Plume designs generative motion systems — real-time, responsive, never quite the same twice.">
+<meta name="theme-color" content="#E8E5DB">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='9' fill='%23171A1D'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Hanken+Grotesk:wght@400;500;600&family=Fragment+Mono&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: #E8E5DB;
+    --paper-2: #DEDACD;
+    --ink: #171A1D;
+    --ink-soft: #55595F;
+    --indigo: #4A3B8C;
+    --seal: #B9812E;
+    --line: rgba(23,26,29,0.14);
+    --font-display: 'Instrument Serif', serif;
+    --font-body: 'Hanken Grotesk', sans-serif;
+    --font-mono: 'Fragment Mono', monospace;
+  }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
+  *,*::before,*::after{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--font-body);
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  img,svg,canvas{ display:block; max-width:100%; }
+  a{ color:inherit; }
+  ::selection{ background:var(--indigo); color:var(--paper); }
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            min-height: 100vh;
-            overflow-x: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
+  :focus-visible{ outline:2px solid var(--seal); outline-offset:3px; border-radius:2px; }
 
-        /* Animated Mesh Background */
-        .ambient-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: -1;
-            overflow: hidden;
-            filter: blur(100px);
-            opacity: 0.6;
-        }
+  .skip-link{
+    position:absolute; left:-999px; top:auto;
+    background:var(--ink); color:var(--paper); padding:.75rem 1.25rem;
+    font-family:var(--font-mono); font-size:.8rem; z-index:200;
+  }
+  .skip-link:focus{ left:1rem; top:1rem; }
 
-        .blob {
-            position: absolute;
-            border-radius: 50%;
-            animation: float 20s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
-        }
+  section[id]{ scroll-margin-top:90px; }
 
-        .blob-1 {
-            width: 40vw;
-            height: 40vw;
-            background: #4f46e5;
-            top: -10%;
-            left: -10%;
-        }
+  /* ---------- custom cursor ---------- */
+  .cursor-dot,.cursor-ring{
+    position:fixed; top:0; left:0; pointer-events:none; z-index:300;
+    border-radius:50%; transform:translate(-50%,-50%);
+  }
+  .cursor-dot{ width:5px; height:5px; background:var(--ink); }
+  .cursor-ring{
+    width:32px; height:32px; border:1px solid var(--ink);
+    transition:width .2s ease, height .2s ease, border-color .2s ease, opacity .2s ease;
+    opacity:.55;
+  }
+  .cursor-ring.is-active{ width:52px; height:52px; border-color:var(--seal); opacity:.9; }
+  @media (pointer:coarse){ .cursor-dot,.cursor-ring{ display:none; } }
+  @media (pointer:fine){ body{ cursor:none; } a,button{ cursor:none; } }
 
-        .blob-2 {
-            width: 35vw;
-            height: 35vw;
-            background: #9333ea;
-            bottom: -20%;
-            right: -10%;
-            animation-delay: -5s;
-        }
+  /* ---------- grain overlay ---------- */
+  #grain-canvas{
+    position:fixed; inset:0; width:100%; height:100%;
+    z-index:60; pointer-events:none; opacity:.05; mix-blend-mode:overlay;
+  }
 
-        .blob-3 {
-            width: 30vw;
-            height: 30vw;
-            background: #0ea5e9;
-            top: 40%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            animation-delay: -10s;
-        }
+  /* ---------- nav ---------- */
+  .nav{
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:1.4rem clamp(1.25rem, 4vw, 3rem);
+    transition:background .4s ease, border-color .4s ease, backdrop-filter .4s ease, padding .3s ease;
+    border-bottom:1px solid transparent;
+  }
+  .nav.is-scrolled{
+    background:rgba(232,229,219,.82);
+    backdrop-filter:blur(10px);
+    border-bottom-color:var(--line);
+    padding-top:1rem; padding-bottom:1rem;
+  }
+  .nav__left{ display:flex; align-items:center; gap:.9rem; }
+  .nav__logo{
+    font-family:var(--font-display); font-style:italic; font-size:1.5rem;
+    text-decoration:none; letter-spacing:.01em;
+  }
+  .nav__status{
+    display:flex; align-items:center; gap:.4rem;
+    font-family:var(--font-mono); font-size:.68rem; letter-spacing:.06em;
+    color:var(--ink-soft); text-transform:uppercase;
+  }
+  .nav__status .dot{
+    width:6px; height:6px; border-radius:50%; background:var(--seal);
+    animation:pulse 2.6s ease-in-out infinite;
+  }
+  @keyframes pulse{ 0%,100%{ opacity:.35; transform:scale(.85);} 50%{ opacity:1; transform:scale(1);} }
 
-        @keyframes float {
-            0% { transform: translate(0, 0) scale(1); }
-            50% { transform: translate(10%, 15%) scale(1.1); }
-            100% { transform: translate(-5%, 5%) scale(0.9); }
-        }
+  .nav__links{ display:flex; align-items:center; gap:2rem; list-style:none; margin:0; padding:0; }
+  .nav__links a{
+    font-family:var(--font-mono); font-size:.75rem; letter-spacing:.06em;
+    text-transform:uppercase; text-decoration:none; position:relative; padding-bottom:2px;
+  }
+  .nav__links a::after{
+    content:''; position:absolute; left:0; right:0; bottom:0; height:1px;
+    background:var(--ink); transform:scaleX(0); transform-origin:right;
+    transition:transform .3s ease;
+  }
+  .nav__links a:hover::after{ transform:scaleX(1); transform-origin:left; }
+  .nav__right{ display:flex; align-items:center; gap:1.5rem; }
+  @media (max-width:760px){ .nav__links{ display:none; } }
 
-        /* Bento Box Grid */
-        .bento-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            grid-auto-rows: minmax(200px, auto);
-            gap: 20px;
-            width: 100%;
-            max-width: 1200px;
-            z-index: 1;
-        }
+  /* ---------- buttons ---------- */
+  .btn{
+    display:inline-flex; align-items:center; gap:.6rem;
+    padding:.95rem 1.75rem; border-radius:999px;
+    background:var(--ink); color:var(--paper); border:1px solid var(--ink);
+    font-family:var(--font-mono); font-size:.78rem; letter-spacing:.06em; text-transform:uppercase;
+    text-decoration:none; transition:transform .25s cubic-bezier(.2,.8,.2,1), background .25s ease, color .25s ease, border-color .25s ease;
+    will-change:transform;
+  }
+  .btn:hover{ background:var(--indigo); border-color:var(--indigo); }
+  .btn--ghost{ background:transparent; color:var(--ink); padding:.75rem 1.4rem; }
+  .btn--ghost:hover{ background:var(--ink); color:var(--paper); }
 
-        /* Glassmorphism Cards */
-        .card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 28px;
-            padding: 32px;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            transition: transform 0.3s ease, border-color 0.3s ease;
-        }
+  /* ---------- hero ---------- */
+  .hero{ position:relative; min-height:100vh; overflow:hidden; }
+  #ink-canvas{ position:absolute; inset:0; width:100%; height:100%; z-index:0; }
+  .hero__inner{
+    position:relative; z-index:1;
+    min-height:100vh; display:flex; flex-direction:column; justify-content:center;
+    padding:clamp(6rem,10vw,9rem) clamp(1.25rem,6vw,4rem) 6rem;
+    max-width:1400px; margin:0 auto;
+  }
+  .eyebrow{
+    font-family:var(--font-mono); font-size:.75rem; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--ink-soft); margin:0 0 1.6rem;
+  }
+  .headline{
+    font-family:var(--font-display); font-weight:400;
+    font-size:clamp(2.6rem, 7.2vw, 6.4rem); line-height:1.02; letter-spacing:-.01em;
+    margin:0 0 1.75rem; max-width:14ch;
+  }
+  .headline em{ font-style:italic; color:var(--indigo); }
+  .subhead{
+    font-size:clamp(1.02rem,1.6vw,1.2rem); line-height:1.6; color:var(--ink-soft);
+    max-width:38ch; margin:0 0 2.6rem; font-weight:400;
+  }
+  .hero__cta{ display:flex; align-items:center; gap:1.4rem; flex-wrap:wrap; }
+  .hero__hint{
+    position:absolute; left:clamp(1.25rem,6vw,4rem); bottom:6.5rem; z-index:1;
+    font-family:var(--font-mono); font-size:.72rem; letter-spacing:.04em; color:var(--ink-soft);
+    display:flex; align-items:center; gap:.5rem;
+    transition:opacity .8s ease; opacity:.85;
+  }
+  .hero__hint.is-hidden{ opacity:0; }
+  .hero__hint .arrow{ display:inline-block; animation:driftX 2.2s ease-in-out infinite; }
+  @keyframes driftX{ 0%,100%{ transform:translateX(0);} 50%{ transform:translateX(5px);} }
 
-        .card:hover {
-            transform: translateY(-4px);
-            border-color: rgba(255, 255, 255, 0.2);
-        }
+  .scroll-cue{
+    position:absolute; left:50%; bottom:2.4rem; transform:translateX(-50%); z-index:1;
+    display:flex; flex-direction:column; align-items:center; gap:.6rem;
+    font-family:var(--font-mono); font-size:.68rem; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--ink-soft);
+  }
+  .scroll-cue__line{ width:1px; height:34px; background:var(--line); position:relative; overflow:hidden; }
+  .scroll-cue__line::after{
+    content:''; position:absolute; left:0; top:-34px; width:100%; height:34px; background:var(--ink);
+    animation:cueDrop 2.4s ease-in-out infinite;
+  }
+  @keyframes cueDrop{ 0%{ top:-34px;} 60%{ top:34px;} 100%{ top:34px;} }
 
-        /* Mouse Hover Glow Effect */
-        .card::before {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(800px circle at var(--mouse-x) var(--mouse-y), rgba(255, 255, 255, 0.06), transparent 40%);
-            z-index: 0;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
+  /* ---------- load-in reveal for hero ---------- */
+  .nav, .eyebrow, .headline, .subhead, .hero__cta, .hero__hint{
+    opacity:0; transform:translateY(16px);
+    transition:opacity .9s ease, transform .9s ease;
+  }
+  body.is-loaded .nav{ opacity:1; transform:none; transition-delay:.05s; }
+  body.is-loaded .eyebrow{ opacity:1; transform:none; transition-delay:.25s; }
+  body.is-loaded .headline{ opacity:1; transform:none; transition-delay:.4s; }
+  body.is-loaded .subhead{ opacity:1; transform:none; transition-delay:.6s; }
+  body.is-loaded .hero__cta{ opacity:1; transform:none; transition-delay:.75s; }
+  body.is-loaded .hero__hint{ opacity:.85; transform:none; transition-delay:1.1s; }
 
-        .card:hover::before {
-            opacity: 1;
-        }
+  /* ---------- marquee ---------- */
+  .marquee{
+    border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+    overflow:hidden; white-space:nowrap; padding:1.1rem 0; position:relative; z-index:1; background:var(--paper);
+  }
+  .marquee__track{ display:inline-flex; animation:marquee 26s linear infinite; }
+  .marquee__track span{
+    font-family:var(--font-mono); font-size:.85rem; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--ink-soft); padding:0 1.5rem;
+  }
+  @keyframes marquee{ from{ transform:translateX(0);} to{ transform:translateX(-50%);} }
 
-        .card-content {
-            position: relative;
-            z-index: 1;
-        }
+  /* ---------- generic section ---------- */
+  .section{ padding:clamp(5rem,10vw,8rem) clamp(1.25rem,6vw,4rem); max-width:1400px; margin:0 auto; }
+  .section__header{ max-width:46ch; margin-bottom:3.5rem; }
+  .section__eyebrow{
+    font-family:var(--font-mono); font-size:.75rem; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--seal); margin:0 0 .9rem;
+  }
+  .section__title{
+    font-family:var(--font-display); font-weight:400; font-size:clamp(1.9rem,3.4vw,2.7rem);
+    line-height:1.15; margin:0;
+  }
 
-        /* Specific Card Sizings */
-        .card-hero { grid-column: span 2; grid-row: span 2; justify-content: flex-end; }
-        .card-skills { grid-column: span 2; grid-row: span 1; }
-        .card-project { grid-column: span 1; grid-row: span 2; }
-        .card-location { grid-column: span 1; grid-row: span 1; display: flex; align-items: center; justify-content: center; text-align: center; }
-        .card-social { grid-column: span 2; grid-row: span 1; }
+  [data-reveal]{ opacity:0; transform:translateY(26px); transition:opacity .8s ease, transform .8s ease; }
+  [data-reveal].is-visible{ opacity:1; transform:none; }
 
-        /* Typography & Elements */
-        h1 {
-            font-size: 3rem;
-            font-weight: 700;
-            line-height: 1.1;
-            margin-bottom: 12px;
-            letter-spacing: -1px;
-        }
+  /* ---------- field notes ---------- */
+  .field-grid{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:1px;
+    background:var(--line); border:1px solid var(--line);
+  }
+  .field-card{
+    background:var(--paper); padding:2.6rem 2.2rem; transition:transform .35s ease;
+    transform-style:preserve-3d; will-change:transform;
+  }
+  .field-card__tag{
+    font-family:var(--font-mono); font-size:.7rem; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--seal); margin:0 0 1.4rem;
+  }
+  .field-card__title{
+    font-family:var(--font-display); font-style:italic; font-size:1.6rem; line-height:1.25;
+    margin:0 0 .9rem;
+  }
+  .field-card__body{ font-size:.95rem; line-height:1.65; color:var(--ink-soft); margin:0; }
+  @media (max-width:900px){ .field-grid{ grid-template-columns:1fr; } }
 
-        h2 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 16px;
-        }
+  /* ---------- statement ---------- */
+  .statement{ text-align:center; }
+  .statement__text{
+    font-family:var(--font-display); font-style:italic; font-weight:400;
+    font-size:clamp(1.5rem,3.4vw,2.35rem); line-height:1.45;
+    max-width:32ch; margin:0 auto 1.6rem;
+  }
+  .statement__cite{
+    display:block; font-family:var(--font-mono); font-size:.75rem; letter-spacing:.08em;
+    color:var(--ink-soft); text-transform:uppercase;
+  }
 
-        p {
-            color: var(--text-muted);
-            font-size: 1.1rem;
-            line-height: 1.5;
-        }
+  /* ---------- contact ---------- */
+  .contact{ text-align:center; }
+  .contact__title{
+    font-family:var(--font-display); font-weight:400; font-size:clamp(2rem,4.6vw,3.2rem);
+    line-height:1.15; max-width:18ch; margin:0 auto 1rem;
+  }
+  .contact__sub{ color:var(--ink-soft); max-width:40ch; margin:0 auto 2.4rem; }
+  .contact__email{
+    display:block; margin-top:1.2rem; font-family:var(--font-mono); font-size:.8rem;
+    color:var(--ink-soft); text-decoration:none;
+  }
+  .contact__email:hover{ color:var(--indigo); }
 
-        .alias {
-            display: inline-block;
-            padding: 6px 14px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
+  /* ---------- footer ---------- */
+  .site-footer{
+    border-top:1px solid var(--line);
+    padding:2.6rem clamp(1.25rem,6vw,4rem) 3rem;
+    display:flex; flex-wrap:wrap; gap:2rem; align-items:flex-end; justify-content:space-between;
+    max-width:1400px; margin:0 auto;
+  }
+  .footer__brand{ font-family:var(--font-display); font-style:italic; font-size:1.3rem; }
+  .footer__tag{ font-family:var(--font-mono); font-size:.7rem; color:var(--ink-soft); margin-top:.35rem; }
+  .colophon{
+    font-family:var(--font-mono); font-size:.72rem; line-height:1.7; color:var(--ink-soft);
+    max-width:46ch; text-align:right;
+  }
+  @media (max-width:700px){ .colophon{ text-align:left; } .site-footer{ flex-direction:column; align-items:flex-start; } }
 
-        /* Pill Tags for Skills */
-        .tag-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
+  /* ---------- fallback (no WebGL) ---------- */
+  body.no-webgl .hero{
+    background:
+      radial-gradient(circle at 25% 30%, var(--paper-2), transparent 60%),
+      radial-gradient(circle at 75% 60%, rgba(74,59,140,.14), transparent 55%),
+      var(--paper);
+    animation:fallbackBreathe 10s ease-in-out infinite;
+  }
+  @keyframes fallbackBreathe{ 0%,100%{ filter:saturate(1);} 50%{ filter:saturate(1.15);} }
 
-        .tag {
-            padding: 8px 16px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            font-size: 0.95rem;
-            color: #d4d4d8;
-        }
-
-        .live-clock {
-            font-size: 2.5rem;
-            font-weight: 300;
-            letter-spacing: -2px;
-            margin-bottom: 8px;
-        }
-
-        .btn {
-            display: inline-block;
-            margin-top: auto;
-            padding: 12px 24px;
-            background: var(--text-main);
-            color: var(--bg-color);
-            text-decoration: none;
-            border-radius: 14px;
-            font-weight: 600;
-            text-align: center;
-            transition: transform 0.2s;
-        }
-
-        .btn:hover {
-            transform: scale(1.05);
-        }
-
-        /* Mobile Responsiveness */
-        @media (max-width: 900px) {
-            .bento-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .card-hero, .card-skills, .card-social { grid-column: span 2; }
-            .card-project, .card-location { grid-column: span 1; }
-            h1 { font-size: 2.2rem; }
-        }
-
-        @media (max-width: 600px) {
-            .bento-grid {
-                grid-template-columns: 1fr;
-            }
-            .card { grid-column: span 1 !important; grid-row: auto !important; min-height: 220px; }
-            h1 { font-size: 2rem; }
-            body { padding: 15px; }
-        }
-    </style>
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; }
+    .marquee__track{ animation:none; }
+    [data-reveal], .nav, .eyebrow, .headline, .subhead, .hero__cta, .hero__hint{ transition:none; }
+  }
+</style>
 </head>
 <body>
 
-    <!-- Blurred Animated Background -->
-    <div class="ambient-bg">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
-        <div class="blob blob-3"></div>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<canvas id="grain-canvas" aria-hidden="true"></canvas>
+<div class="cursor-dot" aria-hidden="true"></div>
+<div class="cursor-ring" aria-hidden="true"></div>
+
+<nav class="nav" id="nav">
+  <div class="nav__left">
+    <a href="#" class="nav__logo">Plume</a>
+    <span class="nav__status"><span class="dot"></span>live field</span>
+  </div>
+  <ul class="nav__links">
+    <li><a href="#work">Work</a></li>
+    <li><a href="#studio">Studio</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div class="nav__right">
+    <a href="#contact" class="btn btn--ghost" data-magnetic>Start a project</a>
+  </div>
+</nav>
+
+<main id="main">
+
+  <section class="hero" id="hero">
+    <canvas id="ink-canvas" aria-hidden="true"></canvas>
+    <div class="hero__inner">
+      <p class="eyebrow">Generative atmosphere studio</p>
+      <h1 class="headline">Atmosphere is a material.<br><em>We design with it.</em></h1>
+      <p class="subhead">Plume builds generative motion systems for interfaces and spaces — real-time, responsive, and never quite the same twice.</p>
+      <div class="hero__cta">
+        <a href="#contact" class="btn" data-magnetic data-hover>Start a project</a>
+        <a href="#work" class="btn btn--ghost" data-magnetic data-hover>See how it thinks</a>
+      </div>
     </div>
+    <p class="hero__hint" id="hero-hint"><span class="arrow">→</span> move — the field below is live</p>
+    <div class="scroll-cue"><span>Scroll</span><span class="scroll-cue__line"></span></div>
+  </section>
 
-    <!-- Main Grid Layout -->
-    <div class="bento-grid" id="grid">
-        
-        <!-- Hero Introduction -->
-        <div class="card card-hero">
-            <div class="card-content">
-                <span class="alias">Also known as Rubin Stellar</span>
-                <h1>Hi, I'm Nithan.</h1>
-                <p>I build dynamic web experiences, interactive applications, and experiment with AI media synthesis.</p>
-            </div>
-        </div>
-
-        <!-- Skills Container -->
-        <div class="card card-skills">
-            <div class="card-content">
-                <h2>Toolkit</h2>
-                <div class="tag-container">
-                    <span class="tag">HTML / CSS / JS</span>
-                    <span class="tag">UI/UX Architecture</span>
-                    <span class="tag">AI Voice Synthesis</span>
-                    <span class="tag">Video Animation</span>
-                    <span class="tag">Responsive Design</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Location & Time -->
-        <div class="card card-location">
-            <div class="card-content">
-                <div class="live-clock" id="clock">00:00</div>
-                <p style="font-size: 0.9rem;">Nilambur, Kerala</p>
-            </div>
-        </div>
-
-        <!-- Current Project Spotlight -->
-        <div class="card card-project">
-            <div class="card-content" style="display: flex; flex-direction: column; height: 100%;">
-                <h2>Active Build</h2>
-                <p style="margin-bottom: 20px;">Refactoring <strong>nithan.in</strong> into a seamless, interactive simulation engine.</p>
-                <a href="#" class="btn">View Logic</a>
-            </div>
-        </div>
-
-        <!-- Status / Social -->
-        <div class="card card-social">
-            <div class="card-content">
-                <h2>Current Status</h2>
-                <p>Currently pursuing B.Com CA while designing digital experiences. Open for collaborations.</p>
-            </div>
-        </div>
-
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee__track">
+      <span>DIFFUSION — TENSION — BLOOM — DRIFT — SETTLE — DIFFUSION — TENSION — BLOOM — DRIFT — SETTLE —</span>
+      <span>DIFFUSION — TENSION — BLOOM — DRIFT — SETTLE — DIFFUSION — TENSION — BLOOM — DRIFT — SETTLE —</span>
     </div>
+  </div>
 
-    <script>
-        // Dynamic Hover Glow Effect for Cards
-        document.getElementById("grid").onmousemove = e => {
-            for(const card of document.getElementsByClassName("card")) {
-                const rect = card.getBoundingClientRect(),
-                      x = e.clientX - rect.left,
-                      y = e.clientY - rect.top;
+  <section class="section" id="work">
+    <div class="section__header" data-reveal>
+      <p class="section__eyebrow">Field notes</p>
+      <h2 class="section__title">Three things we keep relearning.</h2>
+    </div>
+    <div class="field-grid" data-reveal>
+      <article class="field-card" data-tilt>
+        <p class="field-card__tag">Material</p>
+        <h3 class="field-card__title">Noise isn't an error.</h3>
+        <p class="field-card__body">Grain and drift are what make a system feel inhabited instead of generated. We shape noise; we don't sand it off.</p>
+      </article>
+      <article class="field-card" data-tilt>
+        <p class="field-card__tag">Timing</p>
+        <h3 class="field-card__title">Nothing arrives all at once.</h3>
+        <p class="field-card__body">Good motion reveals itself the way weather does — gradually, unevenly, on its own schedule, not a fixed easing curve.</p>
+      </article>
+      <article class="field-card" data-tilt>
+        <p class="field-card__tag">Restraint</p>
+        <h3 class="field-card__title">Most of the work is subtraction.</h3>
+        <p class="field-card__body">The version that ships is usually the third one we removed things from. If a motion doesn't earn its place, it doesn't survive.</p>
+      </article>
+    </div>
+  </section>
 
-                card.style.setProperty("--mouse-x", `${x}px`);
-                card.style.setProperty("--mouse-y", `${y}px`);
-            }
-        };
+  <section class="section statement" id="studio">
+    <p class="statement__text" data-reveal>We spend most of our time looking at things too slowly for anyone else to notice — the way light travels across a wall, the way ink gives up its edge in water. Then we build software that remembers to do the same.</p>
+    <span class="statement__cite" data-reveal>— the studio, most days</span>
+  </section>
 
-        // Live Local Clock
-        function updateTime() {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString('en-US', { 
-                hour: '2-digit', 
-                minute: '2-digit',
-                hour12: false 
-            });
-            document.getElementById('clock').textContent = timeString;
+  <section class="section contact" id="contact">
+    <h2 class="contact__title" data-reveal>Have something that shouldn't feel static?</h2>
+    <p class="contact__sub" data-reveal>Tell us what you're building. We'll tell you if we're right for it.</p>
+    <div data-reveal>
+      <a href="mailto:hello@plume.studio" class="btn" data-magnetic data-hover>Start a project</a>
+      <a href="mailto:hello@plume.studio" class="contact__email">hello@plume.studio</a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div>
+    <div class="footer__brand">Plume</div>
+    <div class="footer__tag">Generative atmosphere studio</div>
+  </div>
+  <p class="colophon">Colophon — set in Instrument Serif and Hanken Grotesk, labelled in Fragment Mono. The field above is a live simulation, redrawn in your browser, saved nowhere. © 2026 Plume.</p>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var pointerFine = window.matchMedia('(pointer: fine)').matches;
+
+  /* ---------------- load-in ---------------- */
+  window.addEventListener('load', function(){
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){ document.body.classList.add('is-loaded'); });
+    });
+  });
+
+  /* ---------------- nav scroll state ---------------- */
+  var nav = document.getElementById('nav');
+  function onScroll(){
+    if (window.scrollY > 40) nav.classList.add('is-scrolled');
+    else nav.classList.remove('is-scrolled');
+  }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+
+  /* ---------------- custom cursor ---------------- */
+  if (pointerFine) {
+    var dot = document.querySelector('.cursor-dot');
+    var ring = document.querySelector('.cursor-ring');
+    var mx = window.innerWidth/2, my = window.innerHeight/2, rx = mx, ry = my;
+    window.addEventListener('pointermove', function(e){
+      mx = e.clientX; my = e.clientY;
+      dot.style.left = mx + 'px'; dot.style.top = my + 'px';
+    }, {passive:true});
+    (function cursorLoop(){
+      rx += (mx-rx)*0.18; ry += (my-ry)*0.18;
+      ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+      requestAnimationFrame(cursorLoop);
+    })();
+    document.querySelectorAll('a, button, [data-hover]').forEach(function(el){
+      el.addEventListener('pointerenter', function(){ ring.classList.add('is-active'); });
+      el.addEventListener('pointerleave', function(){ ring.classList.remove('is-active'); });
+    });
+  }
+
+  /* ---------------- magnetic buttons ---------------- */
+  if (pointerFine && !reduceMotion) {
+    document.querySelectorAll('[data-magnetic]').forEach(function(el){
+      el.addEventListener('pointermove', function(e){
+        var r = el.getBoundingClientRect();
+        var relX = e.clientX - (r.left + r.width/2);
+        var relY = e.clientY - (r.top + r.height/2);
+        el.style.transform = 'translate(' + (relX*0.35).toFixed(2) + 'px,' + (relY*0.35).toFixed(2) + 'px)';
+      });
+      el.addEventListener('pointerleave', function(){ el.style.transform = ''; });
+    });
+  }
+
+  /* ---------------- tilt cards ---------------- */
+  if (pointerFine && !reduceMotion) {
+    document.querySelectorAll('[data-tilt]').forEach(function(el){
+      el.addEventListener('pointermove', function(e){
+        var r = el.getBoundingClientRect();
+        var px = (e.clientX - r.left)/r.width - 0.5;
+        var py = (e.clientY - r.top)/r.height - 0.5;
+        el.style.transform = 'perspective(700px) rotateX(' + (-py*7).toFixed(2) + 'deg) rotateY(' + (px*7).toFixed(2) + 'deg)';
+      });
+      el.addEventListener('pointerleave', function(){ el.style.transform = ''; });
+    });
+  }
+
+  /* ---------------- scroll reveal ---------------- */
+  var revealEls = document.querySelectorAll('[data-reveal]');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if (en.isIntersecting) { en.target.classList.add('is-visible'); io.unobserve(en.target); }
+      });
+    }, {threshold:0.15});
+    revealEls.forEach(function(el){ io.observe(el); });
+  } else {
+    revealEls.forEach(function(el){ el.classList.add('is-visible'); });
+  }
+
+  /* ---------------- film grain overlay (2D canvas, cheap) ---------------- */
+  (function grain(){
+    var canvas = document.getElementById('grain-canvas');
+    var ctx = canvas.getContext('2d');
+    var w = 120, h = 120;
+    canvas.width = w; canvas.height = h;
+    function draw(){
+      var imgData = ctx.createImageData(w, h);
+      var d = imgData.data;
+      for (var i = 0; i < d.length; i += 4) {
+        var v = Math.random() * 255;
+        d[i] = v; d[i+1] = v; d[i+2] = v; d[i+3] = 255;
+      }
+      ctx.putImageData(imgData, 0, 0);
+    }
+    draw();
+    if (!reduceMotion) setInterval(draw, 140);
+  })();
+
+  /* ---------------- ink field (WebGL feedback simulation) ---------------- */
+  (function ink(){
+    var canvas = document.getElementById('ink-canvas');
+    var hero = document.getElementById('hero');
+    var hint = document.getElementById('hero-hint');
+
+    try {
+      var gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+      if (!gl) throw new Error('no webgl');
+
+      function compile(type, src){
+        var s = gl.createShader(type);
+        gl.shaderSource(s, src);
+        gl.compileShader(s);
+        if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+          var log = gl.getShaderInfoLog(s);
+          gl.deleteShader(s);
+          throw new Error('shader compile failed: ' + log);
         }
-        setInterval(updateTime, 1000);
-        updateTime();
-    </script>
+        return s;
+      }
+      function link(vs, fs){
+        var p = gl.createProgram();
+        gl.attachShader(p, vs);
+        gl.attachShader(p, fs);
+        gl.linkProgram(p);
+        if (!gl.getProgramParameter(p, gl.LINK_STATUS)) {
+          var log = gl.getProgramInfoLog(p);
+          gl.deleteProgram(p);
+          throw new Error('program link failed: ' + log);
+        }
+        return p;
+      }
+
+      var VERT = [
+        'attribute vec2 aPosition;',
+        'varying vec2 vUv;',
+        'void main(){',
+        '  vUv = aPosition * 0.5 + 0.5;',
+        '  gl_Position = vec4(aPosition, 0.0, 1.0);',
+        '}'
+      ].join('\n');
+
+      var SIM_FRAG = [
+        'precision mediump float;',
+        'uniform sampler2D uPrev;',
+        'uniform vec2 uMouse;',
+        'uniform vec2 uPrevMouse;',
+        'uniform float uTime;',
+        'uniform float uAspect;',
+        'varying vec2 vUv;',
+
+        'float hash(vec2 p){',
+        '  p = fract(p * vec2(123.34, 456.21));',
+        '  p += dot(p, p + 45.32);',
+        '  return fract(p.x * p.y);',
+        '}',
+        'float noise(vec2 p){',
+        '  vec2 i = floor(p); vec2 f = fract(p);',
+        '  float a = hash(i), b = hash(i + vec2(1.0,0.0));',
+        '  float c = hash(i + vec2(0.0,1.0)), d = hash(i + vec2(1.0,1.0));',
+        '  vec2 u = f * f * (3.0 - 2.0 * f);',
+        '  return mix(a,b,u.x) + (c-a)*u.y*(1.0-u.x) + (d-b)*u.x*u.y;',
+        '}',
+        'float fbm(vec2 p){',
+        '  float v = 0.0; float amp = 0.5;',
+        '  for(int i=0;i<4;i++){ v += amp*noise(p); p *= 2.02; amp *= 0.5; }',
+        '  return v;',
+        '}',
+
+        'void main(){',
+        '  vec2 uv = vUv;',
+        '  vec2 flow;',
+        '  flow.x = sin(uv.y*3.0 + uTime*0.25) + sin(uv.x*2.3 - uTime*0.18);',
+        '  flow.y = cos(uv.x*2.6 - uTime*0.22) + cos(uv.y*3.4 + uTime*0.3);',
+        '  vec2 duv = uv + flow*0.0018;',
+        '  duv = clamp(duv, 0.001, 0.999);',
+        '  float prev = texture2D(uPrev, duv).r;',
+        '  prev *= 0.994;',
+
+        '  vec2 pa = uv - uPrevMouse; pa.x *= uAspect;',
+        '  vec2 ba = uMouse - uPrevMouse; ba.x *= uAspect;',
+        '  float h = clamp(dot(pa,ba) / max(dot(ba,ba), 0.000001), 0.0, 1.0);',
+        '  float d = length(pa - ba*h);',
+        '  float ink = smoothstep(0.05, 0.0, d) * 0.35;',
+
+        '  float amb = max(0.0, fbm(uv*2.2 + uTime*0.04) - 0.58);',
+
+        '  float result = clamp(prev + ink + amb*0.03, 0.0, 1.0);',
+        '  gl_FragColor = vec4(result, result, result, 1.0);',
+        '}'
+      ].join('\n');
+
+      var DISPLAY_FRAG = [
+        'precision mediump float;',
+        'uniform sampler2D uSim;',
+        'uniform vec3 uPaper;',
+        'uniform vec3 uInk;',
+        'uniform vec3 uAccent;',
+        'varying vec2 vUv;',
+        'void main(){',
+        '  float v = texture2D(uSim, vUv).r;',
+        '  vec3 color = mix(uPaper, uInk, smoothstep(0.0, 0.55, v));',
+        '  color = mix(color, uAccent, smoothstep(0.6, 0.95, v) * 0.45);',
+        '  float vig = smoothstep(0.95, 0.35, distance(vUv, vec2(0.5, 0.52)));',
+        '  color *= mix(0.9, 1.0, vig);',
+        '  gl_FragColor = vec4(color, 1.0);',
+        '}'
+      ].join('\n');
+
+      var vs = compile(gl.VERTEX_SHADER, VERT);
+      var simFs = compile(gl.FRAGMENT_SHADER, SIM_FRAG);
+      var dispFs = compile(gl.FRAGMENT_SHADER, DISPLAY_FRAG);
+      var simProgram = link(vs, simFs);
+      var dispProgram = link(vs, dispFs);
+
+      var quad = new Float32Array([-1,-1, 1,-1, -1,1, -1,1, 1,-1, 1,1]);
+      var posBuffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, posBuffer);
+      gl.bufferData(gl.ARRAY_BUFFER, quad, gl.STATIC_DRAW);
+
+      function bindQuad(program){
+        var loc = gl.getAttribLocation(program, 'aPosition');
+        gl.bindBuffer(gl.ARRAY_BUFFER, posBuffer);
+        gl.enableVertexAttribArray(loc);
+        gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+      }
+
+      function makeFBO(w, h){
+        var tex = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, tex);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        var fb = gl.createFramebuffer();
+        gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0);
+        if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) {
+          throw new Error('incomplete framebuffer');
+        }
+        gl.clearColor(0,0,0,1);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        return { fb: fb, tex: tex, w: w, h: h };
+      }
+
+      var MAX_SIM_DIM = 480;
+      var simA, simB;
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+      function sizeAll(){
+        var w = hero.clientWidth, h = hero.clientHeight;
+        canvas.width = Math.round(w * dpr);
+        canvas.height = Math.round(h * dpr);
+        var scale = Math.min(1, MAX_SIM_DIM / Math.max(w, h));
+        var simW = Math.max(64, Math.round(w * scale));
+        var simH = Math.max(64, Math.round(h * scale));
+        simA = makeFBO(simW, simH);
+        simB = makeFBO(simW, simH);
+      }
+      sizeAll();
+
+      var uMouseTarget = { x: 0.5, y: 0.5 };
+      var uMouse = { x: 0.5, y: 0.5 };
+      var uMousePrev = { x: 0.5, y: 0.5 };
+      var userInteracted = false;
+
+      function setPointer(clientX, clientY){
+        var r = canvas.getBoundingClientRect();
+        uMouseTarget.x = (clientX - r.left) / r.width;
+        uMouseTarget.y = 1 - (clientY - r.top) / r.height;
+      }
+      window.addEventListener('pointermove', function(e){
+        userInteracted = true;
+        if (hint) hint.classList.add('is-hidden');
+        setPointer(e.clientX, e.clientY);
+      }, {passive:true});
+
+      var simLoc = {
+        uPrev: gl.getUniformLocation(simProgram, 'uPrev'),
+        uMouse: gl.getUniformLocation(simProgram, 'uMouse'),
+        uPrevMouse: gl.getUniformLocation(simProgram, 'uPrevMouse'),
+        uTime: gl.getUniformLocation(simProgram, 'uTime'),
+        uAspect: gl.getUniformLocation(simProgram, 'uAspect')
+      };
+      var dispLoc = {
+        uSim: gl.getUniformLocation(dispProgram, 'uSim'),
+        uPaper: gl.getUniformLocation(dispProgram, 'uPaper'),
+        uInk: gl.getUniformLocation(dispProgram, 'uInk'),
+        uAccent: gl.getUniformLocation(dispProgram, 'uAccent')
+      };
+
+      var visible = true;
+      if ('IntersectionObserver' in window) {
+        new IntersectionObserver(function(entries){
+          visible = entries[0].isIntersecting;
+        }, {threshold:0}).observe(hero);
+      }
+
+      var start = performance.now();
+      var frame = 0;
+      var reducedFrameCap = 50;
+
+      function render(){
+        if (!visible) { requestAnimationFrame(render); return; }
+        if (reduceMotion && frame > reducedFrameCap) { return; }
+        frame++;
+
+        var t = (performance.now() - start) / 1000;
+
+        if (!userInteracted) {
+          uMouseTarget.x = 0.5 + 0.28 * Math.sin(t * 0.6);
+          uMouseTarget.y = 0.5 + 0.22 * Math.sin(t * 0.37 + 1.3);
+        }
+        uMousePrev.x = uMouse.x; uMousePrev.y = uMouse.y;
+        uMouse.x += (uMouseTarget.x - uMouse.x) * 0.15;
+        uMouse.y += (uMouseTarget.y - uMouse.y) * 0.15;
+
+        // simulation pass: read simA, write simB
+        gl.bindFramebuffer(gl.FRAMEBUFFER, simB.fb);
+        gl.viewport(0, 0, simB.w, simB.h);
+        gl.useProgram(simProgram);
+        bindQuad(simProgram);
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, simA.tex);
+        gl.uniform1i(simLoc.uPrev, 0);
+        gl.uniform2f(simLoc.uMouse, uMouse.x, uMouse.y);
+        gl.uniform2f(simLoc.uPrevMouse, uMousePrev.x, uMousePrev.y);
+        gl.uniform1f(simLoc.uTime, t);
+        gl.uniform1f(simLoc.uAspect, simB.w / simB.h);
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+        // swap
+        var tmp = simA; simA = simB; simB = tmp;
+
+        // display pass
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        gl.viewport(0, 0, canvas.width, canvas.height);
+        gl.useProgram(dispProgram);
+        bindQuad(dispProgram);
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, simA.tex);
+        gl.uniform1i(dispLoc.uSim, 0);
+        gl.uniform3f(dispLoc.uPaper, 0.910, 0.898, 0.859);
+        gl.uniform3f(dispLoc.uInk, 0.090, 0.102, 0.114);
+        gl.uniform3f(dispLoc.uAccent, 0.290, 0.231, 0.549);
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+        requestAnimationFrame(render);
+      }
+      requestAnimationFrame(render);
+
+      var resizeTimer;
+      window.addEventListener('resize', function(){
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(sizeAll, 200);
+      });
+
+    } catch (err) {
+      document.body.classList.add('no-webgl');
+      if (hint) hint.style.display = 'none';
+      console.warn('Plume: falling back to static hero background —', err.message);
+    }
+  })();
+})();
+</script>
 </body>
 </html>
