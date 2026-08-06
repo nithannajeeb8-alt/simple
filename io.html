@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rubin Stellar | SYS_OS</title>
+    <style>
+        :root {
+            --bg-color: #09090b;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --accent-primary: #00f0ff;
+            --accent-secondary: #7000ff;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --font-mono: 'Courier New', Courier, monospace;
+            --font-sans: system-ui, -apple-system, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Mouse Tracking Glow */
+        #glow {
+            position: fixed;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(112, 0, 255, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            z-index: 0;
+            transition: opacity 0.3s;
+        }
+
+        .dashboard {
+            width: 90vw;
+            max-width: 1200px;
+            height: 85vh;
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            z-index: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Header / Top Bar */
+        header {
+            padding: 20px 30px;
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--accent-primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .header-left span, .header-right span {
+            margin-right: 20px;
+            color: var(--text-muted);
+        }
+
+        .header-left span strong, .header-right span strong {
+            color: var(--text-main);
+        }
+
+        /* Main Content Layout */
+        .layout {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 250px;
+            border-right: 1px solid var(--glass-border);
+            padding: 30px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .nav-item {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            font-size: 1rem;
+            text-align: left;
+            padding: 15px 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background: var(--accent-primary);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .nav-item:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .nav-item.active {
+            color: var(--accent-primary);
+            background: linear-gradient(90deg, rgba(0, 240, 255, 0.1) 0%, transparent 100%);
+        }
+
+        .nav-item.active::before {
+            transform: scaleY(1);
+        }
+
+        /* Screens */
+        .content-area {
+            flex: 1;
+            padding: 40px;
+            position: relative;
+        }
+
+        .screen {
+            display: none;
+            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        /* Typography & Terminal FX */
+        .terminal-text {
+            font-family: var(--font-mono);
+            font-size: 1.2rem;
+            color: var(--accent-primary);
+            margin-bottom: 20px;
+            min-height: 1.5em;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 300;
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            background: rgba(112, 0, 255, 0.2);
+            border: 1px solid var(--accent-secondary);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-family: var(--font-mono);
+            color: #d8b4fe;
+            margin-bottom: 30px;
+        }
+
+        /* Grid Cards */
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--glass-border);
+            padding: 25px;
+            border-radius: 12px;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-primary);
+        }
+
+        .card h3 {
+            font-size: 1rem;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .card .value {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        /* Progress Bars */
+        .skill-row {
+            margin-bottom: 20px;
+        }
+        
+        .skill-row span {
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-secondary), var(--accent-primary));
+            border-radius: 3px;
+            width: 0; /* Animated via JS */
+            transition: width 1s ease-out;
+        }
+
+        /* Animations */
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Blinking Cursor */
+        .cursor {
+            display: inline-block;
+            width: 10px;
+            height: 1.2rem;
+            background-color: var(--accent-primary);
+            animation: blink 1s step-end infinite;
+            vertical-align: middle;
+            margin-left: 5px;
+        }
+
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Ambient Mouse Glow -->
+    <div id="glow"></div>
+
+    <div class="dashboard">
+        <!-- Top System Bar -->
+        <header>
+            <div class="header-left">
+                <span>USER: <strong>NITHAN NAJEEB</strong></span>
+                <span>ALIAS: <strong>RUBIN STELLAR</strong></span>
+            </div>
+            <div class="header-right">
+                <span>LOC: <strong>NILAMBUR, KL</strong></span>
+                <span>SYS.TIME: <strong id="sys-time">00:00:00</strong></span>
+            </div>
+        </header>
+
+        <div class="layout">
+            <!-- Sidebar -->
+            <nav class="sidebar">
+                <button class="nav-item active" data-target="sys-core">SYS_CORE</button>
+                <button class="nav-item" data-target="skill-tree">SKILL_TREE</button>
+                <button class="nav-item" data-target="directives">DIRECTIVES</button>
+            </nav>
+
+            <!-- Main Content Area -->
+            <main class="content-area">
+                
+                <!-- Screen 1: Overview -->
+                <section id="sys-core" class="screen active">
+                    <div class="terminal-text" id="typewriter"></div>
+                    <h1>Digital Synthesizer</h1>
+                    <div class="badge">B.COM CA // WEB DEV</div>
+                    
+                    <div class="data-grid">
+                        <div class="card">
+                            <h3>Current Domain</h3>
+                            <div class="value">nithan.in</div>
+                        </div>
+                        <div class="card">
+                            <h3>Active Processes</h3>
+                            <div class="value">HTML/CSS/JS</div>
+                        </div>
+                        <div class="card">
+                            <h3>Simulation Engine</h3>
+                            <div class="value">ONLINE</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Screen 2: Skills -->
+                <section id="skill-tree" class="screen">
+                    <h1>Technical Arsenal</h1>
+                    <p style="color: var(--text-muted); margin-bottom: 30px;">Loading proficiency metrics...</p>
+                    
+                    <div class="skill-row">
+                        <span>Front-End Logic (JS/HTML/CSS)</span>
+                        <div class="progress-track"><div class="progress-fill" data-width="88%"></div></div>
+                    </div>
+                    <div class="skill-row">
+                        <span>UI/UX Architecture</span>
+                        <div class="progress-track"><div class="progress-fill" data-width="75%"></div></div>
+                    </div>
+                    <div class="skill-row">
+                        <span>AI Video & Voice Synthesis</span>
+                        <div class="progress-track"><div class="progress-fill" data-width="82%"></div></div>
+                    </div>
+                </section>
+
+                <!-- Screen 3: Directives (Projects) -->
+                <section id="directives" class="screen">
+                    <h1>Active Directives</h1>
+                    <div class="data-grid">
+                        <div class="card">
+                            <h3 style="color: var(--accent-primary)">nithan.in v2.0</h3>
+                            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 10px;">Refactoring main portfolio into an interactive simulation environment.</p>
+                        </div>
+                        <div class="card">
+                            <h3 style="color: var(--accent-secondary)">AI Media Generation</h3>
+                            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 10px;">Scripting and executing lip-sync animations and synthesized voiceovers.</p>
+                        </div>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // 1. Mouse Tracking Ambient Glow
+        const glow = document.getElementById('glow');
+        document.addEventListener('mousemove', (e) => {
+            glow.style.left = e.clientX + 'px';
+            glow.style.top = e.clientY + 'px';
+        });
+
+        // 2. Live System Time
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('sys-time').innerText = now.toLocaleTimeString('en-US', { hour12: false });
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // 3. Typewriter Effect
+        const textToType = "INITIALIZING SECURE CONNECTION... WELCOME, RUBIN STELLAR.";
+        const typeContainer = document.getElementById('typewriter');
+        let typeIndex = 0;
+
+        function typeWriter() {
+            if (typeIndex < textToType.length) {
+                typeContainer.innerHTML = textToType.substring(0, typeIndex + 1) + '<span class="cursor"></span>';
+                typeIndex++;
+                setTimeout(typeWriter, 50); // Typing speed
+            } else {
+                typeContainer.innerHTML = textToType + '<span class="cursor"></span>';
+            }
+        }
+        setTimeout(typeWriter, 500); // Initial delay
+
+        // 4. Tab Switching & Progress Bar Animation Logic
+        const navItems = document.querySelectorAll('.nav-item');
+        const screens = document.querySelectorAll('.screen');
+
+        function animateProgressBars(screenId) {
+            if (screenId === 'skill-tree') {
+                const fills = document.querySelectorAll('.progress-fill');
+                fills.forEach(fill => {
+                    fill.style.width = '0%'; // reset
+                    setTimeout(() => {
+                        fill.style.width = fill.getAttribute('data-width');
+                    }, 100);
+                });
+            }
+        }
+
+        navItems.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Handle active states for buttons
+                navItems.forEach(nav => nav.classList.remove('active'));
+                btn.classList.add('active');
+
+                // Handle active states for screens
+                const targetId = btn.getAttribute('data-target');
+                screens.forEach(screen => {
+                    screen.classList.remove('active');
+                });
+                
+                document.getElementById(targetId).classList.add('active');
+                
+                // Trigger animations if navigating to specific tabs
+                animateProgressBars(targetId);
+            });
+        });
+    </script>
+</body>
+</html>
