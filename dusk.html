@@ -191,12 +191,9 @@
   .reveal.is-visible {
     opacity: 1; transform: translateY(0) scale(1);
   }
-  
-  /* Stagger delays */
   .reveal-d1 { transition-delay: 0.1s; }
   .reveal-d2 { transition-delay: 0.2s; }
   .reveal-d3 { transition-delay: 0.3s; }
-  .reveal-d4 { transition-delay: 0.4s; }
 
   /* ---------- hero ---------- */
   .hero { position: relative; min-height: 100vh; display: flex; align-items: center; }
@@ -225,30 +222,13 @@
 
   /* ---------- mobile specific spacing fixes ---------- */
   @media (max-width: 768px) { 
-    .nav {
-      padding: 1.25rem 1.5rem; 
-    }
-    .nav__left {
-      gap: 0.75rem;
-    }
-    .nav__logo {
-      font-size: 1.5rem;
-    }
-    .nav__status {
-      font-size: 0.6rem;
-      max-width: 80px; 
-      line-height: 1.2;
-    }
-    .btn {
-      padding: 0.8rem 1.5rem;
-      font-size: 0.7rem;
-    }
-    .hero__inner {
-      margin-top: 5rem; 
-    }
-    .headline {
-      margin: 0 0 1.5rem;
-    }
+    .nav { padding: 1.25rem 1.5rem; }
+    .nav__left { gap: 0.75rem; }
+    .nav__logo { font-size: 1.5rem; }
+    .nav__status { font-size: 0.6rem; max-width: 80px; line-height: 1.2; }
+    .btn { padding: 0.8rem 1.5rem; font-size: 0.7rem; }
+    .hero__inner { margin-top: 5rem; }
+    .headline { margin: 0 0 1.5rem; }
   }
 
   /* ---------- marquee ---------- */
@@ -269,9 +249,7 @@
     text-transform: uppercase; color: var(--text-secondary); padding: 0 2rem;
     display: flex; align-items: center; gap: 2rem;
   }
-  .marquee__track span::after {
-    content: '✦'; color: var(--quantum-cyan); font-size: 0.7rem; opacity: 0.5;
-  }
+  .marquee__track span::after { content: '✦'; color: var(--quantum-cyan); font-size: 0.7rem; opacity: 0.5; }
   @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
   /* ---------- generic section headers ---------- */
@@ -285,83 +263,152 @@
     line-height: 1.1; margin: 0; text-wrap: balance;
   }
 
-  /* ---------- field notes (Floating Timeline - Replaced Boxes) ---------- */
-  .field-grid {
+  /* ---------- NEW: Dynamic Holographic Timeline ---------- */
+  .field-timeline {
     display: flex;
     flex-direction: column;
-    gap: 4.5rem;
-    background: transparent;
-    border: none;
+    gap: 2rem;
     position: relative;
-    padding: 2rem 0 2rem 3rem; /* Space for the timeline line on the left */
+    padding: 2rem 0 2rem 4rem; /* Space for the animated line */
   }
   
-  /* Glowing quantum thread connecting them */
-  .field-grid::before {
+  /* Animated Flowing Energy Line */
+  .field-timeline::before {
     content: '';
     position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
+    left: 0; top: 0; bottom: 0;
     width: 2px;
-    background: linear-gradient(to bottom, transparent, var(--quantum-cyan), var(--quantum-purple), transparent);
-    opacity: 0.4;
+    background: linear-gradient(180deg, transparent, var(--quantum-cyan), var(--quantum-purple), transparent);
+    background-size: 100% 200%;
+    animation: energyFlow 4s linear infinite;
+    opacity: 0.6;
+  }
+  @keyframes energyFlow {
+    0% { background-position: 0% -100%; }
+    100% { background-position: 0% 100%; }
   }
 
-  .field-card {
-    background: transparent;
-    padding: 0;
-    border: none;
+  .field-item {
     position: relative;
-    transition: transform 0.5s var(--ease-bounce);
+    display: flex;
+    align-items: center;
   }
 
-  /* The quantum node tracker */
-  .field-card::before {
-    content: '';
+  /* The Breathing Quantum Nodes */
+  .field-node {
     position: absolute;
-    left: -3.35rem; /* Aligned exactly over the thread */
-    top: 0.15rem;
+    left: -4.4rem; /* Aligned exactly on the energy line */
     width: 14px;
     height: 14px;
     border-radius: 50%;
     background: var(--bg-base);
-    border: 2px solid var(--quantum-cyan);
-    box-shadow: 0 0 15px var(--quantum-glow);
-    transition: all 0.4s var(--ease-bounce);
+    border: 2px solid var(--text-secondary);
+    transition: all 0.5s var(--ease-bounce);
     z-index: 2;
+    /* Constant subtle breathing */
+    animation: nodePulse 3s ease-in-out infinite;
+  }
+  @keyframes nodePulse {
+    0%, 100% { box-shadow: 0 0 5px transparent; }
+    50% { box-shadow: 0 0 15px rgba(255,255,255,0.2); }
   }
 
-  .field-card:hover {
-    transform: translateX(20px);
+  /* The Glass Holographic Panel */
+  .field-card {
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 3rem;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    
+    /* Pre-animation states */
+    opacity: 0.4;
+    transform: translateX(30px) scale(0.98);
+    transition: all 0.7s var(--ease-smooth);
   }
 
-  .field-card:hover::before {
+  /* The Scanner Effect (Hidden initially) */
+  .field-card-scanner {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--quantum-cyan), transparent);
+    box-shadow: 0 0 15px var(--quantum-cyan);
+    opacity: 0;
+    transform: translateY(-10px);
+    z-index: 10;
+  }
+
+  /* Text pre-animation states */
+  .field-card__tag, .field-card__title, .field-card__body {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.6s var(--ease-smooth);
+  }
+
+  /* -------- ACTIVE STATES (Triggered by Scroll) -------- */
+  .field-item.is-active .field-node {
+    border-color: var(--quantum-cyan);
     background: var(--quantum-cyan);
-    transform: scale(1.4);
-    box-shadow: 0 0 25px var(--quantum-cyan);
+    transform: scale(1.3);
+    animation: nodeActivePulse 1.5s ease-in-out infinite;
+  }
+  @keyframes nodeActivePulse {
+    0%, 100% { box-shadow: 0 0 15px var(--quantum-cyan); }
+    50% { box-shadow: 0 0 30px var(--quantum-cyan); }
   }
 
-  .field-card > * { position: relative; z-index: 1; }
-  
+  .field-item.is-active .field-card {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    border-color: rgba(0, 229, 255, 0.2);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(0, 229, 255, 0.05);
+  }
+
+  /* Trigger the scanner */
+  .field-item.is-active .field-card-scanner {
+    animation: scanPanel 2.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  }
+  @keyframes scanPanel {
+    0% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(400px); opacity: 0; }
+  }
+
+  /* Reveal text sequentially */
+  .field-item.is-active .field-card__tag {
+    opacity: 1; transform: translateY(0); transition-delay: 0.1s;
+  }
+  .field-item.is-active .field-card__title {
+    opacity: 1; transform: translateY(0); transition-delay: 0.2s;
+    text-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
+  }
+  .field-item.is-active .field-card__body {
+    opacity: 1; transform: translateY(0); transition-delay: 0.3s;
+  }
+
+  /* Text Styling inside the card */
   .field-card__tag {
     font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.2em; 
     text-transform: uppercase; color: var(--text-secondary); margin: 0 0 1.2rem;
   }
-  
   .field-card__title {
     font-family: var(--font-display); font-style: italic; font-size: clamp(2.4rem, 5vw, 3.2rem); line-height: 1.1;
     margin: 0 0 1.2rem; color: var(--text-primary);
   }
-  
   .field-card__body { 
     font-size: 1.1rem; line-height: 1.7; color: var(--text-secondary); 
     margin: 0; font-weight: 300; max-width: 48ch; 
   }
-  
+
+  /* Mobile Adjustments for Timeline */
   @media (max-width: 900px) { 
-    .field-grid { padding-left: 2rem; gap: 3.5rem; } 
-    .field-card::before { left: -2.35rem; }
+    .field-timeline { padding-left: 2.5rem; gap: 2rem; } 
+    .field-node { left: -2.9rem; }
+    .field-card { padding: 2rem; }
   }
 
   /* ---------- statement & star wars crawl ---------- */
@@ -370,8 +417,8 @@
   }
   
   .star-wars-viewport {
-    perspective: 1200px; /* Flattened perspective so it shrinks slower on small screens */
-    height: 70vh; /* Taller on mobile to show more text */
+    perspective: 1200px; 
+    height: 70vh; 
     min-height: 450px;
     overflow: hidden;
     position: relative;
@@ -394,7 +441,6 @@
 
   .statement__text {
     font-family: var(--font-display); font-style: italic; font-weight: 400;
-    /* Massively increased the minimum clamp size for mobile readability */
     font-size: clamp(3rem, 7.5vw, 4.5rem); 
     line-height: 1.15; text-wrap: balance;
     margin: 0 auto 2.5rem; color: var(--text-primary);
@@ -405,27 +451,15 @@
     color: var(--quantum-cyan); text-transform: uppercase;
   }
 
-  /* Animation timing slowed down slightly and depth adjusted */
   .star-wars-viewport.is-visible .star-wars-crawl {
     animation: crawlAnimation 22s linear infinite; 
   }
 
   @keyframes crawlAnimation {
-    0% {
-      transform: rotateX(15deg) translateY(0); 
-      opacity: 0;
-    }
-    10% {
-      opacity: 1;
-    }
-    85% {
-      opacity: 1;
-    }
-    100% {
-      /* translateZ reduced so the text remains larger as it disappears */
-      transform: rotateX(25deg) translateY(-800px) translateZ(-200px); 
-      opacity: 0;
-    }
+    0% { transform: rotateX(15deg) translateY(0); opacity: 0; }
+    10% { opacity: 1; }
+    85% { opacity: 1; }
+    100% { transform: rotateX(25deg) translateY(-800px) translateZ(-200px); opacity: 0; }
   }
 
   /* ---------- contact ---------- */
@@ -518,24 +552,42 @@
       <h2 class="section__title">Three laws of systematic alignment.</h2>
     </div>
     
-    <div class="field-grid reveal reveal-d1">
-      <article class="field-card">
-        <p class="field-card__tag">Material</p>
-        <h3 class="field-card__title">Dust isn't noise.</h3>
-        <p class="field-card__body">Grain and drift are what make a system feel inhabited instead of generated. We shape particles; we give them physics and purpose.</p>
-      </article>
+    <!-- Dynamic Holographic Timeline -->
+    <div class="field-timeline reveal reveal-d1">
       
-      <article class="field-card">
-        <p class="field-card__tag">Timing</p>
-        <h3 class="field-card__title">Fluidity is truth.</h3>
-        <p class="field-card__body">Good motion reveals itself the way a magnetic field does — gradually, responding to unseen forces, on a perfectly aligned schedule.</p>
-      </article>
+      <!-- Card 1 -->
+      <div class="field-item dynamic-node">
+        <div class="field-node"></div>
+        <article class="field-card">
+          <div class="field-card-scanner"></div>
+          <p class="field-card__tag">Material</p>
+          <h3 class="field-card__title">Dust isn't noise.</h3>
+          <p class="field-card__body">Grain and drift are what make a system feel inhabited instead of generated. We shape particles; we give them physics and purpose.</p>
+        </article>
+      </div>
       
-      <article class="field-card">
-        <p class="field-card__tag">Restraint</p>
-        <h3 class="field-card__title">Calculated subtraction.</h3>
-        <p class="field-card__body">Everything around everywhere should have a purpose. If a pixel or a motion doesn't earn its place systematically, it is removed entirely.</p>
-      </article>
+      <!-- Card 2 -->
+      <div class="field-item dynamic-node">
+        <div class="field-node"></div>
+        <article class="field-card">
+          <div class="field-card-scanner"></div>
+          <p class="field-card__tag">Timing</p>
+          <h3 class="field-card__title">Fluidity is truth.</h3>
+          <p class="field-card__body">Good motion reveals itself the way a magnetic field does — gradually, responding to unseen forces, on a perfectly aligned schedule.</p>
+        </article>
+      </div>
+      
+      <!-- Card 3 -->
+      <div class="field-item dynamic-node">
+        <div class="field-node"></div>
+        <article class="field-card">
+          <div class="field-card-scanner"></div>
+          <p class="field-card__tag">Restraint</p>
+          <h3 class="field-card__title">Calculated subtraction.</h3>
+          <p class="field-card__body">Everything around everywhere should have a purpose. If a pixel or a motion doesn't earn its place systematically, it is removed entirely.</p>
+        </article>
+      </div>
+
     </div>
   </section>
 
@@ -612,7 +664,7 @@
     else nav.classList.remove('is-scrolled');
   }, { passive: true });
 
-  // --- Scroll Reveal System ---
+  // --- Scroll Reveal System (General Elements) ---
   const observerOptions = { root: null, rootMargin: '0px', threshold: 0.15 };
   const observer = new IntersectionObserver((entries, obs) => {
     entries.forEach(entry => {
@@ -623,6 +675,22 @@
   }, observerOptions);
 
   document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // --- Scroll Reveal System (Dynamic Timeline Nodes) ---
+  // Uses a stricter root margin so they activate specifically as they reach the middle of the screen
+  const nodeObserverOptions = { root: null, rootMargin: '-25% 0px -25% 0px', threshold: 0 };
+  const nodeObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-active');
+      } else {
+        // Remove this else block if you want them to stay active once scrolled past
+        entry.target.classList.remove('is-active');
+      }
+    });
+  }, nodeObserverOptions);
+
+  document.querySelectorAll('.dynamic-node').forEach(el => nodeObserver.observe(el));
 
   // --- Quantum Dust Particle System ---
   const canvas = document.getElementById('quantum-canvas');
