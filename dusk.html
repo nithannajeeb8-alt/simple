@@ -99,11 +99,11 @@
     border-bottom: 1px solid transparent;
   }
   .nav.is-scrolled {
-    background: rgba(3, 3, 5, 0.7);
+    background: rgba(3, 3, 5, 0.85);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border-bottom-color: var(--line);
-    padding-top: 1.25rem; padding-bottom: 1.25rem;
+    padding-top: 1rem; padding-bottom: 1rem;
   }
   .nav__left { display: flex; align-items: center; gap: 1.5rem; }
   .nav__logo {
@@ -223,6 +223,34 @@
   }
   .hero__cta { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
 
+  /* ---------- mobile specific spacing fixes ---------- */
+  @media (max-width: 768px) { 
+    .nav {
+      padding: 1.25rem 1rem; /* Better side spacing */
+    }
+    .nav__left {
+      gap: 0.75rem;
+    }
+    .nav__logo {
+      font-size: 1.5rem;
+    }
+    .nav__status {
+      font-size: 0.6rem;
+      max-width: 80px; /* Allows text to wrap neatly like in the screenshot */
+      line-height: 1.2;
+    }
+    .btn {
+      padding: 0.8rem 1.5rem;
+      font-size: 0.7rem;
+    }
+    .hero__inner {
+      margin-top: 5rem; /* Pushes the hero content well away from the nav */
+    }
+    .headline {
+      margin: 0 0 1.5rem;
+    }
+  }
+
   /* ---------- marquee ---------- */
   .marquee {
     border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
@@ -291,16 +319,64 @@
   
   @media (max-width: 900px) { .field-grid { grid-template-columns: 1fr; } }
 
-  /* ---------- statement ---------- */
-  .statement { text-align: center; max-width: 900px; margin: 0 auto; }
+  /* ---------- statement & star wars crawl ---------- */
+  .statement-section { 
+    padding: clamp(6rem, 12vw, 10rem) 0; /* Removing side padding to allow full crawl width */
+  }
+  
+  .star-wars-viewport {
+    perspective: 800px;
+    height: 50vh;
+    min-height: 400px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    /* Softly fades the text at top and bottom edges */
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
+  }
+
+  .star-wars-crawl {
+    position: absolute;
+    top: 100%; /* Start just off-screen at the bottom */
+    width: 100%;
+    max-width: 900px;
+    padding: 0 clamp(2rem, 5vw, 4rem);
+    text-align: center;
+    transform-origin: 50% 100%;
+    transform: rotateX(25deg);
+    will-change: transform;
+  }
+
   .statement__text {
     font-family: var(--font-display); font-style: italic; font-weight: 400;
-    font-size: clamp(2rem, 4vw, 3.2rem); line-height: 1.3; text-wrap: balance;
-    margin: 0 auto 2.5rem;
+    font-size: clamp(2.2rem, 5vw, 3.8rem); line-height: 1.3; text-wrap: balance;
+    margin: 0 auto 2.5rem; color: var(--text-primary);
   }
+
   .statement__cite {
     display: inline-block; font-family: var(--font-mono); font-size: 0.8rem; letter-spacing: 0.15em;
     color: var(--quantum-cyan); text-transform: uppercase;
+  }
+
+  /* Trigger animation only when scrolled into view */
+  .star-wars-viewport.is-visible .star-wars-crawl {
+    animation: crawlAnimation 20s linear infinite;
+  }
+
+  @keyframes crawlAnimation {
+    0% {
+      transform: rotateX(25deg) translateY(0);
+      opacity: 1;
+    }
+    90% {
+      opacity: 1;
+    }
+    100% {
+      transform: rotateX(25deg) translateY(-1000px) translateZ(-400px);
+      opacity: 0;
+    }
   }
 
   /* ---------- contact ---------- */
@@ -414,10 +490,13 @@
     </div>
   </section>
 
-  <section class="container" id="studio">
-    <div class="statement reveal">
-      <p class="statement__text">We spend most of our time looking at things too slowly for anyone else to notice — the way quantum dust catches light, the way particles avoid collision. Then we build software that remembers to do the same.</p>
-      <span class="statement__cite reveal reveal-d1">— The Studio, Observing</span>
+  <!-- Changed to Star Wars Viewport Structure -->
+  <section class="statement-section" id="studio">
+    <div class="star-wars-viewport reveal">
+      <div class="star-wars-crawl">
+        <p class="statement__text">We spend most of our time looking at things too slowly for anyone else to notice — the way quantum dust catches light, the way particles avoid collision. Then we build software that remembers to do the same.</p>
+        <span class="statement__cite">— The Studio, Observing</span>
+      </div>
     </div>
   </section>
 
@@ -494,7 +573,8 @@
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         entry.target.classList.add('is-visible');
-        obs.unobserve(entry.target);
+        // Removing unobserve keeps the Star Wars crawl resetting/running whenever scrolled into view
+        // obs.unobserve(entry.target); 
       }
     });
   }, observerOptions);
