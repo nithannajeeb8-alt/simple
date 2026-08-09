@@ -226,7 +226,7 @@
   /* ---------- mobile specific spacing fixes ---------- */
   @media (max-width: 768px) { 
     .nav {
-      padding: 1.25rem 1rem; /* Better side spacing */
+      padding: 1.25rem 1.5rem; 
     }
     .nav__left {
       gap: 0.75rem;
@@ -236,7 +236,7 @@
     }
     .nav__status {
       font-size: 0.6rem;
-      max-width: 80px; /* Allows text to wrap neatly like in the screenshot */
+      max-width: 80px; 
       line-height: 1.2;
     }
     .btn {
@@ -244,7 +244,7 @@
       font-size: 0.7rem;
     }
     .hero__inner {
-      margin-top: 5rem; /* Pushes the hero content well away from the nav */
+      margin-top: 5rem; 
     }
     .headline {
       margin: 0 0 1.5rem;
@@ -285,73 +285,118 @@
     line-height: 1.1; margin: 0; text-wrap: balance;
   }
 
-  /* ---------- field notes (Grid) ---------- */
+  /* ---------- field notes (Floating Timeline - Replaced Boxes) ---------- */
   .field-grid {
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
-    background: var(--line); border: 1px solid var(--line); border-radius: 8px; overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 4.5rem;
+    background: transparent;
+    border: none;
+    position: relative;
+    padding: 2rem 0 2rem 3rem; /* Space for the timeline line on the left */
   }
+  
+  /* Glowing quantum thread connecting them */
+  .field-grid::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, transparent, var(--quantum-cyan), var(--quantum-purple), transparent);
+    opacity: 0.4;
+  }
+
   .field-card {
-    background: var(--bg-base); padding: 4rem 3rem; 
-    transition: background 0.4s ease, transform 0.4s ease;
-    position: relative; overflow: hidden;
+    background: transparent;
+    padding: 0;
+    border: none;
+    position: relative;
+    transition: transform 0.5s var(--ease-bounce);
   }
+
+  /* The quantum node tracker */
   .field-card::before {
-    content: ''; position: absolute; inset: 0; opacity: 0;
-    background: radial-gradient(800px circle at var(--mouse-x) var(--mouse-y), rgba(0, 229, 255, 0.06), transparent 40%);
-    transition: opacity 0.4s ease; z-index: 0; pointer-events: none;
+    content: '';
+    position: absolute;
+    left: -3.35rem; /* Aligned exactly over the thread */
+    top: 0.15rem;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--bg-base);
+    border: 2px solid var(--quantum-cyan);
+    box-shadow: 0 0 15px var(--quantum-glow);
+    transition: all 0.4s var(--ease-bounce);
+    z-index: 2;
   }
-  .field-card:hover::before { opacity: 1; }
+
+  .field-card:hover {
+    transform: translateX(20px);
+  }
+
+  .field-card:hover::before {
+    background: var(--quantum-cyan);
+    transform: scale(1.4);
+    box-shadow: 0 0 25px var(--quantum-cyan);
+  }
+
   .field-card > * { position: relative; z-index: 1; }
   
   .field-card__tag {
-    font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.15em; 
-    text-transform: uppercase; color: var(--text-secondary); margin: 0 0 2rem;
-    display: flex; align-items: center; gap: 0.75rem;
+    font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.2em; 
+    text-transform: uppercase; color: var(--text-secondary); margin: 0 0 1.2rem;
   }
-  .field-card__tag::before {
-    content: ''; display: block; width: 12px; height: 1px; background: var(--quantum-cyan);
-  }
-  .field-card__title {
-    font-family: var(--font-display); font-style: italic; font-size: 2.2rem; line-height: 1.1;
-    margin: 0 0 1.5rem; color: var(--text-primary);
-  }
-  .field-card__body { font-size: 1.05rem; line-height: 1.7; color: var(--text-secondary); margin: 0; font-weight: 300; }
   
-  @media (max-width: 900px) { .field-grid { grid-template-columns: 1fr; } }
+  .field-card__title {
+    font-family: var(--font-display); font-style: italic; font-size: clamp(2.4rem, 5vw, 3.2rem); line-height: 1.1;
+    margin: 0 0 1.2rem; color: var(--text-primary);
+  }
+  
+  .field-card__body { 
+    font-size: 1.1rem; line-height: 1.7; color: var(--text-secondary); 
+    margin: 0; font-weight: 300; max-width: 48ch; 
+  }
+  
+  @media (max-width: 900px) { 
+    .field-grid { padding-left: 2rem; gap: 3.5rem; } 
+    .field-card::before { left: -2.35rem; }
+  }
 
   /* ---------- statement & star wars crawl ---------- */
   .statement-section { 
-    padding: clamp(6rem, 12vw, 10rem) 0; /* Removing side padding to allow full crawl width */
+    padding: clamp(5rem, 10vw, 8rem) 0; 
   }
   
   .star-wars-viewport {
-    perspective: 800px;
-    height: 50vh;
-    min-height: 400px;
+    perspective: 1200px; /* Flattened perspective so it shrinks slower on small screens */
+    height: 70vh; /* Taller on mobile to show more text */
+    min-height: 450px;
     overflow: hidden;
     position: relative;
     display: flex;
     justify-content: center;
-    /* Softly fades the text at top and bottom edges */
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
-    mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
   }
 
   .star-wars-crawl {
     position: absolute;
-    top: 100%; /* Start just off-screen at the bottom */
+    top: 100%; 
     width: 100%;
-    max-width: 900px;
-    padding: 0 clamp(2rem, 5vw, 4rem);
+    max-width: 1000px;
+    padding: 0 clamp(1.5rem, 4vw, 3rem);
     text-align: center;
     transform-origin: 50% 100%;
-    transform: rotateX(25deg);
-    will-change: transform;
+    will-change: transform, opacity;
   }
 
   .statement__text {
     font-family: var(--font-display); font-style: italic; font-weight: 400;
-    font-size: clamp(2.2rem, 5vw, 3.8rem); line-height: 1.3; text-wrap: balance;
+    /* Massively increased the minimum clamp size for mobile readability */
+    font-size: clamp(3rem, 7.5vw, 4.5rem); 
+    line-height: 1.15; text-wrap: balance;
     margin: 0 auto 2.5rem; color: var(--text-primary);
   }
 
@@ -360,21 +405,25 @@
     color: var(--quantum-cyan); text-transform: uppercase;
   }
 
-  /* Trigger animation only when scrolled into view */
+  /* Animation timing slowed down slightly and depth adjusted */
   .star-wars-viewport.is-visible .star-wars-crawl {
-    animation: crawlAnimation 20s linear infinite;
+    animation: crawlAnimation 22s linear infinite; 
   }
 
   @keyframes crawlAnimation {
     0% {
-      transform: rotateX(25deg) translateY(0);
+      transform: rotateX(15deg) translateY(0); 
+      opacity: 0;
+    }
+    10% {
       opacity: 1;
     }
-    90% {
+    85% {
       opacity: 1;
     }
     100% {
-      transform: rotateX(25deg) translateY(-1000px) translateZ(-400px);
+      /* translateZ reduced so the text remains larger as it disappears */
+      transform: rotateX(25deg) translateY(-800px) translateZ(-200px); 
       opacity: 0;
     }
   }
@@ -470,19 +519,19 @@
     </div>
     
     <div class="field-grid reveal reveal-d1">
-      <article class="field-card card-glow">
+      <article class="field-card">
         <p class="field-card__tag">Material</p>
         <h3 class="field-card__title">Dust isn't noise.</h3>
         <p class="field-card__body">Grain and drift are what make a system feel inhabited instead of generated. We shape particles; we give them physics and purpose.</p>
       </article>
       
-      <article class="field-card card-glow">
+      <article class="field-card">
         <p class="field-card__tag">Timing</p>
         <h3 class="field-card__title">Fluidity is truth.</h3>
         <p class="field-card__body">Good motion reveals itself the way a magnetic field does — gradually, responding to unseen forces, on a perfectly aligned schedule.</p>
       </article>
       
-      <article class="field-card card-glow">
+      <article class="field-card">
         <p class="field-card__tag">Restraint</p>
         <h3 class="field-card__title">Calculated subtraction.</h3>
         <p class="field-card__body">Everything around everywhere should have a purpose. If a pixel or a motion doesn't earn its place systematically, it is removed entirely.</p>
@@ -490,7 +539,6 @@
     </div>
   </section>
 
-  <!-- Changed to Star Wars Viewport Structure -->
   <section class="statement-section" id="studio">
     <div class="star-wars-viewport reveal">
       <div class="star-wars-crawl">
@@ -534,7 +582,6 @@
     mouse.x = e.clientX;
     mouse.y = e.clientY;
     
-    // Move dot instantly
     if(cursorDot) {
       cursorDot.style.left = `${mouse.x}px`;
       cursorDot.style.top = `${mouse.y}px`;
@@ -542,7 +589,6 @@
   });
 
   const renderCursor = () => {
-    // Smooth follow for ring
     ring.x += (mouse.x - ring.x) * 0.15;
     ring.y += (mouse.y - ring.y) * 0.15;
     
@@ -554,7 +600,6 @@
   };
   requestAnimationFrame(renderCursor);
 
-  // Hover states for cursor
   document.querySelectorAll('a, button, .field-card').forEach(el => {
     el.addEventListener('mouseenter', () => cursorRing?.classList.add('is-active'));
     el.addEventListener('mouseleave', () => cursorRing?.classList.remove('is-active'));
@@ -573,24 +618,11 @@
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         entry.target.classList.add('is-visible');
-        // Removing unobserve keeps the Star Wars crawl resetting/running whenever scrolled into view
-        // obs.unobserve(entry.target); 
       }
     });
   }, observerOptions);
 
   document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
-  // --- Card Glow Effect ---
-  document.querySelectorAll('.card-glow').forEach(card => {
-    card.addEventListener('mousemove', e => {
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      card.style.setProperty('--mouse-x', `${x}px`);
-      card.style.setProperty('--mouse-y', `${y}px`);
-    });
-  });
 
   // --- Quantum Dust Particle System ---
   const canvas = document.getElementById('quantum-canvas');
@@ -600,7 +632,6 @@
   let particles = [];
   const particleCount = window.innerWidth < 768 ? 60 : 120;
   
-  // Colors for dust
   const colors = ['#00E5FF', '#B000FF', '#FFFFFF', '#4A3B8C'];
 
   function resize() {
@@ -620,24 +651,16 @@
 
     reset(randomY = false) {
       this.x = Math.random() * width;
-      // Start slightly concentrated at the top and flowing around
       this.y = randomY ? Math.random() * height : -10;
       this.size = Math.random() * 2 + 0.5;
-      this.baseX = this.x;
-      this.baseY = this.y;
       this.density = (Math.random() * 30) + 1;
       this.color = colors[Math.floor(Math.random() * colors.length)];
-      
-      // Floating speeds
       this.vx = (Math.random() - 0.5) * 0.5;
-      this.vy = (Math.random() * 0.5) + 0.2; // slight downward drift
-      
-      // Twinkle
+      this.vy = (Math.random() * 0.5) + 0.2; 
       this.alpha = Math.random() * 0.5 + 0.1;
       this.pulseSpeed = Math.random() * 0.02 + 0.005;
       
-      // Special flare particle?
-      this.isFlare = Math.random() < 0.02; // 2% chance to be a fast flare
+      this.isFlare = Math.random() < 0.02; 
       if(this.isFlare) {
         this.size *= 2;
         this.vy = (Math.random() * 2) + 2;
@@ -646,18 +669,15 @@
     }
 
     update() {
-      // Movement
       this.x += this.vx;
       this.y += this.vy;
 
-      // Mouse Interaction (Quantum slide effect)
       let dx = mouse.x - this.x;
       let dy = mouse.y - this.y;
       let distance = Math.sqrt(dx * dx + dy * dy);
       let forceDirectionX = dx / distance;
       let forceDirectionY = dy / distance;
       
-      // Max distance for interaction
       let maxDistance = 200;
       let force = (maxDistance - distance) / maxDistance;
       
@@ -665,18 +685,15 @@
         let directionX = forceDirectionX * force * this.density * 0.05;
         let directionY = forceDirectionY * force * this.density * 0.05;
         
-        // Push away from mouse
         this.x -= directionX;
         this.y -= directionY;
       }
 
-      // Alpha pulsing for twinkling
       if(!this.isFlare) {
         this.alpha += Math.sin(Date.now() * this.pulseSpeed) * 0.01;
         this.alpha = Math.max(0.1, Math.min(this.alpha, 0.7));
       }
 
-      // Reset if out of bounds
       if (this.y > height + 10 || this.x > width + 10 || this.x < -10) {
         this.reset();
       }
@@ -685,27 +702,22 @@
     draw() {
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-      
       ctx.shadowBlur = this.isFlare ? 20 : 10;
       ctx.shadowColor = this.color;
-      
       ctx.fillStyle = this.color;
       ctx.globalAlpha = this.alpha;
       ctx.fill();
       ctx.globalAlpha = 1;
-      ctx.shadowBlur = 0; // reset
+      ctx.shadowBlur = 0; 
     }
   }
 
-  // Init particles
   for (let i = 0; i < particleCount; i++) {
     particles.push(new Particle());
   }
 
-  // Random massive flare occurrence
   setInterval(() => {
     if(document.hidden) return;
-    // Spawn 2-3 fast flares
     for(let i=0; i<3; i++) {
       let p = new Particle();
       p.isFlare = true;
@@ -716,23 +728,18 @@
       p.y = -20;
       p.x = Math.random() * width;
       particles.push(p);
-      
-      // Remove them after they fall so array doesn't grow infinitely
       setTimeout(() => particles.pop(), 4000);
     }
   }, 4500);
 
-  // Render Loop
   function animate() {
     ctx.clearRect(0, 0, width, height);
     
-    // Draw connections (systematic web/dust look)
     ctx.lineWidth = 0.5;
     for (let i = 0; i < particles.length; i++) {
       particles[i].update();
       particles[i].draw();
       
-      // Only draw lines between close particles for a "quantum structure"
       for (let j = i; j < particles.length; j++) {
         let dx = particles[i].x - particles[j].x;
         let dy = particles[i].y - particles[j].y;
@@ -753,7 +760,6 @@
   
   animate();
 
-  // Trigger initial reveal on load
   window.addEventListener('load', () => {
     setTimeout(() => {
       document.querySelectorAll('#hero .reveal').forEach(el => el.classList.add('is-visible'));
