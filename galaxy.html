@@ -2,216 +2,239 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>O P T I M I Z E D  C H A O S</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Resonant Dust | Portfolio</title>
     <style>
-        /* Anti-Modern Reset */
-        *, *::before, *::after { box-sizing: border-box; }
         body, html {
-            margin: 0;
-            padding: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: #030303;
-            color: #d1d1d1;
-            font-family: 'Courier New', Courier, monospace; /* Brutalist/Raw typography */
-            overflow: hidden;
-            cursor: crosshair;
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background-color: #030305; overflow: hidden;
+            font-family: 'Courier New', Courier, monospace;
+            touch-action: none; /* Prevents default scrolling */
+            color: white;
         }
-
-        /* SVG Noise Overlay for Texture */
-        #noise {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: 999;
-            opacity: 0.08;
-            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        canvas { display: block; }
+        #ui-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 10;
         }
-
-        /* Portfolio Nodes */
-        .node {
-            position: absolute;
-            text-transform: uppercase;
-            font-size: clamp(1rem, 2vw, 3rem);
-            letter-spacing: -2px;
-            white-space: nowrap;
-            mix-blend-mode: exclusion;
-            user-select: none;
-            transition: color 0.1s;
+        .project-text {
+            font-size: 1.5rem; letter-spacing: 4px; opacity: 0;
+            transition: opacity 2s ease-in-out; text-transform: uppercase;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
         }
-
-        .node:hover {
-            color: #ff003c;
-            text-shadow: 2px 2px 0px #00e5ff, -2px -2px 0px #ff003c;
-            z-index: 100;
+        #intro {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: #030305; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 20;
+            transition: opacity 1s; pointer-events: auto;
         }
-
-        /* The chaotic cursor trail */
-        .trail {
-            position: absolute;
-            font-size: 10px;
-            pointer-events: none;
-            color: rgba(255, 255, 255, 0.5);
+        button {
+            background: transparent; border: 1px solid rgba(255,255,255,0.3);
+            color: white; padding: 15px 30px; font-size: 1.2rem;
+            border-radius: 50px; letter-spacing: 2px; cursor: pointer;
+            backdrop-filter: blur(5px);
         }
-
-        /* Initialization Screen */
-        #boot-screen {
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            z-index: 1000;
-            cursor: pointer;
-        }
-        #boot-screen:hover { color: #fff; text-shadow: 0 0 10px #fff; }
     </style>
 </head>
 <body>
 
-    <div id="noise"></div>
-    <div id="boot-screen">[ CLICK TO INITIALIZE CHAOS & AUDIO ]</div>
+    <div id="intro">
+        <p style="margin-bottom: 20px; color: rgba(255,255,255,0.5);">Experience with Sound & Motion</p>
+        <button id="start-btn">ENTER CHAOS</button>
+    </div>
+
+    <div id="ui-layer">
+        <div id="project-display" class="project-text"></div>
+    </div>
+
+    <canvas id="canvas"></canvas>
 
     <script>
-        // --- 1. DATA & DOM SETUP ---
-        const sections = [
-            "01_ARCHIVE.EXE",
-            "02_MANIFESTO.TXT",
-            "03_EXPERIMENTS.SYS",
-            "04_CONTACT.BAT",
-            "NULL_VOID",
-            "ERR_404_AESTHETIC"
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const intro = document.getElementById('intro');
+        const startBtn = document.getElementById('start-btn');
+        const projectDisplay = document.getElementById('project-display');
+
+        let width, height;
+        let particles = [];
+        let projects = [
+            { name: "CASE STUDY 01", hue: 200 },
+            { name: "MOTION REEL", hue: 280 },
+            { name: "ABOUT ME", hue: 340 }
         ];
-        
-        const nodes = [];
-        let audioCtx, masterGain;
-        let isAudioInit = false;
+        let currentProjectIndex = 0;
+        let gyroX = 0, gyroY = 0;
+        let audioCtx;
 
-        // --- 2. PROCEDURAL AUDIO ENGINE ---
-        function initAudio() {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            masterGain = audioCtx.createGain();
-            masterGain.gain.value = 0.1; // Keep it low, it's harsh
-            masterGain.connect(audioCtx.destination);
-            
-            // Continuous Ambient Drone
-            const drone = audioCtx.createOscillator();
-            drone.type = 'sine';
-            drone.frequency.value = 40; // Deep sub bass
-            drone.connect(masterGain);
-            drone.start();
-
-            // Modulate drone based on mouse to "optimize chaos"
-            window.addEventListener('mousemove', (e) => {
-                const freq = 30 + (e.clientY / window.innerHeight) * 100;
-                drone.frequency.setTargetAtTime(freq, audioCtx.currentTime, 0.1);
-            });
-
-            isAudioInit = true;
-            document.getElementById('boot-screen').style.display = 'none';
+        // Resize Canvas
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
         }
+        window.addEventListener('resize', resize);
+        resize();
 
-        function playGlitch() {
-            if (!isAudioInit) return;
-            // Generate a harsh, chaotic clicking/glitching sound
+        // Generative Audio (Soothing Sine Waves)
+        function playChime(freq, type = 'sine') {
+            if (!audioCtx) return;
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
-            
-            osc.type = Math.random() > 0.5 ? 'sawtooth' : 'square';
-            osc.frequency.setValueAtTime(Math.random() * 2000 + 50, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(10, audioCtx.currentTime + 0.1);
-            
-            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
-            
+            osc.type = type;
+            osc.frequency.value = freq;
             osc.connect(gain);
-            gain.connect(masterGain);
+            gain.connect(audioCtx.destination);
+            
+            // Soft attack and soothing decay
+            gain.gain.setValueAtTime(0, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.15, audioCtx.currentTime + 0.1);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 3);
+            
             osc.start();
-            osc.stop(audioCtx.currentTime + 0.1);
+            osc.stop(audioCtx.currentTime + 3);
         }
 
-        document.getElementById('boot-screen').addEventListener('click', initAudio);
+        // Haptics Helper
+        function pulseHaptic(pattern) {
+            if (navigator.vibrate) navigator.vibrate(pattern);
+        }
 
-        // --- 3. PHYSICS & CHAOS ENGINE ---
-        // Instead of CSS grids, we use a loop to constantly agitate the elements.
-        sections.forEach((text, i) => {
-            const el = document.createElement('div');
-            el.className = 'node';
-            el.innerText = text;
-            document.body.appendChild(el);
-            
-            nodes.push({
-                el: el,
-                x: Math.random() * window.innerWidth,
-                y: Math.random() * window.innerHeight,
-                vx: (Math.random() - 0.5) * 2, // Velocity X
-                vy: (Math.random() - 0.5) * 2, // Velocity Y
-                targetX: null,
-                targetY: null
-            });
-
-            // Trigger chaos sound on interaction
-            el.addEventListener('mouseenter', playGlitch);
-        });
-
-        let mouseX = window.innerWidth / 2;
-        let mouseY = window.innerHeight / 2;
-
-        window.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-            
-            // Spawn erratic ASCII trails
-            if (Math.random() > 0.5) {
-                const trail = document.createElement('div');
-                trail.className = 'trail';
-                trail.innerText = String.fromCharCode(33 + Math.floor(Math.random() * 94));
-                trail.style.left = mouseX + 'px';
-                trail.style.top = mouseY + 'px';
-                document.body.appendChild(trail);
-                
-                setTimeout(() => trail.remove(), 500);
+        // Particle System
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 2;
+                this.vy = (Math.random() - 0.5) * 2;
+                this.baseSize = Math.random() * 1.5 + 0.5;
+                this.hue = Math.random() * 40 + 200; // Blue/Cyan base
             }
-        });
 
-        function optimizeChaos() {
-            nodes.forEach(node => {
-                // Add random jitter (The Chaos)
-                node.vx += (Math.random() - 0.5) * 0.5;
-                node.vy += (Math.random() - 0.5) * 0.5;
+            update() {
+                // Gyroscope Influence (The Predictable)
+                this.vx += gyroX * 0.05;
+                this.vy += gyroY * 0.05;
 
-                // Apply friction (The Optimization/Restraint)
-                node.vx *= 0.95;
-                node.vy *= 0.95;
-
-                // Move
-                node.x += node.vx;
-                node.y += node.vy;
-
-                // Screen boundaries (Bouncing off walls)
-                const bounds = node.el.getBoundingClientRect();
-                if (node.x < 0 || node.x + bounds.width > window.innerWidth) node.vx *= -1;
-                if (node.y < 0 || node.y + bounds.height > window.innerHeight) node.vy *= -1;
-
-                // Mouse interaction: slightly repel from mouse to make clicking difficult but deliberate
-                const dx = node.x - mouseX;
-                const dy = node.y - mouseY;
-                const dist = Math.sqrt(dx*dx + dy*dy);
-                
-                if (dist < 150) {
-                    node.vx += dx * 0.002;
-                    node.vy += dy * 0.002;
+                // Center Gravity (The Chaos/Swarm)
+                let dx = (width / 2) - this.x;
+                let dy = (height / 2) - this.y;
+                let dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist > 0) {
+                    this.vx += (dx / dist) * 0.01;
+                    this.vy += (dy / dist) * 0.01;
                 }
 
-                // Apply transforms
-                // We use translate3d to force hardware acceleration while maintaining raw pixel movement
-                node.el.style.transform = `translate3d(${node.x}px, ${node.y}px, 0) skew(${node.vx * 2}deg, ${node.vy * 2}deg)`;
-            });
+                // Friction
+                this.vx *= 0.98;
+                this.vy *= 0.98;
 
-            requestAnimationFrame(optimizeChaos);
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Wrap around edges
+                if (this.x < 0) this.x = width;
+                if (this.x > width) this.x = 0;
+                if (this.y < 0) this.y = height;
+                if (this.y > height) this.y = 0;
+            }
+
+            draw() {
+                ctx.fillStyle = `hsla(${this.hue}, 80%, 60%, 0.8)`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.baseSize, 0, Math.PI * 2);
+                ctx.fill();
+            }
         }
 
-        optimizeChaos();
+        // Initialize Chaos
+        for (let i = 0; i < 300; i++) particles.push(new Particle());
+
+        function animate() {
+            // Low opacity clear for fluid trailing effect (soothing)
+            ctx.fillStyle = 'rgba(3, 3, 5, 0.15)';
+            ctx.fillRect(0, 0, width, height);
+
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+
+        // --- INTERACTIONS ---
+
+        // 1. Gyroscope
+        function handleOrientation(event) {
+            // Normalize values for smooth gravity shift
+            gyroX = event.gamma / 45 || 0; // Left/Right
+            gyroY = (event.beta - 45) / 45 || 0; // Front/Back
+        }
+
+        // 2. Touch/Tap (Change Portfolio Item)
+        window.addEventListener('touchstart', (e) => {
+            if (!audioCtx) return;
+            
+            // Cycle Project
+            currentProjectIndex = (currentProjectIndex + 1) % projects.length;
+            let currentProj = projects[currentProjectIndex];
+
+            // Beautiful Chaos Burst
+            pulseHaptic([15, 30, 15]); // Heartbeat haptic
+            playChime(150 + (currentProjectIndex * 50)); // Base note
+            playChime(225 + (currentProjectIndex * 75), 'triangle'); // Harmonic
+
+            // Repel particles from touch point
+            const touch = e.touches[0];
+            particles.forEach(p => {
+                let dx = p.x - touch.clientX;
+                let dy = p.y - touch.clientY;
+                let dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 150) {
+                    p.vx = (dx / dist) * 15;
+                    p.vy = (dy / dist) * 15;
+                    p.hue = currentProj.hue; // Shift color to match project
+                }
+            });
+
+            // Update UI
+            projectDisplay.style.opacity = 0;
+            setTimeout(() => {
+                projectDisplay.innerText = currentProj.name;
+                projectDisplay.style.opacity = 1;
+            }, 500);
+        });
+
+        // Start Experience (Unlocks Device APIs)
+        startBtn.addEventListener('click', async () => {
+            // Request Gyro for iOS 13+
+            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                try {
+                    const permissionState = await DeviceOrientationEvent.requestPermission();
+                    if (permissionState === 'granted') {
+                        window.addEventListener('deviceorientation', handleOrientation);
+                    }
+                } catch (console) {
+                    console.log("Gyroscope permission denied.");
+                }
+            } else {
+                window.addEventListener('deviceorientation', handleOrientation);
+            }
+
+            // Init Audio
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            audioCtx = new AudioContext();
+            
+            // UI Transition
+            intro.style.opacity = 0;
+            setTimeout(() => intro.style.display = 'none', 1000);
+            
+            // Initial UI Fade In
+            projectDisplay.innerText = "TAP TO EXPLORE";
+            projectDisplay.style.opacity = 1;
+
+            animate();
+        });
     </script>
 </body>
 </html>
