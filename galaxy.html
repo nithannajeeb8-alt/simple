@@ -1,543 +1,248 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CONSOLE // SPEC_V4</title>
-  <style>
-    :root {
-      --bg: #0c0d10;
-      --panel: #14161b;
-      --panel-border: #272a33;
-      --amber: #ff9e3b;
-      --amber-dim: #7a4816;
-      --green: #29f27a;
-      --text: #e2ded7;
-      --text-muted: #7d818d;
-      --font-mono: "Geist Mono", "JetBrains Mono", ui-monospace, monospace;
-      --font-display: "Courier New", Courier, monospace;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nithan Najeeb // System Interface</title>
+    <style>
+        /* ==========================================
+           AESTHETICS & Niche Materials (CSS)
+           ========================================== */
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syncopate:wght@400;700&display=swap');
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    
-    body {
-      background-color: var(--bg);
-      color: var(--text);
-      font-family: var(--font-mono);
-      min-height: 100vh;
-      overflow-x: hidden;
-      line-height: 1.4;
-      background-image: 
-        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-      background-size: 32px 32px;
-    }
+        :root {
+            --bg-obsidian: #050505;
+            --text-muted: #888;
+            --accent-cyan: #00f0ff;
+            --accent-amber: #ff9d00;
+        }
 
-    /* Scanline overlay */
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background: repeating-linear-gradient(
-        0deg,
-        rgba(0, 0, 0, 0.15) 0px,
-        rgba(0, 0, 0, 0.15) 1px,
-        transparent 1px,
-        transparent 2px
-      );
-      pointer-events: none;
-      z-index: 1000;
-    }
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            cursor: none; /* Custom cursor used */
+        }
 
-    .chassis {
-      max-width: 1200px;
-      margin: 24px auto;
-      padding: 0 16px;
-      display: grid;
-      gap: 16px;
-    }
+        body {
+            background-color: var(--bg-obsidian);
+            color: #fff;
+            font-family: 'Space Mono', monospace;
+            overflow-x: hidden;
+        }
 
-    /* Top telemetry strip */
-    .telemetry-deck {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: var(--panel);
-      border: 1px solid var(--panel-border);
-      padding: 10px 16px;
-      font-size: 11px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
-    }
+        /* 1. Cinematic Matte Texture (SVG Noise) */
+        .noise-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none; z-index: 9999;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.06'/%3E%3C/svg%3E");
+        }
 
-    .indicator {
-      display: inline-block;
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--green);
-      margin-right: 6px;
-      box-shadow: 0 0 6px var(--green);
-      animation: pulse 2s infinite ease-in-out;
-    }
+        /* 2. Custom Cursor */
+        #cursor, #cursor-aura {
+            position: fixed; top: 0; left: 0;
+            border-radius: 50%; pointer-events: none;
+            transform: translate(-50%, -50%); z-index: 10000;
+        }
+        #cursor { width: 8px; height: 8px; background: var(--accent-cyan); }
+        #cursor-aura { width: 40px; height: 40px; border: 1px solid rgba(0, 240, 255, 0.4); transition: width 0.2s, height 0.2s; }
+        
+        .hover-active ~ #cursor-aura { width: 60px; height: 60px; background: rgba(0, 240, 255, 0.1); border-color: var(--accent-amber); }
 
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
+        /* --- Act I: Boot Sequence --- */
+        #hero {
+            height: 100vh; width: 100vw; display: flex;
+            flex-direction: column; justify-content: center; align-items: center;
+            position: relative; z-index: 10;
+        }
+        .terminal-loader { font-size: 14px; color: var(--accent-cyan); margin-bottom: 2rem; }
+        
+        .main-title {
+            font-family: 'Syncopate', sans-serif; font-size: 6vw;
+            text-transform: uppercase; font-weight: 700;
+            letter-spacing: -2px; opacity: 0; clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%);
+        }
+        .alias { font-size: 1.2rem; color: var(--text-muted); opacity: 0; margin-top: 10px; }
 
-    /* Main Console Grid */
-    .rack-grid {
-      display: grid;
-      grid-template-columns: 1.8fr 1.2fr;
-      gap: 16px;
-    }
+        /* --- Act II: Horizontal Node Scroll --- */
+        #horizontal-section { height: 100vh; overflow: hidden; background: #0a0a0a; }
+        .horizontal-wrapper {
+            display: flex; height: 100%; width: 300vw; /* 3 sections = 300vw */
+        }
+        .node {
+            width: 100vw; height: 100%; display: flex;
+            flex-direction: column; justify-content: center; padding: 10vw;
+            position: relative;
+        }
+        .node h2 { font-family: 'Syncopate', sans-serif; font-size: 4vw; margin-bottom: 1rem; color: var(--accent-amber); }
+        .node p { max-width: 500px; font-size: 1.1rem; line-height: 1.6; color: #ccc; }
+        .node-number { position: absolute; top: 10%; right: 10%; font-size: 10vw; font-weight: 700; opacity: 0.05; font-family: 'Syncopate', sans-serif;}
 
-    @media (max-width: 860px) {
-      .rack-grid { grid-template-columns: 1fr; }
-    }
-
-    /* Modular Panels */
-    .panel {
-      position: relative;
-      background: var(--panel);
-      border: 1px solid var(--panel-border);
-      padding: 24px;
-      box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
-    }
-
-    /* Industrial screws in corner */
-    .panel::after, .panel::before {
-      content: "×";
-      position: absolute;
-      font-size: 12px;
-      color: #3b3f4d;
-      font-family: sans-serif;
-      line-height: 1;
-    }
-    .panel::before { top: 6px; left: 8px; }
-    .panel::after { top: 6px; right: 8px; }
-
-    .panel-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      border-bottom: 1px solid var(--panel-border);
-      padding-bottom: 8px;
-      margin-bottom: 18px;
-    }
-
-    .panel-title {
-      font-size: 12px;
-      letter-spacing: 0.12em;
-      color: var(--amber);
-      text-transform: uppercase;
-    }
-
-    .panel-tag {
-      font-size: 10px;
-      color: var(--text-muted);
-    }
-
-    /* Identity Unit */
-    .hero-spec {
-      font-size: 28px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      line-height: 1.15;
-      margin-bottom: 14px;
-      color: #fff;
-    }
-
-    .hero-bio {
-      color: #a7abb6;
-      font-size: 14px;
-      margin-bottom: 24px;
-      max-width: 580px;
-    }
-
-    /* Tactile Project Swapper */
-    .cartridge-bay {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-
-    .cartridge-btn {
-      flex: 1;
-      background: #1a1d24;
-      border: 1px solid var(--panel-border);
-      color: var(--text-muted);
-      padding: 10px;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      cursor: pointer;
-      text-align: center;
-      transition: all 0.15s ease;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .cartridge-btn:hover {
-      background: #232731;
-      color: var(--text);
-    }
-
-    .cartridge-btn.active {
-      background: #23221e;
-      border-color: var(--amber);
-      color: var(--amber);
-      box-shadow: 0 0 10px rgba(255, 158, 59, 0.15);
-    }
-
-    .cartridge-viewport {
-      background: #0e1014;
-      border: 1px solid var(--panel-border);
-      padding: 20px;
-      min-height: 220px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .project-title {
-      font-size: 18px;
-      color: #fff;
-      margin-bottom: 8px;
-    }
-
-    .project-meta {
-      display: flex;
-      gap: 12px;
-      font-size: 11px;
-      color: var(--amber);
-      margin-bottom: 12px;
-    }
-
-    .project-desc {
-      font-size: 13px;
-      color: #9498a3;
-      margin-bottom: 16px;
-    }
-
-    .project-stack {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-
-    .tag {
-      font-size: 10px;
-      padding: 3px 8px;
-      background: #171920;
-      border: 1px solid #2d303a;
-      color: #999;
-    }
-
-    /* Hardware Oscilloscope */
-    #oscilloscope {
-      width: 100%;
-      height: 120px;
-      background: #090a0d;
-      border: 1px solid var(--panel-border);
-      display: block;
-      margin-bottom: 16px;
-    }
-
-    /* CLI Shell */
-    .cli-window {
-      background: #0a0b0d;
-      border: 1px solid var(--panel-border);
-      padding: 12px;
-      height: 180px;
-      overflow-y: auto;
-      font-size: 12px;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .cli-log {
-      flex: 1;
-      overflow-y: auto;
-      color: #9297a5;
-    }
-
-    .cli-log p { margin-bottom: 4px; }
-    .cli-log .amber { color: var(--amber); }
-
-    .cli-input-row {
-      display: flex;
-      align-items: center;
-      border-top: 1px solid #1f2229;
-      padding-top: 8px;
-      margin-top: 4px;
-    }
-
-    .cli-prompt {
-      color: var(--amber);
-      margin-right: 6px;
-    }
-
-    .cli-input {
-      background: transparent;
-      border: none;
-      outline: none;
-      color: #fff;
-      font-family: var(--font-mono);
-      font-size: 12px;
-      width: 100%;
-    }
-  </style>
+        /* --- Act III: Interactive Terminal --- */
+        #contact-terminal {
+            height: 100vh; display: flex; flex-direction: column;
+            justify-content: flex-end; padding: 5vw; background: var(--bg-obsidian);
+        }
+        .terminal-window {
+            width: 100%; max-width: 800px; border-left: 2px solid var(--accent-cyan); padding-left: 20px;
+        }
+        .output-log { margin-bottom: 20px; color: #ccc; white-space: pre-wrap; line-height: 1.5; }
+        .input-line { display: flex; align-items: center; }
+        .prompt { color: var(--accent-cyan); margin-right: 10px; }
+        input[type="text"] {
+            background: transparent; border: none; color: #fff;
+            font-family: 'Space Mono', monospace; font-size: 1rem; width: 100%; outline: none;
+        }
+    </style>
 </head>
 <body>
 
-  <div class="chassis">
-    <!-- Top System Readout -->
-    <header class="telemetry-deck">
-      <div>
-        <span class="indicator"></span>
-        <span>SYS_STATUS: NOMINAL</span>
-      </div>
-      <div id="clock">00:00:00 UTC</div>
-      <div>CORE_TEMP: 38.2°C // ARCH: HYBRID_NODE</div>
-    </header>
+    <!-- Niche Element: Granular Matte Overlay -->
+    <div class="noise-overlay"></div>
 
-    <div class="rack-grid">
-      <!-- Left Rack Section: Bio & Project Deck -->
-      <section class="panel">
-        <div class="panel-header">
-          <span class="panel-title">[MOD_01] OPERATOR DOSSIER</span>
-          <span class="panel-tag">LOC: 11.27° N / 76.24° E</span>
+    <!-- Custom Cursor -->
+    <div id="cursor"></div>
+    <div id="cursor-aura"></div>
+
+    <!-- ACT I: Hero -->
+    <section id="hero">
+        <div class="terminal-loader" id="loader-text"></div>
+        <h1 class="main-title">Nithan Najeeb</h1>
+        <div class="alias">SYS.OP: Rubin Stellar</div>
+    </section>
+
+    <!-- ACT II: Horizontal Projects -->
+    <section id="horizontal-section">
+        <div class="horizontal-wrapper">
+            <!-- Node 1 -->
+            <div class="node interactive-target">
+                <div class="node-number">01</div>
+                <h2>Mind Atlas</h2>
+                <p>An ecosystem of interactive components and logic systems built with pure DOM manipulation. Architecture focused on psychological design and user friction reduction.</p>
+            </div>
+            <!-- Node 2 -->
+            <div class="node interactive-target">
+                <div class="node-number">02</div>
+                <h2>Local LLM Architecture</h2>
+                <p>Deploying open-weight AI logic entirely on local hardware. Experimenting with Ollama parameters, Qwen, and Llama pipelines to build self-contained thought engines.</p>
+            </div>
+            <!-- Node 3 -->
+            <div class="node interactive-target">
+                <div class="node-number">03</div>
+                <h2>Remevess</h2>
+                <p>A structured initiative translating traditional, skilled artisan craftsmanship into scalable digital commerce. Built from the ground up focusing on narrative and preservation.</p>
+            </div>
         </div>
+    </section>
+
+    <!-- ACT III: Terminal Log -->
+    <section id="contact-terminal">
+        <div class="terminal-window">
+            <div class="output-log" id="output">SYSTEM_READY. Type 'help' for available commands.</div>
+            <div class="input-line">
+                <span class="prompt">guest@stellar:~/$</span>
+                <input type="text" id="term-input" autocomplete="off" autofocus class="interactive-target">
+            </div>
+        </div>
+    </section>
+
+    <!-- GSAP & JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        /* --- 1. Custom Cursor Logic --- */
+        const cursor = document.getElementById('cursor');
+        const aura = document.getElementById('cursor-aura');
         
-        <h1 class="hero-spec">ENGINEERING TACTILE EXPERIENCES AT THE EDGE.</h1>
-        <p class="hero-bio">
-          Synthesizing high-performance web graphics, physics-driven interaction architectures, and embedded edge runtimes. Bridging physical hardware design and modern digital systems.
-        </p>
+        window.addEventListener('mousemove', (e) => {
+            gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0 });
+            gsap.to(aura, { x: e.clientX, y: e.clientY, duration: 0.15 });
+        });
 
-        <div class="panel-header">
-          <span class="panel-title">[MOD_02] FIELD DEPLOYMENTS</span>
-          <span class="panel-tag">ACTIVE CARTRIDGES: 03</span>
-        </div>
+        document.querySelectorAll('.interactive-target').forEach(el => {
+            el.addEventListener('mouseenter', () => aura.classList.add('hover-active'));
+            el.addEventListener('mouseleave', () => aura.classList.remove('hover-active'));
+        });
 
-        <!-- Cartridge selector -->
-        <div class="cartridge-bay">
-          <button class="cartridge-btn active" data-id="0">CRT-01 // ATLAS</button>
-          <button class="cartridge-btn" data-id="1">CRT-02 // SYNAPSE</button>
-          <button class="cartridge-btn" data-id="2">CRT-03 // KINETIC</button>
-        </div>
+        /* --- 2. Boot Sequence Animation --- */
+        const loaderText = "Initializing local environment... Decoding user logic... Access Granted.";
+        let i = 0;
+        const typeWriter = () => {
+            if (i < loaderText.length) {
+                document.getElementById("loader-text").innerHTML += loaderText.charAt(i);
+                i++;
+                setTimeout(typeWriter, 30);
+            } else {
+                launchHero();
+            }
+        };
 
-        <div class="cartridge-viewport" id="viewport">
-          <!-- Dynamic Project Content Rendered Here -->
-        </div>
-      </section>
+        const launchHero = () => {
+            const tl = gsap.timeline();
+            tl.to("#loader-text", { opacity: 0, duration: 0.5, delay: 0.5 })
+              .to(".main-title", { 
+                  clipPath: "polygon(0 0%, 100% 0%, 100% 100%, 0% 100%)", 
+                  opacity: 1, duration: 1.5, ease: "power4.out" 
+              })
+              .to(".alias", { opacity: 1, duration: 1 }, "-=1");
+        };
 
-      <!-- Right Rack Section: Realtime Oscilloscope & Interactive Terminal -->
-      <section class="panel">
-        <div class="panel-header">
-          <span class="panel-title">[MOD_03] FREQ MONITOR</span>
-          <span class="panel-tag">CANVAS_RENDER: LIVE</span>
-        </div>
+        // Start Boot Sequence
+        window.onload = typeWriter;
 
-        <canvas id="oscilloscope"></canvas>
+        /* --- 3. Horizontal Scroll Magic --- */
+        const sections = document.querySelectorAll(".node");
+        const wrapper = document.querySelector(".horizontal-wrapper");
 
-        <div class="panel-header">
-          <span class="panel-title">[MOD_04] COMMAND SUBSYSTEM</span>
-          <span class="panel-tag">SHELL: V2.4</span>
-        </div>
+        gsap.to(wrapper, {
+            xPercent: -100 * (sections.length - 1) / sections.length,
+            ease: "none",
+            scrollTrigger: {
+                trigger: "#horizontal-section",
+                pin: true,
+                scrub: 1,
+                end: () => "+=" + wrapper.offsetWidth
+            }
+        });
 
-        <div class="cli-window">
-          <div class="cli-log" id="cliLog">
-            <p>> SYSTEM LOADED. TYPE <span class="amber">'help'</span> FOR ROUTINES.</p>
-          </div>
-          <div class="cli-input-row">
-            <span class="cli-prompt">λ</span>
-            <input type="text" class="cli-input" id="cliInput" autofocus spellcheck="false" autocomplete="off" />
-          </div>
-        </div>
-      </section>
-    </div>
-  </div>
+        /* --- 4. Interactive Terminal Logic --- */
+        const input = document.getElementById('term-input');
+        const output = document.getElementById('output');
 
-  <script>
-    // --- WEBAUDIO MECHANICAL RELAY SYNTHESIZER ---
-    const AudioEngine = {
-      ctx: null,
-      init() {
-        if (!this.ctx) {
-          this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-      },
-      click(freq = 600, duration = 0.02) {
-        this.init();
-        if (this.ctx.state === 'suspended') this.ctx.resume();
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-        gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start();
-        osc.stop(this.ctx.currentTime + duration);
-      }
-    };
+        input.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                const command = input.value.trim().toLowerCase();
+                let response = "";
 
-    // --- CARTRIDGE REPOSITORY ---
-    const projects = [
-      {
-        title: "MIND ATLAS // SPATIAL ARCHITECTURE",
-        type: "EXPLORATION PLATFORM",
-        year: "2026",
-        desc: "A bi-directional knowledge mapping canvas utilizing force-directed graph physics, custom GL shaders, and low-latency interaction models.",
-        stack: ["WebGL", "TypeScript", "CanvasAPI", "GSAP"]
-      },
-      {
-        title: "LOCAL MATRIX // ON-DEVICE INFERENCE",
-        type: "EDGE COMPUTING ENGINE",
-        year: "2025",
-        desc: "Micro-orchestration runtime for decentralized small-footprint LLMs running directly via WebGPU without remote server dependencies.",
-        stack: ["WebGPU", "WASM", "C++", "Ollama"]
-      },
-      {
-        title: "AEROSPACE RELAY // TACTILE SYSTEM",
-        type: "DESIGN SYSTEM",
-        year: "2025",
-        desc: "High-density mechanical design framework engineered for low-cognitive-load mission-critical diagnostic terminals and industrial controllers.",
-        stack: ["CSS Components", "WebAudio", "Vanilla JS"]
-      }
-    ];
+                switch(command) {
+                    case 'help':
+                        response = "Available commands: \n- whoami\n- contact\n- read_story";
+                        break;
+                    case 'whoami':
+                        response = "Running B.Com CA logic at MES Mampad College. Architecting web structures. Exploring UI, GSAP, and psychological design.";
+                        break;
+                    case 'contact':
+                        response = "Establishing connection protocol...\nEmail: nithan@nithan.in";
+                        break;
+                    case 'read_story':
+                        response = "[DECRYPTED FILE: PSYCHOLOGICAL FICTION]\nThe room smelled like ozone and cold coffee. The system hummed, not with electricity, but with something closer to a pulse. It wasn't answering questions anymore. It was starting to ask them.";
+                        break;
+                    case 'clear':
+                        output.innerHTML = "";
+                        input.value = "";
+                        return;
+                    default:
+                        response = `Command not found: ${command}`;
+                }
 
-    const viewport = document.getElementById('viewport');
-    const buttons = document.querySelectorAll('.cartridge-btn');
-
-    function renderProject(idx) {
-      const p = projects[idx];
-      viewport.innerHTML = `
-        <div>
-          <div class="project-meta">
-            <span>[${p.type}]</span>
-            <span>// YEAR: ${p.year}</span>
-          </div>
-          <h2 class="project-title">${p.title}</h2>
-          <p class="project-desc">${p.desc}</p>
-        </div>
-        <div class="project-stack">
-          ${p.stack.map(s => `<span class="tag">${s}</span>`).join('')}
-        </div>
-      `;
-    }
-
-    buttons.forEach((btn, index) => {
-      btn.addEventListener('click', () => {
-        AudioEngine.click(800, 0.03);
-        buttons.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        renderProject(index);
-      });
-    });
-
-    renderProject(0);
-
-    // --- OSCILLOSCOPE MODULATOR ---
-    const canvas = document.getElementById('oscilloscope');
-    const ctx = canvas.getContext('2d');
-    let width, height, step = 0;
-    let targetFreq = 0.04;
-    let currentFreq = 0.04;
-
-    function resizeCanvas() {
-      width = canvas.width = canvas.offsetWidth;
-      height = canvas.height = canvas.offsetHeight;
-    }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
-
-    window.addEventListener('mousemove', (e) => {
-      const ratio = e.clientX / window.innerWidth;
-      targetFreq = 0.01 + (ratio * 0.08);
-    });
-
-    function drawWave() {
-      ctx.fillStyle = '#090a0d';
-      ctx.fillRect(0, 0, width, height);
-
-      // Grid line
-      ctx.strokeStyle = '#181b22';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(0, height / 2);
-      ctx.lineTo(width, height / 2);
-      ctx.stroke();
-
-      // Sine Wave
-      currentFreq += (targetFreq - currentFreq) * 0.05;
-      ctx.strokeStyle = '#ff9e3b';
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-
-      for (let x = 0; x < width; x++) {
-        const y = height / 2 + Math.sin(x * currentFreq + step) * 28;
-        if (x === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.stroke();
-      step += 0.04;
-      requestAnimationFrame(drawWave);
-    }
-    drawWave();
-
-    // --- CLI EMULATOR ---
-    const cliInput = document.getElementById('cliInput');
-    const cliLog = document.getElementById('cliLog');
-
-    const commands = {
-      help: () => "AVAILABLE COMMANDS: [stack, projects, ping, contact, clear]",
-      stack: () => "CORE ENGINE: TypeScript, WebGPU, GSAP, Node, Tailwind, C++",
-      projects: () => "ACTIVE CARTRIDGES: 01_MIND_ATLAS, 02_LOCAL_MATRIX, 03_AEROSPACE_RELAY",
-      ping: () => "PONG -> 12ms TO LOCAL HOST NODE",
-      contact: () => "TRANSMISSION FREQ: rubinstellar@proton.me // TERMINAL OPEN",
-      clear: () => { cliLog.innerHTML = ""; return null; }
-    };
-
-    cliInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        const raw = cliInput.value.trim().toLowerCase();
-        if (!raw) return;
-
-        AudioEngine.click(400, 0.015);
-        const pCmd = document.createElement('p');
-        pCmd.innerHTML = `<span class="amber">λ</span> ${raw}`;
-        cliLog.appendChild(pCmd);
-
-        if (commands[raw]) {
-          const res = commands[raw]();
-          if (res) {
-            const pRes = document.createElement('p');
-            pRes.textContent = `> ${res}`;
-            cliLog.appendChild(pRes);
-          }
-        } else {
-          const pErr = document.createElement('p');
-          pErr.textContent = `> ERROR: UNRECOGNIZED ROUTINE '${raw}'`;
-          cliLog.appendChild(pErr);
-        }
-
-        cliInput.value = '';
-        cliLog.scrollTop = cliLog.scrollHeight;
-      }
-    });
-
-    // --- CLOCK ---
-    function updateClock() {
-      const now = new Date();
-      document.getElementById('clock').textContent = 
-        now.toISOString().substring(11, 19) + " UTC";
-    }
-    setInterval(updateClock, 1000);
-    updateClock();
-  </script>
+                output.innerHTML += `\n<span style="color: var(--accent-amber)">guest@stellar:~$</span> ${command}\n${response}\n`;
+                input.value = "";
+                
+                // Auto scroll to bottom
+                document.getElementById('contact-terminal').scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }
+        });
+    </script>
 </body>
 </html>
