@@ -1,1045 +1,1125 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nithan — Portfolio</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nithan | Portfolio & Resume</title>
 
-  :root {
-    --gold-1: #fff8e7;
-    --gold-2: #fde68a;
-    --gold-3: #f59e0b;
-    --gold-4: #d97706;
-    --gold-5: #b45309;
-    --gold-6: #92400e;
-    --white: #ffffff;
-    --off-white: #fafaf8;
-    --light: #f5f3ef;
-    --muted: #e8e4db;
-    --text-primary: #1a1610;
-    --text-secondary: #6b5e4a;
-    --text-muted: #9c8d78;
-  }
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cinzel:wght@500;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons for clean resume UI -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-  html { scroll-behavior: smooth; }
-  body { font-family: 'Inter', sans-serif; background: var(--white); color: var(--text-primary); overflow-x: hidden; }
+  <style>
+    /* =========================================
+       CSS VARIABLES & BASE STYLES
+       ========================================= */
+    :root {
+      --bg-white: #faf9f6;
+      --surface-white: #ffffff;
+      --card-bg: #ffffff;
+      --text-dark: #1e1e1e;
+      --text-muted: #666460;
+      
+      /* Gold & White Palette */
+      --gold-deep: #b38728;
+      --gold-main: #d4af37;
+      --gold-light: #f3e5ab;
+      --gold-shimmer: #fffdf5;
+      
+      --gold-gradient: linear-gradient(135deg, #b38728 0%, #f3e5ab 50%, #d4af37 80%, #ffffff 100%);
+      --gold-border: rgba(212, 175, 55, 0.28);
+      --gold-glow: 0 10px 30px rgba(212, 175, 55, 0.25);
+      
+      --font-body: 'Plus Jakarta Sans', sans-serif;
+      --font-title: 'Cinzel', serif;
+      --font-signature: 'Alex Brush', cursive;
+      --transition: all 0.35s ease;
+    }
 
-  /* ========== LOADER ========== */
-  #loader {
-    position: fixed; inset: 0; z-index: 9999;
-    background: var(--white);
-    display: flex; align-items: center; justify-content: center;
-    flex-direction: column;
-    transition: opacity 0.8s ease, visibility 0.8s ease;
-  }
-  #loader.fade-out { opacity: 0; visibility: hidden; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-  .loader-bg-shimmer {
-    position: absolute; inset: 0;
-    background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(245,158,11,0.06) 0%, transparent 70%);
-    animation: shimmer-pulse 3s ease-in-out infinite;
-  }
-  @keyframes shimmer-pulse {
-    0%, 100% { opacity: 0.5; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.05); }
-  }
+    html {
+      scroll-behavior: smooth;
+    }
 
-  .loader-particles {
-    position: absolute; inset: 0; overflow: hidden; pointer-events: none;
-  }
-  .particle {
-    position: absolute; border-radius: 50%;
-    background: radial-gradient(circle, rgba(245,158,11,0.6), rgba(245,158,11,0));
-    animation: float-particle linear infinite;
-  }
-  @keyframes float-particle {
-    0% { transform: translateY(100vh) scale(0); opacity: 0; }
-    10% { opacity: 1; }
-    90% { opacity: 0.5; }
-    100% { transform: translateY(-20vh) scale(1); opacity: 0; }
-  }
+    body {
+      background-color: var(--bg-white);
+      color: var(--text-dark);
+      font-family: var(--font-body);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
 
-  .loader-center { position: relative; display: flex; align-items: center; justify-content: center; }
+    /* =========================================
+       PRELOADER: SIGNATURE & ROTATING GOLD GLOW
+       ========================================= */
+    #loader-wrapper {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 1s cubic-bezier(0.77, 0, 0.175, 1), 
+                  transform 1s cubic-bezier(0.77, 0, 0.175, 1);
+    }
 
-  /* Outer glow ring */
-  .glow-ring-outer {
-    position: absolute;
-    width: 320px; height: 320px;
-    border-radius: 50%;
-    background: conic-gradient(
-      from 0deg,
-      transparent 0%,
-      rgba(245,158,11,0.15) 15%,
-      rgba(252,211,77,0.5) 30%,
-      rgba(245,158,11,0.8) 50%,
-      rgba(252,211,77,0.5) 70%,
-      rgba(245,158,11,0.15) 85%,
-      transparent 100%
-    );
-    animation: spin-outer 4s linear infinite;
-    filter: blur(4px);
-  }
-  @keyframes spin-outer { to { transform: rotate(360deg); } }
+    #loader-wrapper.loaded {
+      opacity: 0;
+      transform: scale(1.04);
+      pointer-events: none;
+    }
 
-  .glow-ring-middle {
-    position: absolute;
-    width: 280px; height: 280px;
-    border-radius: 50%;
-    background: conic-gradient(
-      from 180deg,
-      transparent 0%,
-      rgba(217,119,6,0.1) 20%,
-      rgba(245,158,11,0.6) 40%,
-      rgba(253,230,138,0.9) 50%,
-      rgba(245,158,11,0.6) 60%,
-      rgba(217,119,6,0.1) 80%,
-      transparent 100%
-    );
-    animation: spin-middle 3s linear infinite reverse;
-    filter: blur(2px);
-  }
-  @keyframes spin-middle { to { transform: rotate(360deg); } }
+    /* Outer Wrapper for the Glowing Rotating Border */
+    .signature-card-box {
+      position: relative;
+      padding: 3px;
+      border-radius: 20px;
+      overflow: hidden;
+      opacity: 0;
+      transform: scale(0.9);
+      animation: boxReveal 1s ease 1.6s forwards;
+      box-shadow: 0 20px 50px rgba(212, 175, 55, 0.15);
+    }
 
-  .glow-ring-inner {
-    position: absolute;
-    width: 240px; height: 240px;
-    border-radius: 50%;
-    border: 1px solid rgba(245,158,11,0.3);
-    animation: spin-inner 6s linear infinite;
-    box-shadow: 0 0 20px rgba(245,158,11,0.2), inset 0 0 20px rgba(245,158,11,0.05);
-  }
-  .glow-ring-inner::before {
-    content: '';
-    position: absolute;
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    background: #f59e0b;
-    top: -5px; left: 50%; transform: translateX(-50%);
-    box-shadow: 0 0 20px 8px rgba(245,158,11,0.6);
-    animation: dot-glow 2s ease-in-out infinite;
-  }
-  .glow-ring-inner::after {
-    content: '';
-    position: absolute;
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: #fde68a;
-    bottom: -3px; left: 50%; transform: translateX(-50%);
-    box-shadow: 0 0 16px 6px rgba(253,230,138,0.5);
-  }
-  @keyframes spin-inner { to { transform: rotate(360deg); } }
-  @keyframes dot-glow {
-    0%, 100% { box-shadow: 0 0 20px 8px rgba(245,158,11,0.6); }
-    50% { box-shadow: 0 0 35px 14px rgba(245,158,11,0.9); }
-  }
+    /* Rotating Conic Gold Beam */
+    .signature-card-box::before {
+      content: '';
+      position: absolute;
+      width: 250%;
+      height: 250%;
+      top: -75%;
+      left: -75%;
+      background: conic-gradient(
+        from 0deg,
+        transparent 0deg,
+        transparent 260deg,
+        var(--gold-deep) 300deg,
+        var(--gold-main) 330deg,
+        var(--gold-light) 350deg,
+        #ffffff 360deg
+      );
+      animation: rotateGlow 3s linear infinite;
+    }
 
-  /* Name box */
-  .name-box {
-    position: relative; z-index: 10;
-    width: 220px; height: 220px;
-    border-radius: 24px;
-    background: rgba(255,255,255,0.9);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(245,158,11,0.25);
-    display: flex; align-items: center; justify-content: center; flex-direction: column;
-    box-shadow:
-      0 0 0 1px rgba(245,158,11,0.1),
-      0 8px 40px rgba(245,158,11,0.1),
-      0 2px 8px rgba(180,83,9,0.08),
-      inset 0 1px 0 rgba(255,255,255,0.9);
-    animation: box-breathe 3s ease-in-out infinite;
-    overflow: hidden;
-  }
-  .name-box::before {
-    content: '';
-    position: absolute; inset: 0;
-    background: linear-gradient(135deg, rgba(253,230,138,0.15) 0%, transparent 50%, rgba(245,158,11,0.08) 100%);
-    border-radius: 24px;
-  }
-  @keyframes box-breathe {
-    0%, 100% { box-shadow: 0 0 0 1px rgba(245,158,11,0.1), 0 8px 40px rgba(245,158,11,0.1), 0 2px 8px rgba(180,83,9,0.08), inset 0 1px 0 rgba(255,255,255,0.9); }
-    50% { box-shadow: 0 0 0 1px rgba(245,158,11,0.2), 0 12px 60px rgba(245,158,11,0.18), 0 4px 16px rgba(180,83,9,0.12), inset 0 1px 0 rgba(255,255,255,0.9); }
-  }
+    /* Inner Crisp White Box */
+    .signature-card-inner {
+      position: relative;
+      background: #ffffff;
+      padding: 40px 75px;
+      border-radius: 17px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 0 15px rgba(212, 175, 55, 0.08);
+    }
 
-  .name-box-shine {
-    position: absolute;
-    width: 60%; height: 1px;
-    top: 0; left: 20%;
-    background: linear-gradient(90deg, transparent, rgba(245,158,11,0.6), transparent);
-    animation: shine-move 3s ease-in-out infinite;
-  }
-  @keyframes shine-move {
-    0% { left: -50%; opacity: 0; }
-    20% { opacity: 1; }
-    80% { opacity: 1; }
-    100% { left: 100%; opacity: 0; }
-  }
+    /* The Signature Text Container */
+    .signature-text-container {
+      position: relative;
+      display: inline-block;
+      overflow: hidden;
+    }
 
-  .signature-name {
-    font-family: 'Great Vibes', cursive;
-    font-size: 72px;
-    background: linear-gradient(135deg, #b45309 0%, #d97706 25%, #f59e0b 50%, #fde68a 70%, #f59e0b 85%, #d97706 100%);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    background-clip: text;
-    line-height: 1;
-    position: relative; z-index: 1;
-    filter: drop-shadow(0 2px 8px rgba(180,83,9,0.25));
-    animation: name-appear 1.5s cubic-bezier(0.16, 1, 0.3, 1) both;
-    background-size: 200% 100%;
-    animation: name-appear 1.5s cubic-bezier(0.16, 1, 0.3, 1) both, gold-shimmer 4s ease-in-out infinite 1.5s;
-  }
-  @keyframes name-appear {
-    0% { opacity: 0; transform: translateY(20px) scale(0.8); filter: blur(10px) drop-shadow(0 2px 8px rgba(180,83,9,0)); }
-    100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0) drop-shadow(0 2px 8px rgba(180,83,9,0.25)); }
-  }
-  @keyframes gold-shimmer {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-  }
+    /* The "Nithan" Signature */
+    .signature-name {
+      font-family: var(--font-signature);
+      font-size: 5.5rem;
+      letter-spacing: 2px;
+      font-weight: 400;
+      margin: 0;
+      white-space: nowrap;
+      
+      /* Gold-to-white gradient palette */
+      background: linear-gradient(135deg, #aa771c 0%, #d4af37 35%, #fff1b8 65%, #ffffff 85%, #d4af37 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 3px 6px rgba(179, 135, 40, 0.25));
 
-  .name-subtitle {
-    font-family: 'Inter', sans-serif;
-    font-size: 10px;
-    letter-spacing: 0.25em;
-    color: var(--text-muted);
-    margin-top: 8px;
-    text-transform: uppercase;
-    position: relative; z-index: 1;
-    animation: fade-in-up 1s ease both 0.8s;
-  }
-  @keyframes fade-in-up {
-    0% { opacity: 0; transform: translateY(8px); }
-    100% { opacity: 1; transform: translateY(0); }
-  }
+      /* Reveal like handwriting stroke */
+      clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);
+      animation: writeSignature 1.8s cubic-bezier(0.4, 0, 0.2, 1) 0.3s forwards,
+                 goldShimmer 4s linear infinite;
+    }
 
-  .loader-dots {
-    display: flex; gap: 6px; margin-top: 40px;
-    animation: fade-in-up 1s ease both 1.2s;
-  }
-  .loader-dots span {
-    width: 5px; height: 5px; border-radius: 50%;
-    background: var(--gold-3);
-    animation: dot-bounce 1.4s ease-in-out infinite;
-  }
-  .loader-dots span:nth-child(2) { animation-delay: 0.2s; }
-  .loader-dots span:nth-child(3) { animation-delay: 0.4s; }
-  @keyframes dot-bounce {
-    0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
-    40% { transform: translateY(-8px); opacity: 1; }
-  }
+    .loader-subtitle {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 5px;
+      color: #9f8238;
+      margin-top: 5px;
+      opacity: 0;
+      animation: fadeIn 0.8s ease 2.2s forwards;
+    }
 
-  /* Box exit animation */
-  .name-box.exit {
-    animation: box-exit 0.8s cubic-bezier(0.55, 0, 1, 0.45) forwards !important;
-  }
-  @keyframes box-exit {
-    0% { transform: scale(1); opacity: 1; }
-    40% { transform: scale(1.06); opacity: 1; }
-    100% { transform: scale(0) rotate(8deg); opacity: 0; }
-  }
-  .glow-ring-outer.exit, .glow-ring-middle.exit, .glow-ring-inner.exit {
-    animation: ring-exit 0.6s ease-out forwards !important;
-  }
-  @keyframes ring-exit {
-    to { transform: scale(0); opacity: 0; }
-  }
+    /* Skip button */
+    .skip-btn {
+      position: absolute;
+      bottom: 40px;
+      padding: 8px 18px;
+      font-size: 0.8rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      background: transparent;
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      color: var(--gold-deep);
+      border-radius: 30px;
+      cursor: pointer;
+      opacity: 0;
+      animation: fadeIn 0.5s ease 2.8s forwards;
+      transition: var(--transition);
+    }
+    .skip-btn:hover {
+      background: rgba(212, 175, 55, 0.1);
+      border-color: var(--gold-main);
+    }
 
-  /* ========== MAIN SITE ========== */
-  #main { opacity: 0; transition: opacity 1s ease 0.3s; }
-  #main.visible { opacity: 1; }
+    /* Keyframes */
+    @keyframes writeSignature {
+      0% { clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%); }
+      100% { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
+    }
 
-  /* Nav */
-  nav {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-    padding: 0 40px;
-    height: 64px;
-    display: flex; align-items: center; justify-content: space-between;
-    background: rgba(255,255,255,0.85);
-    backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(245,158,11,0.12);
-    transform: translateY(-100%);
-    animation: nav-slide 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  }
-  @keyframes nav-slide { to { transform: translateY(0); } }
+    @keyframes goldShimmer {
+      to { background-position: 200% center; }
+    }
 
-  .nav-logo {
-    font-family: 'Great Vibes', cursive;
-    font-size: 32px;
-    background: linear-gradient(135deg, #b45309, #f59e0b, #d97706);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    background-clip: text;
-    text-decoration: none;
-  }
-  .nav-links { display: flex; gap: 32px; list-style: none; }
-  .nav-links a {
-    font-size: 13px; letter-spacing: 0.06em; color: var(--text-secondary);
-    text-decoration: none; text-transform: uppercase;
-    transition: color 0.3s ease;
-    position: relative;
-  }
-  .nav-links a::after {
-    content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 1px;
-    background: linear-gradient(90deg, #d97706, #f59e0b);
-    transform: scaleX(0); transform-origin: left; transition: transform 0.3s ease;
-  }
-  .nav-links a:hover { color: var(--gold-5); }
-  .nav-links a:hover::after { transform: scaleX(1); }
+    @keyframes boxReveal {
+      0% {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
 
-  /* Hero */
-  .hero {
-    min-height: 100vh;
-    display: flex; align-items: center; justify-content: center;
-    padding: 120px 40px 80px;
-    position: relative; overflow: hidden;
-    background: linear-gradient(160deg, #ffffff 0%, #fffbf0 40%, #fefce8 70%, #ffffff 100%);
-  }
-  .hero-bg {
-    position: absolute; inset: 0; pointer-events: none;
-    background:
-      radial-gradient(ellipse 80% 60% at 70% 30%, rgba(245,158,11,0.06) 0%, transparent 60%),
-      radial-gradient(ellipse 50% 40% at 20% 80%, rgba(253,230,138,0.08) 0%, transparent 50%);
-  }
-  .hero-grid-lines {
-    position: absolute; inset: 0; pointer-events: none;
-    background-image:
-      linear-gradient(rgba(245,158,11,0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(245,158,11,0.04) 1px, transparent 1px);
-    background-size: 60px 60px;
-    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 0%, transparent 70%);
-  }
-  .hero-content {
-    position: relative; z-index: 1;
-    max-width: 800px; width: 100%;
-    display: grid; grid-template-columns: 1fr; gap: 0;
-  }
+    @keyframes rotateGlow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
 
-  .hero-eyebrow {
-    display: flex; align-items: center; gap: 12px; margin-bottom: 28px;
-    animation: slide-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) both 0.2s;
-  }
-  .eyebrow-line {
-    height: 1px; width: 48px;
-    background: linear-gradient(90deg, transparent, var(--gold-3));
-  }
-  .eyebrow-text {
-    font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase;
-    color: var(--gold-5); font-weight: 500;
-  }
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
 
-  .hero-name {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(60px, 10vw, 100px);
-    font-weight: 300; line-height: 0.95;
-    color: var(--text-primary);
-    margin-bottom: 24px;
-    animation: slide-up 0.9s cubic-bezier(0.16, 1, 0.3, 1) both 0.35s;
-  }
-  .hero-name em {
-    font-style: italic; font-weight: 300;
-    background: linear-gradient(135deg, #b45309, #d97706, #f59e0b);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
+    /* =========================================
+       NAVIGATION BAR
+       ========================================= */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(212, 175, 55, 0.18);
+      z-index: 100;
+      padding: 16px 8%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+    }
 
-  .hero-tagline {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(18px, 2.5vw, 24px);
-    font-weight: 300; font-style: italic;
-    color: var(--text-secondary); line-height: 1.6;
-    max-width: 520px; margin-bottom: 48px;
-    animation: slide-up 1s cubic-bezier(0.16, 1, 0.3, 1) both 0.5s;
-  }
+    .nav-brand {
+      font-family: var(--font-signature);
+      font-size: 2.2rem;
+      background: var(--gold-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-decoration: none;
+      font-weight: 600;
+    }
 
-  .hero-ctas {
-    display: flex; gap: 16px; flex-wrap: wrap;
-    animation: slide-up 1s cubic-bezier(0.16, 1, 0.3, 1) both 0.65s;
-  }
-  .btn-primary {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 14px 32px; border-radius: 4px;
-    background: linear-gradient(135deg, #b45309, #d97706, #f59e0b);
-    color: white; font-size: 13px; letter-spacing: 0.08em;
-    text-transform: uppercase; text-decoration: none; font-weight: 500;
-    border: none; cursor: pointer;
-    box-shadow: 0 4px 20px rgba(180,83,9,0.3), 0 1px 4px rgba(180,83,9,0.2);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    position: relative; overflow: hidden;
-  }
-  .btn-primary::before {
-    content: '';
-    position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-    transition: left 0.4s ease;
-  }
-  .btn-primary:hover::before { left: 100%; }
-  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 30px rgba(180,83,9,0.35); }
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+      align-items: center;
+    }
 
-  .btn-secondary {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 13px 32px; border-radius: 4px;
-    background: transparent; color: var(--gold-5);
-    font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase;
-    text-decoration: none; font-weight: 500;
-    border: 1px solid rgba(180,83,9,0.3);
-    transition: all 0.2s ease;
-  }
-  .btn-secondary:hover {
-    background: rgba(180,83,9,0.05); border-color: var(--gold-4);
-    transform: translateY(-1px);
-  }
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-dark);
+      font-size: 0.92rem;
+      font-weight: 500;
+      transition: var(--transition);
+      position: relative;
+    }
 
-  .hero-scroll {
-    position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
-    display: flex; flex-direction: column; align-items: center; gap: 8px;
-    animation: fade-in 1s ease both 1.5s;
-  }
-  .scroll-text {
-    font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
-    color: var(--text-muted);
-  }
-  .scroll-line {
-    width: 1px; height: 40px;
-    background: linear-gradient(180deg, var(--gold-4), transparent);
-    animation: scroll-pulse 2s ease-in-out infinite;
-  }
-  @keyframes scroll-pulse {
-    0% { transform: scaleY(0); transform-origin: top; opacity: 0; }
-    50% { transform: scaleY(1); transform-origin: top; opacity: 1; }
-    51% { transform: scaleY(1); transform-origin: bottom; }
-    100% { transform: scaleY(0); transform-origin: bottom; opacity: 0; }
-  }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0%;
+      height: 2px;
+      background: var(--gold-main);
+      transition: var(--transition);
+    }
 
-  /* Divider */
-  .section-divider {
-    height: 1px; margin: 0 40px;
-    background: linear-gradient(90deg, transparent, rgba(245,158,11,0.2), rgba(245,158,11,0.3), rgba(245,158,11,0.2), transparent);
-  }
+    .nav-links a:hover {
+      color: var(--gold-deep);
+    }
 
-  /* Section base */
-  .section {
-    padding: 100px 40px;
-    max-width: 1000px; margin: 0 auto;
-  }
-  .section-label {
-    display: flex; align-items: center; gap: 16px; margin-bottom: 60px;
-  }
-  .section-number {
-    font-size: 12px; letter-spacing: 0.15em; color: var(--gold-5); font-weight: 500;
-    font-family: 'Cormorant Garamond', serif; font-style: italic;
-  }
-  .section-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(36px, 5vw, 52px); font-weight: 300;
-    color: var(--text-primary); line-height: 1.1;
-  }
-  .section-title span {
-    background: linear-gradient(135deg, #b45309, #f59e0b);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    background-clip: text; font-style: italic;
-  }
+    .nav-links a:hover::after {
+      width: 100%;
+    }
 
-  /* About */
-  .about-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start;
-  }
-  .about-text p {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 20px; font-weight: 300; line-height: 1.8;
-    color: var(--text-secondary); margin-bottom: 24px;
-  }
-  .about-text p:first-child {
-    font-size: 22px; color: var(--text-primary); font-style: italic;
-  }
-  .about-stats {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
-  }
-  .stat-card {
-    padding: 28px 24px;
-    border: 1px solid rgba(245,158,11,0.15);
-    border-radius: 8px;
-    background: linear-gradient(135deg, rgba(253,230,138,0.06), rgba(255,255,255,0.8));
-    position: relative; overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-  .stat-card::before {
-    content: '';
-    position: absolute; top: 0; left: 0; right: 0; height: 2px;
-    background: linear-gradient(90deg, transparent, var(--gold-3), transparent);
-  }
-  .stat-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(245,158,11,0.1); }
-  .stat-number {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 48px; font-weight: 300; line-height: 1;
-    background: linear-gradient(135deg, #b45309, #f59e0b);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-    margin-bottom: 8px;
-  }
-  .stat-label {
-    font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;
-    color: var(--text-muted);
-  }
+    .nav-cta {
+      padding: 10px 22px;
+      border-radius: 30px;
+      background: var(--gold-gradient);
+      color: #ffffff !important;
+      font-weight: 600 !important;
+      box-shadow: 0 4px 15px rgba(212, 175, 55, 0.35);
+      border: none;
+    }
+    .nav-cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(212, 175, 55, 0.45);
+    }
+    .nav-cta::after { display: none !important; }
 
-  /* Experience */
-  .experience-bg {
-    background: linear-gradient(160deg, #fefce8 0%, #fffbf0 50%, #ffffff 100%);
-    padding: 100px 0;
-  }
-  .timeline { position: relative; }
-  .timeline::before {
-    content: '';
-    position: absolute; left: 0; top: 0; bottom: 0; width: 1px;
-    background: linear-gradient(180deg, transparent, var(--gold-3), var(--gold-4), var(--gold-3), transparent);
-  }
-  .timeline-item {
-    padding-left: 48px; margin-bottom: 60px; position: relative;
-    opacity: 0; transform: translateX(-20px);
-    transition: opacity 0.6s ease, transform 0.6s ease;
-  }
-  .timeline-item.visible { opacity: 1; transform: translateX(0); }
-  .timeline-dot {
-    position: absolute; left: -6px; top: 6px;
-    width: 13px; height: 13px; border-radius: 50%;
-    background: white; border: 2px solid var(--gold-3);
-    box-shadow: 0 0 12px rgba(245,158,11,0.4);
-    transition: box-shadow 0.3s ease;
-  }
-  .timeline-item:hover .timeline-dot { box-shadow: 0 0 24px rgba(245,158,11,0.7); }
-  .timeline-date {
-    font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;
-    color: var(--gold-5); margin-bottom: 8px;
-  }
-  .timeline-role {
-    font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 500;
-    color: var(--text-primary); margin-bottom: 4px;
-  }
-  .timeline-company {
-    font-size: 14px; color: var(--text-muted); margin-bottom: 16px;
-    font-style: italic;
-  }
-  .timeline-desc {
-    font-size: 15px; line-height: 1.8; color: var(--text-secondary); max-width: 540px;
-  }
-  .timeline-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
-  .tag {
-    padding: 4px 12px; border-radius: 2px;
-    background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2);
-    font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
-    color: var(--gold-5);
-  }
+    /* =========================================
+       HERO SECTION
+       ========================================= */
+    .hero {
+      padding: 180px 8% 100px;
+      min-height: 95vh;
+      display: flex;
+      align-items: center;
+      position: relative;
+      background: radial-gradient(circle at 80% 20%, rgba(243, 229, 171, 0.25) 0%, transparent 60%);
+    }
 
-  /* Skills */
-  .skills-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
-  .skill-group {
-    opacity: 0; transform: translateY(20px);
-    transition: opacity 0.5s ease, transform 0.5s ease;
-  }
-  .skill-group.visible { opacity: 1; transform: translateY(0); }
-  .skill-group-title {
-    font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase;
-    color: var(--gold-5); margin-bottom: 20px; padding-bottom: 12px;
-    border-bottom: 1px solid rgba(245,158,11,0.2);
-    display: flex; align-items: center; gap: 8px;
-  }
-  .skill-group-title::before {
-    content: ''; width: 20px; height: 1px;
-    background: linear-gradient(90deg, var(--gold-3), transparent);
-  }
-  .skill-item {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 16px;
-  }
-  .skill-name { font-size: 14px; color: var(--text-secondary); }
-  .skill-bar {
-    width: 100px; height: 2px; border-radius: 1px;
-    background: rgba(245,158,11,0.12);
-    position: relative; overflow: hidden;
-  }
-  .skill-fill {
-    position: absolute; inset: 0 0 0 auto; height: 100%;
-    background: linear-gradient(90deg, #b45309, #f59e0b);
-    border-radius: 1px;
-    width: 0; transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  .skill-group.visible .skill-fill { width: var(--pct); }
+    .hero-content {
+      max-width: 800px;
+    }
 
-  /* Projects */
-  .projects-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
-  .project-card {
-    border: 1px solid rgba(245,158,11,0.15);
-    border-radius: 12px; overflow: hidden;
-    background: white;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    cursor: pointer;
-    opacity: 0; transform: translateY(24px);
-    transition: opacity 0.6s ease, transform 0.6s ease, box-shadow 0.3s ease;
-  }
-  .project-card.visible { opacity: 1; transform: translateY(0); }
-  .project-card:hover { box-shadow: 0 20px 60px rgba(245,158,11,0.12), 0 4px 16px rgba(0,0,0,0.06); }
-  .project-image {
-    height: 180px; position: relative; overflow: hidden;
-    background: linear-gradient(135deg, var(--gold-1), var(--light));
-    display: flex; align-items: center; justify-content: center;
-  }
-  .project-icon {
-    font-size: 48px; opacity: 0.6;
-    animation: icon-float 4s ease-in-out infinite;
-  }
-  @keyframes icon-float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-8px); }
-  }
-  .project-image-overlay {
-    position: absolute; inset: 0;
-    background: linear-gradient(135deg, rgba(180,83,9,0.08), rgba(245,158,11,0.12));
-  }
-  .project-body { padding: 24px; }
-  .project-label {
-    font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
-    color: var(--gold-5); margin-bottom: 8px;
-  }
-  .project-title {
-    font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 500;
-    color: var(--text-primary); margin-bottom: 12px; line-height: 1.3;
-  }
-  .project-desc { font-size: 14px; line-height: 1.7; color: var(--text-muted); margin-bottom: 16px; }
-  .project-link {
-    font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
-    color: var(--gold-5); text-decoration: none;
-    display: inline-flex; align-items: center; gap: 6px;
-    border-bottom: 1px solid rgba(180,83,9,0.2);
-    padding-bottom: 2px;
-    transition: gap 0.2s ease, border-color 0.2s ease;
-  }
-  .project-link:hover { gap: 10px; border-color: var(--gold-4); }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #ffffff;
+      border: 1px solid var(--gold-border);
+      padding: 6px 16px;
+      border-radius: 50px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--gold-deep);
+      margin-bottom: 24px;
+      box-shadow: 0 2px 10px rgba(212, 175, 55, 0.1);
+    }
 
-  /* Contact */
-  .contact-bg {
-    background: linear-gradient(160deg, #fefce8 0%, #fffdf5 100%);
-    padding: 100px 0;
-  }
-  .contact-inner { max-width: 700px; margin: 0 auto; padding: 0 40px; text-align: center; }
-  .contact-heading {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(40px, 6vw, 64px); font-weight: 300; line-height: 1.15;
-    color: var(--text-primary); margin-bottom: 24px;
-  }
-  .contact-sub {
-    font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 300;
-    font-style: italic; color: var(--text-secondary); margin-bottom: 48px; line-height: 1.6;
-  }
-  .contact-links { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
-  .contact-link {
-    display: flex; align-items: center; gap: 10px; padding: 14px 28px;
-    border: 1px solid rgba(180,83,9,0.2); border-radius: 4px;
-    text-decoration: none; color: var(--text-secondary);
-    font-size: 13px; letter-spacing: 0.06em;
-    transition: all 0.3s ease;
-    background: white;
-  }
-  .contact-link:hover {
-    border-color: var(--gold-3); color: var(--gold-5);
-    background: rgba(245,158,11,0.04);
-    transform: translateY(-2px);
-  }
+    .badge-dot {
+      width: 8px;
+      height: 8px;
+      background: #10b981;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #10b981;
+    }
 
-  /* Footer */
-  footer {
-    padding: 40px; border-top: 1px solid rgba(245,158,11,0.12);
-    display: flex; align-items: center; justify-content: space-between;
-    background: white;
-  }
-  .footer-logo {
-    font-family: 'Great Vibes', cursive; font-size: 28px;
-    background: linear-gradient(135deg, #b45309, #d97706);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-  }
-  .footer-copy { font-size: 12px; color: var(--text-muted); letter-spacing: 0.05em; }
+    .hero-title {
+      font-family: var(--font-title);
+      font-size: 3.8rem;
+      line-height: 1.15;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 20px;
+    }
 
-  /* Scroll reveal */
-  .reveal {
-    opacity: 0; transform: translateY(30px);
-    transition: opacity 0.7s ease, transform 0.7s ease;
-  }
-  .reveal.visible { opacity: 1; transform: translateY(0); }
+    .hero-title span {
+      font-family: var(--font-signature);
+      font-size: 4.8rem;
+      font-weight: 400;
+      background: var(--gold-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block;
+    }
 
-  @keyframes slide-up {
-    0% { opacity: 0; transform: translateY(30px); }
-    100% { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes fade-in {
-    to { opacity: 1; }
-  }
+    .hero-subtitle {
+      font-size: 1.25rem;
+      color: var(--text-muted);
+      margin-bottom: 35px;
+      font-weight: 400;
+      max-width: 650px;
+    }
 
-  @media (max-width: 768px) {
-    nav { padding: 0 20px; }
-    .nav-links { display: none; }
-    .hero { padding: 100px 20px 80px; }
-    .section { padding: 60px 20px; }
-    .about-grid { grid-template-columns: 1fr; gap: 40px; }
-    .skills-grid { grid-template-columns: 1fr 1fr; }
-    .projects-grid { grid-template-columns: 1fr; }
-    .footer { padding: 24px 20px; }
-    .contact-inner { padding: 0 20px; }
-    .glow-ring-outer { width: 260px; height: 260px; }
-    .glow-ring-middle { width: 230px; height: 230px; }
-    .glow-ring-inner { width: 200px; height: 200px; }
-    .name-box { width: 190px; height: 190px; }
-    .signature-name { font-size: 60px; }
-  }
-</style>
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 28px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border-radius: 30px;
+      text-decoration: none;
+      transition: var(--transition);
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: var(--gold-gradient);
+      color: #fff;
+      box-shadow: var(--gold-glow);
+      border: none;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(212, 175, 55, 0.4);
+    }
+
+    .btn-secondary {
+      background: #ffffff;
+      color: var(--text-dark);
+      border: 1px solid #e2ded5;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--gold-main);
+      color: var(--gold-deep);
+      background: #fdfcf9;
+    }
+
+    /* Stats Quick Row */
+    .hero-stats {
+      display: flex;
+      gap: 48px;
+      margin-top: 50px;
+      padding-top: 30px;
+      border-top: 1px solid rgba(212, 175, 55, 0.2);
+    }
+
+    .stat-number {
+      font-family: var(--font-title);
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--gold-deep);
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* =========================================
+       SECTION COMMON STYLES
+       ========================================= */
+    .section {
+      padding: 100px 8%;
+    }
+
+    .section-header {
+      text-align: center;
+      max-width: 650px;
+      margin: 0 auto 60px;
+    }
+
+    .section-tag {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: var(--gold-deep);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .section-title {
+      font-family: var(--font-title);
+      font-size: 2.5rem;
+      color: var(--text-dark);
+      position: relative;
+    }
+
+    .section-title::after {
+      content: '';
+      display: block;
+      width: 50px;
+      height: 3px;
+      background: var(--gold-main);
+      margin: 14px auto 0;
+      border-radius: 2px;
+    }
+
+    /* =========================================
+       ABOUT SECTION
+       ========================================= */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 50px;
+      align-items: center;
+    }
+
+    .about-card {
+      background: var(--surface-white);
+      border: 1px solid var(--gold-border);
+      border-radius: 24px;
+      padding: 40px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+      position: relative;
+    }
+
+    .about-card::before {
+      content: '';
+      position: absolute;
+      top: -1px;
+      left: 10%;
+      right: 10%;
+      height: 2px;
+      background: var(--gold-gradient);
+    }
+
+    .about-text {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      margin-bottom: 20px;
+      line-height: 1.8;
+    }
+
+    .info-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 25px;
+    }
+
+    .info-item {
+      font-size: 0.95rem;
+    }
+
+    .info-item strong {
+      color: var(--text-dark);
+      display: block;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--gold-deep);
+    }
+
+    /* =========================================
+       EXPERIENCE & TIMELINE
+       ========================================= */
+    .timeline {
+      position: relative;
+      max-width: 860px;
+      margin: 0 auto;
+      padding-left: 30px;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 7px;
+      width: 2px;
+      background: linear-gradient(180deg, var(--gold-main) 0%, rgba(212, 175, 55, 0.2) 100%);
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: 45px;
+    }
+
+    .timeline-dot {
+      position: absolute;
+      left: -30px;
+      top: 6px;
+      width: 16px;
+      height: 16px;
+      background: #ffffff;
+      border: 3px solid var(--gold-main);
+      border-radius: 50%;
+      box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+    }
+
+    .timeline-card {
+      background: #ffffff;
+      border: 1px solid var(--gold-border);
+      border-radius: 16px;
+      padding: 28px;
+      transition: var(--transition);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+    }
+
+    .timeline-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--gold-glow);
+      border-color: var(--gold-main);
+    }
+
+    .timeline-date {
+      display: inline-block;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--gold-deep);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .timeline-role {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 4px;
+    }
+
+    .timeline-company {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .timeline-desc {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    /* =========================================
+       SKILLS SECTION
+       ========================================= */
+    .skills-wrapper {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 28px;
+    }
+
+    .skill-box {
+      background: #ffffff;
+      padding: 32px;
+      border-radius: 20px;
+      border: 1px solid var(--gold-border);
+      transition: var(--transition);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.02);
+    }
+
+    .skill-box:hover {
+      border-color: var(--gold-main);
+      transform: translateY(-5px);
+      box-shadow: var(--gold-glow);
+    }
+
+    .skill-icon {
+      font-size: 2rem;
+      color: var(--gold-deep);
+      margin-bottom: 18px;
+    }
+
+    .skill-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 15px;
+    }
+
+    .skill-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag {
+      background: #fdfaf3;
+      border: 1px solid rgba(212, 175, 55, 0.2);
+      color: #7b621f;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+
+    /* =========================================
+       PROJECTS SECTION
+       ========================================= */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 30px;
+    }
+
+    .project-card {
+      background: #ffffff;
+      border-radius: 20px;
+      border: 1px solid var(--gold-border);
+      overflow: hidden;
+      transition: var(--transition);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.03);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .project-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--gold-glow);
+      border-color: var(--gold-main);
+    }
+
+    .project-banner {
+      height: 180px;
+      background: linear-gradient(135deg, #f7f3e8 0%, #ede3c8 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gold-deep);
+      font-size: 3rem;
+      position: relative;
+    }
+
+    .project-content {
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+
+    .project-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .project-desc {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 20px;
+      flex-grow: 1;
+    }
+
+    .project-link {
+      font-weight: 600;
+      color: var(--gold-deep);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.9rem;
+      transition: var(--transition);
+    }
+
+    .project-link:hover {
+      color: var(--text-dark);
+      transform: translateX(4px);
+    }
+
+    /* =========================================
+       CONTACT & FOOTER
+       ========================================= */
+    .contact-card {
+      background: #ffffff;
+      border: 1px solid var(--gold-border);
+      border-radius: 28px;
+      padding: 60px 40px;
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto;
+      box-shadow: var(--gold-glow);
+    }
+
+    .contact-title {
+      font-family: var(--font-title);
+      font-size: 2.4rem;
+      margin-bottom: 12px;
+    }
+
+    .contact-desc {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      max-width: 520px;
+      margin: 0 auto 30px;
+    }
+
+    .social-links {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 30px;
+    }
+
+    .social-btn {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      border: 1px solid var(--gold-border);
+      background: #ffffff;
+      color: var(--gold-deep);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      text-decoration: none;
+      transition: var(--transition);
+    }
+
+    .social-btn:hover {
+      background: var(--gold-gradient);
+      color: #ffffff;
+      border-color: transparent;
+      transform: translateY(-3px);
+    }
+
+    footer {
+      text-align: center;
+      padding: 40px 8%;
+      border-top: 1px solid rgba(212, 175, 55, 0.15);
+      color: var(--text-muted);
+      font-size: 0.88rem;
+    }
+
+    /* =========================================
+       RESPONSIVE ADJUSTMENTS
+       ========================================= */
+    @media (max-width: 768px) {
+      .signature-name { font-size: 4rem; }
+      .signature-card-inner { padding: 30px 45px; }
+      .hero-title { font-size: 2.8rem; }
+      .hero-title span { font-size: 3.6rem; }
+      .about-grid { grid-template-columns: 1fr; }
+      .hero-stats { gap: 24px; }
+      .nav-links { display: none; }
+    }
+  </style>
 </head>
 <body>
 
-<!-- ===== LOADER ===== -->
-<div id="loader" role="status" aria-label="Loading">
-  <div class="loader-bg-shimmer"></div>
-  <div class="loader-particles" id="particles"></div>
-
-  <div class="loader-center">
-    <div class="glow-ring-outer"></div>
-    <div class="glow-ring-middle"></div>
-    <div class="glow-ring-inner"></div>
-
-    <div class="name-box">
-      <div class="name-box-shine"></div>
-      <div class="signature-name">Nithan</div>
-      <div class="name-subtitle">Portfolio</div>
+  <!-- =========================================
+       LOADING INTRO SCREEN
+       ========================================= -->
+  <div id="loader-wrapper">
+    <!-- Glowing Box with rotating gold border -->
+    <div class="signature-card-box">
+      <div class="signature-card-inner">
+        <div class="signature-text-container">
+          <h1 class="signature-name">Nithan</h1>
+        </div>
+        <span class="loader-subtitle">Executive Portfolio</span>
+      </div>
     </div>
+    
+    <button class="skip-btn" onclick="dismissLoader()">Skip Intro</button>
   </div>
 
-  <div class="loader-dots" aria-hidden="true">
-    <span></span><span></span><span></span>
-  </div>
-</div>
+  <!-- =========================================
+       MAIN RESUME WEBSITE
+       ========================================= */ -->
 
-<!-- ===== MAIN SITE ===== -->
-<div id="main">
-
-  <nav>
-    <a href="#" class="nav-logo">N</a>
+  <!-- Top Navbar -->
+  <nav class="navbar">
+    <a href="#" class="nav-brand">Nithan</a>
     <ul class="nav-links">
       <li><a href="#about">About</a></li>
       <li><a href="#experience">Experience</a></li>
       <li><a href="#skills">Skills</a></li>
       <li><a href="#projects">Projects</a></li>
-      <li><a href="#contact">Contact</a></li>
+      <li><a href="#contact" class="nav-cta">Get in Touch</a></li>
     </ul>
   </nav>
 
-  <!-- HERO -->
+  <!-- Hero Section -->
   <section class="hero">
-    <div class="hero-bg"></div>
-    <div class="hero-grid-lines"></div>
     <div class="hero-content">
-      <div class="hero-eyebrow">
-        <div class="eyebrow-line"></div>
-        <span class="eyebrow-text">Creative & Developer</span>
+      <div class="hero-badge">
+        <div class="badge-dot"></div>
+        Available for Exclusive Opportunities
       </div>
-      <h1 class="hero-name">Hello, I'm<br><em>Nithan</em></h1>
-      <p class="hero-tagline">
-        I craft digital experiences where creativity meets code — blending thoughtful design with elegant engineering.
+      
+      <h1 class="hero-title">
+        Crafting Vision Into Reality.<br>
+        I am <span>Nithan</span>
+      </h1>
+      
+      <p class="hero-subtitle">
+        Senior Engineer & Creative Technologist specializing in building elegant, high-impact digital experiences and modern web systems.
       </p>
-      <div class="hero-ctas">
-        <a href="#projects" class="btn-primary">View My Work →</a>
-        <a href="#contact" class="btn-secondary">Get In Touch</a>
+
+      <div class="hero-actions">
+        <a href="#contact" class="btn btn-primary">
+          <i class="fa-regular fa-paper-plane"></i> Contact Me
+        </a>
+        <a href="#experience" class="btn btn-secondary">
+          <i class="fa-solid fa-file-arrow-down"></i> View Resume
+        </a>
       </div>
-    </div>
-    <div class="hero-scroll">
-      <span class="scroll-text">Scroll</span>
-      <div class="scroll-line"></div>
+
+      <div class="hero-stats">
+        <div>
+          <div class="stat-number">6+</div>
+          <div class="stat-label">Years Exp.</div>
+        </div>
+        <div>
+          <div class="stat-number">40+</div>
+          <div class="stat-label">Projects Shipped</div>
+        </div>
+        <div>
+          <div class="stat-number">100%</div>
+          <div class="stat-label">Excellence Rating</div>
+        </div>
+      </div>
     </div>
   </section>
 
-  <div class="section-divider"></div>
-
-  <!-- ABOUT -->
-  <section id="about" class="section">
-    <div class="section-label reveal">
-      <span class="section-number">01 —</span>
-      <h2 class="section-title">About <span>Me</span></h2>
+  <!-- About Section -->
+  <section class="section" id="about">
+    <div class="section-header">
+      <div class="section-tag">Biography</div>
+      <h2 class="section-title">About Me</h2>
     </div>
+
     <div class="about-grid">
-      <div class="about-text reveal">
-        <p>I'm a creative developer with a passion for building beautiful, purposeful digital experiences that leave a lasting impression.</p>
-        <p>My work sits at the intersection of visual design and engineering — I believe the best digital products are those that feel as good as they look.</p>
-        <p>When I'm not coding, I'm exploring new design trends, studying creative direction, and finding ways to push the boundaries of what's possible on screen.</p>
+      <div>
+        <p class="about-text">
+          Hello! I’m Nithan. I blend creative design thinking with strict engineering discipline. With extensive hands-on experience designing robust solutions, I strive to make every interface feel natural, responsive, and aesthetically distinctive.
+        </p>
+        <p class="about-text">
+          Whether designing architectural pipelines, directing design standards, or engineering front-end experiences, my dedication remains constant: pure craft and meticulous execution.
+        </p>
       </div>
-      <div class="about-stats">
-        <div class="stat-card reveal">
-          <div class="stat-number">3+</div>
-          <div class="stat-label">Years Experience</div>
-        </div>
-        <div class="stat-card reveal" style="transition-delay: 0.1s">
-          <div class="stat-number">20+</div>
-          <div class="stat-label">Projects Completed</div>
-        </div>
-        <div class="stat-card reveal" style="transition-delay: 0.2s">
-          <div class="stat-number">10+</div>
-          <div class="stat-label">Happy Clients</div>
-        </div>
-        <div class="stat-card reveal" style="transition-delay: 0.3s">
-          <div class="stat-number">∞</div>
-          <div class="stat-label">Ideas to Build</div>
+
+      <div class="about-card">
+        <h3 style="font-family: var(--font-title); margin-bottom: 20px;">Candidate Profile</h3>
+        <div class="info-list">
+          <div class="info-item">
+            <strong>Full Name</strong>
+            Nithan
+          </div>
+          <div class="info-item">
+            <strong>Location</strong>
+            Global / Remote
+          </div>
+          <div class="info-item">
+            <strong>Core Domain</strong>
+            Product Engineering
+          </div>
+          <div class="info-item">
+            <strong>Availability</strong>
+            Immediate
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <div class="section-divider"></div>
-
-  <!-- EXPERIENCE -->
-  <div class="experience-bg">
-    <section id="experience" class="section" style="padding-top: 0; padding-bottom: 0;">
-      <div class="section-label reveal">
-        <span class="section-number">02 —</span>
-        <h2 class="section-title"><span>Experience</span></h2>
-      </div>
-      <div class="timeline">
-        <div class="timeline-item">
-          <div class="timeline-dot"></div>
-          <div class="timeline-date">2023 — Present</div>
-          <div class="timeline-role">Creative Front-End Developer</div>
-          <div class="timeline-company">Freelance & Personal Studio</div>
-          <p class="timeline-desc">Building interactive web experiences for clients across branding, portfolios, and product interfaces. Specialising in motion design, WebGL, and scroll-driven animations.</p>
-          <div class="timeline-tags">
-            <span class="tag">Three.js</span>
-            <span class="tag">GSAP</span>
-            <span class="tag">React</span>
-            <span class="tag">WebGL</span>
-          </div>
-        </div>
-        <div class="timeline-item">
-          <div class="timeline-dot"></div>
-          <div class="timeline-date">2022 — 2023</div>
-          <div class="timeline-role">UI/UX Designer & Developer</div>
-          <div class="timeline-company">Digital Agency — Creative Division</div>
-          <p class="timeline-desc">Led visual design and front-end development for client campaigns. Collaborated with creative teams to produce award-quality digital deliverables on time and on brand.</p>
-          <div class="timeline-tags">
-            <span class="tag">Figma</span>
-            <span class="tag">Vue.js</span>
-            <span class="tag">CSS Animation</span>
-          </div>
-        </div>
-        <div class="timeline-item">
-          <div class="timeline-dot"></div>
-          <div class="timeline-date">2021 — 2022</div>
-          <div class="timeline-role">Web Development Intern</div>
-          <div class="timeline-company">Tech Start-up</div>
-          <p class="timeline-desc">Developed responsive interfaces and contributed to the company's design system. Gained deep experience with component-driven architecture and accessibility standards.</p>
-          <div class="timeline-tags">
-            <span class="tag">JavaScript</span>
-            <span class="tag">HTML/CSS</span>
-            <span class="tag">Design Systems</span>
-          </div>
-        </div>
-      </div>
-    </section>
-  </div>
-
-  <div class="section-divider"></div>
-
-  <!-- SKILLS -->
-  <section id="skills" class="section">
-    <div class="section-label reveal">
-      <span class="section-number">03 —</span>
-      <h2 class="section-title">Skills &amp; <span>Craft</span></h2>
+  <!-- Experience Timeline -->
+  <section class="section" id="experience" style="background: #fdfdfb;">
+    <div class="section-header">
+      <div class="section-tag">Career Path</div>
+      <h2 class="section-title">Experience & History</h2>
     </div>
-    <div class="skills-grid">
-      <div class="skill-group">
-        <div class="skill-group-title">Frontend</div>
-        <div class="skill-item"><span class="skill-name">React / Next.js</span><div class="skill-bar"><div class="skill-fill" style="--pct: 90%"></div></div></div>
-        <div class="skill-item"><span class="skill-name">Three.js / WebGL</span><div class="skill-bar"><div class="skill-fill" style="--pct: 80%"></div></div></div>
-        <div class="skill-item"><span class="skill-name">GSAP / Motion</span><div class="skill-bar"><div class="skill-fill" style="--pct: 85%"></div></div></div>
-        <div class="skill-item"><span class="skill-name">TypeScript</span><div class="skill-bar"><div class="skill-fill" style="--pct: 75%"></div></div></div>
+
+    <div class="timeline">
+      <!-- Item 1 -->
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-card">
+          <span class="timeline-date">2023 — Present</span>
+          <h3 class="timeline-role">Lead Full-Stack Engineer</h3>
+          <h4 class="timeline-company">Aura Labs Inc.</h4>
+          <p class="timeline-desc">
+            Directed full-cycle system architecture and modern web experiences. Scaled applications across global deployments while maintaining sub-second render performance.
+          </p>
+        </div>
       </div>
-      <div class="skill-group" style="transition-delay: 0.1s">
-        <div class="skill-group-title">Design</div>
-        <div class="skill-item"><span class="skill-name">Figma</span><div class="skill-bar"><div class="skill-fill" style="--pct: 88%"></div></div></div>
-        <div class="skill-item"><span class="skill-name">UI / UX Design</span><div class="skill-bar"><div class="skill-fill" style="--pct: 82%"></div></div></div>
-        <div class="skill-item"><span class="skill-name">Motion Design</span><div class="skill-bar"><div class="skill-fill" style="--pct: 78%"></div></div></div>
-        <div class="skill-item"><span class="skill-name">Typography</span><div class="skill-bar"><div class="skill-fill" style="--pct: 70%"></div></div></div>
+
+      <!-- Item 2 -->
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-card">
+          <span class="timeline-date">2021 — 2023</span>
+          <h3 class="timeline-role">Senior Frontend Specialist</h3>
+          <h4 class="timeline-company">Vanguard Digital Solutions</h4>
+          <p class="timeline-desc">
+            Architected interactive design systems, optimized UI/UX micro-interactions, and accelerated user workflows by over 45% through modern frontend solutions.
+          </p>
+        </div>
       </div>
-      <div class="skill-group" style="transition-delay: 0.2s">
-        <div class="skill-group-title">Backend & Tools</div>
-        <div class="skill-item"><span class="skill-name">Node.js</span><div class="skill-bar"><div class="skill-fill" style="--pct: 72%"></div></div></div>
-        <div class="skill-item"><span class="skill-name">Git / GitHub</span><div class="skill-bar"><div class="skill-fill" style="--pct: 88%"></div></div></div>
-        <div class="skill-item"><span class="skill-name">Tailwind CSS</span><div class="skill-bar"><div class="skill-fill" style="--pct: 92%"></div></div></div>
-        <div class="skill-item"><span class="skill-name">Databases</span><div class="skill-bar"><div class="skill-fill" style="--pct: 65%"></div></div></div>
+
+      <!-- Item 3 -->
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-card">
+          <span class="timeline-date">2019 — 2021</span>
+          <h3 class="timeline-role">Software Engineer</h3>
+          <h4 class="timeline-company">Novus Systems</h4>
+          <p class="timeline-desc">
+            Constructed mission-critical REST and GraphQL APIs, streamlined CI/CD release cycles, and collaborated directly with cross-functional leadership teams.
+          </p>
+        </div>
       </div>
     </div>
   </section>
 
-  <div class="section-divider"></div>
-
-  <!-- PROJECTS -->
-  <section id="projects" class="section">
-    <div class="section-label reveal">
-      <span class="section-number">04 —</span>
-      <h2 class="section-title">Selected <span>Work</span></h2>
+  <!-- Skills Section -->
+  <section class="section" id="skills">
+    <div class="section-header">
+      <div class="section-tag">Capabilities</div>
+      <h2 class="section-title">Core Competencies</h2>
     </div>
+
+    <div class="skills-wrapper">
+      <div class="skill-box">
+        <i class="fa-solid fa-code skill-icon"></i>
+        <h3 class="skill-title">Frontend Mastery</h3>
+        <div class="skill-tags">
+          <span class="tag">TypeScript</span>
+          <span class="tag">React / Next.js</span>
+          <span class="tag">Vue.js</span>
+          <span class="tag">TailwindCSS</span>
+          <span class="tag">CSS Grid & Animation</span>
+        </div>
+      </div>
+
+      <div class="skill-box">
+        <i class="fa-solid fa-server skill-icon"></i>
+        <h3 class="skill-title">Backend Architecture</h3>
+        <div class="skill-tags">
+          <span class="tag">Node.js</span>
+          <span class="tag">Python</span>
+          <span class="tag">PostgreSQL</span>
+          <span class="tag">GraphQL & REST</span>
+          <span class="tag">Redis</span>
+        </div>
+      </div>
+
+      <div class="skill-box">
+        <i class="fa-solid fa-gem skill-icon"></i>
+        <h3 class="skill-title">Product & Leadership</h3>
+        <div class="skill-tags">
+          <span class="tag">UI/UX Strategy</span>
+          <span class="tag">Figma</span>
+          <span class="tag">System Design</span>
+          <span class="tag">Team Mentorship</span>
+          <span class="tag">Agile Sprint Leadership</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Projects -->
+  <section class="section" id="projects" style="background: #fdfdfb;">
+    <div class="section-header">
+      <div class="section-tag">Portfolio</div>
+      <h2 class="section-title">Selected Works</h2>
+    </div>
+
     <div class="projects-grid">
+      <!-- Project 1 -->
       <div class="project-card">
-        <div class="project-image">
-          <span class="project-icon">📖</span>
-          <div class="project-image-overlay"></div>
+        <div class="project-banner">
+          <i class="fa-solid fa-chart-line"></i>
         </div>
-        <div class="project-body">
-          <div class="project-label">3D Web Experience</div>
-          <div class="project-title">Interactive Book Portfolio</div>
-          <p class="project-desc">A scroll-driven 3D portfolio built with Three.js and GSAP — pages that flip like a real book as you navigate through work.</p>
-          <a href="#" class="project-link">View Project →</a>
+        <div class="project-content">
+          <h3 class="project-title">Apex Analytics Platform</h3>
+          <p class="project-desc">Real-time enterprise telemetry dashboard delivering millisecond data visualization for high-frequency operations.</p>
+          <a href="#" class="project-link">View Case Study <i class="fa-solid fa-arrow-right"></i></a>
         </div>
       </div>
-      <div class="project-card" style="transition-delay: 0.12s">
-        <div class="project-image" style="background: linear-gradient(135deg, #fefce8, #fde68a20);">
-          <span class="project-icon">✦</span>
-          <div class="project-image-overlay"></div>
+
+      <!-- Project 2 -->
+      <div class="project-card">
+        <div class="project-banner">
+          <i class="fa-solid fa-compass-drafting"></i>
         </div>
-        <div class="project-body">
-          <div class="project-label">Brand Identity</div>
-          <div class="project-title">Luxury Brand Redesign</div>
-          <p class="project-desc">Full visual identity and web presence for a boutique brand — crafting elegance through typography, spacing, and motion.</p>
-          <a href="#" class="project-link">View Project →</a>
-        </div>
-      </div>
-      <div class="project-card" style="transition-delay: 0.2s">
-        <div class="project-image" style="background: linear-gradient(135deg, #fff7ed, #fed7aa20);">
-          <span class="project-icon">◎</span>
-          <div class="project-image-overlay"></div>
-        </div>
-        <div class="project-body">
-          <div class="project-label">Data Visualisation</div>
-          <div class="project-title">Stock Market Dashboard</div>
-          <p class="project-desc">Real-time financial dashboard with custom chart components, smooth data transitions, and a clean analytical interface.</p>
-          <a href="#" class="project-link">View Project →</a>
+        <div class="project-content">
+          <h3 class="project-title">Aethel Design Suite</h3>
+          <p class="project-desc">A unified multi-platform component library adopted across 14 enterprise applications with auto-theming support.</p>
+          <a href="#" class="project-link">View Case Study <i class="fa-solid fa-arrow-right"></i></a>
         </div>
       </div>
-      <div class="project-card" style="transition-delay: 0.32s">
-        <div class="project-image" style="background: linear-gradient(135deg, #f0fdf4, #bbf7d020);">
-          <span class="project-icon">⬡</span>
-          <div class="project-image-overlay"></div>
+
+      <!-- Project 3 -->
+      <div class="project-card">
+        <div class="project-banner">
+          <i class="fa-solid fa-shield-halved"></i>
         </div>
-        <div class="project-body">
-          <div class="project-label">Creative Development</div>
-          <div class="project-title">Generative Art Tool</div>
-          <p class="project-desc">An in-browser canvas tool for creating generative art patterns — built with WebGL shaders and a custom React interface.</p>
-          <a href="#" class="project-link">View Project →</a>
+        <div class="project-content">
+          <h3 class="project-title">Sentinel Identity Layer</h3>
+          <p class="project-desc">Zero-trust authentication gateway engineered for sub-50ms token verification with biometric support.</p>
+          <a href="#" class="project-link">View Case Study <i class="fa-solid fa-arrow-right"></i></a>
         </div>
       </div>
     </div>
   </section>
 
-  <div class="section-divider"></div>
+  <!-- Contact CTA -->
+  <section class="section" id="contact">
+    <div class="contact-card">
+      <div class="section-tag">Let's Connect</div>
+      <h2 class="contact-title">Ready to build something extraordinary?</h2>
+      <p class="contact-desc">
+        I am available for select contract advisory, senior leadership roles, and ambitious creative collaborations.
+      </p>
 
-  <!-- CONTACT -->
-  <div class="contact-bg" id="contact">
-    <div class="contact-inner">
-      <h2 class="contact-heading reveal">Let's create something <em>remarkable</em></h2>
-      <p class="contact-sub reveal">Open to freelance projects, collaborations, and creative conversations.</p>
-      <div class="contact-links reveal">
-        <a href="mailto:hello@nithan.dev" class="contact-link">
-          <span>✉</span> hello@nithan.dev
-        </a>
-        <a href="#" class="contact-link">
-          <span>in</span> LinkedIn
-        </a>
-        <a href="#" class="contact-link">
-          <span>gh</span> GitHub
-        </a>
-        <a href="#" class="contact-link">
-          <span>↗</span> Resume PDF
-        </a>
+      <a href="mailto:hello@nithan.com" class="btn btn-primary">
+        <i class="fa-regular fa-envelope"></i> Send an Email
+      </a>
+
+      <div class="social-links">
+        <a href="#" class="social-btn" title="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+        <a href="#" class="social-btn" title="GitHub"><i class="fa-brands fa-github"></i></a>
+        <a href="#" class="social-btn" title="Twitter / X"><i class="fa-brands fa-x-twitter"></i></a>
       </div>
     </div>
-  </div>
+  </section>
 
+  <!-- Footer -->
   <footer>
-    <div class="footer-logo">Nithan</div>
-    <span class="footer-copy">Crafted with care · 2024</span>
+    <p>&copy; <span id="current-year"></span> Nithan. Designed with elegance in White & Gold.</p>
   </footer>
 
-</div><!-- /#main -->
+  <!-- =========================================
+       TRANSITION SCRIPT
+       ========================================= -->
+  <script>
+    // Set dynamic year
+    document.getElementById('current-year').textContent = new Date().getFullYear();
 
-<script>
-  /* ---- Floating particles ---- */
-  const pc = document.getElementById('particles');
-  for (let i = 0; i < 18; i++) {
-    const p = document.createElement('div');
-    const size = 2 + Math.random() * 6;
-    p.className = 'particle';
-    p.style.cssText = `
-      width:${size}px;height:${size}px;
-      left:${Math.random()*100}%;
-      animation-duration:${5+Math.random()*8}s;
-      animation-delay:${-Math.random()*8}s;
-    `;
-    pc.appendChild(p);
-  }
+    const loader = document.getElementById('loader-wrapper');
 
-  /* ---- Loader sequence ---- */
-  const loader   = document.getElementById('loader');
-  const mainEl   = document.getElementById('main');
-  const nameBox  = document.querySelector('.name-box');
-  const ringOut  = document.querySelector('.glow-ring-outer');
-  const ringMid  = document.querySelector('.glow-ring-middle');
-  const ringIn   = document.querySelector('.glow-ring-inner');
+    function dismissLoader() {
+      loader.classList.add('loaded');
+      setTimeout(() => {
+        loader.style.display = 'none';
+      }, 1000);
+    }
 
-  function doExit() {
-    /* rings vanish */
-    ringOut.classList.add('exit');
-    ringMid.classList.add('exit');
-    setTimeout(() => ringIn.classList.add('exit'), 80);
-    /* box collapses after brief delay */
-    setTimeout(() => nameBox.classList.add('exit'), 100);
-    /* main content fades in */
-    setTimeout(() => {
-      mainEl.classList.add('visible');
-    }, 400);
-    /* loader fully gone */
-    setTimeout(() => {
-      loader.classList.add('fade-out');
-      setTimeout(() => { loader.style.display = 'none'; }, 900);
-    }, 600);
-  }
-
-  /* minimum display time so the name can be read */
-  const minTime = 2800;
-  window.addEventListener('load', () => {
-    const elapsed = performance.now();
-    const wait = Math.max(0, minTime - elapsed);
-    setTimeout(doExit, wait);
-  });
-
-  /* ---- Scroll reveal ---- */
-  const revealEls = document.querySelectorAll('.reveal, .timeline-item, .skill-group, .project-card');
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+    // Timing sequence:
+    // 0.3s -> "Nithan" handwritten reveal in signature font (gold-to-white shimmer)
+    // 1.6s -> Gold box appears enclosing the signature
+    // 2.0s to 4.5s -> Gold rotating glow beam spins smoothly around the perimeter
+    // 4.5s -> Smooth zoom-fade transition into the resume site
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        dismissLoader();
+      }, 4500);
     });
-  }, { threshold: 0.15 });
-  revealEls.forEach(el => io.observe(el));
-
-  /* ---- Parallax-lite on hero ---- */
-  const heroBg = document.querySelector('.hero-bg');
-  window.addEventListener('scroll', () => {
-    const y = window.scrollY;
-    if (heroBg) heroBg.style.transform = `translateY(${y * 0.3}px)`;
-  }, { passive: true });
-
-  /* ---- Nav scroll effect ---- */
-  const navEl = document.querySelector('nav');
-  let lastY = 0;
-  window.addEventListener('scroll', () => {
-    const y = window.scrollY;
-    if (y > 80) navEl.style.background = 'rgba(255,255,255,0.95)';
-    else navEl.style.background = 'rgba(255,255,255,0.85)';
-    lastY = y;
-  }, { passive: true });
-</script>
+  </script>
 </body>
 </html>
