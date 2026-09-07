@@ -3,298 +3,583 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dynamic Sensory Portfolio</title>
+    <title>Kinetic Swarm Portfolio</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;600&display=swap');
-
+        /* CSS is minimal because EVERYTHING is rendered in the Canvas engine */
         body, html {
             margin: 0; padding: 0; width: 100%; height: 100%;
-            background-color: #050508; overflow: hidden;
-            font-family: 'Space Grotesk', sans-serif;
-            touch-action: none; 
-            -webkit-user-select: none;
-            user-select: none;
-            color: white;
+            background-color: #020203; overflow: hidden;
+            touch-action: none; -webkit-user-select: none; user-select: none;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
         }
         canvas { display: block; position: absolute; top: 0; left: 0; z-index: 1; }
         
-        #ui-layer {
+        #overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; z-index: 10;
-            text-align: center; padding: 20px; box-sizing: border-box;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            background: #020203; z-index: 100; transition: opacity 1.5s ease; color: white;
+            text-transform: uppercase; letter-spacing: 4px; pointer-events: auto;
         }
-
-        .content-box {
-            opacity: 0; transform: translateY(20px);
-            transition: all 1.2s cubic-bezier(0.25, 1, 0.5, 1);
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-            padding: 40px 30px; border-radius: 20px;
-            max-width: 90%;
+        .start-btn {
+            margin-top: 30px; padding: 15px 40px; background: transparent; 
+            border: 1px solid rgba(255,255,255,0.3); color: white; border-radius: 30px;
+            font-size: 14px; letter-spacing: 2px; cursor: pointer;
         }
-
-        .content-box.visible { opacity: 1; transform: translateY(0); }
-
-        h1 { font-size: 2rem; font-weight: 600; letter-spacing: 4px; margin: 0 0 10px 0; text-transform: uppercase; }
-        h2 { font-size: 1rem; font-weight: 300; letter-spacing: 2px; color: rgba(255,255,255,0.6); margin: 0 0 20px 0; }
-        p { font-size: 1.1rem; font-weight: 300; line-height: 1.6; margin: 0; color: rgba(255,255,255,0.9); }
-        
-        .hint {
-            position: absolute; bottom: 40px; font-size: 0.8rem; letter-spacing: 3px;
-            color: rgba(255,255,255,0.4); opacity: 0; transition: opacity 2s;
-            animation: pulse 3s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 0.2; }
-            50% { opacity: 0.8; }
-        }
-
-        #intro {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: #050508; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; z-index: 20;
-            transition: opacity 1.5s ease-out; pointer-events: auto;
-        }
-
-        button {
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2);
-            color: white; padding: 18px 40px; font-size: 1rem; font-family: 'Space Grotesk', sans-serif;
-            border-radius: 50px; letter-spacing: 3px; cursor: pointer; transition: all 0.3s;
-        }
-        button:active { background: rgba(255,255,255,0.2); }
+        .start-btn:active { background: rgba(255,255,255,0.1); }
+        .loading-text { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 20px; }
     </style>
 </head>
 <body>
 
-    <div id="intro">
-        <h2 style="color: rgba(255,255,255,0.8); margin-bottom: 40px;">AUDIO & HAPTICS REQUIRED</h2>
-        <button id="start-btn">INITIATE SEQUENCE</button>
+    <!-- Start Screen to unlock Audio and Haptics -->
+    <div id="overlay">
+        <h1 style="font-weight: 300; font-size: 20px;">SENSORY ENGINE</h1>
+        <p style="font-size: 10px; color: #888; max-width: 300px; text-align: center; margin-top: 10px; line-height: 1.5;">
+            This portfolio uses complex particle physics, procedural synthesis, and device haptics.
+        </p>
+        <button class="start-btn" id="start-btn">AWAKEN</button>
+        <div class="loading-text" id="status">INITIALIZING...</div>
     </div>
 
-    <div id="ui-layer">
-        <div id="content-container" class="content-box">
-            <h1 id="title"></h1>
-            <h2 id="subtitle"></h2>
-            <p id="description"></p>
-        </div>
-        <div class="hint" id="hint">TAP TO CONTINUE</div>
-    </div>
-
-    <canvas id="canvas"></canvas>
+    <!-- The Singular Output -->
+    <canvas id="engine-canvas"></canvas>
 
     <script>
-        // --- CONTENT DATA (EDIT THIS TO YOUR LIKING) ---
-        const portfolioData = [
-            {
-                title: "[YOUR NAME]",
-                subtitle: "Creative Technologist",
-                desc: "I build interactive, sensory experiences.",
-                hue: 200, behavior: 'float', baseFreq: [261.63, 329.63, 392.00] // C Major
-            },
-            {
-                title: "WHO I AM",
-                subtitle: "The Beautiful Chaos",
-                desc: "I believe design should feel alive. I blend front-end logic with unpredictable, fluid aesthetics.",
-                hue: 280, behavior: 'orbit', baseFreq: [220.00, 261.63, 329.63] // A Minor
-            },
-            {
-                title: "WHAT I DO",
-                subtitle: "Capabilities",
-                desc: "Web Audio • Gyroscopic UI • Generative Motion • Haptic Interfaces",
-                hue: 40, behavior: 'wave', baseFreq: [329.63, 392.00, 493.88] // E Minor
-            },
-            {
-                title: "SELECTED WORK",
-                subtitle: "Project Zero",
-                desc: "An experiment in using phone hardware to turn digital space into physical calm.",
-                hue: 340, behavior: 'explode', baseFreq: [349.23, 440.00, 523.25] // F Major
-            }
-        ];
-
-        // --- SYSTEM SETUP ---
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        let width, height, audioCtx;
-        let particles = [];
-        let currentIndex = -1;
-        let gyroX = 0, gyroY = 0;
-        let targetHue = 200, currentBehavior = 'float';
-
-        function resize() {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resize);
-        resize();
-
-        // --- SENSORY APIs ---
-        function playChord(frequencies) {
-            if (!audioCtx) return;
-            frequencies.forEach((freq, index) => {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = index % 2 === 0 ? 'sine' : 'triangle';
-                osc.frequency.value = freq;
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                
-                gain.gain.setValueAtTime(0, audioCtx.currentTime);
-                // Stagger the attack slightly for a strummed feel
-                gain.gain.linearRampToValueAtTime(0.05, audioCtx.currentTime + 0.2 + (index * 0.1));
-                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 4);
-                
-                osc.start(audioCtx.currentTime + (index * 0.05));
-                osc.stop(audioCtx.currentTime + 4);
-            });
+        /**
+         * ============================================================================
+         * 1. CORE MATH & UTILITIES
+         * A custom Vector math library to handle advanced physics calculations.
+         * ============================================================================
+         */
+        class Vec2 {
+            constructor(x = 0, y = 0) { this.x = x; this.y = y; }
+            add(v) { this.x += v.x; this.y += v.y; return this; }
+            sub(v) { this.x -= v.x; this.y -= v.y; return this; }
+            mult(n) { this.x *= n; this.y *= n; return this; }
+            div(n) { this.x /= n; this.y /= n; return this; }
+            mag() { return Math.sqrt(this.x * this.x + this.y * this.y); }
+            normalize() { let m = this.mag(); if (m !== 0) this.div(m); return this; }
+            limit(max) { if (this.mag() > max) { this.normalize(); this.mult(max); } return this; }
+            dist(v) { let dx = this.x - v.x; let dy = this.y - v.y; return Math.sqrt(dx * dx + dy * dy); }
+            copy() { return new Vec2(this.x, this.y); }
+            set(x, y) { this.x = x; this.y = y; return this; }
+            heading() { return Math.atan2(this.y, this.x); }
+            lerp(v, amt) { this.x += (v.x - this.x) * amt; this.y += (v.y - this.y) * amt; return this; }
+            static sub(v1, v2) { return new Vec2(v1.x - v2.x, v1.y - v2.y); }
+            static dist(v1, v2) { return v1.dist(v2); }
+            static random2D() { return new Vec2(Math.random() * 2 - 1, Math.random() * 2 - 1).normalize(); }
         }
 
-        function hapticPattern(behavior) {
-            if (!navigator.vibrate) return;
-            if (behavior === 'float') navigator.vibrate([15, 30, 15]);
-            else if (behavior === 'orbit') navigator.vibrate([20, 50, 10, 50, 20]);
-            else if (behavior === 'wave') navigator.vibrate([10, 20, 10, 20, 10]);
-            else if (behavior === 'explode') navigator.vibrate([50, 20, 50]);
-        }
+        const MathUtils = {
+            map: (n, start1, stop1, start2, stop2) => ((n - start1) / (stop1 - start1)) * (stop2 - start2) + start2,
+            random: (min, max) => Math.random() * (max - min) + min,
+            lerp: (start, stop, amt) => start + (stop - start) * amt
+        };
 
-        // --- PARTICLE PHYSICS ---
-        class Particle {
+        /**
+         * ============================================================================
+         * 2. PROCEDURAL AUDIO SYNTHESIZER
+         * Generates music mathematically. No audio files are used.
+         * ============================================================================
+         */
+        class AudioEngine {
             constructor() {
-                this.x = Math.random() * width;
-                this.y = Math.random() * height;
-                this.vx = (Math.random() - 0.5);
-                this.vy = (Math.random() - 0.5);
-                this.baseSize = Math.random() * 2 + 0.5;
-                this.angle = Math.random() * Math.PI * 2;
+                this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                this.masterGain = this.ctx.createGain();
+                this.masterGain.gain.value = 0.6;
+                this.masterGain.connect(this.ctx.destination);
+
+                // Reverb setup
+                this.convolver = this.ctx.createConvolver();
+                this.convolver.buffer = this.createReverbBuffer(3);
+                this.reverbGain = this.ctx.createGain();
+                this.reverbGain.gain.value = 0.4;
+                this.convolver.connect(this.reverbGain);
+                this.reverbGain.connect(this.masterGain);
+
+                // Scales (Pentatonic for soothing predictable harmonics)
+                this.scales = {
+                    ambient: [196.00, 220.00, 261.63, 293.66, 329.63, 392.00], // G Major Pentatonic
+                    chaos: [110.00, 116.54, 130.81, 138.59, 155.56, 164.81],   // Dissonant scale
+                    bright: [261.63, 293.66, 329.63, 392.00, 440.00, 523.25]   // C Major Pentatonic
+                };
+                
+                this.currentScale = this.scales.ambient;
+                this.isPlaying = false;
+                this.tempo = 80;
+                this.nextNoteTime = 0;
+                this.noteIndex = 0;
+            }
+
+            createReverbBuffer(duration) {
+                const sampleRate = this.ctx.sampleRate;
+                const length = sampleRate * duration;
+                const impulse = this.ctx.createBuffer(2, length, sampleRate);
+                for (let i = 0; i < 2; i++) {
+                    const channel = impulse.getChannelData(i);
+                    for (let j = 0; j < length; j++) {
+                        channel[j] = (Math.random() * 2 - 1) * Math.pow(1 - j / length, 2);
+                    }
+                }
+                return impulse;
+            }
+
+            playSynth(freq, type = 'sine', attack = 0.1, decay = 0.3, sustain = 0.1, release = 2) {
+                const osc = this.ctx.createOscillator();
+                const vca = this.ctx.createGain();
+                const filter = this.ctx.createBiquadFilter();
+
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(1000, this.ctx.currentTime);
+                filter.frequency.exponentialRampToValueAtTime(300, this.ctx.currentTime + decay);
+
+                // ADSR Envelope
+                vca.gain.setValueAtTime(0, this.ctx.currentTime);
+                vca.gain.linearRampToValueAtTime(0.3, this.ctx.currentTime + attack);
+                vca.gain.exponentialRampToValueAtTime(sustain, this.ctx.currentTime + attack + decay);
+                vca.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + attack + decay + release);
+
+                osc.connect(filter);
+                filter.connect(vca);
+                vca.connect(this.masterGain);
+                vca.connect(this.convolver); // Send to reverb
+
+                osc.start(this.ctx.currentTime);
+                osc.stop(this.ctx.currentTime + attack + decay + release);
+            }
+
+            playBassDrop() {
+                const osc = this.ctx.createOscillator();
+                const vca = this.ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(150, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(30, this.ctx.currentTime + 1.5);
+                
+                vca.gain.setValueAtTime(0, this.ctx.currentTime);
+                vca.gain.linearRampToValueAtTime(0.5, this.ctx.currentTime + 0.1);
+                vca.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 2);
+
+                osc.connect(vca);
+                vca.connect(this.masterGain);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 2);
+            }
+
+            scheduler() {
+                while (this.nextNoteTime < this.ctx.currentTime + 0.1) {
+                    this.scheduleNote();
+                    this.nextNoteTime += (60.0 / this.tempo);
+                }
+                if (this.isPlaying) this.timerID = requestAnimationFrame(() => this.scheduler());
+            }
+
+            scheduleNote() {
+                // Generative ambient melody
+                if (Math.random() > 0.3) {
+                    const note = this.currentScale[Math.floor(Math.random() * this.currentScale.length)];
+                    this.playSynth(note, 'sine', 0.5, 1, 0.2, 3);
+                }
+                // Harmonic layer
+                if (Math.random() > 0.7) {
+                    const note = this.currentScale[Math.floor(Math.random() * this.currentScale.length)] * 2;
+                    this.playSynth(note, 'triangle', 0.1, 0.5, 0.1, 2);
+                }
+                this.noteIndex++;
+            }
+
+            start() {
+                if (!this.isPlaying) {
+                    this.isPlaying = true;
+                    this.nextNoteTime = this.ctx.currentTime + 0.1;
+                    this.scheduler();
+                }
+            }
+
+            triggerChaos() {
+                this.currentScale = this.scales.chaos;
+                this.tempo = 140;
+                this.playBassDrop();
+                setTimeout(() => {
+                    this.currentScale = this.scales.ambient;
+                    this.tempo = 80;
+                }, 2000);
+            }
+        }
+
+        /**
+         * ============================================================================
+         * 3. SENSOR & DEVICE MANAGER
+         * Handles Gyroscope with Low-Pass Filtering, Touch, and Haptics
+         * ============================================================================
+         */
+        class DeviceManager {
+            constructor() {
+                this.gyro = new Vec2(0, 0);
+                this.targetGyro = new Vec2(0, 0);
+                this.touch = new Vec2(-1000, -1000); // Offscreen initially
+                this.isTouching = false;
+                this.initEvents();
+            }
+
+            initEvents() {
+                window.addEventListener('touchstart', (e) => {
+                    this.touch.set(e.touches[0].clientX, e.touches[0].clientY);
+                    this.isTouching = true;
+                    engine.triggerInteraction();
+                }, { passive: false });
+
+                window.addEventListener('touchmove', (e) => {
+                    this.touch.set(e.touches[0].clientX, e.touches[0].clientY);
+                }, { passive: false });
+
+                window.addEventListener('touchend', () => {
+                    this.isTouching = false;
+                    this.touch.set(-1000, -1000);
+                });
+            }
+
+            async requestGyro() {
+                if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                    try {
+                        const permission = await DeviceOrientationEvent.requestPermission();
+                        if (permission === 'granted') this.attachGyro();
+                    } catch (e) { console.warn("Gyro permission denied"); }
+                } else {
+                    this.attachGyro();
+                }
+            }
+
+            attachGyro() {
+                window.addEventListener('deviceorientation', (e) => {
+                    // Normalize to -1 to 1 range
+                    let x = e.gamma ? e.gamma / 45 : 0; 
+                    let y = e.beta ? (e.beta - 45) / 45 : 0;
+                    this.targetGyro.set(x, y);
+                });
             }
 
             update() {
-                // Gyro Influence
-                this.vx += gyroX * 0.03;
-                this.vy += gyroY * 0.03;
-
-                // Behavior State Machine
-                let dx = (width / 2) - this.x;
-                let dy = (height / 2) - this.y;
-                let dist = Math.sqrt(dx * dx + dy * dy);
-
-                if (currentBehavior === 'orbit') {
-                    // Swirl around center
-                    this.vx += (dy / dist) * 0.15;
-                    this.vy -= (dx / dist) * 0.15;
-                    if (dist > 200) { this.vx += dx * 0.0005; this.vy += dy * 0.0005; }
-                } 
-                else if (currentBehavior === 'wave') {
-                    // Sine wave motion flow
-                    this.angle += 0.05;
-                    this.vx += Math.sin(this.angle) * 0.1;
-                    this.vy += (dy > 0 ? 0.01 : -0.01);
-                } 
-                else if (currentBehavior === 'explode') {
-                    // Constant gentle push outwards, pulled back by gravity
-                    if (dist < 150) { this.vx -= dx * 0.002; this.vy -= dy * 0.002; }
-                    else { this.vx += dx * 0.0005; this.vy += dy * 0.0005; }
-                }
-
-                // Friction
-                this.vx *= 0.96;
-                this.vy *= 0.96;
-                this.x += this.vx;
-                this.y += this.vy;
-
-                // Screen Wrap
-                if (this.x < 0) this.x = width;
-                if (this.x > width) this.x = 0;
-                if (this.y < 0) this.y = height;
-                if (this.y > height) this.y = 0;
+                // Low-pass filter for buttery smooth gyro motion
+                this.gyro.lerp(this.targetGyro, 0.05);
             }
 
-            draw() {
-                ctx.fillStyle = `hsla(${targetHue}, 70%, 60%, 0.7)`;
+            vibrate(pattern) {
+                if (navigator.vibrate) navigator.vibrate(pattern);
+            }
+        }
+
+        /**
+         * ============================================================================
+         * 4. KINETIC TYPOGRAPHY ENGINE
+         * Renders text to an invisible canvas to extract coordinates for particles.
+         * ============================================================================
+         */
+        class Typography {
+            constructor(width, height) {
+                this.canvas = document.createElement('canvas');
+                this.ctx = this.canvas.getContext('2d', { willReadFrequently: true });
+                this.resize(width, height);
+            }
+
+            resize(w, h) {
+                this.width = this.canvas.width = w;
+                this.height = this.canvas.height = h;
+            }
+
+            getPoints(textData) {
+                this.ctx.clearRect(0, 0, this.width, this.height);
+                this.ctx.fillStyle = '#fff';
+                this.ctx.textAlign = 'center';
+                this.ctx.textBaseline = 'middle';
+
+                // Render lines
+                textData.lines.forEach((line, index) => {
+                    this.ctx.font = `bold ${line.size}px 'Helvetica Neue', Helvetica, Arial, sans-serif`;
+                    const y = (this.height / 2) + line.offsetY;
+                    this.ctx.fillText(line.text, this.width / 2, y);
+                });
+
+                const imageData = this.ctx.getImageData(0, 0, this.width, this.height).data;
+                let points = [];
+                
+                // Scan pixel data (step controls particle density)
+                let step = window.innerWidth < 600 ? 3 : 4; 
+                for (let y = 0; y < this.height; y += step) {
+                    for (let x = 0; x < this.width; x += step) {
+                        const alpha = imageData[(y * this.width + x) * 4 + 3];
+                        if (alpha > 128) {
+                            points.push(new Vec2(x, y));
+                        }
+                    }
+                }
+                return points;
+            }
+        }
+
+        /**
+         * ============================================================================
+         * 5. PHYSICS PARTICLE (THE SWARM)
+         * Incorporates Spring physics for text forming, and Boids for chaos.
+         * ============================================================================
+         */
+        class Particle {
+            constructor(x, y) {
+                this.pos = new Vec2(x, y);
+                this.vel = Vec2.random2D().mult(MathUtils.random(1, 3));
+                this.acc = new Vec2(0, 0);
+                this.target = new Vec2(x, y); // Where it belongs in the typography
+                
+                this.maxSpeed = MathUtils.random(4, 8);
+                this.maxForce = MathUtils.random(0.2, 0.5);
+                this.baseRadius = MathUtils.random(1, 2.5);
+                
+                // Color variation based on position
+                this.hueOffset = MathUtils.random(-20, 20);
+            }
+
+            applyForce(force) {
+                this.acc.add(force);
+            }
+
+            // The predictable, soothing pull to form the text
+            arrive(target) {
+                let desired = Vec2.sub(target, this.pos);
+                let d = desired.mag();
+                let speed = this.maxSpeed;
+                if (d < 100) {
+                    speed = MathUtils.map(d, 0, 100, 0, this.maxSpeed);
+                }
+                desired.normalize();
+                desired.mult(speed);
+                let steer = Vec2.sub(desired, this.vel);
+                steer.limit(this.maxForce);
+                return steer;
+            }
+
+            // The Chaos: Fleeing from touch
+            flee(target, radius) {
+                let desired = Vec2.sub(this.pos, target);
+                let d = desired.mag();
+                if (d < radius) {
+                    desired.normalize();
+                    desired.mult(this.maxSpeed * 3); // Explode quickly
+                    let steer = Vec2.sub(desired, this.vel);
+                    steer.limit(this.maxForce * 4);
+                    return steer;
+                }
+                return new Vec2(0, 0);
+            }
+
+            update(device, isChaosMode) {
+                // 1. Core behavior: Form the text
+                let arriveForce = this.arrive(this.target);
+                arriveForce.mult(isChaosMode ? 0.1 : 1.2); // Weaken structure in chaos mode
+                this.applyForce(arriveForce);
+
+                // 2. Gyroscope wind (drifts particles)
+                let gyroForce = device.gyro.copy().mult(isChaosMode ? 2 : 0.5);
+                this.applyForce(gyroForce);
+
+                // 3. Touch Repulsion (Explosion)
+                if (device.isTouching) {
+                    let fleeForce = this.flee(device.touch, 150);
+                    this.applyForce(fleeForce);
+                }
+
+                // Noise/Wander for organic life
+                if (!isChaosMode) {
+                    let wander = Vec2.random2D().mult(0.1);
+                    this.applyForce(wander);
+                }
+
+                this.vel.add(this.acc);
+                this.vel.limit(isChaosMode ? this.maxSpeed * 2 : this.maxSpeed);
+                this.pos.add(this.vel);
+                
+                // Reset acceleration for next frame
+                this.acc.set(0, 0);
+                
+                // Friction
+                this.vel.mult(0.95);
+            }
+
+            draw(ctx, hueBase, isChaosMode) {
                 ctx.beginPath();
-                ctx.arc(this.x, this.y, this.baseSize, 0, Math.PI * 2);
+                ctx.arc(this.pos.x, this.pos.y, isChaosMode ? this.baseRadius * 0.5 : this.baseRadius, 0, Math.PI * 2);
+                let speedAlpha = MathUtils.map(this.vel.mag(), 0, this.maxSpeed, 0.4, 1);
+                ctx.fillStyle = `hsla(${hueBase + this.hueOffset}, 80%, 70%, ${speedAlpha})`;
                 ctx.fill();
             }
         }
 
-        for (let i = 0; i < 250; i++) particles.push(new Particle());
-
-        function animate() {
-            // Dark fluid trail effect
-            ctx.fillStyle = 'rgba(5, 5, 8, 0.15)';
-            ctx.fillRect(0, 0, width, height);
-
-            particles.forEach(p => { p.update(); p.draw(); });
-            requestAnimationFrame(animate);
-        }
-
-        // --- UI & INTERACTION LOGIC ---
-        function advancePortfolio() {
-            if (!audioCtx) return;
-            
-            currentIndex = (currentIndex + 1) % portfolioData.length;
-            const data = portfolioData[currentIndex];
-
-            // Update States
-            targetHue = data.hue;
-            currentBehavior = data.behavior;
-            
-            // Trigger Sensory
-            playChord(data.baseFreq);
-            hapticPattern(data.behavior);
-
-            // Give particles a kick based on touch
-            particles.forEach(p => {
-                p.vx += (Math.random() - 0.5) * 10;
-                p.vy += (Math.random() - 0.5) * 10;
-            });
-
-            // UI Transition
-            const box = document.getElementById('content-container');
-            box.classList.remove('visible');
-            
-            setTimeout(() => {
-                document.getElementById('title').innerText = data.title;
-                document.getElementById('subtitle').innerText = data.subtitle;
-                document.getElementById('description').innerText = data.desc;
-                box.classList.add('visible');
-            }, 500);
-        }
-
-        window.addEventListener('touchstart', advancePortfolio);
-
-        function handleOrientation(event) {
-            gyroX = event.gamma / 45 || 0; 
-            gyroY = (event.beta - 45) / 45 || 0; 
-        }
-
-        // --- INITIALIZATION ---
-        document.getElementById('start-btn').addEventListener('click', async (e) => {
-            e.stopPropagation(); // Prevent triggering the first tap immediately
-            
-            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-                try {
-                    const permission = await DeviceOrientationEvent.requestPermission();
-                    if (permission === 'granted') window.addEventListener('deviceorientation', handleOrientation);
-                } catch(e) { console.log("Gyro denied"); }
-            } else {
-                window.addEventListener('deviceorientation', handleOrientation);
+        /**
+         * ============================================================================
+         * 6. CORE ENGINE
+         * Orchestrates Rendering, State Machine, and Portfolio Data.
+         * ============================================================================
+         */
+        class PortfolioEngine {
+            constructor() {
+                this.canvas = document.getElementById('engine-canvas');
+                this.ctx = this.canvas.getContext('2d', { alpha: false });
+                
+                this.device = new DeviceManager();
+                this.typo = new Typography(window.innerWidth, window.innerHeight);
+                
+                this.particles = [];
+                this.globalHue = 220; // Starts deep blue
+                this.isChaosMode = false;
+                
+                // Portfolio Content (NO HTML, pure data rendered via particles)
+                this.slides = [
+                    {
+                        lines: [
+                            { text: "NITHAN NAJEEB", size: window.innerWidth < 600 ? 30 : 60, offsetY: -30 },
+                            { text: "CREATIVE DEVELOPER", size: window.innerWidth < 600 ? 16 : 24, offsetY: 20 }
+                        ],
+                        hue: 220 // Blue
+                    },
+                    {
+                        lines: [
+                            { text: "BEYOND", size: window.innerWidth < 600 ? 40 : 80, offsetY: -40 },
+                            { text: "THE GLASS BOX", size: window.innerWidth < 600 ? 25 : 40, offsetY: 10 },
+                            { text: "PURE KINETICS", size: window.innerWidth < 600 ? 12 : 18, offsetY: 50 }
+                        ],
+                        hue: 340 // Pink/Red
+                    },
+                    {
+                        lines: [
+                            { text: "CAPABILITIES", size: window.innerWidth < 600 ? 30 : 50, offsetY: -50 },
+                            { text: "WEBGL & CANVAS", size: window.innerWidth < 600 ? 14 : 20, offsetY: -10 },
+                            { text: "AUDIO SYNTHESIS", size: window.innerWidth < 600 ? 14 : 20, offsetY: 20 },
+                            { text: "SENSOR FUSION", size: window.innerWidth < 600 ? 14 : 20, offsetY: 50 }
+                        ],
+                        hue: 40 // Orange/Gold
+                    },
+                    {
+                        lines: [
+                            { text: "TAP TO LOOP", size: window.innerWidth < 600 ? 30 : 50, offsetY: 0 }
+                        ],
+                        hue: 280 // Purple
+                    }
+                ];
+                
+                this.currentSlide = 0;
+                this.audio = null;
+                
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
             }
 
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            audioCtx = new AudioContext();
+            resize() {
+                this.width = this.canvas.width = window.innerWidth;
+                this.height = this.canvas.height = window.innerHeight;
+                this.typo.resize(this.width, this.height);
+                // Re-calculate targets on resize
+                if (this.particles.length > 0) this.morphToSlide(this.currentSlide, false);
+            }
 
-            document.getElementById('intro').style.opacity = 0;
-            setTimeout(() => {
-                document.getElementById('intro').style.display = 'none';
-                document.getElementById('hint').style.opacity = 1;
-                advancePortfolio(); // Load first slide
-            }, 1000);
+            async start() {
+                document.getElementById('status').innerText = "CALIBRATING...";
+                
+                this.audio = new AudioEngine();
+                await this.device.requestGyro();
+                
+                document.getElementById('overlay').style.opacity = 0;
+                setTimeout(() => document.getElementById('overlay').style.display = 'none', 1500);
 
-            animate();
+                this.morphToSlide(0, true);
+                this.audio.start();
+                
+                this.animate();
+            }
+
+            morphToSlide(index, isInit = false) {
+                const slide = this.slides[index];
+                this.globalHue = slide.hue;
+                
+                // Extract coordinates for the text
+                const targetPoints = this.typo.getPoints(slide);
+                
+                // If initializing, create particles
+                if (isInit) {
+                    this.particles = [];
+                    for (let i = 0; i < targetPoints.length; i++) {
+                        let pt = targetPoints[i];
+                        // Start scattered
+                        let px = Math.random() * this.width;
+                        let py = Math.random() * this.height;
+                        let p = new Particle(px, py);
+                        p.target.set(pt.x, pt.y);
+                        this.particles.push(p);
+                    }
+                } else {
+                    // Match existing particles to new targets
+                    // If new text needs more particles, add them
+                    while (this.particles.length < targetPoints.length) {
+                        let px = Math.random() * this.width;
+                        let py = Math.random() * this.height;
+                        this.particles.push(new Particle(px, py));
+                    }
+                    
+                    // Assign targets randomly to create a chaotic reshuffle
+                    let shuffledTargets = [...targetPoints].sort(() => Math.random() - 0.5);
+                    
+                    for (let i = 0; i < this.particles.length; i++) {
+                        if (i < shuffledTargets.length) {
+                            this.particles[i].target.set(shuffledTargets[i].x, shuffledTargets[i].y);
+                        } else {
+                            // Extra particles from previous slide drift offscreen
+                            this.particles[i].target.set(Math.random() * this.width, -200);
+                        }
+                    }
+                }
+            }
+
+            triggerInteraction() {
+                // Change slide
+                this.currentSlide = (this.currentSlide + 1) % this.slides.length;
+                
+                // Engage Chaos Mode temporarily
+                this.isChaosMode = true;
+                this.device.vibrate([40, 30, 80]); // Heavy haptic bump
+                this.audio.triggerChaos();
+
+                // Morph to new slide
+                this.morphToSlide(this.currentSlide);
+
+                // Return to soothing predictability after 1.5 seconds
+                setTimeout(() => {
+                    this.isChaosMode = false;
+                }, 1500);
+            }
+
+            animate() {
+                // Motion Blur / Fluid Trail Effect
+                this.ctx.fillStyle = `rgba(2, 2, 3, ${this.isChaosMode ? 0.4 : 0.2})`;
+                this.ctx.fillRect(0, 0, this.width, this.height);
+
+                this.device.update();
+
+                // Draw Particles
+                for (let i = 0; i < this.particles.length; i++) {
+                    this.particles[i].update(this.device, this.isChaosMode);
+                    this.particles[i].draw(this.ctx, this.globalHue, this.isChaosMode);
+                }
+
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+
+        // Boot Sequence
+        const engine = new PortfolioEngine();
+        document.getElementById('start-btn').addEventListener('click', () => {
+            engine.start();
         });
+
     </script>
 </body>
 </html>
