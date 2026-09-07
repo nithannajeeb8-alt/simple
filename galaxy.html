@@ -3,1123 +3,541 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Nithan | Portfolio & Resume</title>
-
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cinzel:wght@500;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  
-  <!-- FontAwesome Icons for clean resume UI -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+  <title>CONSOLE // SPEC_V4</title>
   <style>
-    /* =========================================
-       CSS VARIABLES & BASE STYLES
-       ========================================= */
     :root {
-      --bg-white: #faf9f6;
-      --surface-white: #ffffff;
-      --card-bg: #ffffff;
-      --text-dark: #1e1e1e;
-      --text-muted: #666460;
-      
-      /* Gold & White Palette */
-      --gold-deep: #b38728;
-      --gold-main: #d4af37;
-      --gold-light: #f3e5ab;
-      --gold-shimmer: #fffdf5;
-      
-      --gold-gradient: linear-gradient(135deg, #b38728 0%, #f3e5ab 50%, #d4af37 80%, #ffffff 100%);
-      --gold-border: rgba(212, 175, 55, 0.28);
-      --gold-glow: 0 10px 30px rgba(212, 175, 55, 0.25);
-      
-      --font-body: 'Plus Jakarta Sans', sans-serif;
-      --font-title: 'Cinzel', serif;
-      --font-signature: 'Alex Brush', cursive;
-      --transition: all 0.35s ease;
+      --bg: #0c0d10;
+      --panel: #14161b;
+      --panel-border: #272a33;
+      --amber: #ff9e3b;
+      --amber-dim: #7a4816;
+      --green: #29f27a;
+      --text: #e2ded7;
+      --text-muted: #7d818d;
+      --font-mono: "Geist Mono", "JetBrains Mono", ui-monospace, monospace;
+      --font-display: "Courier New", Courier, monospace;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
     body {
-      background-color: var(--bg-white);
-      color: var(--text-dark);
-      font-family: var(--font-body);
-      line-height: 1.6;
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-mono);
+      min-height: 100vh;
       overflow-x: hidden;
+      line-height: 1.4;
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 32px 32px;
     }
 
-    /* =========================================
-       PRELOADER: SIGNATURE & ROTATING GOLD GLOW
-       ========================================= */
-    #loader-wrapper {
+    /* Scanline overlay */
+    body::before {
+      content: "";
       position: fixed;
       inset: 0;
-      width: 100vw;
-      height: 100vh;
-      background: #ffffff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-      transition: opacity 1s cubic-bezier(0.77, 0, 0.175, 1), 
-                  transform 1s cubic-bezier(0.77, 0, 0.175, 1);
-    }
-
-    #loader-wrapper.loaded {
-      opacity: 0;
-      transform: scale(1.04);
-      pointer-events: none;
-    }
-
-    /* Outer Wrapper for the Glowing Rotating Border */
-    .signature-card-box {
-      position: relative;
-      padding: 3px;
-      border-radius: 20px;
-      overflow: hidden;
-      opacity: 0;
-      transform: scale(0.9);
-      animation: boxReveal 1s ease 1.6s forwards;
-      box-shadow: 0 20px 50px rgba(212, 175, 55, 0.15);
-    }
-
-    /* Rotating Conic Gold Beam */
-    .signature-card-box::before {
-      content: '';
-      position: absolute;
-      width: 250%;
-      height: 250%;
-      top: -75%;
-      left: -75%;
-      background: conic-gradient(
-        from 0deg,
-        transparent 0deg,
-        transparent 260deg,
-        var(--gold-deep) 300deg,
-        var(--gold-main) 330deg,
-        var(--gold-light) 350deg,
-        #ffffff 360deg
+      background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.15) 0px,
+        rgba(0, 0, 0, 0.15) 1px,
+        transparent 1px,
+        transparent 2px
       );
-      animation: rotateGlow 3s linear infinite;
+      pointer-events: none;
+      z-index: 1000;
     }
 
-    /* Inner Crisp White Box */
-    .signature-card-inner {
-      position: relative;
-      background: #ffffff;
-      padding: 40px 75px;
-      border-radius: 17px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      box-shadow: inset 0 0 15px rgba(212, 175, 55, 0.08);
+    .chassis {
+      max-width: 1200px;
+      margin: 24px auto;
+      padding: 0 16px;
+      display: grid;
+      gap: 16px;
     }
 
-    /* The Signature Text Container */
-    .signature-text-container {
-      position: relative;
-      display: inline-block;
-      overflow: hidden;
-    }
-
-    /* The "Nithan" Signature */
-    .signature-name {
-      font-family: var(--font-signature);
-      font-size: 5.5rem;
-      letter-spacing: 2px;
-      font-weight: 400;
-      margin: 0;
-      white-space: nowrap;
-      
-      /* Gold-to-white gradient palette */
-      background: linear-gradient(135deg, #aa771c 0%, #d4af37 35%, #fff1b8 65%, #ffffff 85%, #d4af37 100%);
-      background-size: 200% auto;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 3px 6px rgba(179, 135, 40, 0.25));
-
-      /* Reveal like handwriting stroke */
-      clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);
-      animation: writeSignature 1.8s cubic-bezier(0.4, 0, 0.2, 1) 0.3s forwards,
-                 goldShimmer 4s linear infinite;
-    }
-
-    .loader-subtitle {
-      font-size: 0.78rem;
-      text-transform: uppercase;
-      letter-spacing: 5px;
-      color: #9f8238;
-      margin-top: 5px;
-      opacity: 0;
-      animation: fadeIn 0.8s ease 2.2s forwards;
-    }
-
-    /* Skip button */
-    .skip-btn {
-      position: absolute;
-      bottom: 40px;
-      padding: 8px 18px;
-      font-size: 0.8rem;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      background: transparent;
-      border: 1px solid rgba(212, 175, 55, 0.3);
-      color: var(--gold-deep);
-      border-radius: 30px;
-      cursor: pointer;
-      opacity: 0;
-      animation: fadeIn 0.5s ease 2.8s forwards;
-      transition: var(--transition);
-    }
-    .skip-btn:hover {
-      background: rgba(212, 175, 55, 0.1);
-      border-color: var(--gold-main);
-    }
-
-    /* Keyframes */
-    @keyframes writeSignature {
-      0% { clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%); }
-      100% { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
-    }
-
-    @keyframes goldShimmer {
-      to { background-position: 200% center; }
-    }
-
-    @keyframes boxReveal {
-      0% {
-        opacity: 0;
-        transform: scale(0.9);
-      }
-      100% {
-        opacity: 1;
-        transform: scale(1);
-      }
-    }
-
-    @keyframes rotateGlow {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-
-    @keyframes fadeIn {
-      to { opacity: 1; }
-    }
-
-    /* =========================================
-       NAVIGATION BAR
-       ========================================= */
-    .navbar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(212, 175, 55, 0.18);
-      z-index: 100;
-      padding: 16px 8%;
+    /* Top telemetry strip */
+    .telemetry-deck {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      padding: 10px 16px;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
     }
 
-    .nav-brand {
-      font-family: var(--font-signature);
-      font-size: 2.2rem;
-      background: var(--gold-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-decoration: none;
-      font-weight: 600;
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 32px;
-      list-style: none;
-      align-items: center;
-    }
-
-    .nav-links a {
-      text-decoration: none;
-      color: var(--text-dark);
-      font-size: 0.92rem;
-      font-weight: 500;
-      transition: var(--transition);
-      position: relative;
-    }
-
-    .nav-links a::after {
-      content: '';
-      position: absolute;
-      bottom: -4px;
-      left: 0;
-      width: 0%;
-      height: 2px;
-      background: var(--gold-main);
-      transition: var(--transition);
-    }
-
-    .nav-links a:hover {
-      color: var(--gold-deep);
-    }
-
-    .nav-links a:hover::after {
-      width: 100%;
-    }
-
-    .nav-cta {
-      padding: 10px 22px;
-      border-radius: 30px;
-      background: var(--gold-gradient);
-      color: #ffffff !important;
-      font-weight: 600 !important;
-      box-shadow: 0 4px 15px rgba(212, 175, 55, 0.35);
-      border: none;
-    }
-    .nav-cta:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(212, 175, 55, 0.45);
-    }
-    .nav-cta::after { display: none !important; }
-
-    /* =========================================
-       HERO SECTION
-       ========================================= */
-    .hero {
-      padding: 180px 8% 100px;
-      min-height: 95vh;
-      display: flex;
-      align-items: center;
-      position: relative;
-      background: radial-gradient(circle at 80% 20%, rgba(243, 229, 171, 0.25) 0%, transparent 60%);
-    }
-
-    .hero-content {
-      max-width: 800px;
-    }
-
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: #ffffff;
-      border: 1px solid var(--gold-border);
-      padding: 6px 16px;
-      border-radius: 50px;
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: var(--gold-deep);
-      margin-bottom: 24px;
-      box-shadow: 0 2px 10px rgba(212, 175, 55, 0.1);
-    }
-
-    .badge-dot {
-      width: 8px;
-      height: 8px;
-      background: #10b981;
-      border-radius: 50%;
-      box-shadow: 0 0 8px #10b981;
-    }
-
-    .hero-title {
-      font-family: var(--font-title);
-      font-size: 3.8rem;
-      line-height: 1.15;
-      font-weight: 700;
-      color: #1a1a1a;
-      margin-bottom: 20px;
-    }
-
-    .hero-title span {
-      font-family: var(--font-signature);
-      font-size: 4.8rem;
-      font-weight: 400;
-      background: var(--gold-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+    .indicator {
       display: inline-block;
-    }
-
-    .hero-subtitle {
-      font-size: 1.25rem;
-      color: var(--text-muted);
-      margin-bottom: 35px;
-      font-weight: 400;
-      max-width: 650px;
-    }
-
-    .hero-actions {
-      display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 14px 28px;
-      font-size: 0.95rem;
-      font-weight: 600;
-      border-radius: 30px;
-      text-decoration: none;
-      transition: var(--transition);
-      cursor: pointer;
-    }
-
-    .btn-primary {
-      background: var(--gold-gradient);
-      color: #fff;
-      box-shadow: var(--gold-glow);
-      border: none;
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 28px rgba(212, 175, 55, 0.4);
-    }
-
-    .btn-secondary {
-      background: #ffffff;
-      color: var(--text-dark);
-      border: 1px solid #e2ded5;
-    }
-
-    .btn-secondary:hover {
-      border-color: var(--gold-main);
-      color: var(--gold-deep);
-      background: #fdfcf9;
-    }
-
-    /* Stats Quick Row */
-    .hero-stats {
-      display: flex;
-      gap: 48px;
-      margin-top: 50px;
-      padding-top: 30px;
-      border-top: 1px solid rgba(212, 175, 55, 0.2);
-    }
-
-    .stat-number {
-      font-family: var(--font-title);
-      font-size: 2rem;
-      font-weight: 700;
-      color: var(--gold-deep);
-    }
-
-    .stat-label {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    /* =========================================
-       SECTION COMMON STYLES
-       ========================================= */
-    .section {
-      padding: 100px 8%;
-    }
-
-    .section-header {
-      text-align: center;
-      max-width: 650px;
-      margin: 0 auto 60px;
-    }
-
-    .section-tag {
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 3px;
-      color: var(--gold-deep);
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    .section-title {
-      font-family: var(--font-title);
-      font-size: 2.5rem;
-      color: var(--text-dark);
-      position: relative;
-    }
-
-    .section-title::after {
-      content: '';
-      display: block;
-      width: 50px;
-      height: 3px;
-      background: var(--gold-main);
-      margin: 14px auto 0;
-      border-radius: 2px;
-    }
-
-    /* =========================================
-       ABOUT SECTION
-       ========================================= */
-    .about-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 50px;
-      align-items: center;
-    }
-
-    .about-card {
-      background: var(--surface-white);
-      border: 1px solid var(--gold-border);
-      border-radius: 24px;
-      padding: 40px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
-      position: relative;
-    }
-
-    .about-card::before {
-      content: '';
-      position: absolute;
-      top: -1px;
-      left: 10%;
-      right: 10%;
-      height: 2px;
-      background: var(--gold-gradient);
-    }
-
-    .about-text {
-      color: var(--text-muted);
-      font-size: 1.05rem;
-      margin-bottom: 20px;
-      line-height: 1.8;
-    }
-
-    .info-list {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-top: 25px;
-    }
-
-    .info-item {
-      font-size: 0.95rem;
-    }
-
-    .info-item strong {
-      color: var(--text-dark);
-      display: block;
-      font-size: 0.82rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--gold-deep);
-    }
-
-    /* =========================================
-       EXPERIENCE & TIMELINE
-       ========================================= */
-    .timeline {
-      position: relative;
-      max-width: 860px;
-      margin: 0 auto;
-      padding-left: 30px;
-    }
-
-    .timeline::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      left: 7px;
-      width: 2px;
-      background: linear-gradient(180deg, var(--gold-main) 0%, rgba(212, 175, 55, 0.2) 100%);
-    }
-
-    .timeline-item {
-      position: relative;
-      margin-bottom: 45px;
-    }
-
-    .timeline-dot {
-      position: absolute;
-      left: -30px;
-      top: 6px;
-      width: 16px;
-      height: 16px;
-      background: #ffffff;
-      border: 3px solid var(--gold-main);
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
-      box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+      background: var(--green);
+      margin-right: 6px;
+      box-shadow: 0 0 6px var(--green);
+      animation: pulse 2s infinite ease-in-out;
     }
 
-    .timeline-card {
-      background: #ffffff;
-      border: 1px solid var(--gold-border);
-      border-radius: 16px;
-      padding: 28px;
-      transition: var(--transition);
-      box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
     }
 
-    .timeline-card:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--gold-glow);
-      border-color: var(--gold-main);
-    }
-
-    .timeline-date {
-      display: inline-block;
-      font-size: 0.82rem;
-      font-weight: 700;
-      color: var(--gold-deep);
-      margin-bottom: 6px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .timeline-role {
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: var(--text-dark);
-      margin-bottom: 4px;
-    }
-
-    .timeline-company {
-      font-size: 0.95rem;
-      color: var(--text-muted);
-      margin-bottom: 12px;
-    }
-
-    .timeline-desc {
-      color: var(--text-muted);
-      font-size: 0.95rem;
-      line-height: 1.6;
-    }
-
-    /* =========================================
-       SKILLS SECTION
-       ========================================= */
-    .skills-wrapper {
+    /* Main Console Grid */
+    .rack-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 28px;
+      grid-template-columns: 1.8fr 1.2fr;
+      gap: 16px;
     }
 
-    .skill-box {
-      background: #ffffff;
-      padding: 32px;
-      border-radius: 20px;
-      border: 1px solid var(--gold-border);
-      transition: var(--transition);
-      box-shadow: 0 4px 16px rgba(0,0,0,0.02);
+    @media (max-width: 860px) {
+      .rack-grid { grid-template-columns: 1fr; }
     }
 
-    .skill-box:hover {
-      border-color: var(--gold-main);
-      transform: translateY(-5px);
-      box-shadow: var(--gold-glow);
+    /* Modular Panels */
+    .panel {
+      position: relative;
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      padding: 24px;
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
     }
 
-    .skill-icon {
-      font-size: 2rem;
-      color: var(--gold-deep);
+    /* Industrial screws in corner */
+    .panel::after, .panel::before {
+      content: "×";
+      position: absolute;
+      font-size: 12px;
+      color: #3b3f4d;
+      font-family: sans-serif;
+      line-height: 1;
+    }
+    .panel::before { top: 6px; left: 8px; }
+    .panel::after { top: 6px; right: 8px; }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      border-bottom: 1px solid var(--panel-border);
+      padding-bottom: 8px;
       margin-bottom: 18px;
     }
 
-    .skill-title {
-      font-size: 1.2rem;
+    .panel-title {
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      color: var(--amber);
+      text-transform: uppercase;
+    }
+
+    .panel-tag {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    /* Identity Unit */
+    .hero-spec {
+      font-size: 28px;
       font-weight: 700;
-      margin-bottom: 15px;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 14px;
+      color: #fff;
     }
 
-    .skill-tags {
+    .hero-bio {
+      color: #a7abb6;
+      font-size: 14px;
+      margin-bottom: 24px;
+      max-width: 580px;
+    }
+
+    /* Tactile Project Swapper */
+    .cartridge-bay {
       display: flex;
-      flex-wrap: wrap;
       gap: 8px;
+      margin-bottom: 16px;
     }
 
-    .tag {
-      background: #fdfaf3;
-      border: 1px solid rgba(212, 175, 55, 0.2);
-      color: #7b621f;
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 0.82rem;
-      font-weight: 600;
+    .cartridge-btn {
+      flex: 1;
+      background: #1a1d24;
+      border: 1px solid var(--panel-border);
+      color: var(--text-muted);
+      padding: 10px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
 
-    /* =========================================
-       PROJECTS SECTION
-       ========================================= */
-    .projects-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 30px;
+    .cartridge-btn:hover {
+      background: #232731;
+      color: var(--text);
     }
 
-    .project-card {
-      background: #ffffff;
-      border-radius: 20px;
-      border: 1px solid var(--gold-border);
-      overflow: hidden;
-      transition: var(--transition);
-      box-shadow: 0 6px 20px rgba(0,0,0,0.03);
+    .cartridge-btn.active {
+      background: #23221e;
+      border-color: var(--amber);
+      color: var(--amber);
+      box-shadow: 0 0 10px rgba(255, 158, 59, 0.15);
+    }
+
+    .cartridge-viewport {
+      background: #0e1014;
+      border: 1px solid var(--panel-border);
+      padding: 20px;
+      min-height: 220px;
       display: flex;
       flex-direction: column;
-    }
-
-    .project-card:hover {
-      transform: translateY(-6px);
-      box-shadow: var(--gold-glow);
-      border-color: var(--gold-main);
-    }
-
-    .project-banner {
-      height: 180px;
-      background: linear-gradient(135deg, #f7f3e8 0%, #ede3c8 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--gold-deep);
-      font-size: 3rem;
-      position: relative;
-    }
-
-    .project-content {
-      padding: 28px;
-      display: flex;
-      flex-direction: column;
-      flex-grow: 1;
+      justify-content: space-between;
     }
 
     .project-title {
-      font-size: 1.3rem;
-      font-weight: 700;
+      font-size: 18px;
+      color: #fff;
       margin-bottom: 8px;
     }
 
-    .project-desc {
-      color: var(--text-muted);
-      font-size: 0.95rem;
-      margin-bottom: 20px;
-      flex-grow: 1;
-    }
-
-    .project-link {
-      font-weight: 600;
-      color: var(--gold-deep);
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.9rem;
-      transition: var(--transition);
-    }
-
-    .project-link:hover {
-      color: var(--text-dark);
-      transform: translateX(4px);
-    }
-
-    /* =========================================
-       CONTACT & FOOTER
-       ========================================= */
-    .contact-card {
-      background: #ffffff;
-      border: 1px solid var(--gold-border);
-      border-radius: 28px;
-      padding: 60px 40px;
-      text-align: center;
-      max-width: 800px;
-      margin: 0 auto;
-      box-shadow: var(--gold-glow);
-    }
-
-    .contact-title {
-      font-family: var(--font-title);
-      font-size: 2.4rem;
+    .project-meta {
+      display: flex;
+      gap: 12px;
+      font-size: 11px;
+      color: var(--amber);
       margin-bottom: 12px;
     }
 
-    .contact-desc {
-      color: var(--text-muted);
-      font-size: 1.05rem;
-      max-width: 520px;
-      margin: 0 auto 30px;
+    .project-desc {
+      font-size: 13px;
+      color: #9498a3;
+      margin-bottom: 16px;
     }
 
-    .social-links {
+    .project-stack {
       display: flex;
-      justify-content: center;
-      gap: 16px;
-      margin-top: 30px;
+      gap: 6px;
+      flex-wrap: wrap;
     }
 
-    .social-btn {
-      width: 46px;
-      height: 46px;
-      border-radius: 50%;
-      border: 1px solid var(--gold-border);
-      background: #ffffff;
-      color: var(--gold-deep);
-      display: inline-flex;
+    .tag {
+      font-size: 10px;
+      padding: 3px 8px;
+      background: #171920;
+      border: 1px solid #2d303a;
+      color: #999;
+    }
+
+    /* Hardware Oscilloscope */
+    #oscilloscope {
+      width: 100%;
+      height: 120px;
+      background: #090a0d;
+      border: 1px solid var(--panel-border);
+      display: block;
+      margin-bottom: 16px;
+    }
+
+    /* CLI Shell */
+    .cli-window {
+      background: #0a0b0d;
+      border: 1px solid var(--panel-border);
+      padding: 12px;
+      height: 180px;
+      overflow-y: auto;
+      font-size: 12px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .cli-log {
+      flex: 1;
+      overflow-y: auto;
+      color: #9297a5;
+    }
+
+    .cli-log p { margin-bottom: 4px; }
+    .cli-log .amber { color: var(--amber); }
+
+    .cli-input-row {
+      display: flex;
       align-items: center;
-      justify-content: center;
-      font-size: 1.1rem;
-      text-decoration: none;
-      transition: var(--transition);
+      border-top: 1px solid #1f2229;
+      padding-top: 8px;
+      margin-top: 4px;
     }
 
-    .social-btn:hover {
-      background: var(--gold-gradient);
-      color: #ffffff;
-      border-color: transparent;
-      transform: translateY(-3px);
+    .cli-prompt {
+      color: var(--amber);
+      margin-right: 6px;
     }
 
-    footer {
-      text-align: center;
-      padding: 40px 8%;
-      border-top: 1px solid rgba(212, 175, 55, 0.15);
-      color: var(--text-muted);
-      font-size: 0.88rem;
-    }
-
-    /* =========================================
-       RESPONSIVE ADJUSTMENTS
-       ========================================= */
-    @media (max-width: 768px) {
-      .signature-name { font-size: 4rem; }
-      .signature-card-inner { padding: 30px 45px; }
-      .hero-title { font-size: 2.8rem; }
-      .hero-title span { font-size: 3.6rem; }
-      .about-grid { grid-template-columns: 1fr; }
-      .hero-stats { gap: 24px; }
-      .nav-links { display: none; }
+    .cli-input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      width: 100%;
     }
   </style>
 </head>
 <body>
 
-  <!-- =========================================
-       LOADING INTRO SCREEN
-       ========================================= -->
-  <div id="loader-wrapper">
-    <!-- Glowing Box with rotating gold border -->
-    <div class="signature-card-box">
-      <div class="signature-card-inner">
-        <div class="signature-text-container">
-          <h1 class="signature-name">Nithan</h1>
-        </div>
-        <span class="loader-subtitle">Executive Portfolio</span>
+  <div class="chassis">
+    <!-- Top System Readout -->
+    <header class="telemetry-deck">
+      <div>
+        <span class="indicator"></span>
+        <span>SYS_STATUS: NOMINAL</span>
       </div>
+      <div id="clock">00:00:00 UTC</div>
+      <div>CORE_TEMP: 38.2°C // ARCH: HYBRID_NODE</div>
+    </header>
+
+    <div class="rack-grid">
+      <!-- Left Rack Section: Bio & Project Deck -->
+      <section class="panel">
+        <div class="panel-header">
+          <span class="panel-title">[MOD_01] OPERATOR DOSSIER</span>
+          <span class="panel-tag">LOC: 11.27° N / 76.24° E</span>
+        </div>
+        
+        <h1 class="hero-spec">ENGINEERING TACTILE EXPERIENCES AT THE EDGE.</h1>
+        <p class="hero-bio">
+          Synthesizing high-performance web graphics, physics-driven interaction architectures, and embedded edge runtimes. Bridging physical hardware design and modern digital systems.
+        </p>
+
+        <div class="panel-header">
+          <span class="panel-title">[MOD_02] FIELD DEPLOYMENTS</span>
+          <span class="panel-tag">ACTIVE CARTRIDGES: 03</span>
+        </div>
+
+        <!-- Cartridge selector -->
+        <div class="cartridge-bay">
+          <button class="cartridge-btn active" data-id="0">CRT-01 // ATLAS</button>
+          <button class="cartridge-btn" data-id="1">CRT-02 // SYNAPSE</button>
+          <button class="cartridge-btn" data-id="2">CRT-03 // KINETIC</button>
+        </div>
+
+        <div class="cartridge-viewport" id="viewport">
+          <!-- Dynamic Project Content Rendered Here -->
+        </div>
+      </section>
+
+      <!-- Right Rack Section: Realtime Oscilloscope & Interactive Terminal -->
+      <section class="panel">
+        <div class="panel-header">
+          <span class="panel-title">[MOD_03] FREQ MONITOR</span>
+          <span class="panel-tag">CANVAS_RENDER: LIVE</span>
+        </div>
+
+        <canvas id="oscilloscope"></canvas>
+
+        <div class="panel-header">
+          <span class="panel-title">[MOD_04] COMMAND SUBSYSTEM</span>
+          <span class="panel-tag">SHELL: V2.4</span>
+        </div>
+
+        <div class="cli-window">
+          <div class="cli-log" id="cliLog">
+            <p>> SYSTEM LOADED. TYPE <span class="amber">'help'</span> FOR ROUTINES.</p>
+          </div>
+          <div class="cli-input-row">
+            <span class="cli-prompt">λ</span>
+            <input type="text" class="cli-input" id="cliInput" autofocus spellcheck="false" autocomplete="off" />
+          </div>
+        </div>
+      </section>
     </div>
-    
-    <button class="skip-btn" onclick="dismissLoader()">Skip Intro</button>
   </div>
 
-  <!-- =========================================
-       MAIN RESUME WEBSITE
-       ========================================= */ -->
-
-  <!-- Top Navbar -->
-  <nav class="navbar">
-    <a href="#" class="nav-brand">Nithan</a>
-    <ul class="nav-links">
-      <li><a href="#about">About</a></li>
-      <li><a href="#experience">Experience</a></li>
-      <li><a href="#skills">Skills</a></li>
-      <li><a href="#projects">Projects</a></li>
-      <li><a href="#contact" class="nav-cta">Get in Touch</a></li>
-    </ul>
-  </nav>
-
-  <!-- Hero Section -->
-  <section class="hero">
-    <div class="hero-content">
-      <div class="hero-badge">
-        <div class="badge-dot"></div>
-        Available for Exclusive Opportunities
-      </div>
-      
-      <h1 class="hero-title">
-        Crafting Vision Into Reality.<br>
-        I am <span>Nithan</span>
-      </h1>
-      
-      <p class="hero-subtitle">
-        Senior Engineer & Creative Technologist specializing in building elegant, high-impact digital experiences and modern web systems.
-      </p>
-
-      <div class="hero-actions">
-        <a href="#contact" class="btn btn-primary">
-          <i class="fa-regular fa-paper-plane"></i> Contact Me
-        </a>
-        <a href="#experience" class="btn btn-secondary">
-          <i class="fa-solid fa-file-arrow-down"></i> View Resume
-        </a>
-      </div>
-
-      <div class="hero-stats">
-        <div>
-          <div class="stat-number">6+</div>
-          <div class="stat-label">Years Exp.</div>
-        </div>
-        <div>
-          <div class="stat-number">40+</div>
-          <div class="stat-label">Projects Shipped</div>
-        </div>
-        <div>
-          <div class="stat-number">100%</div>
-          <div class="stat-label">Excellence Rating</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- About Section -->
-  <section class="section" id="about">
-    <div class="section-header">
-      <div class="section-tag">Biography</div>
-      <h2 class="section-title">About Me</h2>
-    </div>
-
-    <div class="about-grid">
-      <div>
-        <p class="about-text">
-          Hello! I’m Nithan. I blend creative design thinking with strict engineering discipline. With extensive hands-on experience designing robust solutions, I strive to make every interface feel natural, responsive, and aesthetically distinctive.
-        </p>
-        <p class="about-text">
-          Whether designing architectural pipelines, directing design standards, or engineering front-end experiences, my dedication remains constant: pure craft and meticulous execution.
-        </p>
-      </div>
-
-      <div class="about-card">
-        <h3 style="font-family: var(--font-title); margin-bottom: 20px;">Candidate Profile</h3>
-        <div class="info-list">
-          <div class="info-item">
-            <strong>Full Name</strong>
-            Nithan
-          </div>
-          <div class="info-item">
-            <strong>Location</strong>
-            Global / Remote
-          </div>
-          <div class="info-item">
-            <strong>Core Domain</strong>
-            Product Engineering
-          </div>
-          <div class="info-item">
-            <strong>Availability</strong>
-            Immediate
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Experience Timeline -->
-  <section class="section" id="experience" style="background: #fdfdfb;">
-    <div class="section-header">
-      <div class="section-tag">Career Path</div>
-      <h2 class="section-title">Experience & History</h2>
-    </div>
-
-    <div class="timeline">
-      <!-- Item 1 -->
-      <div class="timeline-item">
-        <div class="timeline-dot"></div>
-        <div class="timeline-card">
-          <span class="timeline-date">2023 — Present</span>
-          <h3 class="timeline-role">Lead Full-Stack Engineer</h3>
-          <h4 class="timeline-company">Aura Labs Inc.</h4>
-          <p class="timeline-desc">
-            Directed full-cycle system architecture and modern web experiences. Scaled applications across global deployments while maintaining sub-second render performance.
-          </p>
-        </div>
-      </div>
-
-      <!-- Item 2 -->
-      <div class="timeline-item">
-        <div class="timeline-dot"></div>
-        <div class="timeline-card">
-          <span class="timeline-date">2021 — 2023</span>
-          <h3 class="timeline-role">Senior Frontend Specialist</h3>
-          <h4 class="timeline-company">Vanguard Digital Solutions</h4>
-          <p class="timeline-desc">
-            Architected interactive design systems, optimized UI/UX micro-interactions, and accelerated user workflows by over 45% through modern frontend solutions.
-          </p>
-        </div>
-      </div>
-
-      <!-- Item 3 -->
-      <div class="timeline-item">
-        <div class="timeline-dot"></div>
-        <div class="timeline-card">
-          <span class="timeline-date">2019 — 2021</span>
-          <h3 class="timeline-role">Software Engineer</h3>
-          <h4 class="timeline-company">Novus Systems</h4>
-          <p class="timeline-desc">
-            Constructed mission-critical REST and GraphQL APIs, streamlined CI/CD release cycles, and collaborated directly with cross-functional leadership teams.
-          </p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Skills Section -->
-  <section class="section" id="skills">
-    <div class="section-header">
-      <div class="section-tag">Capabilities</div>
-      <h2 class="section-title">Core Competencies</h2>
-    </div>
-
-    <div class="skills-wrapper">
-      <div class="skill-box">
-        <i class="fa-solid fa-code skill-icon"></i>
-        <h3 class="skill-title">Frontend Mastery</h3>
-        <div class="skill-tags">
-          <span class="tag">TypeScript</span>
-          <span class="tag">React / Next.js</span>
-          <span class="tag">Vue.js</span>
-          <span class="tag">TailwindCSS</span>
-          <span class="tag">CSS Grid & Animation</span>
-        </div>
-      </div>
-
-      <div class="skill-box">
-        <i class="fa-solid fa-server skill-icon"></i>
-        <h3 class="skill-title">Backend Architecture</h3>
-        <div class="skill-tags">
-          <span class="tag">Node.js</span>
-          <span class="tag">Python</span>
-          <span class="tag">PostgreSQL</span>
-          <span class="tag">GraphQL & REST</span>
-          <span class="tag">Redis</span>
-        </div>
-      </div>
-
-      <div class="skill-box">
-        <i class="fa-solid fa-gem skill-icon"></i>
-        <h3 class="skill-title">Product & Leadership</h3>
-        <div class="skill-tags">
-          <span class="tag">UI/UX Strategy</span>
-          <span class="tag">Figma</span>
-          <span class="tag">System Design</span>
-          <span class="tag">Team Mentorship</span>
-          <span class="tag">Agile Sprint Leadership</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Featured Projects -->
-  <section class="section" id="projects" style="background: #fdfdfb;">
-    <div class="section-header">
-      <div class="section-tag">Portfolio</div>
-      <h2 class="section-title">Selected Works</h2>
-    </div>
-
-    <div class="projects-grid">
-      <!-- Project 1 -->
-      <div class="project-card">
-        <div class="project-banner">
-          <i class="fa-solid fa-chart-line"></i>
-        </div>
-        <div class="project-content">
-          <h3 class="project-title">Apex Analytics Platform</h3>
-          <p class="project-desc">Real-time enterprise telemetry dashboard delivering millisecond data visualization for high-frequency operations.</p>
-          <a href="#" class="project-link">View Case Study <i class="fa-solid fa-arrow-right"></i></a>
-        </div>
-      </div>
-
-      <!-- Project 2 -->
-      <div class="project-card">
-        <div class="project-banner">
-          <i class="fa-solid fa-compass-drafting"></i>
-        </div>
-        <div class="project-content">
-          <h3 class="project-title">Aethel Design Suite</h3>
-          <p class="project-desc">A unified multi-platform component library adopted across 14 enterprise applications with auto-theming support.</p>
-          <a href="#" class="project-link">View Case Study <i class="fa-solid fa-arrow-right"></i></a>
-        </div>
-      </div>
-
-      <!-- Project 3 -->
-      <div class="project-card">
-        <div class="project-banner">
-          <i class="fa-solid fa-shield-halved"></i>
-        </div>
-        <div class="project-content">
-          <h3 class="project-title">Sentinel Identity Layer</h3>
-          <p class="project-desc">Zero-trust authentication gateway engineered for sub-50ms token verification with biometric support.</p>
-          <a href="#" class="project-link">View Case Study <i class="fa-solid fa-arrow-right"></i></a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Contact CTA -->
-  <section class="section" id="contact">
-    <div class="contact-card">
-      <div class="section-tag">Let's Connect</div>
-      <h2 class="contact-title">Ready to build something extraordinary?</h2>
-      <p class="contact-desc">
-        I am available for select contract advisory, senior leadership roles, and ambitious creative collaborations.
-      </p>
-
-      <a href="mailto:hello@nithan.com" class="btn btn-primary">
-        <i class="fa-regular fa-envelope"></i> Send an Email
-      </a>
-
-      <div class="social-links">
-        <a href="#" class="social-btn" title="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
-        <a href="#" class="social-btn" title="GitHub"><i class="fa-brands fa-github"></i></a>
-        <a href="#" class="social-btn" title="Twitter / X"><i class="fa-brands fa-x-twitter"></i></a>
-      </div>
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <footer>
-    <p>&copy; <span id="current-year"></span> Nithan. Designed with elegance in White & Gold.</p>
-  </footer>
-
-  <!-- =========================================
-       TRANSITION SCRIPT
-       ========================================= -->
   <script>
-    // Set dynamic year
-    document.getElementById('current-year').textContent = new Date().getFullYear();
+    // --- WEBAUDIO MECHANICAL RELAY SYNTHESIZER ---
+    const AudioEngine = {
+      ctx: null,
+      init() {
+        if (!this.ctx) {
+          this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+      },
+      click(freq = 600, duration = 0.02) {
+        this.init();
+        if (this.ctx.state === 'suspended') this.ctx.resume();
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+        gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + duration);
+      }
+    };
 
-    const loader = document.getElementById('loader-wrapper');
+    // --- CARTRIDGE REPOSITORY ---
+    const projects = [
+      {
+        title: "MIND ATLAS // SPATIAL ARCHITECTURE",
+        type: "EXPLORATION PLATFORM",
+        year: "2026",
+        desc: "A bi-directional knowledge mapping canvas utilizing force-directed graph physics, custom GL shaders, and low-latency interaction models.",
+        stack: ["WebGL", "TypeScript", "CanvasAPI", "GSAP"]
+      },
+      {
+        title: "LOCAL MATRIX // ON-DEVICE INFERENCE",
+        type: "EDGE COMPUTING ENGINE",
+        year: "2025",
+        desc: "Micro-orchestration runtime for decentralized small-footprint LLMs running directly via WebGPU without remote server dependencies.",
+        stack: ["WebGPU", "WASM", "C++", "Ollama"]
+      },
+      {
+        title: "AEROSPACE RELAY // TACTILE SYSTEM",
+        type: "DESIGN SYSTEM",
+        year: "2025",
+        desc: "High-density mechanical design framework engineered for low-cognitive-load mission-critical diagnostic terminals and industrial controllers.",
+        stack: ["CSS Components", "WebAudio", "Vanilla JS"]
+      }
+    ];
 
-    function dismissLoader() {
-      loader.classList.add('loaded');
-      setTimeout(() => {
-        loader.style.display = 'none';
-      }, 1000);
+    const viewport = document.getElementById('viewport');
+    const buttons = document.querySelectorAll('.cartridge-btn');
+
+    function renderProject(idx) {
+      const p = projects[idx];
+      viewport.innerHTML = `
+        <div>
+          <div class="project-meta">
+            <span>[${p.type}]</span>
+            <span>// YEAR: ${p.year}</span>
+          </div>
+          <h2 class="project-title">${p.title}</h2>
+          <p class="project-desc">${p.desc}</p>
+        </div>
+        <div class="project-stack">
+          ${p.stack.map(s => `<span class="tag">${s}</span>`).join('')}
+        </div>
+      `;
     }
 
-    // Timing sequence:
-    // 0.3s -> "Nithan" handwritten reveal in signature font (gold-to-white shimmer)
-    // 1.6s -> Gold box appears enclosing the signature
-    // 2.0s to 4.5s -> Gold rotating glow beam spins smoothly around the perimeter
-    // 4.5s -> Smooth zoom-fade transition into the resume site
-    window.addEventListener('load', () => {
-      setTimeout(() => {
-        dismissLoader();
-      }, 4500);
+    buttons.forEach((btn, index) => {
+      btn.addEventListener('click', () => {
+        AudioEngine.click(800, 0.03);
+        buttons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderProject(index);
+      });
     });
+
+    renderProject(0);
+
+    // --- OSCILLOSCOPE MODULATOR ---
+    const canvas = document.getElementById('oscilloscope');
+    const ctx = canvas.getContext('2d');
+    let width, height, step = 0;
+    let targetFreq = 0.04;
+    let currentFreq = 0.04;
+
+    function resizeCanvas() {
+      width = canvas.width = canvas.offsetWidth;
+      height = canvas.height = canvas.offsetHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    window.addEventListener('mousemove', (e) => {
+      const ratio = e.clientX / window.innerWidth;
+      targetFreq = 0.01 + (ratio * 0.08);
+    });
+
+    function drawWave() {
+      ctx.fillStyle = '#090a0d';
+      ctx.fillRect(0, 0, width, height);
+
+      // Grid line
+      ctx.strokeStyle = '#181b22';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, height / 2);
+      ctx.lineTo(width, height / 2);
+      ctx.stroke();
+
+      // Sine Wave
+      currentFreq += (targetFreq - currentFreq) * 0.05;
+      ctx.strokeStyle = '#ff9e3b';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+
+      for (let x = 0; x < width; x++) {
+        const y = height / 2 + Math.sin(x * currentFreq + step) * 28;
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      step += 0.04;
+      requestAnimationFrame(drawWave);
+    }
+    drawWave();
+
+    // --- CLI EMULATOR ---
+    const cliInput = document.getElementById('cliInput');
+    const cliLog = document.getElementById('cliLog');
+
+    const commands = {
+      help: () => "AVAILABLE COMMANDS: [stack, projects, ping, contact, clear]",
+      stack: () => "CORE ENGINE: TypeScript, WebGPU, GSAP, Node, Tailwind, C++",
+      projects: () => "ACTIVE CARTRIDGES: 01_MIND_ATLAS, 02_LOCAL_MATRIX, 03_AEROSPACE_RELAY",
+      ping: () => "PONG -> 12ms TO LOCAL HOST NODE",
+      contact: () => "TRANSMISSION FREQ: rubinstellar@proton.me // TERMINAL OPEN",
+      clear: () => { cliLog.innerHTML = ""; return null; }
+    };
+
+    cliInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const raw = cliInput.value.trim().toLowerCase();
+        if (!raw) return;
+
+        AudioEngine.click(400, 0.015);
+        const pCmd = document.createElement('p');
+        pCmd.innerHTML = `<span class="amber">λ</span> ${raw}`;
+        cliLog.appendChild(pCmd);
+
+        if (commands[raw]) {
+          const res = commands[raw]();
+          if (res) {
+            const pRes = document.createElement('p');
+            pRes.textContent = `> ${res}`;
+            cliLog.appendChild(pRes);
+          }
+        } else {
+          const pErr = document.createElement('p');
+          pErr.textContent = `> ERROR: UNRECOGNIZED ROUTINE '${raw}'`;
+          cliLog.appendChild(pErr);
+        }
+
+        cliInput.value = '';
+        cliLog.scrollTop = cliLog.scrollHeight;
+      }
+    });
+
+    // --- CLOCK ---
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('clock').textContent = 
+        now.toISOString().substring(11, 19) + " UTC";
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
   </script>
 </body>
 </html>
