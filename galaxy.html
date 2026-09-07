@@ -3,246 +3,215 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nithan Najeeb // System Interface</title>
+    <title>O P T I M I Z E D  C H A O S</title>
     <style>
-        /* ==========================================
-           AESTHETICS & Niche Materials (CSS)
-           ========================================== */
-        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syncopate:wght@400;700&display=swap');
-
-        :root {
-            --bg-obsidian: #050505;
-            --text-muted: #888;
-            --accent-cyan: #00f0ff;
-            --accent-amber: #ff9d00;
+        /* Anti-Modern Reset */
+        *, *::before, *::after { box-sizing: border-box; }
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #030303;
+            color: #d1d1d1;
+            font-family: 'Courier New', Courier, monospace; /* Brutalist/Raw typography */
+            overflow: hidden;
+            cursor: crosshair;
         }
 
-        * {
-            margin: 0; padding: 0; box-sizing: border-box;
-            cursor: none; /* Custom cursor used */
+        /* SVG Noise Overlay for Texture */
+        #noise {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 999;
+            opacity: 0.08;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         }
 
-        body {
-            background-color: var(--bg-obsidian);
-            color: #fff;
-            font-family: 'Space Mono', monospace;
-            overflow-x: hidden;
-        }
-
-        /* 1. Cinematic Matte Texture (SVG Noise) */
-        .noise-overlay {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            pointer-events: none; z-index: 9999;
-            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.06'/%3E%3C/svg%3E");
-        }
-
-        /* 2. Custom Cursor */
-        #cursor, #cursor-aura {
-            position: fixed; top: 0; left: 0;
-            border-radius: 50%; pointer-events: none;
-            transform: translate(-50%, -50%); z-index: 10000;
-        }
-        #cursor { width: 8px; height: 8px; background: var(--accent-cyan); }
-        #cursor-aura { width: 40px; height: 40px; border: 1px solid rgba(0, 240, 255, 0.4); transition: width 0.2s, height 0.2s; }
-        
-        .hover-active ~ #cursor-aura { width: 60px; height: 60px; background: rgba(0, 240, 255, 0.1); border-color: var(--accent-amber); }
-
-        /* --- Act I: Boot Sequence --- */
-        #hero {
-            height: 100vh; width: 100vw; display: flex;
-            flex-direction: column; justify-content: center; align-items: center;
-            position: relative; z-index: 10;
-        }
-        .terminal-loader { font-size: 14px; color: var(--accent-cyan); margin-bottom: 2rem; }
-        
-        .main-title {
-            font-family: 'Syncopate', sans-serif; font-size: 6vw;
-            text-transform: uppercase; font-weight: 700;
-            letter-spacing: -2px; opacity: 0; clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%);
-        }
-        .alias { font-size: 1.2rem; color: var(--text-muted); opacity: 0; margin-top: 10px; }
-
-        /* --- Act II: Horizontal Node Scroll --- */
-        #horizontal-section { height: 100vh; overflow: hidden; background: #0a0a0a; }
-        .horizontal-wrapper {
-            display: flex; height: 100%; width: 300vw; /* 3 sections = 300vw */
-        }
+        /* Portfolio Nodes */
         .node {
-            width: 100vw; height: 100%; display: flex;
-            flex-direction: column; justify-content: center; padding: 10vw;
-            position: relative;
+            position: absolute;
+            text-transform: uppercase;
+            font-size: clamp(1rem, 2vw, 3rem);
+            letter-spacing: -2px;
+            white-space: nowrap;
+            mix-blend-mode: exclusion;
+            user-select: none;
+            transition: color 0.1s;
         }
-        .node h2 { font-family: 'Syncopate', sans-serif; font-size: 4vw; margin-bottom: 1rem; color: var(--accent-amber); }
-        .node p { max-width: 500px; font-size: 1.1rem; line-height: 1.6; color: #ccc; }
-        .node-number { position: absolute; top: 10%; right: 10%; font-size: 10vw; font-weight: 700; opacity: 0.05; font-family: 'Syncopate', sans-serif;}
 
-        /* --- Act III: Interactive Terminal --- */
-        #contact-terminal {
-            height: 100vh; display: flex; flex-direction: column;
-            justify-content: flex-end; padding: 5vw; background: var(--bg-obsidian);
+        .node:hover {
+            color: #ff003c;
+            text-shadow: 2px 2px 0px #00e5ff, -2px -2px 0px #ff003c;
+            z-index: 100;
         }
-        .terminal-window {
-            width: 100%; max-width: 800px; border-left: 2px solid var(--accent-cyan); padding-left: 20px;
+
+        /* The chaotic cursor trail */
+        .trail {
+            position: absolute;
+            font-size: 10px;
+            pointer-events: none;
+            color: rgba(255, 255, 255, 0.5);
         }
-        .output-log { margin-bottom: 20px; color: #ccc; white-space: pre-wrap; line-height: 1.5; }
-        .input-line { display: flex; align-items: center; }
-        .prompt { color: var(--accent-cyan); margin-right: 10px; }
-        input[type="text"] {
-            background: transparent; border: none; color: #fff;
-            font-family: 'Space Mono', monospace; font-size: 1rem; width: 100%; outline: none;
+
+        /* Initialization Screen */
+        #boot-screen {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 1000;
+            cursor: pointer;
         }
+        #boot-screen:hover { color: #fff; text-shadow: 0 0 10px #fff; }
     </style>
 </head>
 <body>
 
-    <!-- Niche Element: Granular Matte Overlay -->
-    <div class="noise-overlay"></div>
+    <div id="noise"></div>
+    <div id="boot-screen">[ CLICK TO INITIALIZE CHAOS & AUDIO ]</div>
 
-    <!-- Custom Cursor -->
-    <div id="cursor"></div>
-    <div id="cursor-aura"></div>
-
-    <!-- ACT I: Hero -->
-    <section id="hero">
-        <div class="terminal-loader" id="loader-text"></div>
-        <h1 class="main-title">Nithan Najeeb</h1>
-        <div class="alias">SYS.OP: Rubin Stellar</div>
-    </section>
-
-    <!-- ACT II: Horizontal Projects -->
-    <section id="horizontal-section">
-        <div class="horizontal-wrapper">
-            <!-- Node 1 -->
-            <div class="node interactive-target">
-                <div class="node-number">01</div>
-                <h2>Mind Atlas</h2>
-                <p>An ecosystem of interactive components and logic systems built with pure DOM manipulation. Architecture focused on psychological design and user friction reduction.</p>
-            </div>
-            <!-- Node 2 -->
-            <div class="node interactive-target">
-                <div class="node-number">02</div>
-                <h2>Local LLM Architecture</h2>
-                <p>Deploying open-weight AI logic entirely on local hardware. Experimenting with Ollama parameters, Qwen, and Llama pipelines to build self-contained thought engines.</p>
-            </div>
-            <!-- Node 3 -->
-            <div class="node interactive-target">
-                <div class="node-number">03</div>
-                <h2>Remevess</h2>
-                <p>A structured initiative translating traditional, skilled artisan craftsmanship into scalable digital commerce. Built from the ground up focusing on narrative and preservation.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- ACT III: Terminal Log -->
-    <section id="contact-terminal">
-        <div class="terminal-window">
-            <div class="output-log" id="output">SYSTEM_READY. Type 'help' for available commands.</div>
-            <div class="input-line">
-                <span class="prompt">guest@stellar:~/$</span>
-                <input type="text" id="term-input" autocomplete="off" autofocus class="interactive-target">
-            </div>
-        </div>
-    </section>
-
-    <!-- GSAP & JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    
     <script>
-        gsap.registerPlugin(ScrollTrigger);
-
-        /* --- 1. Custom Cursor Logic --- */
-        const cursor = document.getElementById('cursor');
-        const aura = document.getElementById('cursor-aura');
+        // --- 1. DATA & DOM SETUP ---
+        const sections = [
+            "01_ARCHIVE.EXE",
+            "02_MANIFESTO.TXT",
+            "03_EXPERIMENTS.SYS",
+            "04_CONTACT.BAT",
+            "NULL_VOID",
+            "ERR_404_AESTHETIC"
+        ];
         
+        const nodes = [];
+        let audioCtx, masterGain;
+        let isAudioInit = false;
+
+        // --- 2. PROCEDURAL AUDIO ENGINE ---
+        function initAudio() {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            masterGain = audioCtx.createGain();
+            masterGain.gain.value = 0.1; // Keep it low, it's harsh
+            masterGain.connect(audioCtx.destination);
+            
+            // Continuous Ambient Drone
+            const drone = audioCtx.createOscillator();
+            drone.type = 'sine';
+            drone.frequency.value = 40; // Deep sub bass
+            drone.connect(masterGain);
+            drone.start();
+
+            // Modulate drone based on mouse to "optimize chaos"
+            window.addEventListener('mousemove', (e) => {
+                const freq = 30 + (e.clientY / window.innerHeight) * 100;
+                drone.frequency.setTargetAtTime(freq, audioCtx.currentTime, 0.1);
+            });
+
+            isAudioInit = true;
+            document.getElementById('boot-screen').style.display = 'none';
+        }
+
+        function playGlitch() {
+            if (!isAudioInit) return;
+            // Generate a harsh, chaotic clicking/glitching sound
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            
+            osc.type = Math.random() > 0.5 ? 'sawtooth' : 'square';
+            osc.frequency.setValueAtTime(Math.random() * 2000 + 50, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(10, audioCtx.currentTime + 0.1);
+            
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+            
+            osc.connect(gain);
+            gain.connect(masterGain);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.1);
+        }
+
+        document.getElementById('boot-screen').addEventListener('click', initAudio);
+
+        // --- 3. PHYSICS & CHAOS ENGINE ---
+        // Instead of CSS grids, we use a loop to constantly agitate the elements.
+        sections.forEach((text, i) => {
+            const el = document.createElement('div');
+            el.className = 'node';
+            el.innerText = text;
+            document.body.appendChild(el);
+            
+            nodes.push({
+                el: el,
+                x: Math.random() * window.innerWidth,
+                y: Math.random() * window.innerHeight,
+                vx: (Math.random() - 0.5) * 2, // Velocity X
+                vy: (Math.random() - 0.5) * 2, // Velocity Y
+                targetX: null,
+                targetY: null
+            });
+
+            // Trigger chaos sound on interaction
+            el.addEventListener('mouseenter', playGlitch);
+        });
+
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+
         window.addEventListener('mousemove', (e) => {
-            gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0 });
-            gsap.to(aura, { x: e.clientX, y: e.clientY, duration: 0.15 });
-        });
-
-        document.querySelectorAll('.interactive-target').forEach(el => {
-            el.addEventListener('mouseenter', () => aura.classList.add('hover-active'));
-            el.addEventListener('mouseleave', () => aura.classList.remove('hover-active'));
-        });
-
-        /* --- 2. Boot Sequence Animation --- */
-        const loaderText = "Initializing local environment... Decoding user logic... Access Granted.";
-        let i = 0;
-        const typeWriter = () => {
-            if (i < loaderText.length) {
-                document.getElementById("loader-text").innerHTML += loaderText.charAt(i);
-                i++;
-                setTimeout(typeWriter, 30);
-            } else {
-                launchHero();
-            }
-        };
-
-        const launchHero = () => {
-            const tl = gsap.timeline();
-            tl.to("#loader-text", { opacity: 0, duration: 0.5, delay: 0.5 })
-              .to(".main-title", { 
-                  clipPath: "polygon(0 0%, 100% 0%, 100% 100%, 0% 100%)", 
-                  opacity: 1, duration: 1.5, ease: "power4.out" 
-              })
-              .to(".alias", { opacity: 1, duration: 1 }, "-=1");
-        };
-
-        // Start Boot Sequence
-        window.onload = typeWriter;
-
-        /* --- 3. Horizontal Scroll Magic --- */
-        const sections = document.querySelectorAll(".node");
-        const wrapper = document.querySelector(".horizontal-wrapper");
-
-        gsap.to(wrapper, {
-            xPercent: -100 * (sections.length - 1) / sections.length,
-            ease: "none",
-            scrollTrigger: {
-                trigger: "#horizontal-section",
-                pin: true,
-                scrub: 1,
-                end: () => "+=" + wrapper.offsetWidth
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            
+            // Spawn erratic ASCII trails
+            if (Math.random() > 0.5) {
+                const trail = document.createElement('div');
+                trail.className = 'trail';
+                trail.innerText = String.fromCharCode(33 + Math.floor(Math.random() * 94));
+                trail.style.left = mouseX + 'px';
+                trail.style.top = mouseY + 'px';
+                document.body.appendChild(trail);
+                
+                setTimeout(() => trail.remove(), 500);
             }
         });
 
-        /* --- 4. Interactive Terminal Logic --- */
-        const input = document.getElementById('term-input');
-        const output = document.getElementById('output');
+        function optimizeChaos() {
+            nodes.forEach(node => {
+                // Add random jitter (The Chaos)
+                node.vx += (Math.random() - 0.5) * 0.5;
+                node.vy += (Math.random() - 0.5) * 0.5;
 
-        input.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                const command = input.value.trim().toLowerCase();
-                let response = "";
+                // Apply friction (The Optimization/Restraint)
+                node.vx *= 0.95;
+                node.vy *= 0.95;
 
-                switch(command) {
-                    case 'help':
-                        response = "Available commands: \n- whoami\n- contact\n- read_story";
-                        break;
-                    case 'whoami':
-                        response = "Running B.Com CA logic at MES Mampad College. Architecting web structures. Exploring UI, GSAP, and psychological design.";
-                        break;
-                    case 'contact':
-                        response = "Establishing connection protocol...\nEmail: nithan@nithan.in";
-                        break;
-                    case 'read_story':
-                        response = "[DECRYPTED FILE: PSYCHOLOGICAL FICTION]\nThe room smelled like ozone and cold coffee. The system hummed, not with electricity, but with something closer to a pulse. It wasn't answering questions anymore. It was starting to ask them.";
-                        break;
-                    case 'clear':
-                        output.innerHTML = "";
-                        input.value = "";
-                        return;
-                    default:
-                        response = `Command not found: ${command}`;
+                // Move
+                node.x += node.vx;
+                node.y += node.vy;
+
+                // Screen boundaries (Bouncing off walls)
+                const bounds = node.el.getBoundingClientRect();
+                if (node.x < 0 || node.x + bounds.width > window.innerWidth) node.vx *= -1;
+                if (node.y < 0 || node.y + bounds.height > window.innerHeight) node.vy *= -1;
+
+                // Mouse interaction: slightly repel from mouse to make clicking difficult but deliberate
+                const dx = node.x - mouseX;
+                const dy = node.y - mouseY;
+                const dist = Math.sqrt(dx*dx + dy*dy);
+                
+                if (dist < 150) {
+                    node.vx += dx * 0.002;
+                    node.vy += dy * 0.002;
                 }
 
-                output.innerHTML += `\n<span style="color: var(--accent-amber)">guest@stellar:~$</span> ${command}\n${response}\n`;
-                input.value = "";
-                
-                // Auto scroll to bottom
-                document.getElementById('contact-terminal').scrollIntoView({ behavior: 'smooth', block: 'end' });
-            }
-        });
+                // Apply transforms
+                // We use translate3d to force hardware acceleration while maintaining raw pixel movement
+                node.el.style.transform = `translate3d(${node.x}px, ${node.y}px, 0) skew(${node.vx * 2}deg, ${node.vy * 2}deg)`;
+            });
+
+            requestAnimationFrame(optimizeChaos);
+        }
+
+        optimizeChaos();
     </script>
 </body>
 </html>
