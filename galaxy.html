@@ -3,72 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resonant Dust | Portfolio</title>
+    <title>Dynamic Sensory Portfolio</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;600&display=swap');
+
         body, html {
             margin: 0; padding: 0; width: 100%; height: 100%;
-            background-color: #030305; overflow: hidden;
-            font-family: 'Courier New', Courier, monospace;
-            touch-action: none; /* Prevents default scrolling */
+            background-color: #050508; overflow: hidden;
+            font-family: 'Space Grotesk', sans-serif;
+            touch-action: none; 
+            -webkit-user-select: none;
+            user-select: none;
             color: white;
         }
-        canvas { display: block; }
+        canvas { display: block; position: absolute; top: 0; left: 0; z-index: 1; }
+        
         #ui-layer {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none; display: flex; flex-direction: column;
             justify-content: center; align-items: center; z-index: 10;
+            text-align: center; padding: 20px; box-sizing: border-box;
         }
-        .project-text {
-            font-size: 1.5rem; letter-spacing: 4px; opacity: 0;
-            transition: opacity 2s ease-in-out; text-transform: uppercase;
-            text-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+
+        .content-box {
+            opacity: 0; transform: translateY(20px);
+            transition: all 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            padding: 40px 30px; border-radius: 20px;
+            max-width: 90%;
         }
+
+        .content-box.visible { opacity: 1; transform: translateY(0); }
+
+        h1 { font-size: 2rem; font-weight: 600; letter-spacing: 4px; margin: 0 0 10px 0; text-transform: uppercase; }
+        h2 { font-size: 1rem; font-weight: 300; letter-spacing: 2px; color: rgba(255,255,255,0.6); margin: 0 0 20px 0; }
+        p { font-size: 1.1rem; font-weight: 300; line-height: 1.6; margin: 0; color: rgba(255,255,255,0.9); }
+        
+        .hint {
+            position: absolute; bottom: 40px; font-size: 0.8rem; letter-spacing: 3px;
+            color: rgba(255,255,255,0.4); opacity: 0; transition: opacity 2s;
+            animation: pulse 3s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 0.8; }
+        }
+
         #intro {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: #030305; display: flex; flex-direction: column;
+            background: #050508; display: flex; flex-direction: column;
             justify-content: center; align-items: center; z-index: 20;
-            transition: opacity 1s; pointer-events: auto;
+            transition: opacity 1.5s ease-out; pointer-events: auto;
         }
+
         button {
-            background: transparent; border: 1px solid rgba(255,255,255,0.3);
-            color: white; padding: 15px 30px; font-size: 1.2rem;
-            border-radius: 50px; letter-spacing: 2px; cursor: pointer;
-            backdrop-filter: blur(5px);
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2);
+            color: white; padding: 18px 40px; font-size: 1rem; font-family: 'Space Grotesk', sans-serif;
+            border-radius: 50px; letter-spacing: 3px; cursor: pointer; transition: all 0.3s;
         }
+        button:active { background: rgba(255,255,255,0.2); }
     </style>
 </head>
 <body>
 
     <div id="intro">
-        <p style="margin-bottom: 20px; color: rgba(255,255,255,0.5);">Experience with Sound & Motion</p>
-        <button id="start-btn">ENTER CHAOS</button>
+        <h2 style="color: rgba(255,255,255,0.8); margin-bottom: 40px;">AUDIO & HAPTICS REQUIRED</h2>
+        <button id="start-btn">INITIATE SEQUENCE</button>
     </div>
 
     <div id="ui-layer">
-        <div id="project-display" class="project-text"></div>
+        <div id="content-container" class="content-box">
+            <h1 id="title"></h1>
+            <h2 id="subtitle"></h2>
+            <p id="description"></p>
+        </div>
+        <div class="hint" id="hint">TAP TO CONTINUE</div>
     </div>
 
     <canvas id="canvas"></canvas>
 
     <script>
+        // --- CONTENT DATA (EDIT THIS TO YOUR LIKING) ---
+        const portfolioData = [
+            {
+                title: "[YOUR NAME]",
+                subtitle: "Creative Technologist",
+                desc: "I build interactive, sensory experiences.",
+                hue: 200, behavior: 'float', baseFreq: [261.63, 329.63, 392.00] // C Major
+            },
+            {
+                title: "WHO I AM",
+                subtitle: "The Beautiful Chaos",
+                desc: "I believe design should feel alive. I blend front-end logic with unpredictable, fluid aesthetics.",
+                hue: 280, behavior: 'orbit', baseFreq: [220.00, 261.63, 329.63] // A Minor
+            },
+            {
+                title: "WHAT I DO",
+                subtitle: "Capabilities",
+                desc: "Web Audio • Gyroscopic UI • Generative Motion • Haptic Interfaces",
+                hue: 40, behavior: 'wave', baseFreq: [329.63, 392.00, 493.88] // E Minor
+            },
+            {
+                title: "SELECTED WORK",
+                subtitle: "Project Zero",
+                desc: "An experiment in using phone hardware to turn digital space into physical calm.",
+                hue: 340, behavior: 'explode', baseFreq: [349.23, 440.00, 523.25] // F Major
+            }
+        ];
+
+        // --- SYSTEM SETUP ---
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
-        const intro = document.getElementById('intro');
-        const startBtn = document.getElementById('start-btn');
-        const projectDisplay = document.getElementById('project-display');
-
-        let width, height;
+        let width, height, audioCtx;
         let particles = [];
-        let projects = [
-            { name: "CASE STUDY 01", hue: 200 },
-            { name: "MOTION REEL", hue: 280 },
-            { name: "ABOUT ME", hue: 340 }
-        ];
-        let currentProjectIndex = 0;
+        let currentIndex = -1;
         let gyroX = 0, gyroY = 0;
-        let audioCtx;
+        let targetHue = 200, currentBehavior = 'float';
 
-        // Resize Canvas
         function resize() {
             width = canvas.width = window.innerWidth;
             height = canvas.height = window.innerHeight;
@@ -76,63 +130,81 @@
         window.addEventListener('resize', resize);
         resize();
 
-        // Generative Audio (Soothing Sine Waves)
-        function playChime(freq, type = 'sine') {
+        // --- SENSORY APIs ---
+        function playChord(frequencies) {
             if (!audioCtx) return;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = type;
-            osc.frequency.value = freq;
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            
-            // Soft attack and soothing decay
-            gain.gain.setValueAtTime(0, audioCtx.currentTime);
-            gain.gain.linearRampToValueAtTime(0.15, audioCtx.currentTime + 0.1);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 3);
-            
-            osc.start();
-            osc.stop(audioCtx.currentTime + 3);
+            frequencies.forEach((freq, index) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = index % 2 === 0 ? 'sine' : 'triangle';
+                osc.frequency.value = freq;
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                gain.gain.setValueAtTime(0, audioCtx.currentTime);
+                // Stagger the attack slightly for a strummed feel
+                gain.gain.linearRampToValueAtTime(0.05, audioCtx.currentTime + 0.2 + (index * 0.1));
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 4);
+                
+                osc.start(audioCtx.currentTime + (index * 0.05));
+                osc.stop(audioCtx.currentTime + 4);
+            });
         }
 
-        // Haptics Helper
-        function pulseHaptic(pattern) {
-            if (navigator.vibrate) navigator.vibrate(pattern);
+        function hapticPattern(behavior) {
+            if (!navigator.vibrate) return;
+            if (behavior === 'float') navigator.vibrate([15, 30, 15]);
+            else if (behavior === 'orbit') navigator.vibrate([20, 50, 10, 50, 20]);
+            else if (behavior === 'wave') navigator.vibrate([10, 20, 10, 20, 10]);
+            else if (behavior === 'explode') navigator.vibrate([50, 20, 50]);
         }
 
-        // Particle System
+        // --- PARTICLE PHYSICS ---
         class Particle {
             constructor() {
                 this.x = Math.random() * width;
                 this.y = Math.random() * height;
-                this.vx = (Math.random() - 0.5) * 2;
-                this.vy = (Math.random() - 0.5) * 2;
-                this.baseSize = Math.random() * 1.5 + 0.5;
-                this.hue = Math.random() * 40 + 200; // Blue/Cyan base
+                this.vx = (Math.random() - 0.5);
+                this.vy = (Math.random() - 0.5);
+                this.baseSize = Math.random() * 2 + 0.5;
+                this.angle = Math.random() * Math.PI * 2;
             }
 
             update() {
-                // Gyroscope Influence (The Predictable)
-                this.vx += gyroX * 0.05;
-                this.vy += gyroY * 0.05;
+                // Gyro Influence
+                this.vx += gyroX * 0.03;
+                this.vy += gyroY * 0.03;
 
-                // Center Gravity (The Chaos/Swarm)
+                // Behavior State Machine
                 let dx = (width / 2) - this.x;
                 let dy = (height / 2) - this.y;
                 let dist = Math.sqrt(dx * dx + dy * dy);
-                if (dist > 0) {
-                    this.vx += (dx / dist) * 0.01;
-                    this.vy += (dy / dist) * 0.01;
+
+                if (currentBehavior === 'orbit') {
+                    // Swirl around center
+                    this.vx += (dy / dist) * 0.15;
+                    this.vy -= (dx / dist) * 0.15;
+                    if (dist > 200) { this.vx += dx * 0.0005; this.vy += dy * 0.0005; }
+                } 
+                else if (currentBehavior === 'wave') {
+                    // Sine wave motion flow
+                    this.angle += 0.05;
+                    this.vx += Math.sin(this.angle) * 0.1;
+                    this.vy += (dy > 0 ? 0.01 : -0.01);
+                } 
+                else if (currentBehavior === 'explode') {
+                    // Constant gentle push outwards, pulled back by gravity
+                    if (dist < 150) { this.vx -= dx * 0.002; this.vy -= dy * 0.002; }
+                    else { this.vx += dx * 0.0005; this.vy += dy * 0.0005; }
                 }
 
                 // Friction
-                this.vx *= 0.98;
-                this.vy *= 0.98;
-
+                this.vx *= 0.96;
+                this.vy *= 0.96;
                 this.x += this.vx;
                 this.y += this.vy;
 
-                // Wrap around edges
+                // Screen Wrap
                 if (this.x < 0) this.x = width;
                 if (this.x > width) this.x = 0;
                 if (this.y < 0) this.y = height;
@@ -140,98 +212,86 @@
             }
 
             draw() {
-                ctx.fillStyle = `hsla(${this.hue}, 80%, 60%, 0.8)`;
+                ctx.fillStyle = `hsla(${targetHue}, 70%, 60%, 0.7)`;
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.baseSize, 0, Math.PI * 2);
                 ctx.fill();
             }
         }
 
-        // Initialize Chaos
-        for (let i = 0; i < 300; i++) particles.push(new Particle());
+        for (let i = 0; i < 250; i++) particles.push(new Particle());
 
         function animate() {
-            // Low opacity clear for fluid trailing effect (soothing)
-            ctx.fillStyle = 'rgba(3, 3, 5, 0.15)';
+            // Dark fluid trail effect
+            ctx.fillStyle = 'rgba(5, 5, 8, 0.15)';
             ctx.fillRect(0, 0, width, height);
 
-            particles.forEach(p => {
-                p.update();
-                p.draw();
-            });
+            particles.forEach(p => { p.update(); p.draw(); });
             requestAnimationFrame(animate);
         }
 
-        // --- INTERACTIONS ---
-
-        // 1. Gyroscope
-        function handleOrientation(event) {
-            // Normalize values for smooth gravity shift
-            gyroX = event.gamma / 45 || 0; // Left/Right
-            gyroY = (event.beta - 45) / 45 || 0; // Front/Back
-        }
-
-        // 2. Touch/Tap (Change Portfolio Item)
-        window.addEventListener('touchstart', (e) => {
+        // --- UI & INTERACTION LOGIC ---
+        function advancePortfolio() {
             if (!audioCtx) return;
             
-            // Cycle Project
-            currentProjectIndex = (currentProjectIndex + 1) % projects.length;
-            let currentProj = projects[currentProjectIndex];
+            currentIndex = (currentIndex + 1) % portfolioData.length;
+            const data = portfolioData[currentIndex];
 
-            // Beautiful Chaos Burst
-            pulseHaptic([15, 30, 15]); // Heartbeat haptic
-            playChime(150 + (currentProjectIndex * 50)); // Base note
-            playChime(225 + (currentProjectIndex * 75), 'triangle'); // Harmonic
+            // Update States
+            targetHue = data.hue;
+            currentBehavior = data.behavior;
+            
+            // Trigger Sensory
+            playChord(data.baseFreq);
+            hapticPattern(data.behavior);
 
-            // Repel particles from touch point
-            const touch = e.touches[0];
+            // Give particles a kick based on touch
             particles.forEach(p => {
-                let dx = p.x - touch.clientX;
-                let dy = p.y - touch.clientY;
-                let dist = Math.sqrt(dx * dx + dy * dy);
-                if (dist < 150) {
-                    p.vx = (dx / dist) * 15;
-                    p.vy = (dy / dist) * 15;
-                    p.hue = currentProj.hue; // Shift color to match project
-                }
+                p.vx += (Math.random() - 0.5) * 10;
+                p.vy += (Math.random() - 0.5) * 10;
             });
 
-            // Update UI
-            projectDisplay.style.opacity = 0;
+            // UI Transition
+            const box = document.getElementById('content-container');
+            box.classList.remove('visible');
+            
             setTimeout(() => {
-                projectDisplay.innerText = currentProj.name;
-                projectDisplay.style.opacity = 1;
+                document.getElementById('title').innerText = data.title;
+                document.getElementById('subtitle').innerText = data.subtitle;
+                document.getElementById('description').innerText = data.desc;
+                box.classList.add('visible');
             }, 500);
-        });
+        }
 
-        // Start Experience (Unlocks Device APIs)
-        startBtn.addEventListener('click', async () => {
-            // Request Gyro for iOS 13+
+        window.addEventListener('touchstart', advancePortfolio);
+
+        function handleOrientation(event) {
+            gyroX = event.gamma / 45 || 0; 
+            gyroY = (event.beta - 45) / 45 || 0; 
+        }
+
+        // --- INITIALIZATION ---
+        document.getElementById('start-btn').addEventListener('click', async (e) => {
+            e.stopPropagation(); // Prevent triggering the first tap immediately
+            
             if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
                 try {
-                    const permissionState = await DeviceOrientationEvent.requestPermission();
-                    if (permissionState === 'granted') {
-                        window.addEventListener('deviceorientation', handleOrientation);
-                    }
-                } catch (console) {
-                    console.log("Gyroscope permission denied.");
-                }
+                    const permission = await DeviceOrientationEvent.requestPermission();
+                    if (permission === 'granted') window.addEventListener('deviceorientation', handleOrientation);
+                } catch(e) { console.log("Gyro denied"); }
             } else {
                 window.addEventListener('deviceorientation', handleOrientation);
             }
 
-            // Init Audio
             const AudioContext = window.AudioContext || window.webkitAudioContext;
             audioCtx = new AudioContext();
-            
-            // UI Transition
-            intro.style.opacity = 0;
-            setTimeout(() => intro.style.display = 'none', 1000);
-            
-            // Initial UI Fade In
-            projectDisplay.innerText = "TAP TO EXPLORE";
-            projectDisplay.style.opacity = 1;
+
+            document.getElementById('intro').style.opacity = 0;
+            setTimeout(() => {
+                document.getElementById('intro').style.display = 'none';
+                document.getElementById('hint').style.opacity = 1;
+                advancePortfolio(); // Load first slide
+            }, 1000);
 
             animate();
         });
