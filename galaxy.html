@@ -2,55 +2,77 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Kinetic Swarm Portfolio</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Kinetic Sensory Portfolio</title>
     <style>
-        /* CSS is minimal because EVERYTHING is rendered in the Canvas engine */
+        :root { --bg-color: #010102; }
         body, html {
             margin: 0; padding: 0; width: 100%; height: 100%;
-            background-color: #020203; overflow: hidden;
+            background-color: var(--bg-color); overflow: hidden;
             touch-action: none; -webkit-user-select: none; user-select: none;
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
         canvas { display: block; position: absolute; top: 0; left: 0; z-index: 1; }
         
         #overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            background: #020203; z-index: 100; transition: opacity 1.5s ease; color: white;
-            text-transform: uppercase; letter-spacing: 4px; pointer-events: auto;
+            background: var(--bg-color); z-index: 100; transition: opacity 1.5s ease, visibility 1.5s;
+            color: #fff; text-align: center; padding: 20px; box-sizing: border-box;
         }
+        
+        .title { font-size: 24px; font-weight: 200; letter-spacing: 8px; margin-bottom: 20px; text-transform: uppercase; }
+        .instructions { font-size: 11px; font-weight: 400; color: rgba(255,255,255,0.4); max-width: 280px; line-height: 1.8; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 40px; }
+        .highlight { color: rgba(255,255,255,0.9); font-weight: 600; }
+        
         .start-btn {
-            margin-top: 30px; padding: 15px 40px; background: transparent; 
-            border: 1px solid rgba(255,255,255,0.3); color: white; border-radius: 30px;
-            font-size: 14px; letter-spacing: 2px; cursor: pointer;
+            position: relative; padding: 18px 50px; background: transparent; 
+            border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 50px;
+            font-size: 12px; letter-spacing: 4px; cursor: pointer; transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            overflow: hidden; outline: none; backdrop-filter: blur(5px);
         }
-        .start-btn:active { background: rgba(255,255,255,0.1); }
-        .loading-text { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 20px; }
+        .start-btn:active { transform: scale(0.95); background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.5); }
+        .start-btn::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s;
+        }
+        .start-btn:hover::before { left: 100%; }
+        
+        #hud {
+            position: absolute; bottom: 30px; left: 0; width: 100%; text-align: center;
+            font-size: 10px; color: rgba(255,255,255,0.3); letter-spacing: 4px; z-index: 10;
+            pointer-events: none; opacity: 0; transition: opacity 2s ease;
+            animation: pulse 3s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.2; }
+            100% { opacity: 0.7; }
+        }
     </style>
 </head>
 <body>
 
-    <!-- Start Screen to unlock Audio and Haptics -->
     <div id="overlay">
-        <h1 style="font-weight: 300; font-size: 20px;">SENSORY ENGINE</h1>
-        <p style="font-size: 10px; color: #888; max-width: 300px; text-align: center; margin-top: 10px; line-height: 1.5;">
-            This portfolio uses complex particle physics, procedural synthesis, and device haptics.
-        </p>
-        <button class="start-btn" id="start-btn">AWAKEN</button>
-        <div class="loading-text" id="status">INITIALIZING...</div>
+        <div class="title">SENSORY UX</div>
+        <div class="instructions">
+            This experience requires access to your device's hardware.<br><br>
+            <span class="highlight">DRAG</span> to distort.<br>
+            <span class="highlight">SHAKE</span> to advance.
+        </div>
+        <button class="start-btn" id="start-btn">INITIALIZE</button>
     </div>
 
-    <!-- The Singular Output -->
+    <div id="hud">SHAKE DEVICE VISCEROUSLY</div>
+
     <canvas id="engine-canvas"></canvas>
 
     <script>
-        /**
-         * ============================================================================
-         * 1. CORE MATH & UTILITIES
-         * A custom Vector math library to handle advanced physics calculations.
-         * ============================================================================
-         */
+        /** ============================================================================
+         * 1. VECTOR MATH
+         * High-performance 2D vector library for physics calculations.
+         * ============================================================================ */
         class Vec2 {
             constructor(x = 0, y = 0) { this.x = x; this.y = y; }
             add(v) { this.x += v.x; this.y += v.y; return this; }
@@ -60,13 +82,9 @@
             mag() { return Math.sqrt(this.x * this.x + this.y * this.y); }
             normalize() { let m = this.mag(); if (m !== 0) this.div(m); return this; }
             limit(max) { if (this.mag() > max) { this.normalize(); this.mult(max); } return this; }
-            dist(v) { let dx = this.x - v.x; let dy = this.y - v.y; return Math.sqrt(dx * dx + dy * dy); }
             copy() { return new Vec2(this.x, this.y); }
             set(x, y) { this.x = x; this.y = y; return this; }
-            heading() { return Math.atan2(this.y, this.x); }
-            lerp(v, amt) { this.x += (v.x - this.x) * amt; this.y += (v.y - this.y) * amt; return this; }
             static sub(v1, v2) { return new Vec2(v1.x - v2.x, v1.y - v2.y); }
-            static dist(v1, v2) { return v1.dist(v2); }
             static random2D() { return new Vec2(Math.random() * 2 - 1, Math.random() * 2 - 1).normalize(); }
         }
 
@@ -76,39 +94,27 @@
             lerp: (start, stop, amt) => start + (stop - start) * amt
         };
 
-        /**
-         * ============================================================================
-         * 2. PROCEDURAL AUDIO SYNTHESIZER
-         * Generates music mathematically. No audio files are used.
-         * ============================================================================
-         */
+        /** ============================================================================
+         * 2. PROCEDURAL GENERATIVE AUDIO ENGINE
+         * Creates a dynamic drone and reactive sound effects without loading MP3s.
+         * ============================================================================ */
         class AudioEngine {
             constructor() {
                 this.ctx = new (window.AudioContext || window.webkitAudioContext)();
                 this.masterGain = this.ctx.createGain();
-                this.masterGain.gain.value = 0.6;
+                this.masterGain.gain.value = 0.5;
                 this.masterGain.connect(this.ctx.destination);
-
-                // Reverb setup
+                
+                // Convolver for massive spatial reverb
                 this.convolver = this.ctx.createConvolver();
-                this.convolver.buffer = this.createReverbBuffer(3);
+                this.convolver.buffer = this.createReverbBuffer(4);
                 this.reverbGain = this.ctx.createGain();
-                this.reverbGain.gain.value = 0.4;
+                this.reverbGain.gain.value = 0.6;
                 this.convolver.connect(this.reverbGain);
                 this.reverbGain.connect(this.masterGain);
 
-                // Scales (Pentatonic for soothing predictable harmonics)
-                this.scales = {
-                    ambient: [196.00, 220.00, 261.63, 293.66, 329.63, 392.00], // G Major Pentatonic
-                    chaos: [110.00, 116.54, 130.81, 138.59, 155.56, 164.81],   // Dissonant scale
-                    bright: [261.63, 293.66, 329.63, 392.00, 440.00, 523.25]   // C Major Pentatonic
-                };
-                
-                this.currentScale = this.scales.ambient;
-                this.isPlaying = false;
-                this.tempo = 80;
-                this.nextNoteTime = 0;
-                this.noteIndex = 0;
+                this.droneOscillators = [];
+                this.initialized = false;
             }
 
             createReverbBuffer(duration) {
@@ -118,117 +124,121 @@
                 for (let i = 0; i < 2; i++) {
                     const channel = impulse.getChannelData(i);
                     for (let j = 0; j < length; j++) {
-                        channel[j] = (Math.random() * 2 - 1) * Math.pow(1 - j / length, 2);
+                        channel[j] = (Math.random() * 2 - 1) * Math.pow(1 - j / length, 3);
                     }
                 }
                 return impulse;
             }
 
-            playSynth(freq, type = 'sine', attack = 0.1, decay = 0.3, sustain = 0.1, release = 2) {
-                const osc = this.ctx.createOscillator();
-                const vca = this.ctx.createGain();
-                const filter = this.ctx.createBiquadFilter();
+            startDrone() {
+                if (this.initialized) return;
+                this.initialized = true;
 
-                osc.type = type;
-                osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                // Create a 3-oscillator dark ambient drone
+                const freqs = [55.00, 82.41, 110.00]; // A1, E2, A2
+                freqs.forEach(freq => {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    const panner = this.ctx.createStereoPanner();
+                    
+                    osc.type = 'sine';
+                    osc.frequency.value = freq;
+                    
+                    // Slow volume swell
+                    gain.gain.setValueAtTime(0, this.ctx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.1, this.ctx.currentTime + 5);
+                    
+                    // Random panning
+                    panner.pan.value = Math.random() * 0.6 - 0.3;
 
-                filter.type = 'lowpass';
-                filter.frequency.setValueAtTime(1000, this.ctx.currentTime);
-                filter.frequency.exponentialRampToValueAtTime(300, this.ctx.currentTime + decay);
-
-                // ADSR Envelope
-                vca.gain.setValueAtTime(0, this.ctx.currentTime);
-                vca.gain.linearRampToValueAtTime(0.3, this.ctx.currentTime + attack);
-                vca.gain.exponentialRampToValueAtTime(sustain, this.ctx.currentTime + attack + decay);
-                vca.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + attack + decay + release);
-
-                osc.connect(filter);
-                filter.connect(vca);
-                vca.connect(this.masterGain);
-                vca.connect(this.convolver); // Send to reverb
-
-                osc.start(this.ctx.currentTime);
-                osc.stop(this.ctx.currentTime + attack + decay + release);
+                    osc.connect(gain);
+                    gain.connect(panner);
+                    panner.connect(this.convolver); // Route through reverb
+                    
+                    osc.start();
+                    this.droneOscillators.push({ osc, gain, panner, baseFreq: freq });
+                });
             }
 
-            playBassDrop() {
+            playShatter() {
+                // Intense FM Synthesis Burst
                 const osc = this.ctx.createOscillator();
+                const mod = this.ctx.createOscillator();
+                const modGain = this.ctx.createGain();
                 const vca = this.ctx.createGain();
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(150, this.ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(30, this.ctx.currentTime + 1.5);
+
+                osc.type = 'sawtooth';
+                mod.type = 'square';
+                
+                osc.frequency.setValueAtTime(100, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(10, this.ctx.currentTime + 1.5);
+                
+                mod.frequency.setValueAtTime(500, this.ctx.currentTime);
+                mod.frequency.exponentialRampToValueAtTime(50, this.ctx.currentTime + 1);
+                
+                modGain.gain.setValueAtTime(1000, this.ctx.currentTime);
+                modGain.gain.exponentialRampToValueAtTime(1, this.ctx.currentTime + 1);
+
+                mod.connect(modGain);
+                modGain.connect(osc.frequency);
                 
                 vca.gain.setValueAtTime(0, this.ctx.currentTime);
-                vca.gain.linearRampToValueAtTime(0.5, this.ctx.currentTime + 0.1);
-                vca.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 2);
+                vca.gain.linearRampToValueAtTime(0.8, this.ctx.currentTime + 0.05); // Hard attack
+                vca.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 2.5); // Long decay
 
                 osc.connect(vca);
                 vca.connect(this.masterGain);
+                vca.connect(this.convolver);
+
+                mod.start();
                 osc.start();
-                osc.stop(this.ctx.currentTime + 2);
+                mod.stop(this.ctx.currentTime + 3);
+                osc.stop(this.ctx.currentTime + 3);
             }
 
-            scheduler() {
-                while (this.nextNoteTime < this.ctx.currentTime + 0.1) {
-                    this.scheduleNote();
-                    this.nextNoteTime += (60.0 / this.tempo);
-                }
-                if (this.isPlaying) this.timerID = requestAnimationFrame(() => this.scheduler());
-            }
+            playTouchRipple() {
+                const osc = this.ctx.createOscillator();
+                const vca = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(440 + Math.random() * 200, this.ctx.currentTime);
+                
+                vca.gain.setValueAtTime(0, this.ctx.currentTime);
+                vca.gain.linearRampToValueAtTime(0.05, this.ctx.currentTime + 0.02);
+                vca.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.5);
 
-            scheduleNote() {
-                // Generative ambient melody
-                if (Math.random() > 0.3) {
-                    const note = this.currentScale[Math.floor(Math.random() * this.currentScale.length)];
-                    this.playSynth(note, 'sine', 0.5, 1, 0.2, 3);
-                }
-                // Harmonic layer
-                if (Math.random() > 0.7) {
-                    const note = this.currentScale[Math.floor(Math.random() * this.currentScale.length)] * 2;
-                    this.playSynth(note, 'triangle', 0.1, 0.5, 0.1, 2);
-                }
-                this.noteIndex++;
-            }
-
-            start() {
-                if (!this.isPlaying) {
-                    this.isPlaying = true;
-                    this.nextNoteTime = this.ctx.currentTime + 0.1;
-                    this.scheduler();
-                }
-            }
-
-            triggerChaos() {
-                this.currentScale = this.scales.chaos;
-                this.tempo = 140;
-                this.playBassDrop();
-                setTimeout(() => {
-                    this.currentScale = this.scales.ambient;
-                    this.tempo = 80;
-                }, 2000);
+                osc.connect(vca);
+                vca.connect(this.convolver);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.6);
             }
         }
 
-        /**
-         * ============================================================================
-         * 3. SENSOR & DEVICE MANAGER
-         * Handles Gyroscope with Low-Pass Filtering, Touch, and Haptics
-         * ============================================================================
-         */
+        /** ============================================================================
+         * 3. SENSOR MANAGER (ACCELEROMETER SHAKE + GYRO)
+         * ============================================================================ */
         class DeviceManager {
-            constructor() {
+            constructor(onShakeCallback) {
                 this.gyro = new Vec2(0, 0);
                 this.targetGyro = new Vec2(0, 0);
-                this.touch = new Vec2(-1000, -1000); // Offscreen initially
-                this.isTouching = false;
-                this.initEvents();
+                
+                this.touch = new Vec2(-1000, -1000);
+                this.isDragging = false;
+                
+                this.onShake = onShakeCallback;
+                
+                // Shake detection variables
+                this.lastAcc = { x: 0, y: 0, z: 0 };
+                this.lastShakeTime = 0;
+                this.SHAKE_THRESHOLD = 15; // Requires a vigorous physical shake
+                
+                this.initTouch();
             }
 
-            initEvents() {
+            initTouch() {
                 window.addEventListener('touchstart', (e) => {
                     this.touch.set(e.touches[0].clientX, e.touches[0].clientY);
-                    this.isTouching = true;
-                    engine.triggerInteraction();
+                    this.isDragging = true;
+                    if (engine.audio) engine.audio.playTouchRipple();
                 }, { passive: false });
 
                 window.addEventListener('touchmove', (e) => {
@@ -236,33 +246,65 @@
                 }, { passive: false });
 
                 window.addEventListener('touchend', () => {
-                    this.isTouching = false;
+                    this.isDragging = false;
                     this.touch.set(-1000, -1000);
                 });
             }
 
-            async requestGyro() {
+            async requestPermissions() {
+                // Request Device Orientation (Gyroscope)
                 if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
                     try {
-                        const permission = await DeviceOrientationEvent.requestPermission();
-                        if (permission === 'granted') this.attachGyro();
+                        const perm1 = await DeviceOrientationEvent.requestPermission();
+                        if (perm1 === 'granted') {
+                            window.addEventListener('deviceorientation', (e) => this.handleOrientation(e));
+                        }
                     } catch (e) { console.warn("Gyro permission denied"); }
                 } else {
-                    this.attachGyro();
+                    window.addEventListener('deviceorientation', (e) => this.handleOrientation(e));
+                }
+
+                // Request Device Motion (Accelerometer for Shake)
+                if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+                    try {
+                        const perm2 = await DeviceMotionEvent.requestPermission();
+                        if (perm2 === 'granted') {
+                            window.addEventListener('devicemotion', (e) => this.handleMotion(e));
+                        }
+                    } catch (e) { console.warn("Motion permission denied"); }
+                } else {
+                    window.addEventListener('devicemotion', (e) => this.handleMotion(e));
                 }
             }
 
-            attachGyro() {
-                window.addEventListener('deviceorientation', (e) => {
-                    // Normalize to -1 to 1 range
-                    let x = e.gamma ? e.gamma / 45 : 0; 
-                    let y = e.beta ? (e.beta - 45) / 45 : 0;
-                    this.targetGyro.set(x, y);
-                });
+            handleOrientation(e) {
+                let x = e.gamma ? e.gamma / 45 : 0; 
+                let y = e.beta ? (e.beta - 45) / 45 : 0;
+                this.targetGyro.set(x, y);
+            }
+
+            handleMotion(e) {
+                let acc = e.accelerationIncludingGravity || e.acceleration;
+                if (!acc) return;
+                
+                let deltaX = Math.abs(this.lastAcc.x - acc.x);
+                let deltaY = Math.abs(this.lastAcc.y - acc.y);
+                let deltaZ = Math.abs(this.lastAcc.z - acc.z);
+                
+                // Total acceleration change
+                let force = deltaX + deltaY + deltaZ;
+                let now = Date.now();
+
+                // If shake exceeds threshold and cooldown (1.5s) has passed
+                if (force > this.SHAKE_THRESHOLD && now - this.lastShakeTime > 1500) {
+                    this.lastShakeTime = now;
+                    this.onShake();
+                }
+
+                this.lastAcc = { x: acc.x, y: acc.y, z: acc.z };
             }
 
             update() {
-                // Low-pass filter for buttery smooth gyro motion
                 this.gyro.lerp(this.targetGyro, 0.05);
             }
 
@@ -271,47 +313,54 @@
             }
         }
 
-        /**
-         * ============================================================================
-         * 4. KINETIC TYPOGRAPHY ENGINE
-         * Renders text to an invisible canvas to extract coordinates for particles.
-         * ============================================================================
-         */
+        /** ============================================================================
+         * 4. HIGH-DPI TYPOGRAPHY ENGINE (CRITICAL FOR MOBILE CLARITY)
+         * ============================================================================ */
         class Typography {
-            constructor(width, height) {
+            constructor() {
                 this.canvas = document.createElement('canvas');
                 this.ctx = this.canvas.getContext('2d', { willReadFrequently: true });
-                this.resize(width, height);
+                this.dpr = window.devicePixelRatio || 1; // Fixes blurry pixel extraction
             }
 
             resize(w, h) {
-                this.width = this.canvas.width = w;
-                this.height = this.canvas.height = h;
+                this.logicalWidth = w;
+                this.logicalHeight = h;
+                this.canvas.width = w * this.dpr;
+                this.canvas.height = h * this.dpr;
+                this.ctx.scale(this.dpr, this.dpr);
             }
 
-            getPoints(textData) {
-                this.ctx.clearRect(0, 0, this.width, this.height);
-                this.ctx.fillStyle = '#fff';
+            getPoints(slideData) {
+                this.ctx.clearRect(0, 0, this.logicalWidth, this.logicalHeight);
+                this.ctx.fillStyle = '#ffffff';
                 this.ctx.textAlign = 'center';
                 this.ctx.textBaseline = 'middle';
 
-                // Render lines
-                textData.lines.forEach((line, index) => {
-                    this.ctx.font = `bold ${line.size}px 'Helvetica Neue', Helvetica, Arial, sans-serif`;
-                    const y = (this.height / 2) + line.offsetY;
-                    this.ctx.fillText(line.text, this.width / 2, y);
+                // Render dynamic text sizing based on screen width
+                let scaleFactor = this.logicalWidth < 600 ? 0.6 : 1;
+
+                slideData.lines.forEach(line => {
+                    let fontSize = Math.floor(line.size * scaleFactor);
+                    this.ctx.font = `900 ${fontSize}px -apple-system, sans-serif`;
+                    const y = (this.logicalHeight / 2) + (line.offsetY * scaleFactor);
+                    this.ctx.fillText(line.text, this.logicalWidth / 2, y);
                 });
 
-                const imageData = this.ctx.getImageData(0, 0, this.width, this.height).data;
+                // Extract exact pixels
+                const imageData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height).data;
                 let points = [];
                 
-                // Scan pixel data (step controls particle density)
-                let step = window.innerWidth < 600 ? 3 : 4; 
-                for (let y = 0; y < this.height; y += step) {
-                    for (let x = 0; x < this.width; x += step) {
-                        const alpha = imageData[(y * this.width + x) * 4 + 3];
+                // Dense sampling for high-fidelity text
+                // Adjust step based on DPR so retina screens don't get 4x the particles causing lag
+                let step = Math.floor(5 * this.dpr); 
+
+                for (let y = 0; y < this.canvas.height; y += step) {
+                    for (let x = 0; x < this.canvas.width; x += step) {
+                        const alpha = imageData[(y * this.canvas.width + x) * 4 + 3];
                         if (alpha > 128) {
-                            points.push(new Vec2(x, y));
+                            // Convert scaled coordinates back to logical screen coordinates
+                            points.push(new Vec2(x / this.dpr, y / this.dpr));
                         }
                     }
                 }
@@ -319,266 +368,267 @@
             }
         }
 
-        /**
-         * ============================================================================
-         * 5. PHYSICS PARTICLE (THE SWARM)
-         * Incorporates Spring physics for text forming, and Boids for chaos.
-         * ============================================================================
-         */
+        /** ============================================================================
+         * 5. HIGH-PERFORMANCE FLUID PARTICLE (WITH TRAILS)
+         * ============================================================================ */
         class Particle {
             constructor(x, y) {
                 this.pos = new Vec2(x, y);
-                this.vel = Vec2.random2D().mult(MathUtils.random(1, 3));
+                this.vel = new Vec2(0, 0);
                 this.acc = new Vec2(0, 0);
-                this.target = new Vec2(x, y); // Where it belongs in the typography
+                this.target = new Vec2(x, y);
+                this.origin = new Vec2(x, y); // The absolute target before breathing math
                 
-                this.maxSpeed = MathUtils.random(4, 8);
-                this.maxForce = MathUtils.random(0.2, 0.5);
-                this.baseRadius = MathUtils.random(1, 2.5);
+                // Physics constants
+                this.friction = MathUtils.random(0.85, 0.92);
+                this.springConst = MathUtils.random(0.08, 0.15); // Much tighter spring for legibility
                 
-                // Color variation based on position
-                this.hueOffset = MathUtils.random(-20, 20);
+                this.hueOffset = MathUtils.random(-15, 15);
+                this.size = MathUtils.random(1, 2);
+                
+                // Fluid trails
+                this.history = [];
+                this.historyLength = 4;
             }
 
-            applyForce(force) {
-                this.acc.add(force);
-            }
+            update(device, isChaos, time) {
+                // Update history for trails
+                this.history.push(this.pos.copy());
+                if (this.history.length > this.historyLength) this.history.shift();
 
-            // The predictable, soothing pull to form the text
-            arrive(target) {
-                let desired = Vec2.sub(target, this.pos);
-                let d = desired.mag();
-                let speed = this.maxSpeed;
-                if (d < 100) {
-                    speed = MathUtils.map(d, 0, 100, 0, this.maxSpeed);
-                }
-                desired.normalize();
-                desired.mult(speed);
-                let steer = Vec2.sub(desired, this.vel);
-                steer.limit(this.maxForce);
-                return steer;
-            }
+                if (isChaos) {
+                    // Total loss of structural integrity
+                    let chaosForce = Vec2.random2D().mult(MathUtils.random(5, 15));
+                    this.acc.add(chaosForce);
+                } else {
+                    // 1. Organic Breathing (Sine Wave Distortion based on position)
+                    let breatheX = Math.sin(time * 0.002 + this.origin.y * 0.01) * 3;
+                    let breatheY = Math.cos(time * 0.0015 + this.origin.x * 0.01) * 3;
+                    this.target.set(this.origin.x + breatheX, this.origin.y + breatheY);
 
-            // The Chaos: Fleeing from touch
-            flee(target, radius) {
-                let desired = Vec2.sub(this.pos, target);
-                let d = desired.mag();
-                if (d < radius) {
-                    desired.normalize();
-                    desired.mult(this.maxSpeed * 3); // Explode quickly
-                    let steer = Vec2.sub(desired, this.vel);
-                    steer.limit(this.maxForce * 4);
-                    return steer;
-                }
-                return new Vec2(0, 0);
-            }
+                    // 2. Spring Force (Pull to target) Hooke's Law: F = -k * x
+                    let springForce = Vec2.sub(this.target, this.pos).mult(this.springConst);
+                    this.acc.add(springForce);
 
-            update(device, isChaosMode) {
-                // 1. Core behavior: Form the text
-                let arriveForce = this.arrive(this.target);
-                arriveForce.mult(isChaosMode ? 0.1 : 1.2); // Weaken structure in chaos mode
-                this.applyForce(arriveForce);
+                    // 3. Gyroscope Drift (parallax depth effect)
+                    // Closer particles drift more
+                    let depth = MathUtils.map(this.size, 1, 2, 0.5, 2);
+                    let gyroForce = device.gyro.copy().mult(depth * 3);
+                    this.acc.add(gyroForce);
 
-                // 2. Gyroscope wind (drifts particles)
-                let gyroForce = device.gyro.copy().mult(isChaosMode ? 2 : 0.5);
-                this.applyForce(gyroForce);
-
-                // 3. Touch Repulsion (Explosion)
-                if (device.isTouching) {
-                    let fleeForce = this.flee(device.touch, 150);
-                    this.applyForce(fleeForce);
+                    // 4. Magnetic Repulsion from Drag (Chaos)
+                    if (device.isDragging) {
+                        let diff = Vec2.sub(this.pos, device.touch);
+                        let dist = diff.mag();
+                        let maxDist = 120;
+                        if (dist < maxDist) {
+                            let repelStr = MathUtils.map(dist, 0, maxDist, 20, 0);
+                            diff.normalize().mult(repelStr);
+                            this.acc.add(diff);
+                        }
+                    }
                 }
 
-                // Noise/Wander for organic life
-                if (!isChaosMode) {
-                    let wander = Vec2.random2D().mult(0.1);
-                    this.applyForce(wander);
-                }
-
+                // Euler Integration
                 this.vel.add(this.acc);
-                this.vel.limit(isChaosMode ? this.maxSpeed * 2 : this.maxSpeed);
+                this.vel.mult(this.friction);
                 this.pos.add(this.vel);
-                
-                // Reset acceleration for next frame
-                this.acc.set(0, 0);
-                
-                // Friction
-                this.vel.mult(0.95);
+                this.acc.set(0, 0); // Reset
             }
 
-            draw(ctx, hueBase, isChaosMode) {
-                ctx.beginPath();
-                ctx.arc(this.pos.x, this.pos.y, isChaosMode ? this.baseRadius * 0.5 : this.baseRadius, 0, Math.PI * 2);
-                let speedAlpha = MathUtils.map(this.vel.mag(), 0, this.maxSpeed, 0.4, 1);
-                ctx.fillStyle = `hsla(${hueBase + this.hueOffset}, 80%, 70%, ${speedAlpha})`;
-                ctx.fill();
+            draw(ctx, baseHue) {
+                // Draw fluid glowing trail
+                if (this.history.length > 1) {
+                    ctx.beginPath();
+                    ctx.moveTo(this.history[0].x, this.history[0].y);
+                    for (let i = 1; i < this.history.length; i++) {
+                        ctx.lineTo(this.history[i].x, this.history[i].y);
+                    }
+                    ctx.lineTo(this.pos.x, this.pos.y);
+                    
+                    let alpha = MathUtils.map(this.vel.mag(), 0, 15, 0.4, 1);
+                    ctx.strokeStyle = `hsla(${baseHue + this.hueOffset}, 80%, 70%, ${alpha})`;
+                    ctx.lineWidth = this.size;
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
+                    ctx.stroke();
+                }
             }
         }
 
-        /**
-         * ============================================================================
+        /** ============================================================================
          * 6. CORE ENGINE
-         * Orchestrates Rendering, State Machine, and Portfolio Data.
-         * ============================================================================
-         */
+         * ============================================================================ */
         class PortfolioEngine {
             constructor() {
                 this.canvas = document.getElementById('engine-canvas');
-                this.ctx = this.canvas.getContext('2d', { alpha: false });
+                this.ctx = this.canvas.getContext('2d');
                 
-                this.device = new DeviceManager();
-                this.typo = new Typography(window.innerWidth, window.innerHeight);
+                this.device = new DeviceManager(() => this.triggerShake());
+                this.typo = new Typography();
                 
                 this.particles = [];
-                this.globalHue = 220; // Starts deep blue
-                this.isChaosMode = false;
+                this.currentSlide = 0;
+                this.globalHue = 210;
+                this.isChaos = false;
+                this.time = 0;
                 
-                // Portfolio Content (NO HTML, pure data rendered via particles)
+                // Portfolio Content (Optimized for density & sizes)
                 this.slides = [
                     {
+                        hue: 210, // Cyan
                         lines: [
-                            { text: "NITHAN NAJEEB", size: window.innerWidth < 600 ? 30 : 60, offsetY: -30 },
-                            { text: "CREATIVE DEVELOPER", size: window.innerWidth < 600 ? 16 : 24, offsetY: 20 }
-                        ],
-                        hue: 220 // Blue
+                            { text: "SHAKE", size: 90, offsetY: -30 },
+                            { text: "TO BREAK", size: 30, offsetY: 30 }
+                        ]
                     },
                     {
+                        hue: 340, // Pink/Red
                         lines: [
-                            { text: "BEYOND", size: window.innerWidth < 600 ? 40 : 80, offsetY: -40 },
-                            { text: "THE GLASS BOX", size: window.innerWidth < 600 ? 25 : 40, offsetY: 10 },
-                            { text: "PURE KINETICS", size: window.innerWidth < 600 ? 12 : 18, offsetY: 50 }
-                        ],
-                        hue: 340 // Pink/Red
+                            { text: "NITHAN", size: 80, offsetY: -40 },
+                            { text: "NAJEEB", size: 80, offsetY: 25 },
+                            { text: "CREATIVE DEVELOPER", size: 16, offsetY: 80 }
+                        ]
                     },
                     {
+                        hue: 45, // Gold
                         lines: [
-                            { text: "CAPABILITIES", size: window.innerWidth < 600 ? 30 : 50, offsetY: -50 },
-                            { text: "WEBGL & CANVAS", size: window.innerWidth < 600 ? 14 : 20, offsetY: -10 },
-                            { text: "AUDIO SYNTHESIS", size: window.innerWidth < 600 ? 14 : 20, offsetY: 20 },
-                            { text: "SENSOR FUSION", size: window.innerWidth < 600 ? 14 : 20, offsetY: 50 }
-                        ],
-                        hue: 40 // Orange/Gold
+                            { text: "CAPABILITIES", size: 45, offsetY: -60 },
+                            { text: "WEBGL & CANVAS", size: 20, offsetY: -10 },
+                            { text: "AUDIO SYNTHESIS", size: 20, offsetY: 20 },
+                            { text: "SENSOR FUSION", size: 20, offsetY: 50 },
+                            { text: "HAPTIC DESIGN", size: 20, offsetY: 80 }
+                        ]
                     },
                     {
+                        hue: 280, // Purple
                         lines: [
-                            { text: "TAP TO LOOP", size: window.innerWidth < 600 ? 30 : 50, offsetY: 0 }
-                        ],
-                        hue: 280 // Purple
+                            { text: "BEYOND", size: 70, offsetY: -30 },
+                            { text: "THE GRID", size: 30, offsetY: 25 }
+                        ]
                     }
                 ];
-                
-                this.currentSlide = 0;
-                this.audio = null;
-                
-                this.resize();
+
                 window.addEventListener('resize', () => this.resize());
+                this.resize();
             }
 
             resize() {
-                this.width = this.canvas.width = window.innerWidth;
-                this.height = this.canvas.height = window.innerHeight;
+                this.width = window.innerWidth;
+                this.height = window.innerHeight;
+                
+                // Scale physical canvas rendering for Retina displays
+                let dpr = window.devicePixelRatio || 1;
+                this.canvas.width = this.width * dpr;
+                this.canvas.height = this.height * dpr;
+                this.canvas.style.width = `${this.width}px`;
+                this.canvas.style.height = `${this.height}px`;
+                this.ctx.scale(dpr, dpr);
+
                 this.typo.resize(this.width, this.height);
-                // Re-calculate targets on resize
+                
                 if (this.particles.length > 0) this.morphToSlide(this.currentSlide, false);
             }
 
             async start() {
-                document.getElementById('status').innerText = "CALIBRATING...";
+                document.getElementById('start-btn').innerText = "CONNECTING SENSORS...";
                 
                 this.audio = new AudioEngine();
-                await this.device.requestGyro();
+                await this.device.requestPermissions();
                 
                 document.getElementById('overlay').style.opacity = 0;
-                setTimeout(() => document.getElementById('overlay').style.display = 'none', 1500);
+                setTimeout(() => {
+                    document.getElementById('overlay').style.visibility = 'hidden';
+                    document.getElementById('hud').style.opacity = 1;
+                }, 1500);
 
+                this.audio.startDrone();
                 this.morphToSlide(0, true);
-                this.audio.start();
-                
                 this.animate();
+            }
+
+            triggerShake() {
+                if (this.isChaos) return; // Prevent spamming
+                
+                // 1. Sensory Output
+                this.device.vibrate([100, 50, 100, 50, 200]); // Heavy shudder
+                this.audio.playShatter();
+                
+                // 2. Visual Chaos
+                this.isChaos = true;
+                
+                // Advance Slide
+                this.currentSlide = (this.currentSlide + 1) % this.slides.length;
+                
+                // 3. Rebuild structure after a delay
+                setTimeout(() => {
+                    this.isChaos = false;
+                    this.morphToSlide(this.currentSlide);
+                }, 1000);
             }
 
             morphToSlide(index, isInit = false) {
                 const slide = this.slides[index];
                 this.globalHue = slide.hue;
                 
-                // Extract coordinates for the text
                 const targetPoints = this.typo.getPoints(slide);
                 
-                // If initializing, create particles
                 if (isInit) {
                     this.particles = [];
                     for (let i = 0; i < targetPoints.length; i++) {
-                        let pt = targetPoints[i];
-                        // Start scattered
-                        let px = Math.random() * this.width;
-                        let py = Math.random() * this.height;
-                        let p = new Particle(px, py);
-                        p.target.set(pt.x, pt.y);
+                        // Start particles from a single dot in the center for a dramatic intro explosion
+                        let p = new Particle(this.width / 2, this.height / 2);
+                        p.origin.set(targetPoints[i].x, targetPoints[i].y);
                         this.particles.push(p);
                     }
                 } else {
-                    // Match existing particles to new targets
-                    // If new text needs more particles, add them
+                    // Match particles to new targets. Add/remove as needed.
                     while (this.particles.length < targetPoints.length) {
-                        let px = Math.random() * this.width;
-                        let py = Math.random() * this.height;
-                        this.particles.push(new Particle(px, py));
+                        // Spawn new particles from the edges
+                        this.particles.push(new Particle(Math.random() * this.width, -50));
                     }
                     
-                    // Assign targets randomly to create a chaotic reshuffle
+                    // Shuffle targets to create criss-crossing paths when they reform
                     let shuffledTargets = [...targetPoints].sort(() => Math.random() - 0.5);
                     
                     for (let i = 0; i < this.particles.length; i++) {
                         if (i < shuffledTargets.length) {
-                            this.particles[i].target.set(shuffledTargets[i].x, shuffledTargets[i].y);
+                            this.particles[i].origin.set(shuffledTargets[i].x, shuffledTargets[i].y);
                         } else {
-                            // Extra particles from previous slide drift offscreen
-                            this.particles[i].target.set(Math.random() * this.width, -200);
+                            // Extra particles get thrown into the void
+                            this.particles[i].origin.set(
+                                this.width / 2 + (Math.random() - 0.5) * this.width * 3, 
+                                this.height / 2 + (Math.random() - 0.5) * this.height * 3
+                            );
                         }
                     }
                 }
             }
 
-            triggerInteraction() {
-                // Change slide
-                this.currentSlide = (this.currentSlide + 1) % this.slides.length;
-                
-                // Engage Chaos Mode temporarily
-                this.isChaosMode = true;
-                this.device.vibrate([40, 30, 80]); // Heavy haptic bump
-                this.audio.triggerChaos();
-
-                // Morph to new slide
-                this.morphToSlide(this.currentSlide);
-
-                // Return to soothing predictability after 1.5 seconds
-                setTimeout(() => {
-                    this.isChaosMode = false;
-                }, 1500);
-            }
-
             animate() {
-                // Motion Blur / Fluid Trail Effect
-                this.ctx.fillStyle = `rgba(2, 2, 3, ${this.isChaosMode ? 0.4 : 0.2})`;
-                this.ctx.fillRect(0, 0, this.width, this.height);
-
+                this.time += 16;
                 this.device.update();
 
-                // Draw Particles
+                // Clear with slight motion blur effect
+                this.ctx.fillStyle = `rgba(1, 1, 2, ${this.isChaos ? 0.1 : 0.4})`;
+                this.ctx.fillRect(0, 0, this.width, this.height);
+
+                this.ctx.globalCompositeOperation = 'lighter'; // Makes trails glow brilliantly
+
                 for (let i = 0; i < this.particles.length; i++) {
-                    this.particles[i].update(this.device, this.isChaosMode);
-                    this.particles[i].draw(this.ctx, this.globalHue, this.isChaosMode);
+                    this.particles[i].update(this.device, this.isChaos, this.time);
+                    this.particles[i].draw(this.ctx, this.globalHue);
                 }
+                
+                this.ctx.globalCompositeOperation = 'source-over';
 
                 requestAnimationFrame(() => this.animate());
             }
         }
 
-        // Boot Sequence
+        // Boot
         const engine = new PortfolioEngine();
-        document.getElementById('start-btn').addEventListener('click', () => {
-            engine.start();
-        });
+        document.getElementById('start-btn').addEventListener('click', () => engine.start());
 
     </script>
 </body>
