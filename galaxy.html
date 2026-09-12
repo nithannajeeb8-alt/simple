@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ORION-X // Deep Space Vehicle</title>
+
+<title>ORION X-01</title>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
@@ -14,309 +15,313 @@
     box-sizing:border-box;
 }
 
-html{
-    scroll-behavior:smooth;
+html,body{
+    width:100%;
+    min-height:100%;
+    background:#020308;
+    color:white;
+    font-family:Inter,sans-serif;
 }
 
 body{
-    background:#020307;
-    color:#eef3f8;
-    font-family:Inter, sans-serif;
     overflow-x:hidden;
 }
 
-canvas{
+#space{
     position:fixed;
     inset:0;
     z-index:0;
 }
 
-.noise{
+canvas{
+    display:block;
+}
+
+.vignette{
     position:fixed;
     inset:0;
     z-index:2;
     pointer-events:none;
-    opacity:.045;
-    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+
+    background:
+        radial-gradient(
+            ellipse at center,
+            transparent 30%,
+            rgba(0,0,0,.25) 65%,
+            rgba(0,0,0,.9) 100%
+        );
 }
 
-.overlay{
+.grid{
     position:fixed;
     inset:0;
     z-index:1;
     pointer-events:none;
-    background:
-        radial-gradient(circle at 50% 45%, transparent 20%, rgba(0,0,0,.25) 65%, rgba(0,0,0,.8)),
-        linear-gradient(to bottom, transparent 70%, #020307 100%);
+    opacity:.08;
+
+    background-image:
+        linear-gradient(
+            rgba(255,255,255,.08) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(255,255,255,.08) 1px,
+            transparent 1px
+        );
+
+    background-size:100px 100px;
+
+    transform:
+        perspective(700px)
+        rotateX(65deg)
+        translateY(35%);
 }
 
 nav{
     position:fixed;
+    z-index:10;
     top:0;
     left:0;
     width:100%;
-    z-index:10;
-    padding:25px 5vw;
+
     display:flex;
     justify-content:space-between;
     align-items:center;
-    mix-blend-mode:screen;
+
+    padding:28px 5vw;
+
+    font-family:"Space Mono",monospace;
 }
 
 .logo{
-    font-family:"Space Mono", monospace;
-    letter-spacing:4px;
     font-size:13px;
-    font-weight:bold;
+    letter-spacing:4px;
 }
 
-.navlinks{
+.nav{
     display:flex;
     gap:35px;
-    font-family:"Space Mono", monospace;
-    font-size:10px;
+
+    font-size:9px;
     letter-spacing:2px;
-}
-
-.navlinks span{
     opacity:.55;
-    transition:.3s;
-}
-
-.navlinks span:hover{
-    opacity:1;
 }
 
 .hero{
     position:relative;
-    z-index:3;
+    z-index:5;
+
     height:100vh;
     min-height:700px;
+
     pointer-events:none;
 }
 
-.hero-copy{
+.copy{
     position:absolute;
+
     left:7vw;
     top:50%;
+
     transform:translateY(-50%);
-    max-width:520px;
+
+    max-width:480px;
 }
 
 .kicker{
     font-family:"Space Mono",monospace;
-    font-size:11px;
+    font-size:10px;
     letter-spacing:5px;
-    opacity:.55;
+    color:#8e98a5;
+
     margin-bottom:25px;
 }
 
 h1{
-    font-size:clamp(65px,9vw,145px);
-    line-height:.78;
-    letter-spacing:-8px;
+    font-size:clamp(70px,10vw,150px);
+    line-height:.76;
+
+    letter-spacing:-9px;
     font-weight:600;
 }
 
 h1 span{
     display:block;
+
     color:transparent;
-    -webkit-text-stroke:1px rgba(255,255,255,.7);
+
+    -webkit-text-stroke:
+        1px rgba(255,255,255,.65);
 }
 
-.description{
+.desc{
     margin-top:35px;
-    max-width:390px;
-    line-height:1.7;
-    color:#9da5af;
+
+    max-width:360px;
+
+    color:#9099a5;
     font-size:13px;
+    line-height:1.8;
 }
 
-.status{
-    margin-top:35px;
+.stats{
     display:flex;
     gap:35px;
+
+    margin-top:30px;
+
     font-family:"Space Mono",monospace;
-    font-size:9px;
-    letter-spacing:1px;
+    font-size:8px;
 }
 
-.status div{
+.stats div{
     display:flex;
     flex-direction:column;
     gap:7px;
 }
 
-.status b{
-    color:#fff;
+.stats strong{
     font-size:11px;
 }
 
-.green{
-    color:#79ffb0;
+.online{
+    color:#78ffb1;
 }
 
-.scroll{
+.bottom{
     position:absolute;
-    bottom:35px;
+    bottom:30px;
     left:7vw;
-    font-family:"Space Mono",monospace;
-    font-size:9px;
-    letter-spacing:3px;
-    opacity:.5;
-}
 
-.scroll:after{
-    content:"";
-    display:inline-block;
-    width:60px;
-    height:1px;
-    background:#fff;
-    opacity:.3;
-    margin-left:15px;
-    vertical-align:middle;
-}
-
-section{
-    position:relative;
-    z-index:4;
-    min-height:100vh;
-    padding:140px 7vw;
-    pointer-events:none;
-}
-
-.section-inner{
-    max-width:1200px;
-    margin:auto;
-}
-
-.section-label{
-    font-family:"Space Mono",monospace;
-    font-size:9px;
-    letter-spacing:4px;
-    color:#7d8792;
-    margin-bottom:25px;
-}
-
-.section-title{
-    font-size:clamp(45px,7vw,100px);
-    line-height:.9;
-    letter-spacing:-5px;
-    max-width:700px;
-}
-
-.spec-grid{
-    margin-top:100px;
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    border-top:1px solid rgba(255,255,255,.12);
-    border-bottom:1px solid rgba(255,255,255,.12);
-}
-
-.spec{
-    padding:35px 25px;
-    border-right:1px solid rgba(255,255,255,.1);
-}
-
-.spec:last-child{
-    border-right:0;
-}
-
-.spec small{
-    display:block;
     font-family:"Space Mono",monospace;
     font-size:8px;
-    letter-spacing:2px;
-    color:#68717b;
-    margin-bottom:15px;
-}
+    letter-spacing:3px;
 
-.spec strong{
-    font-size:27px;
-    font-weight:500;
-}
-
-.big-number{
-    font-family:"Space Mono",monospace;
-    font-size:clamp(80px,16vw,220px);
-    letter-spacing:-15px;
-    opacity:.85;
-}
-
-.mission{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:10vw;
-    align-items:center;
-}
-
-.mission p{
-    color:#8d96a0;
-    line-height:1.9;
-    max-width:480px;
-    font-size:14px;
+    color:#78818b;
 }
 
 .hud{
     position:fixed;
-    z-index:5;
     right:30px;
     bottom:30px;
+
+    z-index:8;
+
     font-family:"Space Mono",monospace;
     font-size:8px;
-    letter-spacing:1px;
-    color:#76808b;
+    line-height:1.8;
+
+    color:#69737e;
+
+    text-align:right;
+}
+
+section{
+    position:relative;
+    z-index:5;
+
+    min-height:100vh;
+
+    padding:
+        160px
+        7vw;
+
     pointer-events:none;
 }
 
-.hud div{
-    margin-top:5px;
+.label{
+    font-family:"Space Mono",monospace;
+    font-size:9px;
+    letter-spacing:4px;
+    color:#737d88;
+
+    margin-bottom:25px;
+}
+
+.title{
+    font-size:clamp(50px,8vw,115px);
+    line-height:.88;
+    letter-spacing:-6px;
+}
+
+.specs{
+    margin-top:100px;
+
+    display:grid;
+    grid-template-columns:
+        repeat(4,1fr);
+
+    border-top:
+        1px solid rgba(255,255,255,.12);
+
+    border-bottom:
+        1px solid rgba(255,255,255,.12);
+}
+
+.spec{
+    padding:30px;
+
+    border-right:
+        1px solid rgba(255,255,255,.1);
+}
+
+.spec:last-child{
+    border:0;
+}
+
+.spec small{
+    display:block;
+
+    font-family:"Space Mono",monospace;
+    font-size:8px;
+
+    color:#68727c;
+
+    margin-bottom:15px;
+}
+
+.spec b{
+    font-size:25px;
+    font-weight:500;
 }
 
 @media(max-width:800px){
 
-    .navlinks{
+    .nav{
         display:none;
     }
 
-    nav{
-        padding:20px;
-    }
-
-    .hero-copy{
-        left:7vw;
-        top:56%;
+    .copy{
+        top:58%;
     }
 
     h1{
-        font-size:20vw;
+        font-size:21vw;
         letter-spacing:-5px;
     }
 
-    .description{
-        max-width:300px;
+    .desc{
         font-size:11px;
+        max-width:290px;
     }
 
-    .spec-grid{
+    .specs{
         grid-template-columns:1fr 1fr;
     }
 
-    .spec:nth-child(2){
-        border-right:0;
-    }
-
-    .spec:nth-child(1),
-    .spec:nth-child(2){
-        border-bottom:1px solid rgba(255,255,255,.1);
-    }
-
-    .mission{
-        grid-template-columns:1fr;
+    .spec{
+        border-bottom:
+            1px solid rgba(255,255,255,.1);
     }
 
     section{
-        padding:100px 7vw;
+        padding:
+            120px 7vw;
+    }
+
+    .hud{
+        display:none;
     }
 }
 </style>
@@ -324,27 +329,33 @@ section{
 
 <body>
 
-<div class="noise"></div>
-<div class="overlay"></div>
+<div id="space"></div>
+
+<div class="grid"></div>
+<div class="vignette"></div>
+
 
 <nav>
-    <div class="logo">ORION / X-01</div>
 
-    <div class="navlinks">
+    <div class="logo">
+        ORION / X-01
+    </div>
+
+    <div class="nav">
         <span>VEHICLE</span>
-        <span>SYSTEMS</span>
+        <span>PROPULSION</span>
         <span>MISSION</span>
     </div>
+
 </nav>
 
-<main>
 
-<section class="hero">
+<div class="hero">
 
-    <div class="hero-copy">
+    <div class="copy">
 
         <div class="kicker">
-            DEEP SPACE VEHICLE / 01
+            DEEP SPACE VEHICLE / 001
         </div>
 
         <h1>
@@ -352,69 +363,28 @@ section{
             <span>X-01</span>
         </h1>
 
-        <p class="description">
-            A next-generation deep-space vehicle engineered for
-            long-duration missions beyond Earth orbit.
-        </p>
+        <div class="desc">
+            A long-range spacecraft engineered for
+            deep-space exploration, orbital construction
+            and missions beyond Earth.
+        </div>
 
-        <div class="status">
+        <div class="stats">
+
             <div>
                 <span>STATUS</span>
-                <b class="green">● OPERATIONAL</b>
+                <strong class="online">
+                    ● ONLINE
+                </strong>
             </div>
 
             <div>
                 <span>CREW</span>
-                <b>06</b>
+                <strong>06</strong>
             </div>
 
             <div>
                 <span>RANGE</span>
-                <b>∞</b>
-            </div>
-        </div>
-
-    </div>
-
-    <div class="scroll">
-        SCROLL TO EXPLORE
-    </div>
-
-</section>
-
-
-<section>
-
-    <div class="section-inner">
-
-        <div class="section-label">
-            01 / VEHICLE
-        </div>
-
-        <div class="section-title">
-            BUILT FOR<br>
-            THE VOID.
-        </div>
-
-        <div class="spec-grid">
-
-            <div class="spec">
-                <small>LENGTH</small>
-                <strong>86.4 M</strong>
-            </div>
-
-            <div class="spec">
-                <small>MAX VELOCITY</small>
-                <strong>0.21 C</strong>
-            </div>
-
-            <div class="spec">
-                <small>CREW CAPACITY</small>
-                <strong>06</strong>
-            </div>
-
-            <div class="spec">
-                <small>MISSION RANGE</small>
                 <strong>12 AU</strong>
             </div>
 
@@ -422,132 +392,115 @@ section{
 
     </div>
 
-</section>
 
-
-<section>
-
-    <div class="section-inner mission">
-
-        <div>
-            <div class="section-label">
-                02 / PROPULSION
-            </div>
-
-            <div class="big-number">
-                04
-            </div>
-        </div>
-
-        <div>
-
-            <div class="section-title">
-                FOUR ENGINES.<br>
-                ONE PURPOSE.
-            </div>
-
-            <p style="margin-top:35px">
-                Independent fusion-electric propulsion units provide
-                redundancy across every phase of the mission. The
-                vehicle can maintain thrust even after multiple
-                system failures.
-            </p>
-
-        </div>
-
+    <div class="bottom">
+        MOVE YOUR CURSOR · EXPLORE VEHICLE
     </div>
 
-</section>
-
-
-<section>
-
-    <div class="section-inner">
-
-        <div class="section-label">
-            03 / MISSION
-        </div>
-
-        <div class="section-title">
-            EARTH<br>
-            IS ONLY<br>
-            THE START.
-        </div>
-
-        <p style="
-            margin-top:45px;
-            max-width:450px;
-            color:#8d96a0;
-            line-height:1.9;
-            font-size:14px;
-        ">
-            Designed for orbital construction, asteroid exploration,
-            deep-space research and missions that currently exist
-            only on somebody's very ambitious whiteboard.
-        </p>
-
-    </div>
-
-</section>
-
-</main>
-
-<div class="hud">
-    <div>ORION X-01 // FLIGHT COMPUTER</div>
-    <div id="coords">LAT 00.000 / LON 00.000</div>
-    <div id="velocity">VEL 000,000 KM/H</div>
 </div>
 
 
-<script type="module">
+<div class="hud">
 
-import * as THREE from
-"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
+    <div>FLIGHT COMPUTER // X01</div>
+    <div id="velocity">
+        VELOCITY 082,400 KM/H
+    </div>
 
-import { OrbitControls } from
-"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js";
+    <div id="angle">
+        PITCH +00.00°
+    </div>
 
-
-/* --------------------------------
-   SCENE
--------------------------------- */
-
-const scene = new THREE.Scene();
-
-scene.background = new THREE.Color(0x020307);
-
-scene.fog = new THREE.FogExp2(
-    0x020307,
-    0.003
-);
+</div>
 
 
-const camera = new THREE.PerspectiveCamera(
-    42,
-    innerWidth / innerHeight,
-    .1,
-    3000
-);
+<section>
+
+    <div class="label">
+        01 / VEHICLE
+    </div>
+
+    <div class="title">
+        BUILT<br>
+        FOR THE<br>
+        VOID.
+    </div>
+
+    <div class="specs">
+
+        <div class="spec">
+            <small>LENGTH</small>
+            <b>86.4 M</b>
+        </div>
+
+        <div class="spec">
+            <small>CREW</small>
+            <b>06</b>
+        </div>
+
+        <div class="spec">
+            <small>MAX SPEED</small>
+            <b>0.21 C</b>
+        </div>
+
+        <div class="spec">
+            <small>RANGE</small>
+            <b>12 AU</b>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- THREE.JS -->
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+
+<script>
+
+/* =========================================================
+   SETUP
+========================================================= */
+
+const scene =
+    new THREE.Scene();
+
+scene.background =
+    new THREE.Color(0x020308);
+
+
+const camera =
+    new THREE.PerspectiveCamera(
+        42,
+        window.innerWidth /
+        window.innerHeight,
+        .1,
+        3000
+    );
 
 camera.position.set(
     0,
-    3,
+    1.5,
     22
 );
 
 
-const renderer = new THREE.WebGLRenderer({
-    antialias:true,
-    alpha:true
-});
+const renderer =
+    new THREE.WebGLRenderer({
+        antialias:true
+    });
 
 renderer.setSize(
-    innerWidth,
-    innerHeight
+    window.innerWidth,
+    window.innerHeight
 );
 
 renderer.setPixelRatio(
-    Math.min(devicePixelRatio,2)
+    Math.min(
+        window.devicePixelRatio,
+        2
+    )
 );
 
 renderer.outputColorSpace =
@@ -556,299 +509,291 @@ renderer.outputColorSpace =
 renderer.toneMapping =
     THREE.ACESFilmicToneMapping;
 
-renderer.toneMappingExposure = 1.2;
+renderer.toneMappingExposure =
+    1.35;
 
-document.body.appendChild(
-    renderer.domElement
-);
+document
+    .getElementById("space")
+    .appendChild(renderer.domElement);
 
 
-/* --------------------------------
-   LIGHTING
--------------------------------- */
+/* =========================================================
+   LIGHTS
+========================================================= */
 
-scene.add(
+const ambient =
     new THREE.AmbientLight(
-        0x7d8799,
-        .35
-    )
-);
+        0xffffff,
+        .7
+    );
+
+scene.add(ambient);
 
 
-const keyLight =
+const sun =
     new THREE.DirectionalLight(
         0xffffff,
-        4
+        5
     );
 
-keyLight.position.set(
-    8,
+sun.position.set(
     10,
-    12
+    15,
+    15
 );
 
-scene.add(keyLight);
+scene.add(sun);
 
 
-const rimLight =
+const blueLight =
     new THREE.PointLight(
-        0x6688ff,
-        80,
-        60
+        0x5e9cff,
+        100,
+        70
     );
 
-rimLight.position.set(
-    -12,
+blueLight.position.set(
+    -15,
     4,
+    5
+);
+
+scene.add(blueLight);
+
+
+const redLight =
+    new THREE.PointLight(
+        0xff453a,
+        30,
+        40
+    );
+
+redLight.position.set(
+    10,
+    -4,
     -10
 );
 
-scene.add(rimLight);
+scene.add(redLight);
 
 
-/* --------------------------------
+/* =========================================================
    MATERIALS
--------------------------------- */
+========================================================= */
 
-const hull =
+const metal =
     new THREE.MeshStandardMaterial({
-        color:0x515761,
-        metalness:.92,
-        roughness:.28
+        color:0x697078,
+        metalness:.95,
+        roughness:.27
     });
 
-const darkHull =
+
+const darkMetal =
     new THREE.MeshStandardMaterial({
-        color:0x171a1f,
-        metalness:.9,
-        roughness:.22
+        color:0x161a1f,
+        metalness:.95,
+        roughness:.2
     });
 
-const black =
+
+const blackMetal =
     new THREE.MeshStandardMaterial({
-        color:0x080a0d,
-        metalness:.75,
-        roughness:.32
+        color:0x07090c,
+        metalness:.8,
+        roughness:.3
     });
+
 
 const glass =
     new THREE.MeshPhysicalMaterial({
         color:0x07131d,
-        metalness:.1,
+        metalness:.3,
         roughness:.05,
-        transmission:.25,
+        transmission:.35,
         transparent:true,
-        opacity:.82
+        opacity:.9
     });
 
-const engineMaterial =
+
+const engineGlow =
     new THREE.MeshBasicMaterial({
-        color:0x8ec8ff
+        color:0x9dd5ff
     });
 
 
-/* --------------------------------
-   SHIP GROUP
--------------------------------- */
+const redGlow =
+    new THREE.MeshBasicMaterial({
+        color:0xff453a
+    });
 
-const ship = new THREE.Group();
+
+/* =========================================================
+   SHIP
+========================================================= */
+
+const ship =
+    new THREE.Group();
 
 scene.add(ship);
 
 
-/* --------------------------------
-   UTILITY
--------------------------------- */
+/* =========================================================
+   MAIN BODY
+========================================================= */
 
-function box(
-    x,
-    y,
-    z,
-    sx,
-    sy,
-    sz,
-    material,
-    bevel = .1
-){
-
-    const geo =
-        new THREE.BoxGeometry(
-            sx,
-            sy,
-            sz,
-            2,
-            2,
-            2
-        );
-
-    const mesh =
-        new THREE.Mesh(
-            geo,
-            material
-        );
-
-    mesh.position.set(x,y,z);
-
-    ship.add(mesh);
-
-    return mesh;
-}
-
-
-function cylinder(
-    x,
-    y,
-    z,
-    radius,
-    depth,
-    material,
-    rotX = 0,
-    rotZ = 0
-){
-
-    const geo =
-        new THREE.CylinderGeometry(
-            radius,
-            radius,
-            depth,
-            24
-        );
-
-    const mesh =
-        new THREE.Mesh(
-            geo,
-            material
-        );
-
-    mesh.position.set(x,y,z);
-
-    mesh.rotation.x = rotX;
-    mesh.rotation.z = rotZ;
-
-    ship.add(mesh);
-
-    return mesh;
-}
-
-
-/* --------------------------------
-   MAIN FUSELAGE
--------------------------------- */
-
-const fuselageGeo =
-    new THREE.CapsuleGeometry(
-        2.3,
-        9,
-        8,
-        20
-    );
-
-const fuselage =
+const body =
     new THREE.Mesh(
-        fuselageGeo,
-        hull
+        new THREE.CapsuleGeometry(
+            2.4,
+            8.5,
+            8,
+            24
+        ),
+        metal
     );
 
-fuselage.rotation.z =
+body.rotation.z =
     Math.PI / 2;
 
-fuselage.scale.set(
+body.scale.set(
     1,
     .62,
-    .75
+    .78
 );
 
-ship.add(fuselage);
+ship.add(body);
 
 
-/* --------------------------------
+/* =========================================================
    NOSE
--------------------------------- */
-
-const noseGeo =
-    new THREE.ConeGeometry(
-        2.3,
-        5,
-        8
-    );
+========================================================= */
 
 const nose =
     new THREE.Mesh(
-        noseGeo,
-        hull
+        new THREE.ConeGeometry(
+            2.35,
+            5,
+            8
+        ),
+        metal
     );
 
 nose.rotation.z =
     -Math.PI / 2;
 
 nose.position.x =
-    7;
+    6.8;
 
-nose.scale.set(
-    1,
-    1,
-    .72
-);
+nose.scale.z =
+    .72;
 
 ship.add(nose);
 
 
-/* --------------------------------
-   COCKPIT
--------------------------------- */
+/* =========================================================
+   NOSE TIP
+========================================================= */
 
-const cockpitGeo =
-    new THREE.SphereGeometry(
-        2.05,
-        32,
-        16,
-        0,
-        Math.PI * 2,
-        0,
-        Math.PI / 2
+const noseTip =
+    new THREE.Mesh(
+        new THREE.SphereGeometry(
+            .28,
+            16,
+            16
+        ),
+        blackMetal
     );
+
+noseTip.position.x =
+    9.25;
+
+ship.add(noseTip);
+
+
+/* =========================================================
+   COCKPIT
+========================================================= */
 
 const cockpit =
     new THREE.Mesh(
-        cockpitGeo,
+        new THREE.SphereGeometry(
+            2,
+            32,
+            20
+        ),
         glass
     );
 
 cockpit.position.set(
-    3.4,
+    3.0,
     1.45,
     0
 );
 
 cockpit.scale.set(
     1.8,
-    .65,
-    .9
+    .6,
+    .85
 );
 
 ship.add(cockpit);
 
 
-/* --------------------------------
+/* =========================================================
+   COCKPIT FRAME
+========================================================= */
+
+for(let i=0;i<3;i++){
+
+    const frame =
+        new THREE.Mesh(
+            new THREE.BoxGeometry(
+                .12,
+                1.4,
+                2.2
+            ),
+            blackMetal
+        );
+
+    frame.position.set(
+        2.3 + i*.65,
+        1.4,
+        0
+    );
+
+    frame.rotation.z =
+        Math.PI / 2;
+
+    ship.add(frame);
+}
+
+
+/* =========================================================
    WINGS
--------------------------------- */
+========================================================= */
 
-function wing(side){
+function createWing(side){
 
-    const geo =
+    const geometry =
         new THREE.BufferGeometry();
 
-    const s = side;
+    const vertices =
+        new Float32Array([
 
-    const vertices = new Float32Array([
-        0,0,0,
-        -6,0,0,
-        -2,s*3.7,0,
-        3,s*2.2,0,
-        4,s*.8,0
-    ]);
+            2.5,0,0,
 
-    geo.setAttribute(
+            -4,0,0,
+
+            -2.5,0,side*4.5,
+
+            2,0,side*3.0,
+
+            4,0,side*1.1
+
+        ]);
+
+    geometry.setAttribute(
         "position",
         new THREE.BufferAttribute(
             vertices,
@@ -856,357 +801,459 @@ function wing(side){
         )
     );
 
-    geo.setIndex([
+    geometry.setIndex([
         0,1,2,
         0,2,3,
         0,3,4
     ]);
 
-    geo.computeVertexNormals();
+    geometry.computeVertexNormals();
 
-    const mesh =
+    const wing =
         new THREE.Mesh(
-            geo,
-            darkHull
+            geometry,
+            darkMetal
         );
 
-    mesh.position.set(
-        0,
-        0,
-        side * .25
-    );
+    wing.position.z =
+        side*.15;
 
-    ship.add(mesh);
+    ship.add(wing);
+
+    return wing;
 }
 
-wing(1);
-wing(-1);
+createWing(1);
+createWing(-1);
 
 
-/* --------------------------------
+/* =========================================================
    ENGINE PODS
--------------------------------- */
+========================================================= */
 
-for(let side of [-1,1]){
+function engine(side){
 
     const pod =
-        box(
-            -4,
-            side*3.2,
-            -.2,
-            6,
-            1.25,
-            1.25,
-            darkHull
+        new THREE.Mesh(
+            new THREE.BoxGeometry(
+                6,
+                1.15,
+                1.2
+            ),
+            darkMetal
         );
+
+    pod.position.set(
+        -3.1,
+        side*3.05,
+        -.1
+    );
 
     pod.rotation.z =
-        side * -.08;
+        side*.05;
 
-    /* engine housing */
+    ship.add(pod);
 
-    cylinder(
-        -7,
-        side*3.2,
-        -.2,
-        .72,
-        .5,
-        black,
-        0,
-        Math.PI/2
-    );
 
-    /* engine glow */
+    /* rear engine housing */
 
-    const glow =
+    const housing =
         new THREE.Mesh(
             new THREE.CylinderGeometry(
-                .42,
-                .68,
-                .12,
+                .72,
+                .72,
+                .6,
                 32
             ),
-            engineMaterial
+            blackMetal
         );
 
-    glow.rotation.z =
+    housing.rotation.z =
         Math.PI/2;
 
-    glow.position.set(
-        -7.28,
-        side*3.2,
-        -.2
+    housing.position.set(
+        -6.1,
+        side*3.05,
+        -.1
     );
 
-    ship.add(glow);
-
-}
+    ship.add(housing);
 
 
-/* --------------------------------
-   CENTRAL REACTOR
--------------------------------- */
+    /* blue engine */
 
-box(
-    -1,
-    0,
-    -1,
-    5,
-    1.4,
-    2.5,
-    black
-);
-
-
-/* --------------------------------
-   TOP STRUCTURE
--------------------------------- */
-
-box(
-    0,
-    1.3,
-    0,
-    5,
-    .45,
-    1.4,
-    darkHull
-);
-
-box(
-    -3,
-    1.1,
-    0,
-    2,
-    .35,
-    1,
-    hull
-);
-
-
-/* --------------------------------
-   PANEL LINES
--------------------------------- */
-
-for(let i=-3;i<5;i++){
-
-    box(
-        i,
-        .7,
-        1.75,
-        .035,
-        .08,
-        .02,
-        black
-    );
-
-    box(
-        i,
-        -.7,
-        1.75,
-        .035,
-        .08,
-        .02,
-        black
-    );
-}
-
-
-/* --------------------------------
-   NAV LIGHTS
--------------------------------- */
-
-const navMaterial =
-    new THREE.MeshBasicMaterial({
-        color:0xffffff
-    });
-
-for(let side of [-1,1]){
-
-    const light =
+    const flame =
         new THREE.Mesh(
-            new THREE.SphereGeometry(
-                .07,
-                12,
-                12
+            new THREE.ConeGeometry(
+                .45,
+                1.7,
+                32
             ),
-            navMaterial
+            engineGlow
         );
 
-    light.position.set(
-        5,
-        side*1.2,
-        .8
+    flame.rotation.z =
+        Math.PI/2;
+
+    flame.position.set(
+        -7.05,
+        side*3.05,
+        -.1
     );
 
-    ship.add(light);
+    ship.add(flame);
+
+
+    /* inner engine */
+
+    const inner =
+        new THREE.Mesh(
+            new THREE.CylinderGeometry(
+                .23,
+                .32,
+                .15,
+                32
+            ),
+            new THREE.MeshBasicMaterial({
+                color:0xffffff
+            })
+        );
+
+    inner.rotation.z =
+        Math.PI/2;
+
+    inner.position.set(
+        -7.82,
+        side*3.05,
+        -.1
+    );
+
+    ship.add(inner);
 }
 
+engine(1);
+engine(-1);
 
-/* --------------------------------
+
+/* =========================================================
+   REACTOR SECTION
+========================================================= */
+
+const reactor =
+    new THREE.Mesh(
+        new THREE.BoxGeometry(
+            4.5,
+            1.5,
+            2.8
+        ),
+        blackMetal
+    );
+
+reactor.position.set(
+    -1,
+    0,
+    0
+);
+
+ship.add(reactor);
+
+
+/* =========================================================
+   TOP SPINE
+========================================================= */
+
+const spine =
+    new THREE.Mesh(
+        new THREE.BoxGeometry(
+            7,
+            .45,
+            1.15
+        ),
+        darkMetal
+    );
+
+spine.position.y =
+    1.3;
+
+ship.add(spine);
+
+
+/* =========================================================
    ANTENNA
--------------------------------- */
+========================================================= */
 
 const antenna =
     new THREE.Mesh(
         new THREE.CylinderGeometry(
-            .025,
-            .025,
-            2.5,
-            8
+            .035,
+            .035,
+            2.8,
+            12
         ),
-        black
+        blackMetal
     );
 
 antenna.position.set(
-    -1,
-    2.2,
+    -1.2,
+    2.7,
     0
 );
 
 ship.add(antenna);
 
+
 const dish =
     new THREE.Mesh(
         new THREE.SphereGeometry(
-            .35,
-            16,
-            8
+            .45,
+            24,
+            12
         ),
-        darkHull
+        darkMetal
     );
 
 dish.scale.set(
     1,
-    .25,
+    .22,
     1
 );
 
 dish.position.set(
-    -1,
-    3.35,
+    -1.2,
+    4,
     0
 );
 
 ship.add(dish);
 
 
-/* --------------------------------
-   STARS
--------------------------------- */
+/* =========================================================
+   LANDING STRUCTURES
+========================================================= */
 
-const starGeo =
-    new THREE.BufferGeometry();
+for(const side of [-1,1]){
 
-const starCount = 7000;
+    const leg =
+        new THREE.Mesh(
+            new THREE.BoxGeometry(
+                .25,
+                1.5,
+                .25
+            ),
+            blackMetal
+        );
 
-const positions =
-    new Float32Array(
-        starCount * 3
+    leg.position.set(
+        1,
+        -1.35,
+        side*1.2
     );
 
-for(let i=0;i<starCount*3;i+=3){
+    leg.rotation.z =
+        side*.25;
 
-    positions[i] =
-        (Math.random()-.5)*1500;
+    ship.add(leg);
 
-    positions[i+1] =
-        (Math.random()-.5)*900;
+    const foot =
+        new THREE.Mesh(
+            new THREE.BoxGeometry(
+                1,
+                .15,
+                .55
+            ),
+            blackMetal
+        );
 
-    positions[i+2] =
-        (Math.random()-.5)*1500;
+    foot.position.set(
+        .8,
+        -2.05,
+        side*1.2
+    );
+
+    ship.add(foot);
 }
 
-starGeo.setAttribute(
+
+/* =========================================================
+   PANEL DETAILS
+========================================================= */
+
+for(let i=-3;i<5;i++){
+
+    const panel =
+        new THREE.Mesh(
+            new THREE.BoxGeometry(
+                .045,
+                .1,
+                1.7
+            ),
+            blackMetal
+        );
+
+    panel.position.set(
+        i,
+        .78,
+        1.75
+    );
+
+    ship.add(panel);
+}
+
+
+/* =========================================================
+   NAVIGATION LIGHTS
+========================================================= */
+
+function light(x,y,z,color){
+
+    const bulb =
+        new THREE.Mesh(
+            new THREE.SphereGeometry(
+                .1,
+                16,
+                16
+            ),
+            new THREE.MeshBasicMaterial({
+                color:color
+            })
+        );
+
+    bulb.position.set(
+        x,y,z
+    );
+
+    ship.add(bulb);
+
+    return bulb;
+}
+
+light(
+    5,
+    0,
+    1.3,
+    0x78aaff
+);
+
+light(
+    5,
+    0,
+    -1.3,
+    0xff453a
+);
+
+
+/* =========================================================
+   STARS
+========================================================= */
+
+const starGeometry =
+    new THREE.BufferGeometry();
+
+const count =
+    9000;
+
+const starPositions =
+    new Float32Array(
+        count*3
+    );
+
+for(
+    let i=0;
+    i<count*3;
+    i+=3
+){
+
+    starPositions[i] =
+        (Math.random()-.5)*1600;
+
+    starPositions[i+1] =
+        (Math.random()-.5)*1000;
+
+    starPositions[i+2] =
+        (Math.random()-.5)*1600;
+}
+
+starGeometry.setAttribute(
     "position",
     new THREE.BufferAttribute(
-        positions,
+        starPositions,
         3
     )
 );
 
+const starMaterial =
+    new THREE.PointsMaterial({
+        color:0xffffff,
+        size:.65,
+        transparent:true,
+        opacity:.8
+    });
+
 const stars =
     new THREE.Points(
-        starGeo,
-        new THREE.PointsMaterial({
-            color:0xffffff,
-            size:.55,
-            transparent:true,
-            opacity:.75
-        })
+        starGeometry,
+        starMaterial
     );
 
 scene.add(stars);
 
 
-/* --------------------------------
-   PLANET
--------------------------------- */
+/* =========================================================
+   DISTANT PLANET
+========================================================= */
 
 const planet =
     new THREE.Mesh(
         new THREE.SphereGeometry(
-            45,
+            55,
             64,
             32
         ),
         new THREE.MeshStandardMaterial({
-            color:0x161b24,
-            roughness:1,
-            metalness:0
+            color:0x151b25,
+            roughness:1
         })
     );
 
 planet.position.set(
-    -150,
-    -100,
-    -280
+    -160,
+    -90,
+    -320
 );
 
 scene.add(planet);
 
 
-/* --------------------------------
-   CAMERA CONTROL
--------------------------------- */
-
-const controls =
-    new OrbitControls(
-        camera,
-        renderer.domElement
-    );
-
-controls.enableDamping = true;
-controls.enableZoom = false;
-controls.enablePan = false;
-
-controls.autoRotate = false;
-
-
-/* --------------------------------
-   MOUSE PARALLAX
--------------------------------- */
+/* =========================================================
+   MOUSE
+========================================================= */
 
 let mouseX = 0;
 let mouseY = 0;
 
 window.addEventListener(
     "pointermove",
-    e => {
+    event => {
 
         mouseX =
-            (e.clientX / innerWidth - .5);
+            (event.clientX /
+            window.innerWidth -
+            .5);
 
         mouseY =
-            (e.clientY / innerHeight - .5);
+            (event.clientY /
+            window.innerHeight -
+            .5);
     }
 );
 
 
-/* --------------------------------
+/* =========================================================
    SCROLL
--------------------------------- */
+========================================================= */
 
-let scroll = 0;
+let scroll =
+    0;
 
 window.addEventListener(
     "scroll",
@@ -1215,15 +1262,14 @@ window.addEventListener(
         scroll =
             window.scrollY /
             (document.body.scrollHeight -
-             innerHeight);
-
+            window.innerHeight);
     }
 );
 
 
-/* --------------------------------
+/* =========================================================
    ANIMATION
--------------------------------- */
+========================================================= */
 
 const clock =
     new THREE.Clock();
@@ -1234,85 +1280,112 @@ function animate(){
         animate
     );
 
-    const t =
+    const time =
         clock.getElapsedTime();
 
 
-    /* subtle ship movement */
+    /*
+        SPACECRAFT MOVEMENT
+    */
 
     ship.rotation.y =
-        t*.035 +
-        mouseX*.25;
+        time*.04 +
+        mouseX*.3;
+
+    ship.rotation.x =
+        mouseY*.12;
 
     ship.rotation.z =
-        Math.sin(t*.45)*.025;
+        Math.sin(
+            time*.5
+        )*.025;
 
     ship.position.y =
-        Math.sin(t*.65)*.18;
+        Math.sin(
+            time*.7
+        )*.15;
 
 
-    /* camera */
+    /*
+        CAMERA PARALLAX
+    */
 
     camera.position.x +=
         (
             mouseX*2 -
             camera.position.x
-        ) * .025;
+        )*.025;
 
     camera.position.y +=
         (
-            3 -
-            mouseY*1.3 -
+            1.5 -
+            mouseY*1.5 -
             camera.position.y
-        ) * .025;
+        )*.025;
 
 
-    /* scroll cinematic movement */
+    /*
+        SCROLL CAMERA
+    */
 
     camera.position.z =
         22 -
-        scroll * 8;
-
-    ship.rotation.x =
-        scroll * .35;
+        scroll*7;
 
 
-    /* stars */
+    /*
+        STAR MOTION
+    */
 
     stars.rotation.y =
-        t*.003;
+        time*.002;
 
 
-    /* controls */
+    /*
+        ENGINE PULSE
+    */
 
-    controls.target.set(
-        0,
-        0,
-        0
+    const pulse =
+        1 +
+        Math.sin(time*12)*.12;
+
+    ship.children.forEach(
+        child => {
+
+            if(
+                child.material ===
+                engineGlow
+            ){
+
+                child.scale.x =
+                    pulse;
+            }
+        }
     );
 
-    controls.update();
 
-
-    /* HUD */
-
-    document.getElementById(
-        "coords"
-    ).textContent =
-        "LAT " +
-        (mouseY*90).toFixed(3) +
-        " / LON " +
-        (mouseX*180).toFixed(3);
+    /*
+        HUD
+    */
 
     document.getElementById(
         "velocity"
     ).textContent =
-        "VEL " +
+        "VELOCITY " +
         Math.floor(
-            82000 +
+            82400 +
             scroll*130000
         ).toLocaleString() +
         " KM/H";
+
+
+    document.getElementById(
+        "angle"
+    ).textContent =
+        "PITCH " +
+        (mouseY*18)
+        .toFixed(2) +
+        "°";
 
 
     renderer.render(
@@ -1324,22 +1397,23 @@ function animate(){
 animate();
 
 
-/* --------------------------------
+/* =========================================================
    RESIZE
--------------------------------- */
+========================================================= */
 
 window.addEventListener(
     "resize",
     () => {
 
         camera.aspect =
-            innerWidth / innerHeight;
+            window.innerWidth /
+            window.innerHeight;
 
         camera.updateProjectionMatrix();
 
         renderer.setSize(
-            innerWidth,
-            innerHeight
+            window.innerWidth,
+            window.innerHeight
         );
     }
 );
@@ -1347,4 +1421,4 @@ window.addEventListener(
 </script>
 
 </body>
-</html> 
+</html>
