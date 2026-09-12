@@ -2,1026 +2,1428 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#08080a">
-<meta name="apple-mobile-web-app-capable" content="yes">
-
-<title>CHAOS / CLARITY</title>
-
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+>
+<meta name="theme-color" content="#080807">
+<title>SHAB — Shake to Discover</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap');
-
+/* =========================================================
+   ROOT
+========================================================= */
 :root{
-    --bg:#08080a;
-    --fg:#f4f0e8;
-    --muted:#9d9a94;
-    --line:#29282b;
-    --accent:#d8c9aa;
-    --mx:50%;
-    --my:50%;
-    --tiltX:0deg;
-    --tiltY:0deg;
+    --bg:#080807;
+    --fg:#eee9df;
+    --muted:#8d8981;
+    --line:rgba(255,255,255,.12);
+    --accent:#d9ceb9;
+    --x:50%;
+    --y:50%;
+    --progress:0%;
+    --rotation:0deg;
 }
-
+/* =========================================================
+   RESET
+========================================================= */
 *{
     box-sizing:border-box;
 }
-
-html{
-    scroll-behavior:smooth;
-    background:var(--bg);
-}
-
+html,
 body{
     margin:0;
+    width:100%;
+    min-height:100%;
     background:var(--bg);
     color:var(--fg);
-    font-family:Manrope,sans-serif;
-    overflow-x:hidden;
-    cursor:none;
 }
-
-a{
-    color:inherit;
-    text-decoration:none;
-}
-
-/* GRAIN */
-
-.grain{
-    position:fixed;
-    inset:0;
-    pointer-events:none;
-    z-index:50;
-    opacity:.055;
-    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-
-/* CURSOR */
-
-.cursor{
-    position:fixed;
-    z-index:100;
-    width:18px;
-    height:18px;
-    border:1px solid white;
-    border-radius:50%;
-    pointer-events:none;
-    transform:translate(-50%,-50%);
-    mix-blend-mode:difference;
-    transition:
-        width .25s ease,
-        height .25s ease,
-        background .25s ease;
-}
-
-.cursor.big{
-    width:65px;
-    height:65px;
-    background:white;
-}
-
-/* HUD */
-
-.hud{
-    position:fixed;
-    z-index:40;
-    top:18px;
-    left:20px;
-    right:20px;
-
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-
-    font:11px 'DM Mono',monospace;
-    letter-spacing:.12em;
-    text-transform:uppercase;
-
-    color:#c8c4bc;
-    mix-blend-mode:difference;
-}
-
-.hud button{
-    font:inherit;
-    color:inherit;
-    background:none;
-    border:1px solid #777;
-    padding:8px 12px;
-    border-radius:99px;
-    cursor:pointer;
-}
-
-/* HERO */
-
-.hero{
-    min-height:100svh;
-    min-height:100vh;
-    position:relative;
-    display:grid;
-    place-items:center;
+html{
     overflow:hidden;
 }
-
-.hero-inner{
-    width:min(1200px,90vw);
-    position:relative;
-    z-index:5;
-
-    transform:
-        perspective(1000px)
-        rotateX(var(--tiltY))
-        rotateY(var(--tiltX));
-
-    transition:transform .25s ease-out;
+body{
+    font-family:
+        Inter,
+        Helvetica,
+        Arial,
+        sans-serif;
+    overflow:hidden;
+    user-select:none;
+    -webkit-user-select:none;
+    -webkit-font-smoothing:antialiased;
 }
-
-.eyebrow{
-    font:11px 'DM Mono',monospace;
-    letter-spacing:.18em;
-    color:var(--muted);
-    margin-bottom:20px;
-}
-
-.title{
-    font-size:clamp(62px,13vw,190px);
-    line-height:.78;
-    letter-spacing:-.075em;
-    font-weight:800;
-    margin:0;
-}
-
-.title span{
-    display:block;
-}
-
-.ghost{
-    color:transparent;
-    -webkit-text-stroke:1px #706e6a;
-}
-
-.hero-note{
-    display:flex;
-    justify-content:space-between;
-    align-items:end;
-
-    margin-top:55px;
-    border-top:1px solid var(--line);
-    padding-top:15px;
-
-    color:#aaa69e;
-    font-size:13px;
-}
-
-.hero-note b{
-    color:#eee9df;
-}
-
-/* PARTICLES */
-
-#sand{
-    position:absolute;
+/* =========================================================
+   GRAIN
+========================================================= */
+body::after{
+    content:"";
+    position:fixed;
     inset:0;
-
+    pointer-events:none;
+    z-index:100;
+    opacity:.055;
+    background-image:url(
+        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"
+    );
+}
+/* =========================================================
+   CANVAS
+========================================================= */
+#particles{
+    position:fixed;
+    inset:0;
     width:100%;
     height:100%;
-
-    z-index:2;
+    z-index:1;
     pointer-events:none;
 }
-
-/* ORB */
-
-.orb{
-    position:absolute;
-
-    width:min(55vw,680px);
-    height:min(55vw,680px);
-
-    left:var(--mx);
-    top:var(--my);
-
-    transform:translate(-50%,-50%);
-
-    border-radius:50%;
-
+/* =========================================================
+   BACKGROUND WORLDS
+========================================================= */
+.background{
+    position:fixed;
+    inset:0;
+    z-index:0;
+    overflow:hidden;
+    transition:
+        background 1.2s cubic-bezier(.2,.8,.2,1);
+}
+/* WORLD 0 */
+.world-0{
     background:
         radial-gradient(
-            circle at 38% 32%,
-            #eee7d8 0%,
-            #bdb6a8 8%,
-            #6c6a68 25%,
-            #202023 60%,
-            transparent 71%
+            circle at var(--x) var(--y),
+            rgba(235,225,205,.18),
+            transparent 25%
+        ),
+        radial-gradient(
+            circle at 20% 80%,
+            rgba(130,120,100,.08),
+            transparent 30%
+        ),
+        #080807;
+}
+/* WORLD 1 */
+.world-1{
+    background:
+        linear-gradient(
+            115deg,
+            #10100e,
+            #1a1915 45%,
+            #090908
         );
-
-    filter:blur(2px);
-    opacity:.18;
-
-    z-index:1;
-
-    transition:
-        left .7s cubic-bezier(.2,.8,.2,1),
-        top .7s cubic-bezier(.2,.8,.2,1);
 }
-
-.orb::after{
-    content:"";
-
+/* WORLD 2 */
+.world-2{
+    background:
+        radial-gradient(
+            ellipse at 70% 25%,
+            rgba(210,185,135,.2),
+            transparent 25%
+        ),
+        radial-gradient(
+            ellipse at 25% 70%,
+            rgba(110,130,120,.12),
+            transparent 35%
+        ),
+        #0b0c0b;
+}
+/* WORLD 3 */
+.world-3{
+    background:
+        repeating-linear-gradient(
+            90deg,
+            transparent 0,
+            transparent 49px,
+            rgba(255,255,255,.025) 50px
+        ),
+        repeating-linear-gradient(
+            0deg,
+            transparent 0,
+            transparent 49px,
+            rgba(255,255,255,.025) 50px
+        ),
+        #090a0b;
+}
+/* WORLD 4 */
+.world-4{
+    background:
+        radial-gradient(
+            circle at 50% 40%,
+            rgba(230,215,185,.15),
+            transparent 24%
+        ),
+        linear-gradient(
+            140deg,
+            #15130f,
+            #080807 55%
+        );
+}
+/* WORLD 5 */
+.world-5{
+    background:
+        radial-gradient(
+            circle at 50% 50%,
+            rgba(240,230,210,.16),
+            transparent 15%
+        ),
+        #050505;
+}
+/* =========================================================
+   ATMOSPHERIC ELEMENTS
+========================================================= */
+.atmosphere{
     position:absolute;
-    inset:-20%;
-
+    width:70vmax;
+    height:70vmax;
+    left:var(--x);
+    top:var(--y);
+    transform:
+        translate(-50%,-50%)
+        rotate(var(--rotation));
     border-radius:50%;
-    border:1px solid #cfc7b7;
-
-    opacity:.15;
-
-    animation:spin 18s linear infinite;
+    border:1px solid rgba(255,255,255,.07);
+    box-shadow:
+        0 0 120px
+        rgba(220,210,190,.05),
+        inset 0 0 120px
+        rgba(255,255,255,.025);
+    transition:
+        left .9s ease,
+        top .9s ease,
+        transform 1.2s ease;
 }
-
-@keyframes spin{
+.atmosphere::before{
+    content:"";
+    position:absolute;
+    inset:12%;
+    border-radius:50%;
+    border:1px dashed rgba(255,255,255,.08);
+    animation:
+        orbit 25s linear infinite;
+}
+.atmosphere::after{
+    content:"";
+    position:absolute;
+    inset:25%;
+    border-radius:50%;
+    background:
+        radial-gradient(
+            circle,
+            rgba(225,215,195,.09),
+            transparent 65%
+        );
+    filter:blur(30px);
+}
+@keyframes orbit{
     to{
         transform:rotate(360deg);
     }
 }
-
-/* SCROLL */
-
-.scroll{
-    position:absolute;
-    bottom:24px;
-    left:50%;
-
-    transform:translateX(-50%);
-
-    font:10px 'DM Mono',monospace;
-    letter-spacing:.2em;
-
-    color:#777;
-
-    z-index:6;
-}
-
-.scroll i{
-    display:block;
-
-    width:1px;
-    height:45px;
-
-    background:#555;
-
-    margin:10px auto 0;
-
-    animation:pulse 1.5s infinite;
-}
-
-@keyframes pulse{
-    50%{
-        height:65px;
-        opacity:.25;
-    }
-}
-
-/* SECTIONS */
-
-section{
-    position:relative;
-    padding:150px 5vw;
-    border-top:1px solid var(--line);
-}
-
-.wrap{
-    max-width:1200px;
-    margin:auto;
-}
-
-.section-label{
-    font:10px 'DM Mono',monospace;
-    color:#777;
-    letter-spacing:.2em;
-    text-transform:uppercase;
-    margin-bottom:50px;
-}
-
-.statement{
-    font-size:clamp(36px,6.2vw,82px);
-    line-height:.98;
-    letter-spacing:-.055em;
-    max-width:1000px;
-}
-
-.statement em{
-    font-style:normal;
-    color:#777;
-}
-
-/* REVEAL */
-
-.reveal{
-    opacity:0;
-    transform:translateY(45px);
-
-    transition:
-        opacity .9s ease,
-        transform .9s cubic-bezier(.2,.8,.2,1);
-}
-
-.reveal.show{
-    opacity:1;
-    transform:none;
-}
-
-/* WORK */
-
-.work-grid{
-    display:grid;
-
-    grid-template-columns:repeat(12,1fr);
-
-    gap:18px;
-
-    margin-top:80px;
-}
-
-.card{
-    position:relative;
-
-    min-height:420px;
-
-    border:1px solid var(--line);
-
-    overflow:hidden;
-
-    background:#101013;
-
-    grid-column:span 7;
-
+/* =========================================================
+   UI
+========================================================= */
+.top{
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;
+    padding:
+        max(18px,env(safe-area-inset-top))
+        22px
+        18px;
+    z-index:30;
     display:flex;
-    align-items:end;
-
-    padding:25px;
-
-    isolation:isolate;
-}
-
-.card:nth-child(2){
-    grid-column:span 5;
-    min-height:520px;
-}
-
-.card:nth-child(3){
-    grid-column:span 5;
-}
-
-.card:nth-child(4){
-    grid-column:span 7;
-}
-
-.card::before{
-    content:"";
-
-    position:absolute;
-    inset:0;
-
-    background:
-        radial-gradient(
-            circle at var(--px,50%) var(--py,50%),
-            rgba(235,225,205,.28),
-            transparent 27%
-        ),
-        linear-gradient(135deg,#1c1b1d,#08080a);
-
-    z-index:-2;
-
-    transform:scale(1);
-
-    transition:transform .8s ease;
-}
-
-.card:hover::before{
-    transform:scale(1.08);
-}
-
-.card .num{
-    position:absolute;
-
-    top:20px;
-    right:20px;
-
-    font:10px 'DM Mono';
-    color:#777;
-}
-
-.card h3{
-    font-size:clamp(28px,4vw,54px);
-    line-height:.9;
-    letter-spacing:-.05em;
-    margin:0;
-}
-
-.card p{
-    font-size:12px;
-    color:#aaa;
-    margin:12px 0 0;
-}
-
-/* PROCESS */
-
-.process{
-    display:grid;
-
-    grid-template-columns:1fr 2fr;
-
-    gap:50px;
-}
-
-.steps{
-    border-top:1px solid var(--line);
-}
-
-.step{
-    display:grid;
-
-    grid-template-columns:70px 1fr auto;
-
-    gap:20px;
-
-    padding:28px 0;
-
-    border-bottom:1px solid var(--line);
-
-    align-items:start;
-}
-
-.step span{
-    font:11px 'DM Mono';
-    color:#666;
-}
-
-.step h3{
-    margin:0;
-    font-size:25px;
-}
-
-.step p{
-    margin:8px 0 0;
-
-    color:#85817a;
-
-    font-size:13px;
-
-    max-width:580px;
-}
-
-.step b{
-    font:11px 'DM Mono';
-    font-weight:400;
-    color:#aaa;
-}
-
-/* CONTACT */
-
-.contact{
-    min-height:90vh;
-
-    display:flex;
+    justify-content:space-between;
     align-items:center;
 }
-
-.contact h2{
-    font-size:clamp(55px,12vw,170px);
-
-    line-height:.78;
-
-    letter-spacing:-.08em;
-
-    margin:0;
+.mono{
+    font-family:
+        "DM Mono",
+        monospace;
+    font-size:10px;
+    letter-spacing:.15em;
+    text-transform:uppercase;
 }
-
-.contact h2 span{
-    display:block;
+.logo{
+    color:#ddd7ca;
 }
-
-.contact .line{
-    margin-top:55px;
-
+.counter{
+    color:#77736c;
+}
+.bottom-ui{
+    position:fixed;
+    left:0;
+    right:0;
+    bottom:0;
+    z-index:30;
+    padding:
+        18px
+        22px
+        max(18px,env(safe-area-inset-bottom));
     display:flex;
     justify-content:space-between;
-
-    border-top:1px solid var(--line);
-
-    padding-top:15px;
-
-    font:11px 'DM Mono';
-
-    color:#999;
+    align-items:end;
+    pointer-events:none;
 }
-
-/* CONTROLS */
-
-.sound{
+.instruction{
+    color:#8d8981;
+    max-width:230px;
+    line-height:1.5;
+}
+.progress{
+    width:90px;
+    height:1px;
+    background:#333;
+}
+.progress i{
+    display:block;
+    width:var(--progress);
+    height:100%;
+    background:#ddd5c6;
+    transition:width .8s ease;
+}
+/* =========================================================
+   MAIN STAGE
+========================================================= */
+.stage{
+    position:relative;
+    z-index:5;
+    width:100vw;
+    height:100svh;
+    display:grid;
+    place-items:center;
+    padding:30px;
+}
+.scene{
+    width:min(1100px,90vw);
+    position:relative;
+    text-align:center;
+    perspective:1200px;
+}
+/* =========================================================
+   SCENE STATES
+========================================================= */
+.scene.shaking{
+    animation:
+        shakeScene .45s cubic-bezier(.36,.07,.19,.97);
+}
+@keyframes shakeScene{
+    0%{
+        transform:translateX(0) rotate(0);
+    }
+    15%{
+        transform:translateX(-15px) rotate(-1deg);
+    }
+    30%{
+        transform:translateX(13px) rotate(1deg);
+    }
+    45%{
+        transform:translateX(-9px) rotate(-.7deg);
+    }
+    60%{
+        transform:translateX(7px) rotate(.5deg);
+    }
+    75%{
+        transform:translateX(-3px);
+    }
+    100%{
+        transform:translateX(0);
+    }
+}
+/* =========================================================
+   CONTENT
+========================================================= */
+.eyebrow{
+    color:#858179;
+    margin-bottom:25px;
+}
+.title{
+    margin:0;
+    font-size:
+        clamp(
+            70px,
+            15vw,
+            200px
+        );
+    line-height:.78;
+    letter-spacing:-.085em;
+    font-weight:800;
+}
+.title .outline{
+    color:transparent;
+    -webkit-text-stroke:
+        1px #716d65;
+}
+.title em{
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+    font-weight:400;
+    font-style:italic;
+}
+.description{
+    max-width:560px;
+    margin:50px auto 0;
+    color:#969188;
+    font-size:13px;
+    line-height:1.7;
+}
+.meta{
+    margin-top:25px;
+    color:#66635d;
+}
+/* =========================================================
+   CONTENT ANIMATION
+========================================================= */
+.content-exit{
+    animation:
+        contentExit .7s
+        cubic-bezier(.7,0,.3,1)
+        forwards;
+}
+.content-enter{
+    animation:
+        contentEnter 1.05s
+        cubic-bezier(.16,1,.3,1)
+        forwards;
+}
+@keyframes contentExit{
+    0%{
+        opacity:1;
+        transform:
+            translateY(0)
+            scale(1)
+            rotateX(0);
+        filter:blur(0);
+    }
+    100%{
+        opacity:0;
+        transform:
+            translateY(-80px)
+            scale(.85)
+            rotateX(20deg);
+        filter:blur(15px);
+    }
+}
+@keyframes contentEnter{
+    0%{
+        opacity:0;
+        transform:
+            translateY(80px)
+            scale(.82)
+            rotateX(-20deg);
+        filter:blur(15px);
+    }
+    55%{
+        opacity:1;
+    }
+    100%{
+        opacity:1;
+        transform:
+            translateY(0)
+            scale(1)
+            rotateX(0);
+        filter:blur(0);
+    }
+}
+/* =========================================================
+   SPECIAL CONTENT
+========================================================= */
+.number{
+    font-size:clamp(90px,20vw,260px);
+    font-weight:800;
+    line-height:.7;
+    color:#151512;
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:
+        translate(-50%,-50%);
+    z-index:-1;
+    letter-spacing:-.1em;
+}
+.list{
+    margin:45px auto 0;
+    max-width:650px;
+    display:grid;
+    grid-template-columns:
+        repeat(2,1fr);
+    gap:1px;
+    background:var(--line);
+}
+.item{
+    background:rgba(10,10,9,.65);
+    padding:20px;
+    text-align:left;
+    min-height:95px;
+}
+.item small{
+    display:block;
+    color:#5e5b55;
+    margin-bottom:8px;
+}
+.item strong{
+    font-size:15px;
+    font-weight:500;
+}
+.statement{
+    font-size:
+        clamp(
+            34px,
+            6vw,
+            75px
+        );
+    line-height:1;
+    letter-spacing:-.06em;
+}
+.statement i{
+    font-family:
+        Georgia,
+        serif;
+    color:#77736b;
+    font-weight:400;
+}
+/* =========================================================
+   SHAKE PROMPT
+========================================================= */
+.shake-hint{
     position:fixed;
-
-    bottom:20px;
-    right:20px;
-
-    z-index:40;
-
-    border:1px solid #444;
-
-    background:#0d0d0f;
-
-    color:#eee;
-
-    border-radius:999px;
-
-    padding:11px 15px;
-
-    font:10px 'DM Mono';
-
-    letter-spacing:.08em;
-
-    cursor:pointer;
+    left:50%;
+    bottom:75px;
+    transform:
+        translateX(-50%);
+    z-index:25;
+    color:#aaa59b;
+    transition:
+        opacity .4s;
 }
-
+.shake-hint.hidden{
+    opacity:0;
+}
+.shake-icon{
+    width:34px;
+    height:34px;
+    margin:0 auto 10px;
+    border:1px solid #555;
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    animation:
+        breathe 2s ease-in-out infinite;
+}
+@keyframes breathe{
+    50%{
+        transform:
+            scale(1.15);
+        border-color:#aaa;
+    }
+}
+/* =========================================================
+   PERMISSION
+========================================================= */
 .permission{
     position:fixed;
-
-    left:15px;
-    right:15px;
-    bottom:75px;
-
-    z-index:60;
-
-    padding:16px;
-
-    border:1px solid #39383a;
-
-    background:rgba(12,12,14,.92);
-
-    backdrop-filter:blur(15px);
-
-    font-size:12px;
-
-    color:#aaa;
-
+    left:16px;
+    right:16px;
+    bottom:65px;
+    z-index:80;
     display:none;
+    padding:18px;
+    background:
+        rgba(15,15,13,.94);
+    border:1px solid #393833;
+    backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:blur(20px);
+    font-size:12px;
+    line-height:1.6;
+    color:#aaa59b;
 }
-
 .permission button{
-    margin-top:10px;
-
-    background:#eee;
-
-    color:#111;
-
+    margin-top:12px;
+    padding:10px 15px;
     border:0;
-
-    border-radius:99px;
-
-    padding:9px 14px;
-
+    border-radius:50px;
+    background:#eee9df;
+    color:#111;
     font-weight:700;
-
-    cursor:pointer;
 }
-
-/* FOOTER */
-
-.footer{
-    padding:25px 5vw;
-
-    border-top:1px solid var(--line);
-
-    display:flex;
-
-    justify-content:space-between;
-
-    color:#666;
-
-    font:10px 'DM Mono';
+/* =========================================================
+   BUTTONS
+========================================================= */
+.controls{
+    position:fixed;
+    top:55px;
+    right:20px;
+    z-index:40;
 }
-
-/* MOBILE */
-
+button{
+    appearance:none;
+    -webkit-appearance:none;
+    background:
+        rgba(10,10,9,.65);
+    color:#aaa;
+    border:1px solid #3a3935;
+    border-radius:50px;
+    padding:8px 12px;
+    font:
+        9px "DM Mono",
+        monospace;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+}
+/* =========================================================
+   BURST
+========================================================= */
+.burst{
+    position:fixed;
+    left:50%;
+    top:50%;
+    width:10px;
+    height:10px;
+    border-radius:50%;
+    pointer-events:none;
+    z-index:15;
+    border:1px solid rgba(240,230,210,.8);
+    transform:
+        translate(-50%,-50%)
+        scale(1);
+    animation:
+        burst .9s
+        cubic-bezier(.16,1,.3,1)
+        forwards;
+}
+@keyframes burst{
+    0%{
+        opacity:.8;
+        transform:
+            translate(-50%,-50%)
+            scale(1);
+    }
+    100%{
+        opacity:0;
+        transform:
+            translate(-50%,-50%)
+            scale(70);
+    }
+}
+/* =========================================================
+   DESKTOP
+========================================================= */
+@media(min-width:800px){
+    .list{
+        grid-template-columns:
+            repeat(3,1fr);
+    }
+}
+/* =========================================================
+   MOBILE
+========================================================= */
 @media(max-width:700px){
-
-    body{
-        cursor:auto;
+    .stage{
+        padding:22px;
     }
-
-    .cursor{
-        display:none;
+    .description{
+        margin-top:35px;
+        font-size:12px;
     }
-
-    .hud{
-        top:12px;
-        left:13px;
-        right:13px;
-    }
-
-    .hero-inner{
-        width:88vw;
-    }
-
-    .hero-note{
-        font-size:11px;
+    .list{
+        grid-template-columns:
+            repeat(2,1fr);
         margin-top:35px;
     }
-
-    .hero-note span:last-child{
-        max-width:130px;
-        text-align:right;
+    .item{
+        padding:15px;
+        min-height:85px;
     }
-
-    .orb{
-        width:100vw;
-        height:100vw;
+    .item strong{
+        font-size:12px;
     }
-
-    .work-grid{
-        display:block;
+    .bottom-ui{
+        padding-left:16px;
+        padding-right:16px;
     }
-
-    .card,
-    .card:nth-child(n){
-        min-height:390px;
-        margin-bottom:12px;
-    }
-
-    .process{
-        grid-template-columns:1fr;
-        gap:35px;
-    }
-
-    .step{
-        grid-template-columns:40px 1fr;
-    }
-
-    .step b{
-        display:none;
-    }
-
-    section{
-        padding:110px 6vw;
-    }
-
-    .contact{
-        min-height:80vh;
-    }
-
-    .contact .line{
-        gap:20px;
-        flex-direction:column;
-    }
-
-    .footer{
-        gap:20px;
-        flex-direction:column;
+    .instruction{
+        max-width:180px;
+        font-size:9px;
     }
 }
-
-/* REDUCED MOTION */
-
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
 @media(prefers-reduced-motion:reduce){
-
     *,
     *::before,
     *::after{
-        scroll-behavior:auto !important;
-        animation-duration:.01ms !important;
-        transition-duration:.01ms !important;
+        animation-duration:.01ms!important;
+        animation-iteration-count:1!important;
+        transition-duration:.01ms!important;
     }
 }
 </style>
 </head>
-
 <body>
-
-<div class="grain"></div>
-<div class="cursor"></div>
-
-<div class="hud">
-    <span>Portfolio / 2026</span>
-    <button id="motionBtn">motion: off</button>
+<!-- ======================================================
+     BACKGROUND
+======================================================= -->
+<div
+    class="background world-0"
+    id="background"
+>
+    <div class="atmosphere"></div>
 </div>
-
-<div class="permission" id="permission">
-    Tilt interaction is ready. iPhone requires permission before motion data can be used.
-    <br>
-    <button id="allowMotion">Enable motion</button>
+<!-- ======================================================
+     PARTICLES
+======================================================= -->
+<canvas id="particles"></canvas>
+<!-- ======================================================
+     TOP BAR
+======================================================= -->
+<header class="top">
+    <div class="logo mono">
+        SHAB
+    </div>
+    <div
+        class="counter mono"
+        id="counter"
+    >
+        01 / 06
+    </div>
+</header>
+<!-- ======================================================
+     CONTROLS
+======================================================= -->
+<div class="controls">
+    <button id="motionButton">
+        Enable shake
+    </button>
 </div>
-
-<button class="sound" id="sound">
-    sound: off
-</button>
-
-<main>
-
-<!-- HERO -->
-
-<section class="hero">
-
-    <canvas id="sand"></canvas>
-
-    <div class="orb"></div>
-
-    <div class="hero-inner">
-
-        <div class="eyebrow">
-            A portfolio in controlled chaos
-        </div>
-
-        <h1 class="title">
-            <span>BEAUTY</span>
-            <span class="ghost">IN THE</span>
-            <span>MIST</span>
-        </h1>
-
-        <div class="hero-note">
-
-            <span>
-                <b>Finding form</b>
-                <br>
-                where everything moves.
-            </span>
-
-            <span>
-                Move your phone.
-                <br>
-                The page responds.
-            </span>
-
-        </div>
-
+<!-- ======================================================
+     STAGE
+======================================================= -->
+<main class="stage">
+    <div
+        class="scene"
+        id="scene"
+    >
+        <!-- CONTENT INSERTED BY JS -->
     </div>
-
-    <div class="scroll">
-        ENTER THE WORK
-        <i></i>
-    </div>
-
-</section>
-
-
-<!-- PHILOSOPHY -->
-
-<section>
-
-    <div class="wrap">
-
-        <div class="section-label">
-            01 / philosophy
-        </div>
-
-        <div class="statement reveal">
-            I make things that feel
-            <em>quiet at first</em>,
-            then refuse to leave your head.
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- WORK -->
-
-<section>
-
-    <div class="wrap">
-
-        <div class="section-label">
-            02 / selected work
-        </div>
-
-        <div class="work-grid">
-
-            <a class="card reveal" href="#">
-                <span class="num">01</span>
-
-                <div>
-                    <h3>Nocturne</h3>
-                    <p>Identity / digital experience / 2026</p>
-                </div>
-            </a>
-
-            <a class="card reveal" href="#">
-                <span class="num">02</span>
-
-                <div>
-                    <h3>Afterglow</h3>
-                    <p>Art direction / motion / interaction</p>
-                </div>
-            </a>
-
-            <a class="card reveal" href="#">
-                <span class="num">03</span>
-
-                <div>
-                    <h3>Drift</h3>
-                    <p>Experimental interface / sound</p>
-                </div>
-            </a>
-
-            <a class="card reveal" href="#">
-                <span class="num">04</span>
-
-                <div>
-                    <h3>Untitled / 04</h3>
-                    <p>Visual system / web / culture</p>
-                </div>
-            </a>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- PROCESS -->
-
-<section>
-
-    <div class="wrap process">
-
-        <div>
-
-            <div class="section-label">
-                03 / process
-            </div>
-
-            <div class="statement reveal"
-                 style="font-size:clamp(35px,5vw,65px)">
-                Less noise.
-                <br>
-                <em>More signal.</em>
-            </div>
-
-        </div>
-
-        <div class="steps">
-
-            <div class="step reveal">
-                <span>01</span>
-
-                <div>
-                    <h3>Observe</h3>
-                    <p>
-                        Find the human tension hiding underneath the brief.
-                    </p>
-                </div>
-
-                <b>LOOK</b>
-            </div>
-
-            <div class="step reveal">
-                <span>02</span>
-
-                <div>
-                    <h3>Distill</h3>
-                    <p>
-                        Remove everything that exists only because someone expected it.
-                    </p>
-                </div>
-
-                <b>EDIT</b>
-            </div>
-
-            <div class="step reveal">
-                <span>03</span>
-
-                <div>
-                    <h3>Compose</h3>
-                    <p>
-                        Build rhythm, typography, motion and atmosphere as one system.
-                    </p>
-                </div>
-
-                <b>MAKE</b>
-            </div>
-
-            <div class="step reveal">
-                <span>04</span>
-
-                <div>
-                    <h3>Disrupt</h3>
-                    <p>
-                        Leave one beautiful thing slightly unresolved.
-                    </p>
-                </div>
-
-                <b>FEEL</b>
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- CONTACT -->
-
-<section class="contact">
-
-    <div class="wrap">
-
-        <div class="section-label">
-            04 / contact
-        </div>
-
-        <h2 class="reveal">
-            <span>LET'S MAKE</span>
-            <span class="ghost">SOMETHING</span>
-            <span>ALIVE.</span>
-        </h2>
-
-        <div class="line">
-
-            <span>
-                available for selected collaborations
-            </span>
-
-            <a href="mailto:hello@example.com">
-                hello@example.com ↗
-            </a>
-
-        </div>
-
-    </div>
-
-</section>
-
 </main>
-
-
-<footer class="footer">
-
-    <span>
-        © 2026 / NAME
-    </span>
-
-    <span>
-        Built for humans with functioning gyroscopes.
-    </span>
-
-</footer>
-
-
+<!-- ======================================================
+     SHAKE HINT
+======================================================= -->
+<div
+    class="shake-hint"
+    id="shakeHint"
+>
+    <div class="shake-icon">
+        ↯
+    </div>
+    <div class="mono">
+        shake to discover
+    </div>
+</div>
+<!-- ======================================================
+     BOTTOM UI
+======================================================= -->
+<div class="bottom-ui">
+    <div
+        class="instruction mono"
+        id="instruction"
+    >
+        The page changes when you move it.
+    </div>
+    <div>
+        <div
+            class="progress"
+        >
+            <i></i>
+        </div>
+    </div>
+</div>
+<!-- ======================================================
+     PERMISSION
+======================================================= -->
+<div
+    class="permission"
+    id="permission"
+>
+    <strong>
+        Motion interaction
+    </strong>
+    <br>
+    Your iPhone needs permission to detect shaking.
+    The sensor is used only for this interaction.
+    <br>
+    <button id="allowMotion">
+        Allow motion
+    </button>
+</div>
 <script>
-
 /* =========================================================
-   CORE
+   DATA
 ========================================================= */
-
-const root = document.documentElement;
-
-const cursor = document.querySelector(".cursor");
-const orb = document.querySelector(".orb");
-
-const canvas = document.getElementById("sand");
-const ctx = canvas.getContext("2d", {
-    alpha:true
-});
-
-let W = 0;
-let H = 0;
-let DPR = 1;
-
-let particles = [];
-
-let pointer = {
+const scenes = [
+    {
+        eyebrow:
+            "01 / introduction",
+        title:
+            `SHAB<br><span class="outline">IN THE</span><br><em>MIST.</em>`,
+        description:
+            `A digital portfolio built around one idea: finding clarity inside chaos.`,
+        meta:
+            "Kerala / 2026",
+        instruction:
+            "There is more here. Shake the phone.",
+        world:
+            0
+    },
+    {
+        eyebrow:
+            "02 / the student",
+        title:
+            `<span class="outline">THE</span><br>STUDENT.`,
+        description:
+            `B.Com Computer Applications student at Mampad College, exploring the space where commerce and technology meet.`,
+        meta:
+            "B.Com Computer Applications / Mampad College",
+        instruction:
+            "A commerce mind with a technical curiosity.",
+        world:
+            1
+    },
+    {
+        eyebrow:
+            "03 / the builder",
+        title:
+            `CURIOUS<br><em>BY DEFAULT.</em>`,
+        description:
+            `Technology, artificial intelligence, digital experiences and strange ideas that might become useful things.`,
+        meta:
+            "Explore / experiment / build",
+        instruction:
+            "The best ideas usually start slightly unreasonable.",
+        world:
+            2
+    },
+    {
+        eyebrow:
+            "04 / the thinker",
+        title:
+            `<span class="outline">FIND</span><br>THE<br><em>PATTERN.</em>`,
+        description:
+            `Observe the noise. Question the obvious. Connect ideas that normally sit in different rooms.`,
+        meta:
+            "Question / connect / simplify",
+        instruction:
+            "Chaos is only a pattern you haven't found yet.",
+        world:
+            3
+    },
+    {
+        eyebrow:
+            "05 / selected direction",
+        title:
+            `MAKE<br><span class="outline">IT</span><br><em>ALIVE.</em>`,
+        description:
+            "",
+        meta:
+            "Selected interests",
+        instruction:
+            "Things worth exploring.",
+        world:
+            4,
+        custom:true
+    },
+    {
+        eyebrow:
+            "06 / next",
+        title:
+            `WHAT'S<br><span class="outline">NEXT?</span>`,
+        description:
+            `Still learning. Still experimenting. Still looking for the next interesting problem.`,
+        meta:
+            "SHAB / Kerala / India",
+        instruction:
+            "The story doesn't end here.",
+        world:
+            5
+    }
+];
+/* =========================================================
+   STATE
+========================================================= */
+let current = 0;
+let shaking = false;
+let motionActive = false;
+let lastShake = 0;
+let soundEnabled = false;
+let audioContext = null;
+/* =========================================================
+   DOM
+========================================================= */
+const scene =
+    document.getElementById("scene");
+const background =
+    document.getElementById("background");
+const counter =
+    document.getElementById("counter");
+const instruction =
+    document.getElementById("instruction");
+const progress =
+    document.querySelector(".progress i");
+const shakeHint =
+    document.getElementById("shakeHint");
+const permission =
+    document.getElementById("permission");
+const motionButton =
+    document.getElementById("motionButton");
+/* =========================================================
+   SCENE RENDERER
+========================================================= */
+function renderScene(
+    index,
+    entering = true
+){
+    const data =
+        scenes[index];
+    let content = "";
+    if(data.custom){
+        content = `
+            <div class="eyebrow mono">
+                ${data.eyebrow}
+            </div>
+            <div class="statement">
+                BUILD<br>
+                <i>things people feel.</i>
+            </div>
+            <div class="list">
+                <div class="item">
+                    <small class="mono">
+                        01
+                    </small>
+                    <strong>
+                        Artificial Intelligence
+                    </strong>
+                </div>
+                <div class="item">
+                    <small class="mono">
+                        02
+                    </small>
+                    <strong>
+                        Data & Analytics
+                    </strong>
+                </div>
+                <div class="item">
+                    <small class="mono">
+                        03
+                    </small>
+                    <strong>
+                        Digital Experiences
+                    </strong>
+                </div>
+                <div class="item">
+                    <small class="mono">
+                        04
+                    </small>
+                    <strong>
+                        Business & Technology
+                    </strong>
+                </div>
+                <div class="item">
+                    <small class="mono">
+                        05
+                    </small>
+                    <strong>
+                        Creative Experimentation
+                    </strong>
+                </div>
+                <div class="item">
+                    <small class="mono">
+                        06
+                    </small>
+                    <strong>
+                        Learning Everything Interesting
+                    </strong>
+                </div>
+            </div>
+        `;
+    }
+    else{
+        content = `
+            <div class="eyebrow mono">
+                ${data.eyebrow}
+            </div>
+            <div class="number">
+                ${String(index + 1).padStart(2,"0")}
+            </div>
+            <h1 class="title">
+                ${data.title}
+            </h1>
+            <div class="description">
+                ${data.description}
+            </div>
+            <div class="meta mono">
+                ${data.meta}
+            </div>
+        `;
+    }
+    scene.innerHTML =
+        content;
+    if(entering){
+        scene.classList.remove(
+            "content-enter"
+        );
+        void scene.offsetWidth;
+        scene.classList.add(
+            "content-enter"
+        );
+    }
+    counter.textContent =
+        `${String(index + 1).padStart(2,"0")} / ${String(scenes.length).padStart(2,"0")}`;
+    instruction.textContent =
+        data.instruction;
+    progress.style.width =
+        `${((index + 1) / scenes.length) * 100}%`;
+    background.className =
+        `background world-${data.world}`;
+    rootStyle();
+}
+/* =========================================================
+   ROOT STYLE
+========================================================= */
+function rootStyle(){
+    document.documentElement
+        .style
+        .setProperty(
+            "--rotation",
+            `${current * 17}deg`
+        );
+}
+/* =========================================================
+   INITIAL
+========================================================= */
+renderScene(
+    current,
+    false
+);
+/* =========================================================
+   NEXT SCENE
+========================================================= */
+function nextScene(){
+    if(shaking)
+        return;
+    const now =
+        Date.now();
+    /*
+        Cooldown prevents one physical shake
+        from advancing through several scenes.
+    */
+    if(now - lastShake < 1100)
+        return;
+    lastShake = now;
+    shaking = true;
+    /*
+        Hide hint after first interaction.
+    */
+    shakeHint.classList.add(
+        "hidden"
+    );
+    /*
+        Current scene disintegrates.
+    */
+    scene.classList.remove(
+        "content-enter"
+    );
+    scene.classList.add(
+        "content-exit"
+    );
+    createBurst();
+    if(soundEnabled){
+        playTone(
+            current
+        );
+    }
+    setTimeout(
+        () => {
+            current =
+                (current + 1) % scenes.length;
+            renderScene(
+                current,
+                true
+            );
+            setTimeout(
+                () => {
+                    shaking = false;
+                },
+                700
+            );
+        },
+        480
+    );
+}
+/* =========================================================
+   PARTICLE BURST
+========================================================= */
+function createBurst(){
+    const burst =
+        document.createElement("div");
+    burst.className =
+        "burst";
+    document.body.appendChild(
+        burst
+    );
+    setTimeout(
+        () => burst.remove(),
+        1000
+    );
+    /*
+        Also violently move the particle
+        field outward.
+    */
+    particles.forEach(
+        p => {
+            const dx =
+                p.x - W / 2;
+            const dy =
+                p.y - H / 2;
+            const distance =
+                Math.hypot(dx,dy) || 1;
+            p.vx +=
+                dx / distance *
+                (2 + Math.random() * 5);
+            p.vy +=
+                dy / distance *
+                (2 + Math.random() * 5);
+        }
+    );
+}
+/* =========================================================
+   DEVICE SHAKE DETECTION
+========================================================= */
+let lastAcceleration = {
     x:0,
-    y:0
+    y:0,
+    z:0
 };
-
-let motionEnabled = false;
-
-let ax = 0;
-let ay = 0;
-
-let animationFrame;
-
-
+let shakeEnergy = 0;
+/*
+    This threshold is deliberately moderate.
+    A casual phone movement should not
+    accidentally navigate.
+    A deliberate shake should.
+*/
+const SHAKE_THRESHOLD =
+    18;
+function handleMotion(event){
+    if(!motionActive)
+        return;
+    const acc =
+        event.accelerationIncludingGravity;
+    if(!acc)
+        return;
+    const x =
+        Number(acc.x) || 0;
+    const y =
+        Number(acc.y) || 0;
+    const z =
+        Number(acc.z) || 0;
+    const dx =
+        x - lastAcceleration.x;
+    const dy =
+        y - lastAcceleration.y;
+    const dz =
+        z - lastAcceleration.z;
+    const delta =
+        Math.sqrt(
+            dx * dx +
+            dy * dy +
+            dz * dz
+        );
+    lastAcceleration = {
+        x,
+        y,
+        z
+    };
+    /*
+        Smooth energy rather than relying
+        on a single sensor spike.
+    */
+    shakeEnergy =
+        shakeEnergy * .82 +
+        delta;
+    if(
+        shakeEnergy >
+        SHAKE_THRESHOLD
+    ){
+        shakeEnergy = 0;
+        nextScene();
+    }
+}
 /* =========================================================
-   CANVAS
+   ENABLE MOTION
 ========================================================= */
-
-function resizeCanvas(){
-
-    DPR = Math.min(window.devicePixelRatio || 1, 2);
-
-    W = window.innerWidth;
-    H = window.innerHeight;
-
-    canvas.width = Math.floor(W * DPR);
-    canvas.height = Math.floor(H * DPR);
-
-    canvas.style.width = W + "px";
-    canvas.style.height = H + "px";
-
+async function enableMotion(){
+    try{
+        /*
+            Modern iOS requires permission
+            from a user gesture.
+        */
+        if(
+            typeof DeviceMotionEvent !==
+            "undefined" &&
+            typeof DeviceMotionEvent
+                .requestPermission ===
+                "function"
+        ){
+            const result =
+                await
+                DeviceMotionEvent
+                    .requestPermission();
+            if(result !== "granted"){
+                motionButton.textContent =
+                    "motion denied";
+                return;
+            }
+        }
+        window.addEventListener(
+            "devicemotion",
+            handleMotion,
+            true
+        );
+        motionActive = true;
+        motionButton.textContent =
+            "shake active";
+        permission.style.display =
+            "none";
+        shakeHint.classList.remove(
+            "hidden"
+        );
+        /*
+            A small calibration period
+            prevents the permission gesture
+            itself becoming a shake.
+        */
+        shakeEnergy = 0;
+        lastAcceleration = {
+            x:0,
+            y:0,
+            z:0
+        };
+    }
+    catch(error){
+        console.error(
+            "Motion permission error:",
+            error
+        );
+        motionButton.textContent =
+            "motion unavailable";
+    }
+}
+/* =========================================================
+   MOTION BUTTON
+========================================================= */
+motionButton.addEventListener(
+    "click",
+    () => {
+        if(motionActive){
+            window.removeEventListener(
+                "devicemotion",
+                handleMotion,
+                true
+            );
+            motionActive = false;
+            motionButton.textContent =
+                "enable shake";
+            return;
+        }
+        if(
+            typeof DeviceMotionEvent !==
+            "undefined" &&
+            typeof DeviceMotionEvent
+                .requestPermission ===
+                "function"
+        ){
+            permission.style.display =
+                "block";
+        }
+        else{
+            enableMotion();
+        }
+    }
+);
+document
+    .getElementById("allowMotion")
+    .addEventListener(
+        "click",
+        enableMotion
+    );
+/* =========================================================
+   TOUCH FALLBACK
+========================================================= */
+/*
+    Desktop users don't have accelerometers,
+    so clicking/tapping the page can advance.
+*/
+let touchStart = null;
+window.addEventListener(
+    "pointerdown",
+    event => {
+        touchStart = {
+            x:event.clientX,
+            y:event.clientY
+        };
+    },
+    {passive:true}
+);
+window.addEventListener(
+    "pointerup",
+    event => {
+        if(!touchStart)
+            return;
+        const dx =
+            event.clientX -
+            touchStart.x;
+        const dy =
+            event.clientY -
+            touchStart.y;
+        const distance =
+            Math.hypot(dx,dy);
+        /*
+            Only use a deliberate swipe
+            as desktop/mobile fallback.
+        */
+        if(
+            distance > 100
+        ){
+            nextScene();
+        }
+        touchStart = null;
+    },
+    {passive:true}
+);
+/* =========================================================
+   POINTER ATMOSPHERE
+========================================================= */
+window.addEventListener(
+    "pointermove",
+    event => {
+        document.documentElement
+            .style
+            .setProperty(
+                "--x",
+                event.clientX + "px"
+            );
+        document.documentElement
+            .style
+            .setProperty(
+                "--y",
+                event.clientY + "px"
+            );
+    },
+    {passive:true}
+);
+/* =========================================================
+   AUDIO
+========================================================= */
+function playTone(step){
+    try{
+        if(!audioContext){
+            audioContext =
+                new (
+                    window.AudioContext ||
+                    window.webkitAudioContext
+                )();
+        }
+        if(
+            audioContext.state ===
+            "suspended"
+        ){
+            audioContext.resume();
+        }
+        const oscillator =
+            audioContext
+                .createOscillator();
+        const gain =
+            audioContext
+                .createGain();
+        /*
+            Each world gets a slightly
+            different frequency.
+        */
+        oscillator.frequency.value =
+            90 +
+            step * 25;
+        oscillator.type =
+            step % 2 === 0
+            ? "sine"
+            : "triangle";
+        gain.gain.setValueAtTime(
+            .0001,
+            audioContext.currentTime
+        );
+        gain.gain.exponentialRampToValueAtTime(
+            .025,
+            audioContext.currentTime + .03
+        );
+        gain.gain.exponentialRampToValueAtTime(
+            .0001,
+            audioContext.currentTime + .7
+        );
+        oscillator.connect(gain);
+        gain.connect(
+            audioContext.destination
+        );
+        oscillator.start();
+        oscillator.stop(
+            audioContext.currentTime + .75
+        );
+    }
+    catch(error){
+        console.log(
+            "Audio unavailable"
+        );
+    }
+}
+/* =========================================================
+   PARTICLE ENGINE
+========================================================= */
+const canvas =
+    document.getElementById(
+        "particles"
+    );
+const ctx =
+    canvas.getContext(
+        "2d"
+    );
+let W =
+    window.innerWidth;
+let H =
+    window.innerHeight;
+let DPR =
+    Math.min(
+        window.devicePixelRatio || 1,
+        2
+    );
+let particles = [];
+function resize(){
+    W =
+        window.innerWidth;
+    H =
+        window.innerHeight;
+    DPR =
+        Math.min(
+            window.devicePixelRatio || 1,
+            2
+        );
+    canvas.width =
+        W * DPR;
+    canvas.height =
+        H * DPR;
+    canvas.style.width =
+        W + "px";
+    canvas.style.height =
+        H + "px";
     ctx.setTransform(
         DPR,
         0,
@@ -1030,243 +1432,89 @@ function resizeCanvas(){
         0,
         0
     );
-
-    pointer.x = W * .5;
-    pointer.y = H * .5;
-
     createParticles();
 }
-
-
 function createParticles(){
-
-    const count =
+    const amount =
         W < 700
-        ? 420
-        : 850;
-
-    particles = [];
-
-    for(let i = 0; i < count; i++){
-
+        ? 430
+        : 900;
+    particles =
+        [];
+    for(
+        let i = 0;
+        i < amount;
+        i++
+    ){
         particles.push({
-
-            x:Math.random() * W,
-
-            y:Math.random() * H,
-
-            vx:(Math.random() - .5) * .2,
-
-            vy:(Math.random() - .5) * .2,
-
-            r:Math.random() * 1.3 + .2,
-
-            alpha:Math.random() * .55 + .08
-
+            x:
+                Math.random() * W,
+            y:
+                Math.random() * H,
+            vx:
+                (Math.random()-.5)
+                * .25,
+            vy:
+                (Math.random()-.5)
+                * .25,
+            r:
+                .25 +
+                Math.random() * 1.25,
+            alpha:
+                .08 +
+                Math.random() * .42
         });
-
     }
 }
-
-
+resize();
 window.addEventListener(
     "resize",
-    resizeCanvas,
+    resize,
     {passive:true}
 );
-
-resizeCanvas();
-
-
 /* =========================================================
-   POINTER
+   PARTICLE LOOP
 ========================================================= */
-
-window.addEventListener(
-    "pointermove",
-    function(e){
-
-        pointer.x = e.clientX;
-        pointer.y = e.clientY;
-
-        root.style.setProperty(
-            "--mx",
-            e.clientX + "px"
-        );
-
-        root.style.setProperty(
-            "--my",
-            e.clientY + "px"
-        );
-
-        if(cursor){
-
-            cursor.style.left =
-                e.clientX + "px";
-
-            cursor.style.top =
-                e.clientY + "px";
-
-        }
-
-        document
-            .querySelectorAll(".card")
-            .forEach(card => {
-
-                const rect =
-                    card.getBoundingClientRect();
-
-                if(
-                    e.clientX >= rect.left &&
-                    e.clientX <= rect.right &&
-                    e.clientY >= rect.top &&
-                    e.clientY <= rect.bottom
-                ){
-
-                    const px =
-                        ((e.clientX - rect.left) /
-                        rect.width) * 100;
-
-                    const py =
-                        ((e.clientY - rect.top) /
-                        rect.height) * 100;
-
-                    card.style.setProperty(
-                        "--px",
-                        px + "%"
-                    );
-
-                    card.style.setProperty(
-                        "--py",
-                        py + "%"
-                    );
-
-                }
-
-            });
-
-    },
-    {passive:true}
-);
-
-
-/* =========================================================
-   CURSOR
-========================================================= */
-
-document
-    .querySelectorAll(
-        "a,button"
-    )
-    .forEach(element => {
-
-        element.addEventListener(
-            "mouseenter",
-            () => cursor?.classList.add("big")
-        );
-
-        element.addEventListener(
-            "mouseleave",
-            () => cursor?.classList.remove("big")
-        );
-
-    });
-
-
-/* =========================================================
-   PARTICLE ENGINE
-========================================================= */
-
-function drawParticles(){
-
+function animate(){
     ctx.clearRect(
         0,
         0,
         W,
         H
     );
-
-    for(const p of particles){
-
-        let dx =
-            p.x - pointer.x;
-
-        let dy =
-            p.y - pointer.y;
-
-        let distance =
-            Math.sqrt(
-                dx * dx +
-                dy * dy
-            );
-
-        if(distance < 1){
-            distance = 1;
-        }
-
-
-        /* Mouse influence */
-
-        const influence =
-            Math.max(
-                0,
-                1 - distance / 300
-            );
-
-        const swirl =
-            influence * .055;
-
-
+    for(
+        const p of particles
+    ){
+        /*
+            Gentle gravitational drift
+            toward the cursor.
+        */
+        const dx =
+            W / 2 -
+            p.x;
+        const dy =
+            H / 2 -
+            p.y;
         p.vx +=
-            -dy * swirl;
-
-
+            dx * .000002;
         p.vy +=
-            dx * swirl;
-
-
-        /* Phone motion */
-
-        if(motionEnabled){
-
-            p.vx +=
-                ax * .0009;
-
-            p.vy +=
-                ay * .0009;
-
-        }
-
-
-        /* Natural movement */
-
-        p.vx *= .985;
-        p.vy *= .985;
-
-
+            dy * .000002;
+        p.vx *= .992;
+        p.vy *= .992;
         p.x += p.vx;
         p.y += p.vy;
-
-
-        /* Wrap */
-
+        /*
+            Wrap edges.
+        */
         if(p.x < -10)
             p.x = W + 10;
-
         if(p.x > W + 10)
             p.x = -10;
-
         if(p.y < -10)
             p.y = H + 10;
-
         if(p.y > H + 10)
             p.y = -10;
-
-
-        /* Draw */
-
         ctx.beginPath();
-
         ctx.arc(
             p.x,
             p.y,
@@ -1274,451 +1522,54 @@ function drawParticles(){
             0,
             Math.PI * 2
         );
-
         ctx.fillStyle =
-            `rgba(230,224,211,${p.alpha})`;
-
+            `rgba(
+                231,
+                224,
+                210,
+                ${p.alpha}
+            )`;
         ctx.fill();
-
     }
-
-    animationFrame =
-        requestAnimationFrame(drawParticles);
+    requestAnimationFrame(
+        animate
+    );
 }
-
-drawParticles();
-
-
+animate();
 /* =========================================================
-   MOTION SENSOR
+   KEYBOARD FALLBACK
 ========================================================= */
-
-const motionBtn =
-    document.getElementById("motionBtn");
-
-const permissionBox =
-    document.getElementById("permission");
-
-const allowMotion =
-    document.getElementById("allowMotion");
-
-
-function handleOrientation(event){
-
-    const gamma =
-        Number(event.gamma) || 0;
-
-    const beta =
-        Number(event.beta) || 0;
-
-
-    ax = Math.max(
-        -30,
-        Math.min(30,gamma)
-    );
-
-    ay = Math.max(
-        -30,
-        Math.min(30,beta)
-    );
-
-
-    root.style.setProperty(
-        "--tiltX",
-        Math.max(
-            -4,
-            Math.min(
-                4,
-                ax / 8
-            )
-        ) + "deg"
-    );
-
-
-    root.style.setProperty(
-        "--tiltY",
-        Math.max(
-            -4,
-            Math.min(
-                4,
-                ay / 15
-            )
-        ) + "deg"
-    );
-
-}
-
-
-async function enableMotion(){
-
-    try{
-
-        /*
-         iOS 13+
-         */
-
-        if(
-            typeof DeviceOrientationEvent !==
-            "undefined" &&
-            typeof DeviceOrientationEvent.requestPermission ===
-            "function"
-        ){
-
-            const permission =
-                await DeviceOrientationEvent.requestPermission();
-
-            if(permission !== "granted"){
-
-                motionBtn.textContent =
-                    "motion: denied";
-
-                return;
-            }
-
-        }
-
-
-        window.addEventListener(
-            "deviceorientation",
-            handleOrientation,
-            true
-        );
-
-
-        motionEnabled = true;
-
-        motionBtn.textContent =
-            "motion: on";
-
-        permissionBox.style.display =
-            "none";
-
-
-    }catch(error){
-
-        console.error(
-            "Motion error:",
-            error
-        );
-
-        motionBtn.textContent =
-            "motion: unavailable";
-
-    }
-
-}
-
-
-motionBtn.addEventListener(
-    "click",
-    function(){
-
-        if(motionEnabled){
-
-            motionEnabled = false;
-
-            window.removeEventListener(
-                "deviceorientation",
-                handleOrientation,
-                true
-            );
-
-            motionBtn.textContent =
-                "motion: off";
-
-            return;
-        }
-
-
-        /*
-         iPhone requires a user gesture.
-         */
-
-        if(
-            typeof DeviceOrientationEvent !==
-            "undefined" &&
-            typeof DeviceOrientationEvent.requestPermission ===
-            "function"
-        ){
-
-            permissionBox.style.display =
-                "block";
-
-        }else{
-
-            enableMotion();
-
-        }
-
-    }
-);
-
-
-allowMotion.addEventListener(
-    "click",
-    enableMotion
-);
-
-
-/* =========================================================
-   SOUND
-========================================================= */
-
-let audioContext = null;
-
-let soundEnabled = false;
-
-
-function playTone(){
-
-    try{
-
-        if(!audioContext){
-
-            audioContext =
-                new (
-                    window.AudioContext ||
-                    window.webkitAudioContext
-                )();
-
-        }
-
-
-        if(
-            audioContext.state ===
-            "suspended"
-        ){
-
-            audioContext.resume();
-
-        }
-
-
-        const oscillator =
-            audioContext.createOscillator();
-
-        const gain =
-            audioContext.createGain();
-
-
-        oscillator.type =
-            "sine";
-
-
-        oscillator.frequency.value =
-            110 +
-            Math.random() * 70;
-
-
-        gain.gain.setValueAtTime(
-            .0001,
-            audioContext.currentTime
-        );
-
-
-        gain.gain.exponentialRampToValueAtTime(
-            .018,
-            audioContext.currentTime + .04
-        );
-
-
-        gain.gain.exponentialRampToValueAtTime(
-            .0001,
-            audioContext.currentTime + .65
-        );
-
-
-        oscillator.connect(gain);
-
-        gain.connect(
-            audioContext.destination
-        );
-
-
-        oscillator.start();
-
-        oscillator.stop(
-            audioContext.currentTime + .7
-        );
-
-    }catch(error){
-
-        console.log(
-            "Audio unavailable"
-        );
-
-    }
-
-}
-
-
-const soundButton =
-    document.getElementById("sound");
-
-
-soundButton.addEventListener(
-    "click",
-    function(){
-
-        soundEnabled =
-            !soundEnabled;
-
-
-        soundButton.textContent =
-            "sound: " +
-            (soundEnabled
-                ? "on"
-                : "off"
-            );
-
-
-        if(soundEnabled){
-
-            playTone();
-
-        }
-
-    }
-);
-
-
-/* =========================================================
-   SCROLL SOUND
-========================================================= */
-
-let lastSoundTime = 0;
-
-
 window.addEventListener(
-    "scroll",
-    function(){
-
-        if(!soundEnabled)
-            return;
-
-
-        const now =
-            Date.now();
-
-
+    "keydown",
+    event => {
+        if(
+            event.code ===
+            "Space" ||
+            event.code ===
+            "ArrowRight"
+        ){
+            event.preventDefault();
+            nextScene();
+        }
+    }
+);
+/* =========================================================
+   VISIBILITY SAFETY
+========================================================= */
+document.addEventListener(
+    "visibilitychange",
+    () => {
         /*
-         Prevent hundreds of sounds
-         during one scroll.
+            Reset sensor energy when
+            user leaves the page.
         */
-
-        if(now - lastSoundTime < 180)
-            return;
-
-
-        lastSoundTime =
-            now;
-
-
-        if(Math.random() < .15){
-
-            playTone();
-
+        if(
+            document.hidden
+        ){
+            shakeEnergy = 0;
         }
-
-    },
-    {passive:true}
-);
-
-
-/* =========================================================
-   REVEAL OBSERVER
-========================================================= */
-
-const observer =
-    new IntersectionObserver(
-        entries => {
-
-            entries.forEach(entry => {
-
-                if(entry.isIntersecting){
-
-                    entry.target
-                        .classList
-                        .add("show");
-
-                }
-
-            });
-
-        },
-        {
-            threshold:.12
-        }
-    );
-
-
-document
-    .querySelectorAll(".reveal")
-    .forEach(element => {
-
-        observer.observe(element);
-
-    });
-
-
-/* =========================================================
-   MOBILE TOUCH
-========================================================= */
-
-window.addEventListener(
-    "touchmove",
-    function(e){
-
-        if(!e.touches.length)
-            return;
-
-
-        const touch =
-            e.touches[0];
-
-
-        pointer.x =
-            touch.clientX;
-
-        pointer.y =
-            touch.clientY;
-
-
-        root.style.setProperty(
-            "--mx",
-            pointer.x + "px"
-        );
-
-        root.style.setProperty(
-            "--my",
-            pointer.y + "px"
-        );
-
-    },
-    {passive:true}
-);
-
-
-/* =========================================================
-   CLEANUP
-========================================================= */
-
-window.addEventListener(
-    "pagehide",
-    function(){
-
-        if(animationFrame){
-
-            cancelAnimationFrame(
-                animationFrame
-            );
-
-        }
-
     }
 );
-
 </script>
-
 </body>
 </html>
