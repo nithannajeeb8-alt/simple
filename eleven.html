@@ -2,21 +2,28 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport"
-      content="width=device-width,initial-scale=1,viewport-fit=cover">
 
-<title>SHAB / SIGNAL</title>
+<meta name="viewport"
+      content="width=device-width,
+      initial-scale=1,
+      viewport-fit=cover">
+
+<title>SHAB — Portfolio</title>
 
 <style>
+
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400&family=Manrope:wght@300;400;500;600;700&display=swap');
 
+
 :root{
-    --bg:#050505;
-    --fg:#eeeae1;
-    --dim:#716e67;
-    --line:rgba(255,255,255,.11);
-    --accent:#d8cfbc;
+    --black:#070707;
+    --white:#f0eee8;
+    --grey:#77746d;
+    --soft:#aaa69d;
+    --line:rgba(255,255,255,.12);
+    --gold:#cfc4a7;
 }
+
 
 *{
     box-sizing:border-box;
@@ -24,234 +31,429 @@
     padding:0;
 }
 
-html,
-body{
-    width:100%;
-    height:100%;
-    overflow:hidden;
-    background:var(--bg);
+
+html{
+    scroll-behavior:smooth;
 }
 
+
 body{
-    color:var(--fg);
-    font-family:Manrope,sans-serif;
-    user-select:none;
+    background:var(--black);
+    color:var(--white);
+
+    font-family:"Manrope",sans-serif;
+
+    overflow-x:hidden;
+
     -webkit-font-smoothing:antialiased;
+}
+
+
+body.playing{
     cursor:none;
 }
+
+
+a{
+    color:inherit;
+    text-decoration:none;
+}
+
 
 button{
     font:inherit;
 }
 
+
 /* =========================================================
-   WORLD
+   LOADING
 ========================================================= */
 
-#world{
+.loader{
+
     position:fixed;
     inset:0;
-    width:100%;
-    height:100svh;
-    overflow:hidden;
-    background:#050505;
+
+    background:#070707;
+
+    z-index:1000;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    transition:
+        opacity 1.2s ease,
+        visibility 1.2s ease;
 }
 
-#particles,
-#field,
-#distortion{
-    position:absolute;
-    inset:0;
-    width:100%;
-    height:100%;
-}
 
-#particles{
-    z-index:2;
-}
+.loader.done{
 
-#field{
-    z-index:3;
-    mix-blend-mode:screen;
-}
-
-#distortion{
-    z-index:5;
+    opacity:0;
+    visibility:hidden;
     pointer-events:none;
 }
 
-/* =========================================================
-   ATMOSPHERE
-========================================================= */
 
-.void{
-    position:absolute;
-    inset:-30%;
-    z-index:1;
+.loader-inner{
+    width:min(400px,80vw);
+}
 
-    background:
-        radial-gradient(
-            ellipse at 50% 48%,
-            rgba(255,255,255,.065),
-            transparent 28%
-        ),
-        radial-gradient(
-            ellipse at 25% 80%,
-            rgba(180,170,150,.035),
-            transparent 35%
-        );
 
-    filter:blur(60px);
+.loader-top{
+
+    display:flex;
+    justify-content:space-between;
+
+    font-family:"DM Mono",monospace;
+    font-size:8px;
+
+    color:#5f5c56;
+
+    letter-spacing:.18em;
+    text-transform:uppercase;
+
+    margin-bottom:20px;
+}
+
+
+.loader-line{
+
+    height:1px;
+
+    background:rgba(255,255,255,.1);
+
+    overflow:hidden;
+}
+
+
+.loader-progress{
+
+    height:100%;
+    width:0;
+
+    background:#e5e0d6;
 
     animation:
-        breathe 12s ease-in-out infinite alternate;
+        loading 1.5s
+        cubic-bezier(.16,1,.3,1)
+        forwards;
 }
 
-@keyframes breathe{
-    from{
-        transform:scale(1);
-    }
+
+@keyframes loading{
+
     to{
-        transform:scale(1.12) translate(1%,-1%);
+        width:100%;
     }
+
 }
+
 
 /* =========================================================
-   GRAIN
+   NOISE
 ========================================================= */
 
-.grain{
-    position:absolute;
+.noise{
+
+    position:fixed;
     inset:0;
-    z-index:80;
+
+    z-index:900;
+
     pointer-events:none;
 
-    opacity:.055;
+    opacity:.045;
 
     background-image:
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 
     mix-blend-mode:overlay;
 }
 
+
 /* =========================================================
-   TOP
+   FIXED ATMOSPHERE
 ========================================================= */
 
-.top{
-    position:absolute;
+.atmosphere{
+
+    position:fixed;
+    inset:-30%;
+
+    z-index:-2;
+
+    background:
+
+        radial-gradient(
+            circle at 50% 30%,
+            rgba(255,255,255,.055),
+            transparent 28%
+        ),
+
+        radial-gradient(
+            circle at 15% 80%,
+            rgba(185,170,140,.035),
+            transparent 30%
+        );
+
+    filter:blur(70px);
+
+    animation:
+        breathing 12s ease-in-out infinite alternate;
+}
+
+
+@keyframes breathing{
+
+    from{
+        transform:scale(1);
+    }
+
+    to{
+        transform:
+            scale(1.15)
+            translate(2%,-1%);
+    }
+
+}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+nav{
+
+    position:fixed;
+
     top:0;
     left:0;
+
     width:100%;
-    z-index:40;
+
+    z-index:100;
 
     padding:
-        max(20px,env(safe-area-inset-top))
-        clamp(20px,4vw,60px)
+        max(22px,env(safe-area-inset-top))
+        5vw
         0;
 
     display:flex;
     justify-content:space-between;
     align-items:center;
 
+    mix-blend-mode:difference;
+}
+
+
+.logo{
+
+    font-size:12px;
+    font-weight:700;
+
+    letter-spacing:.3em;
+}
+
+
+.nav-right{
+
+    display:flex;
+    gap:30px;
+
     font-family:"DM Mono",monospace;
+
     font-size:8px;
-    letter-spacing:.18em;
+
+    letter-spacing:.16em;
+
     text-transform:uppercase;
 }
 
-.logo{
-    color:#f0ece4;
-    font-family:Manrope,sans-serif;
-    font-size:12px;
-    font-weight:700;
-    letter-spacing:.28em;
+
+.nav-right span{
+
+    color:#aaa;
+
 }
 
-.top-meta{
-    color:#625f59;
+
+.music-button{
+
+    cursor:pointer;
+
+    border:0;
+    background:none;
+
+    color:white;
+
+    display:flex;
+    align-items:center;
+
+    gap:8px;
 }
 
-/* =========================================================
-   SCENE
-========================================================= */
 
-.scene{
-    position:absolute;
-    inset:0;
-    z-index:20;
+.music-bars{
 
-    transform-style:preserve-3d;
+    display:flex;
+    gap:2px;
+    align-items:center;
+
+    height:12px;
+}
+
+
+.music-bars i{
+
+    display:block;
+
+    width:1px;
+
+    height:5px;
+
+    background:white;
 
     transition:
-        transform 1.4s cubic-bezier(.16,1,.3,1);
+        height .25s ease;
+
 }
 
+
+.playing .music-bars i:nth-child(1){
+    animation:bar .7s infinite alternate;
+}
+
+.playing .music-bars i:nth-child(2){
+    animation:bar .5s .1s infinite alternate;
+}
+
+.playing .music-bars i:nth-child(3){
+    animation:bar .8s .2s infinite alternate;
+}
+
+.playing .music-bars i:nth-child(4){
+    animation:bar .45s .15s infinite alternate;
+}
+
+
+@keyframes bar{
+
+    from{
+        height:3px;
+    }
+
+    to{
+        height:12px;
+    }
+
+}
+
+
 /* =========================================================
-   SECRET GRID
+   CUSTOM CURSOR
 ========================================================= */
 
-.grid{
-    position:absolute;
-    inset:-20%;
+.cursor{
+
+    position:fixed;
+
+    width:10px;
+    height:10px;
+
+    border:1px solid rgba(255,255,255,.7);
+
+    border-radius:50%;
+
+    transform:
+        translate(-50%,-50%);
+
+    pointer-events:none;
+
+    z-index:1001;
 
     opacity:0;
 
-    background-image:
-        linear-gradient(
-            rgba(255,255,255,.035) 1px,
-            transparent 1px
-        ),
-        linear-gradient(
-            90deg,
-            rgba(255,255,255,.035) 1px,
-            transparent 1px
-        );
-
-    background-size:
-        80px 80px;
-
-    transform:
-        perspective(700px)
-        rotateX(65deg)
-        translateY(20%);
-
     transition:
-        opacity 1.5s ease;
-
-    pointer-events:none;
+        width .35s cubic-bezier(.16,1,.3,1),
+        height .35s cubic-bezier(.16,1,.3,1),
+        opacity .3s;
 }
 
-.active-grid .grid{
-    opacity:.35;
+
+body.playing .cursor{
+    opacity:1;
 }
+
+
+.cursor.large{
+
+    width:70px;
+    height:70px;
+
+    border-color:
+        rgba(255,255,255,.25);
+}
+
 
 /* =========================================================
-   MAIN TYPE
+   HERO
 ========================================================= */
 
 .hero{
-    position:absolute;
 
-    left:7vw;
-    top:50%;
+    height:100svh;
+    min-height:650px;
 
-    transform:
-        translateY(-50%)
-        translateZ(120px);
+    position:relative;
 
-    width:90vw;
+    display:flex;
+    align-items:center;
 
-    z-index:15;
+    overflow:hidden;
 }
 
-.big{
+
+.hero-inner{
+
+    width:100%;
+
+    padding:
+        0 5vw;
+
+    position:relative;
+}
+
+
+.hero-kicker{
+
+    font-family:"DM Mono",monospace;
+
+    font-size:8px;
+
+    letter-spacing:.25em;
+
+    color:#77736c;
+
+    text-transform:uppercase;
+
+    margin-bottom:30px;
+}
+
+
+.hero-title{
+
     font-size:
-        clamp(65px,13vw,200px);
+        clamp(
+            80px,
+            17vw,
+            270px
+        );
 
-    line-height:.76;
+    line-height:.72;
 
-    letter-spacing:-.085em;
+    letter-spacing:-.095em;
 
     font-weight:500;
 
@@ -259,417 +461,786 @@ button{
 
     position:relative;
 
-    will-change:transform;
+    z-index:3;
+
+    transition:
+        transform .25s ease-out;
 }
 
-.big .line{
+
+.hero-title .line{
+
     display:block;
+
     overflow:hidden;
 }
 
-.big .word{
+
+.hero-title .word{
+
     display:block;
 
-    transform:
-        translateY(110%);
+    transform:translateY(115%);
 
     animation:
-        reveal 1.3s cubic-bezier(.16,1,.3,1)
+        heroReveal 1.5s
+        cubic-bezier(.16,1,.3,1)
         forwards;
 }
 
-.big .line:nth-child(2) .word{
-    animation-delay:.08s;
+
+.hero-title .line:nth-child(2) .word{
+
+    animation-delay:.1s;
+
 }
 
-.big .line:nth-child(3) .word{
-    animation-delay:.16s;
-}
 
-@keyframes reveal{
+@keyframes heroReveal{
+
     to{
         transform:translateY(0);
     }
+
 }
 
+
 /* =========================================================
-   TYPE GHOSTS
+   HERO GHOST
 ========================================================= */
 
-.ghost{
-    position:absolute;
-    inset:0;
+.hero-ghost{
 
-    pointer-events:none;
+    position:absolute;
+
+    left:5vw;
+    top:50%;
+
+    transform:
+        translateY(-48%)
+        translate(5vw,2vw);
 
     font-size:
-        clamp(65px,13vw,200px);
+        clamp(
+            80px,
+            17vw,
+            270px
+        );
 
-    line-height:.76;
-    letter-spacing:-.085em;
-    font-weight:500;
+    line-height:.72;
+
+    letter-spacing:-.095em;
 
     color:transparent;
 
     -webkit-text-stroke:
-        1px rgba(255,255,255,.06);
+        1px rgba(255,255,255,.055);
 
-    transform:
-        translate(
-            4vw,
-            3vw
-        );
+    z-index:1;
 
-    z-index:-1;
+    pointer-events:none;
 }
+
 
 /* =========================================================
-   DESCRIPTION
+   HERO FOOT
 ========================================================= */
 
-.info{
+.hero-bottom{
+
     position:absolute;
 
-    left:7vw;
-    bottom:10vh;
+    left:5vw;
+    right:5vw;
 
-    width:min(330px,70vw);
+    bottom:7vh;
 
-    color:#7b7871;
+    display:flex;
+    justify-content:space-between;
+    align-items:end;
 
-    font-size:11px;
-    line-height:1.8;
-
-    z-index:25;
-
-    transition:
-        opacity .5s ease,
-        transform .8s cubic-bezier(.16,1,.3,1);
+    z-index:5;
 }
 
-.info strong{
+
+.hero-description{
+
+    width:min(350px,65vw);
+
+    color:#817e77;
+
+    font-size:11px;
+
+    line-height:1.8;
+}
+
+
+.hero-description strong{
+
     color:#ded9ce;
+
     font-weight:500;
 }
 
-/* =========================================================
-   INDEX
-========================================================= */
 
-.index{
-    position:absolute;
-
-    right:5vw;
-    top:50%;
-
-    transform:translateY(-50%);
-
-    z-index:30;
+.hero-index{
 
     font-family:"DM Mono",monospace;
-    font-size:8px;
 
-    color:#5e5b55;
+    color:#69655e;
+
+    font-size:8px;
 
     letter-spacing:.16em;
 }
 
-.index strong{
-    color:#e8e2d7;
+
+/* =========================================================
+   MARQUEE
+========================================================= */
+
+.marquee{
+
+    overflow:hidden;
+
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+
+    padding:16px 0;
+
+    white-space:nowrap;
+}
+
+
+.marquee-track{
+
+    display:inline-flex;
+
+    animation:
+        marquee 25s
+        linear infinite;
+}
+
+
+.marquee span{
+
+    font-size:
+        clamp(
+            22px,
+            3vw,
+            45px
+        );
+
+    letter-spacing:-.04em;
+
+    color:#aaa69d;
+
+    margin-right:50px;
+}
+
+
+.marquee .dot{
+
+    color:#625f58;
+}
+
+
+@keyframes marquee{
+
+    from{
+        transform:translateX(0);
+    }
+
+    to{
+        transform:translateX(-50%);
+    }
+
+}
+
+
+/* =========================================================
+   ABOUT
+========================================================= */
+
+.about{
+
+    min-height:100svh;
+
+    padding:
+        18vh 7vw;
+
+    display:grid;
+
+    grid-template-columns:
+        1fr 1.7fr;
+
+    gap:8vw;
+
+    align-items:center;
+}
+
+
+.section-number{
+
+    font-family:"DM Mono",monospace;
+
+    font-size:8px;
+
+    color:#625f59;
+
+    letter-spacing:.2em;
+}
+
+
+.about-title{
+
+    font-size:
+        clamp(
+            42px,
+            7vw,
+            100px
+        );
+
+    line-height:.9;
+
+    letter-spacing:-.065em;
+
     font-weight:400;
 }
 
+
+.about-copy{
+
+    max-width:650px;
+
+    font-size:
+        clamp(
+            18px,
+            2.5vw,
+            34px
+        );
+
+    line-height:1.25;
+
+    letter-spacing:-.035em;
+
+    color:#b9b5ac;
+}
+
+
+.about-copy strong{
+
+    color:#eeeae1;
+
+    font-weight:400;
+}
+
+
 /* =========================================================
-   SIGNAL
+   WORK
 ========================================================= */
 
-.signal{
+.work{
+
+    padding:
+        10vh 5vw
+        18vh;
+}
+
+
+.work-head{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:end;
+
+    margin-bottom:12vh;
+}
+
+
+.work-head h2{
+
+    font-size:
+        clamp(
+            60px,
+            11vw,
+            170px
+        );
+
+    line-height:.75;
+
+    letter-spacing:-.08em;
+
+    font-weight:400;
+}
+
+
+.work-head p{
+
+    width:220px;
+
+    color:#706d66;
+
+    font-family:"DM Mono",monospace;
+
+    font-size:8px;
+
+    line-height:1.7;
+
+    text-transform:uppercase;
+}
+
+
+/* =========================================================
+   PROJECT
+========================================================= */
+
+.project{
+
+    position:relative;
+
+    min-height:
+        clamp(
+            500px,
+            80vh,
+            900px
+        );
+
+    margin-bottom:18vh;
+
+    display:flex;
+
+    align-items:center;
+
+    overflow:hidden;
+}
+
+
+.project-visual{
+
     position:absolute;
 
-    right:5vw;
-    top:50%;
+    inset:0;
 
-    width:1px;
-    height:32vh;
+    overflow:hidden;
 
-    transform:translateY(-50%);
+    background:#101010;
+}
+
+
+.project-visual::before{
+
+    content:"";
+
+    position:absolute;
+
+    inset:-20%;
+
+    background:
+        radial-gradient(
+            circle at 50% 50%,
+            rgba(255,255,255,.12),
+            transparent 25%
+        );
+
+    filter:blur(30px);
+
+    transition:
+        transform 1.2s
+        cubic-bezier(.16,1,.3,1);
+
+}
+
+
+.project:hover
+.project-visual::before{
+
+    transform:
+        scale(1.3)
+        rotate(8deg);
+
+}
+
+
+/* project 01 */
+
+.visual-one{
 
     background:
         linear-gradient(
-            to bottom,
-            transparent,
-            rgba(255,255,255,.28),
-            transparent
+            120deg,
+            #121212,
+            #282620
         );
-
-    z-index:30;
 }
 
-.signal-point{
+
+.visual-one::after{
+
+    content:"01";
+
     position:absolute;
 
-    width:5px;
-    height:5px;
+    font-size:
+        42vw;
 
-    border-radius:50%;
+    line-height:1;
 
-    background:#eee8dc;
+    color:
+        rgba(255,255,255,.025);
 
-    left:-2px;
+    font-weight:700;
+
+    letter-spacing:-.1em;
+
+    left:15%;
     top:0;
-
-    box-shadow:
-        0 0 15px rgba(255,255,255,.25);
-
-    transition:
-        top 1.3s cubic-bezier(.16,1,.3,1);
 }
 
-/* =========================================================
-   PROMPT
-========================================================= */
 
-.prompt{
+/* project 02 */
+
+.visual-two{
+
+    background:
+        radial-gradient(
+            circle at 70% 40%,
+            #30302d,
+            #101010 50%
+        );
+}
+
+
+.visual-two::after{
+
+    content:"02";
+
     position:absolute;
 
-    left:50%;
-    bottom:3.5vh;
+    font-size:
+        42vw;
 
-    transform:translateX(-50%);
+    line-height:1;
 
-    z-index:35;
+    color:
+        rgba(255,255,255,.035);
 
-    font-family:"DM Mono",monospace;
-    font-size:7px;
+    font-weight:700;
 
-    color:#504d48;
-
-    letter-spacing:.25em;
-    text-transform:uppercase;
-
-    white-space:nowrap;
-
-    transition:
-        opacity .5s ease;
+    right:10%;
+    top:0;
 }
 
-/* =========================================================
-   INTRO
-========================================================= */
 
-.intro{
+/* project 03 */
+
+.visual-three{
+
+    background:
+        linear-gradient(
+            135deg,
+            #0b0b0b,
+            #1e1c18
+        );
+}
+
+
+.visual-three::after{
+
+    content:"03";
+
     position:absolute;
-    inset:0;
 
-    z-index:100;
+    font-size:
+        42vw;
 
-    background:#050505;
+    line-height:1;
 
-    display:flex;
-    align-items:center;
+    color:
+        rgba(255,255,255,.025);
 
-    transition:
-        opacity 1.2s cubic-bezier(.16,1,.3,1),
-        visibility 1.2s;
+    font-weight:700;
+
+    left:15%;
+    top:0;
 }
 
-.intro.hide{
-    opacity:0;
-    visibility:hidden;
-    pointer-events:none;
+
+/* project content */
+
+.project-content{
+
+    position:relative;
+
+    z-index:5;
+
+    padding:
+        8vw;
+
+    max-width:750px;
 }
 
-.intro-content{
-    margin-left:7vw;
-}
 
-.micro{
+.project-number{
+
     font-family:"DM Mono",monospace;
+
+    color:#77736b;
+
     font-size:8px;
-    letter-spacing:.24em;
-    color:#5e5b56;
+
+    letter-spacing:.2em;
 
     margin-bottom:30px;
 }
 
-.intro-title{
+
+.project-title{
+
     font-size:
-        clamp(58px,12vw,170px);
+        clamp(
+            58px,
+            9vw,
+            140px
+        );
 
     line-height:.78;
-    letter-spacing:-.08em;
-    font-weight:500;
+
+    letter-spacing:-.075em;
+
+    font-weight:400;
 }
 
-.intro-title div{
-    overflow:hidden;
+
+.project-info{
+
+    margin-top:35px;
+
+    max-width:320px;
+
+    color:#99958d;
+
+    font-size:11px;
+
+    line-height:1.8;
 }
 
-.intro-title span{
-    display:block;
 
-    transform:translateY(110%);
+.project-link{
 
-    animation:
-        introUp 1.5s cubic-bezier(.16,1,.3,1)
-        forwards;
-}
-
-.intro-title div:nth-child(2) span{
-    animation-delay:.12s;
-}
-
-@keyframes introUp{
-    to{
-        transform:translateY(0);
-    }
-}
-
-.enter{
-    margin-top:48px;
-
-    background:none;
-    border:0;
-
-    color:#77736c;
-
-    font-family:"DM Mono",monospace;
-    font-size:8px;
-
-    letter-spacing:.2em;
-    text-transform:uppercase;
-
-    cursor:pointer;
-}
-
-.enter span{
     display:inline-block;
 
-    padding-bottom:9px;
+    margin-top:30px;
+
+    font-family:"DM Mono",monospace;
+
+    font-size:8px;
+
+    letter-spacing:.18em;
+
+    text-transform:uppercase;
 
     border-bottom:
-        1px solid rgba(255,255,255,.22);
+        1px solid rgba(255,255,255,.3);
+
+    padding-bottom:8px;
+}
+
+
+/* =========================================================
+   PHILOSOPHY
+========================================================= */
+
+.statement{
+
+    min-height:100svh;
+
+    padding:
+        15vh 7vw;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    text-align:center;
+}
+
+
+.statement-inner{
+
+    max-width:1200px;
+}
+
+
+.statement-small{
+
+    font-family:"DM Mono",monospace;
+
+    color:#65615b;
+
+    font-size:8px;
+
+    letter-spacing:.25em;
+
+    text-transform:uppercase;
+
+    margin-bottom:50px;
+}
+
+
+.statement-big{
+
+    font-size:
+        clamp(
+            42px,
+            7vw,
+            105px
+        );
+
+    line-height:.92;
+
+    letter-spacing:-.07em;
+
+    font-weight:400;
+}
+
+
+.statement-big span{
+
+    color:#77736b;
+
+}
+
+
+/* =========================================================
+   CONTACT
+========================================================= */
+
+.contact{
+
+    min-height:100svh;
+
+    padding:
+        10vh 5vw
+        8vh;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:space-between;
+}
+
+
+.contact-top{
+
+    display:flex;
+
+    justify-content:space-between;
+}
+
+
+.contact-title{
+
+    font-size:
+        clamp(
+            65px,
+            13vw,
+            200px
+        );
+
+    line-height:.75;
+
+    letter-spacing:-.085em;
+
+    font-weight:400;
+}
+
+
+.contact-title span{
+
+    display:block;
+}
+
+
+.contact-link{
+
+    font-size:
+        clamp(
+            24px,
+            4vw,
+            55px
+        );
+
+    letter-spacing:-.04em;
+
+    color:#aaa69d;
 
     transition:
-        color .3s ease,
-        letter-spacing .3s ease;
+        color .3s ease;
 }
 
-.enter:hover span{
-    color:#fff;
-    letter-spacing:.28em;
+
+.contact-link:hover{
+
+    color:white;
 }
+
+
+.footer{
+
+    border-top:
+        1px solid var(--line);
+
+    padding-top:20px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    font-family:"DM Mono",monospace;
+
+    font-size:8px;
+
+    color:#5f5c56;
+
+    letter-spacing:.15em;
+
+    text-transform:uppercase;
+}
+
 
 /* =========================================================
-   CHAOS
+   SCROLL REVEALS
 ========================================================= */
 
-.chaos .big{
-    animation:
-        violent .28s steps(2) infinite;
-}
-
-.chaos .ghost{
-    opacity:.8;
-}
-
-@keyframes violent{
-
-    0%{
-        transform:translate(0,0);
-        filter:none;
-    }
-
-    20%{
-        transform:translate(-12px,4px);
-        filter:
-            blur(.4px)
-            contrast(1.2);
-    }
-
-    40%{
-        transform:translate(8px,-5px);
-    }
-
-    60%{
-        transform:translate(-4px,3px);
-    }
-
-    80%{
-        transform:translate(9px,-2px);
-    }
-
-    100%{
-        transform:translate(0,0);
-    }
-}
-
-/* =========================================================
-   IMPACT
-========================================================= */
-
-.impact{
-    position:absolute;
-    inset:0;
-
-    z-index:70;
-
-    pointer-events:none;
+.reveal{
 
     opacity:0;
-}
 
-.impact.active{
-    animation:
-        impactFlash .55s ease-out;
-}
-
-@keyframes impactFlash{
-
-    0%{
-        opacity:0;
-        background:#fff;
-    }
-
-    8%{
-        opacity:.16;
-    }
-
-    100%{
-        opacity:0;
-    }
-}
-
-/* =========================================================
-   CURSOR
-========================================================= */
-
-.cursor{
-    position:fixed;
-
-    width:10px;
-    height:10px;
-
-    border:
-        1px solid rgba(255,255,255,.7);
-
-    border-radius:50%;
-
-    pointer-events:none;
-
-    z-index:200;
-
-    transform:translate(-50%,-50%);
+    transform:
+        translateY(70px);
 
     transition:
-        width .25s ease,
-        height .25s ease;
+        opacity 1.1s
+        cubic-bezier(.16,1,.3,1),
+        transform 1.1s
+        cubic-bezier(.16,1,.3,1);
 }
 
-.cursor.big{
-    width:42px;
-    height:42px;
+
+.reveal.visible{
+
+    opacity:1;
+
+    transform:
+        translateY(0);
 }
+
 
 /* =========================================================
    MOBILE
@@ -677,806 +1248,1227 @@ button{
 
 @media(max-width:700px){
 
-    body{
-        cursor:default;
-    }
+    nav{
 
-    .cursor{
-        display:none;
-    }
-
-    .top{
         padding-left:20px;
         padding-right:20px;
     }
 
-    .top-meta{
-        font-size:7px;
+
+    .nav-right span:first-child{
+
+        display:none;
     }
 
-    .hero{
-        left:7vw;
-        top:43%;
+
+    .hero-inner{
+
+        padding:
+            0 7vw;
     }
 
-    .big{
+
+    .hero-title{
+
         font-size:
-            clamp(
-                54px,
-                16.5vw,
-                110px
-            );
+            18vw;
     }
 
-    .ghost{
+
+    .hero-ghost{
+
         font-size:
-            clamp(
-                54px,
-                16.5vw,
-                110px
-            );
+            18vw;
+
+        left:7vw;
     }
 
-    .info{
+
+    .hero-bottom{
+
         left:7vw;
-        bottom:11vh;
+        right:7vw;
+
+        bottom:8vh;
+
+        display:block;
+    }
+
+
+    .hero-description{
+
+        width:70vw;
 
         font-size:10px;
-
-        width:68vw;
     }
 
-    .index{
-        right:5vw;
+
+    .hero-index{
+
+        margin-top:18px;
+    }
+
+
+    .about{
+
+        display:block;
+
+        padding:
+            16vh 7vw;
+    }
+
+
+    .about .section-number{
+
+        margin-bottom:50px;
+    }
+
+
+    .about-title{
+
+        margin-bottom:50px;
+
+        font-size:
+            48px;
+    }
+
+
+    .about-copy{
+
+        font-size:23px;
+    }
+
+
+    .work{
+
+        padding:
+            12vh 5vw;
+    }
+
+
+    .work-head{
+
+        display:block;
+
+        margin-bottom:8vh;
+    }
+
+
+    .work-head p{
+
+        margin-top:30px;
+    }
+
+
+    .project{
+
+        min-height:70vh;
+
+        margin-bottom:8vh;
+    }
+
+
+    .project-content{
+
+        padding:8vw;
+    }
+
+
+    .project-title{
+
+        font-size:
+            17vw;
+    }
+
+
+    .project-info{
+
+        font-size:10px;
+    }
+
+
+    .statement{
+
+        padding:
+            12vh 7vw;
+    }
+
+
+    .statement-big{
+
+        font-size:12vw;
+    }
+
+
+    .contact{
+
+        padding:
+            10vh 7vw 6vh;
+    }
+
+
+    .contact-title{
+
+        font-size:19vw;
+    }
+
+
+    .contact-link{
+
+        margin-top:50px;
+
+        font-size:8vw;
+    }
+
+
+    .footer{
+
         font-size:7px;
+
+        gap:20px;
     }
 
-    .signal{
-        right:5vw;
-        height:21vh;
-    }
-
-    .prompt{
-        bottom:2.5vh;
-    }
-
-    .intro-content{
-        margin-left:7vw;
-    }
-
-    .intro-title{
-        font-size:18vw;
-    }
 }
 
-@media(max-height:700px) and (max-width:700px){
 
-    .hero{
-        top:40%;
-    }
-
-    .info{
-        bottom:8vh;
-    }
-}
-
-@media(prefers-reduced-motion:reduce){
-
-    *,
-    *::before,
-    *::after{
-        animation-duration:.01ms!important;
-        animation-iteration-count:1!important;
-        transition-duration:.01ms!important;
-    }
-}
 </style>
 </head>
 
 
 <body>
 
-<div id="world">
 
-    <div class="void"></div>
+<!-- =========================================================
+     LOADER
+========================================================= -->
 
-    <div class="grid"></div>
+<div class="loader" id="loader">
 
-    <canvas id="particles"></canvas>
-    <canvas id="field"></canvas>
-    <canvas id="distortion"></canvas>
+    <div class="loader-inner">
 
-    <div class="grain"></div>
+        <div class="loader-top">
 
+            <span>SHAB</span>
 
-    <!-- =====================================================
-         TOP
-    ====================================================== -->
-
-    <header class="top">
-
-        <div class="logo">
-            SHAB
-        </div>
-
-        <div class="top-meta">
-            MAMPAD / KERALA / 2026
-        </div>
-
-    </header>
-
-
-    <!-- =====================================================
-         SCENE
-    ====================================================== -->
-
-    <main class="scene" id="scene">
-
-        <section class="hero">
-
-            <div
-                class="big"
-                id="big"
-            >
-                <div class="line">
-                    <span class="word">
-                        STILL
-                    </span>
-                </div>
-
-                <div class="line">
-                    <span class="word">
-                        BECOMING.
-                    </span>
-                </div>
-            </div>
-
-            <div
-                class="ghost"
-                id="ghost"
-            >
-                STILL<br>
-                BECOMING.
-            </div>
-
-        </section>
-
-
-        <div
-            class="info"
-            id="info"
-        >
-            Somewhere between
-            <strong>curiosity</strong>,
-            technology and everything
-            I haven't figured out yet.
-        </div>
-
-
-        <div class="index">
-            <strong id="number">01</strong>
-            / 06
-        </div>
-
-
-        <div class="signal">
-
-            <div
-                class="signal-point"
-                id="point"
-            ></div>
+            <span>INITIALIZING</span>
 
         </div>
 
-    </main>
+        <div class="loader-line">
+
+            <div class="loader-progress"></div>
+
+        </div>
+
+    </div>
+
+</div>
 
 
-    <div
-        class="prompt"
-        id="prompt"
+<div class="noise"></div>
+
+<div class="atmosphere"></div>
+
+
+<!-- =========================================================
+     NAV
+========================================================= -->
+
+<nav>
+
+    <a
+        class="logo"
+        href="#top"
     >
-        SHAKE TO DISTURB THE SIGNAL
+        SHAB
+    </a>
+
+
+    <div class="nav-right">
+
+        <span>
+            PORTFOLIO / 2026
+        </span>
+
+        <button
+            class="music-button"
+            id="music"
+        >
+
+            <div class="music-bars">
+
+                <i></i>
+                <i></i>
+                <i></i>
+                <i></i>
+
+            </div>
+
+            <span>
+                SOUND
+            </span>
+
+        </button>
+
+    </div>
+
+</nav>
+
+
+<!-- =========================================================
+     CURSOR
+========================================================= -->
+
+<div
+    class="cursor"
+    id="cursor"
+></div>
+
+
+<!-- =========================================================
+     HERO
+========================================================= -->
+
+<section
+    class="hero"
+    id="top"
+>
+
+    <div class="hero-inner">
+
+        <div class="hero-kicker">
+
+            B.COM COMPUTER APPLICATIONS
+            / MAMPAD COLLEGE
+
+        </div>
+
+
+        <h1 class="hero-title">
+
+            <span class="line">
+                <span class="word">
+                    STILL
+                </span>
+            </span>
+
+            <span class="line">
+                <span class="word">
+                    BECOMING.
+                </span>
+            </span>
+
+        </h1>
+
+
+        <div class="hero-ghost">
+
+            STILL<br>
+            BECOMING.
+
+        </div>
+
     </div>
 
 
-    <div
-        class="impact"
-        id="impact"
-    ></div>
+    <div class="hero-bottom">
+
+        <p class="hero-description">
+
+            I'm <strong>SHAB</strong>.
+            A student from Kerala exploring
+            technology, design, business,
+            artificial intelligence and
+            whatever looks interesting enough
+            to keep me awake.
+
+        </p>
 
 
-    <!-- =====================================================
-         INTRO
-    ====================================================== -->
+        <div class="hero-index">
 
-    <section
-        class="intro"
-        id="intro"
-    >
-
-        <div class="intro-content">
-
-            <div class="micro">
-                SHAB / AN INTERACTIVE PORTFOLIO
-            </div>
-
-            <div class="intro-title">
-
-                <div>
-                    <span>
-                        ENTER
-                    </span>
-                </div>
-
-                <div>
-                    <span>
-                        THE NOISE.
-                    </span>
-                </div>
-
-            </div>
-
-            <button
-                class="enter"
-                id="enter"
-            >
-                <span>
-                    BEGIN EXPERIENCE →
-                </span>
-            </button>
+            01 — INTRODUCTION
 
         </div>
 
-    </section>
+    </div>
+
+</section>
 
 
-    <div
-        class="cursor"
-        id="cursor"
-    ></div>
+<!-- =========================================================
+     MARQUEE
+========================================================= -->
+
+<div class="marquee">
+
+    <div class="marquee-track">
+
+        <span>
+            DESIGN
+            <b class="dot">✦</b>
+        </span>
+
+        <span>
+            TECHNOLOGY
+            <b class="dot">✦</b>
+        </span>
+
+        <span>
+            CURIOSITY
+            <b class="dot">✦</b>
+        </span>
+
+        <span>
+            AI
+            <b class="dot">✦</b>
+        </span>
+
+        <span>
+            EXPERIMENT
+            <b class="dot">✦</b>
+        </span>
+
+
+        <span>
+            DESIGN
+            <b class="dot">✦</b>
+        </span>
+
+        <span>
+            TECHNOLOGY
+            <b class="dot">✦</b>
+        </span>
+
+        <span>
+            CURIOSITY
+            <b class="dot">✦</b>
+        </span>
+
+        <span>
+            AI
+            <b class="dot">✦</b>
+        </span>
+
+        <span>
+            EXPERIMENT
+            <b class="dot">✦</b>
+        </span>
+
+    </div>
 
 </div>
+
+
+<!-- =========================================================
+     ABOUT
+========================================================= -->
+
+<section class="about">
+
+    <div class="reveal">
+
+        <div class="section-number">
+            02 / ABOUT
+        </div>
+
+        <h2 class="about-title">
+            Curious<br>
+            by default.
+        </h2>
+
+    </div>
+
+
+    <div class="about-copy reveal">
+
+        I study
+        <strong>
+            B.Com Computer Applications
+        </strong>
+        at Mampad College.
+
+        <br><br>
+
+        But a degree isn't really the
+        interesting part.
+
+        <br><br>
+
+        I like taking things apart,
+        understanding why they work,
+        then wondering whether they
+        could work completely differently.
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     WORK
+========================================================= -->
+
+<section class="work">
+
+    <div class="work-head reveal">
+
+        <h2>
+            Selected<br>
+            experiments.
+        </h2>
+
+        <p>
+            Not everything I've made.
+            Just the things that taught
+            me something.
+        </p>
+
+    </div>
+
+
+    <!-- PROJECT 01 -->
+
+    <article class="project reveal">
+
+        <div
+            class="project-visual visual-one"
+        ></div>
+
+
+        <div class="project-content">
+
+            <div class="project-number">
+                01 / INTERACTION
+            </div>
+
+            <h3 class="project-title">
+                Motion<br>
+                Interface.
+            </h3>
+
+            <p class="project-info">
+                An experiment where the
+                physical movement of a phone
+                becomes part of the interface.
+            </p>
+
+            <a
+                class="project-link"
+                href="#"
+            >
+                Explore experiment →
+            </a>
+
+        </div>
+
+    </article>
+
+
+    <!-- PROJECT 02 -->
+
+    <article class="project reveal">
+
+        <div
+            class="project-visual visual-two"
+        ></div>
+
+
+        <div class="project-content">
+
+            <div class="project-number">
+                02 / AI
+            </div>
+
+            <h3 class="project-title">
+                Human<br>
+                × Machine.
+            </h3>
+
+            <p class="project-info">
+                Exploring what happens when
+                artificial intelligence becomes
+                less like a tool and more like
+                a creative collaborator.
+            </p>
+
+            <a
+                class="project-link"
+                href="#"
+            >
+                View concept →
+            </a>
+
+        </div>
+
+    </article>
+
+
+    <!-- PROJECT 03 -->
+
+    <article class="project reveal">
+
+        <div
+            class="project-visual visual-three"
+        ></div>
+
+
+        <div class="project-content">
+
+            <div class="project-number">
+                03 / DIGITAL
+            </div>
+
+            <h3 class="project-title">
+                Built<br>
+                from curiosity.
+            </h3>
+
+            <p class="project-info">
+                Interfaces, experiments and
+                strange little ideas that exist
+                mostly because I wanted to know
+                whether I could make them work.
+            </p>
+
+            <a
+                class="project-link"
+                href="#"
+            >
+                Open project →
+            </a>
+
+        </div>
+
+    </article>
+
+</section>
+
+
+<!-- =========================================================
+     STATEMENT
+========================================================= -->
+
+<section class="statement">
+
+    <div class="statement-inner reveal">
+
+        <div class="statement-small">
+            05 / PHILOSOPHY
+        </div>
+
+        <h2 class="statement-big">
+
+            I don't want to make
+            <span>
+                ordinary things
+            </span>
+            look interesting.
+
+            <br><br>
+
+            I want to make
+            <span>
+                interesting things
+            </span>
+            impossible to ignore.
+
+        </h2>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     CONTACT
+========================================================= -->
+
+<section class="contact">
+
+    <div class="contact-top">
+
+        <div>
+
+            <div class="section-number">
+                06 / CONTACT
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div>
+
+        <h2 class="contact-title">
+
+            <span>
+                LET'S
+            </span>
+
+            <span>
+                MAKE
+            </span>
+
+            <span>
+                SOMETHING.
+            </span>
+
+        </h2>
+
+
+        <a
+            class="contact-link"
+            href="mailto:your@email.com"
+        >
+            your@email.com ↗
+        </a>
+
+    </div>
+
+
+    <footer class="footer">
+
+        <span>
+            SHAB
+        </span>
+
+        <span>
+            KERALA / INDIA
+        </span>
+
+        <span>
+            © 2026
+        </span>
+
+    </footer>
+
+</section>
 
 
 <script>
 
 /* =========================================================
-   SCENES
+   LOADER
 ========================================================= */
 
-const scenes = [
+window.addEventListener(
+    "load",
+    ()=>{
 
-    {
-        words:[
-            "STILL",
-            "BECOMING."
-        ],
+        setTimeout(
+            ()=>{
+                document
+                    .getElementById("loader")
+                    .classList
+                    .add("done");
+            },
+            1600
+        );
 
-        category:
-            "INTRODUCTION",
-
-        text:
-            `Somewhere between <strong>curiosity</strong>,
-            technology and everything I haven't
-            figured out yet.`
-    },
-
-    {
-        words:[
-            "LEARN.",
-            "BREAK.",
-            "REPEAT."
-        ],
-
-        category:
-            "STUDENT",
-
-        text:
-            `B.Com Computer Applications.
-            Business and technology meet here,
-            whether they planned to or not.`
-    },
-
-    {
-        words:[
-            "MAKE",
-            "IT REAL."
-        ],
-
-        category:
-            "BUILDER",
-
-        text:
-            `Ideas become interesting when they
-            leave your head and survive contact
-            with reality.`
-    },
-
-    {
-        words:[
-            "ASK",
-            "WHY?"
-        ],
-
-        category:
-            "THINKER",
-
-        text:
-            `I don't just want to know what
-            technology does. I want to know
-            what it changes.`
-    },
-
-    {
-        words:[
-            "FOLLOW",
-            "CURIOSITY."
-        ],
-
-        category:
-            "INTERESTS",
-
-        text:
-            `AI. Design. Science. Games. Stories.
-            Anything sitting at the edge of
-            something I already understand.`
-    },
-
-    {
-        words:[
-            "STILL",
-            "NOT DONE."
-        ],
-
-        category:
-            "SHAB",
-
-        text:
-            `B.Com Computer Applications.
-            Mampad College. Kerala.
-            The next version is already moving.`
     }
-
-];
+);
 
 
 /* =========================================================
-   DOM
+   CURSOR
 ========================================================= */
-
-const world =
-    document.getElementById("world");
-
-const scene =
-    document.getElementById("scene");
-
-const big =
-    document.getElementById("big");
-
-const ghost =
-    document.getElementById("ghost");
-
-const info =
-    document.getElementById("info");
-
-const number =
-    document.getElementById("number");
-
-const point =
-    document.getElementById("point");
-
-const prompt =
-    document.getElementById("prompt");
-
-const impact =
-    document.getElementById("impact");
-
-const intro =
-    document.getElementById("intro");
-
-const enter =
-    document.getElementById("enter");
 
 const cursor =
     document.getElementById("cursor");
 
+let cx=innerWidth/2;
+let cy=innerHeight/2;
+
+let tx=cx;
+let ty=cy;
+
+
+window.addEventListener(
+    "mousemove",
+    e=>{
+
+        tx=e.clientX;
+        ty=e.clientY;
+
+    }
+);
+
+
+function cursorLoop(){
+
+    cx +=
+        (tx-cx)*.16;
+
+    cy +=
+        (ty-cy)*.16;
+
+    cursor.style.left=
+        cx+"px";
+
+    cursor.style.top=
+        cy+"px";
+
+    requestAnimationFrame(
+        cursorLoop
+    );
+
+}
+
+cursorLoop();
+
+
+document
+    .querySelectorAll("a,button")
+    .forEach(el=>{
+
+        el.addEventListener(
+            "mouseenter",
+            ()=>{
+                cursor.classList
+                    .add("large");
+            }
+        );
+
+        el.addEventListener(
+            "mouseleave",
+            ()=>{
+                cursor.classList
+                    .remove("large");
+            }
+        );
+
+    });
+
 
 /* =========================================================
-   STATE
+   HERO PARALLAX
 ========================================================= */
 
-let current = 0;
+const heroTitle =
+    document.querySelector(
+        ".hero-title"
+    );
 
-let lastAction = 0;
 
-let motionReady = false;
+window.addEventListener(
+    "mousemove",
+    e=>{
 
-let audio = null;
+        const x =
+            (e.clientX/innerWidth-.5);
 
-let mouseX =
-    innerWidth / 2;
+        const y =
+            (e.clientY/innerHeight-.5);
 
-let mouseY =
-    innerHeight / 2;
+        heroTitle.style.transform =
+            `
+            translate(
+                ${x*12}px,
+                ${y*8}px
+            )
+            rotate(
+                ${x*.25}deg
+            )
+            `;
 
-let targetX = mouseX;
-let targetY = mouseY;
-
-let energy = 0;
+    }
+);
 
 
 /* =========================================================
-   AUDIO
+   SCROLL REVEALS
 ========================================================= */
 
-function audioInit(){
+const reveals =
+    document.querySelectorAll(
+        ".reveal"
+    );
 
-    if(audio) return;
 
-    audio =
+const observer =
+    new IntersectionObserver(
+        entries=>{
+
+            entries.forEach(
+                entry=>{
+
+                    if(
+                        entry.isIntersecting
+                    ){
+
+                        entry.target
+                            .classList
+                            .add("visible");
+
+                    }
+
+                }
+            );
+
+        },
+        {
+            threshold:.12
+        }
+    );
+
+
+reveals.forEach(
+    el=>observer.observe(el)
+);
+
+
+/* =========================================================
+   PROJECT PARALLAX
+========================================================= */
+
+const projects =
+    document.querySelectorAll(
+        ".project"
+    );
+
+
+window.addEventListener(
+    "scroll",
+    ()=>{
+
+        projects.forEach(
+            project=>{
+
+                const rect =
+                    project.getBoundingClientRect();
+
+                const center =
+                    innerHeight/2;
+
+                const distance =
+                    rect.top+
+                    rect.height/2-
+                    center;
+
+                const visual =
+                    project.querySelector(
+                        ".project-visual"
+                    );
+
+                if(
+                    Math.abs(distance)<
+                    innerHeight
+                ){
+
+                    const movement =
+                        distance*.035;
+
+                    visual.style.transform =
+                        `scale(1.08)
+                         translateY(
+                            ${movement}px
+                         )`;
+
+                }
+
+            }
+        );
+
+    },
+    {
+        passive:true
+    }
+);
+
+
+/* =========================================================
+   ORIGINAL AMBIENT MUSIC
+========================================================= */
+
+let audioContext=null;
+
+let master=null;
+
+let musicPlaying=false;
+
+let oscillators=[];
+
+let musicTimer=null;
+
+
+function startMusic(){
+
+    if(musicPlaying)
+        return;
+
+    audioContext =
         new(
             window.AudioContext ||
             window.webkitAudioContext
         )();
-}
 
 
-function hitSound(power=1){
+    master =
+        audioContext.createGain();
 
-    audioInit();
+    master.gain.value=.0001;
 
-    if(audio.state==="suspended"){
-        audio.resume();
-    }
-
-    const now =
-        audio.currentTime;
-
-
-    /*
-       Low cinematic pulse
-    */
-
-    const low =
-        audio.createOscillator();
-
-    const lowGain =
-        audio.createGain();
-
-    low.type="sine";
-
-    low.frequency.setValueAtTime(
-        55 + current*14,
-        now
-    );
-
-    low.frequency.exponentialRampToValueAtTime(
-        28,
-        now+.7
-    );
-
-    lowGain.gain.setValueAtTime(
-        .0001,
-        now
-    );
-
-    lowGain.gain.exponentialRampToValueAtTime(
-        .15*power,
-        now+.02
-    );
-
-    lowGain.gain.exponentialRampToValueAtTime(
-        .0001,
-        now+.7
-    );
-
-    low.connect(lowGain);
-    lowGain.connect(audio.destination);
-
-    low.start();
-    low.stop(now+.75);
-
-
-    /*
-       metallic high transient
-    */
-
-    const high =
-        audio.createOscillator();
-
-    const highGain =
-        audio.createGain();
-
-    high.type="triangle";
-
-    high.frequency.setValueAtTime(
-        500+current*90,
-        now
-    );
-
-    high.frequency.exponentialRampToValueAtTime(
-        1200,
-        now+.3
-    );
-
-    highGain.gain.setValueAtTime(
-        .0001,
-        now
-    );
-
-    highGain.gain.exponentialRampToValueAtTime(
-        .035*power,
-        now+.008
-    );
-
-    highGain.gain.exponentialRampToValueAtTime(
-        .0001,
-        now+.35
-    );
-
-    high.connect(highGain);
-    highGain.connect(audio.destination);
-
-    high.start();
-    high.stop(now+.4);
-}
-
-
-/* =========================================================
-   SCENE TRANSITION
-========================================================= */
-
-function transition(){
-
-    const now =
-        performance.now();
-
-    if(
-        now-lastAction<
-        1050
-    ){
-        return;
-    }
-
-    lastAction=now;
-
-    current++;
-
-    if(current>=scenes.length){
-        current=0;
-    }
-
-    const data =
-        scenes[current];
-
-
-    /* ===============================================
-       PRE-EXPLOSION
-    =============================================== */
-
-    world.classList.add("chaos");
-    world.classList.add("active-grid");
-
-    impact.classList.remove("active");
-
-    void impact.offsetWidth;
-
-    impact.classList.add("active");
-
-
-    /* ===============================================
-       EXPLODE CURRENT TYPE
-    =============================================== */
-
-    big.style.transform =
-        `translate(
-            ${-40-Math.random()*60}px,
-            ${-10+Math.random()*20}px
-        )
-        rotate(
-            ${(Math.random()-.5)*2}deg
-        )
-        scale(.96)`;
-
-    big.style.opacity="0";
-
-    info.style.opacity="0";
-
-    info.style.transform=
-        "translateY(20px)";
-
-
-    burst(
-        innerWidth*.48,
-        innerHeight*.48,
-        180+current*90
+    master.connect(
+        audioContext.destination
     );
 
 
     /*
-       short chaos window
+       Main atmospheric drone
     */
 
-    setTimeout(()=>{
-
-        big.innerHTML =
-            data.words
-                .map(word =>
-                    `<div class="line">
-                        <span class="word">${word}</span>
-                    </div>`
-                )
-                .join("");
-
-        ghost.innerHTML =
-            data.words.join("<br>");
-
-        info.innerHTML =
-            data.text;
-
-        number.textContent =
-            String(current+1)
-                .padStart(2,"0");
-
-        point.style.top =
-            `${current*20}%`;
-
-        big.style.transform=
-            "translate(0,0) rotate(0) scale(1)";
-
-        big.style.opacity="1";
-
-        info.style.opacity="1";
-
-        info.style.transform=
-            "translateY(0)";
-
-    },330);
+    const frequencies=[
+        55,
+        82.41,
+        110,
+        164.81
+    ];
 
 
-    setTimeout(()=>{
+    frequencies.forEach(
+        (freq,index)=>{
 
-        world.classList.remove("chaos");
+            const osc =
+                audioContext
+                    .createOscillator();
 
-        if(current!==3){
-            world.classList.remove(
-                "active-grid"
+            const gain =
+                audioContext
+                    .createGain();
+
+            osc.type =
+                index===0
+                    ? "sine"
+                    : "triangle";
+
+            osc.frequency.value =
+                freq;
+
+            gain.gain.value =
+                index===0
+                    ? .11
+                    : .025;
+
+            osc.connect(gain);
+            gain.connect(master);
+
+            osc.start();
+
+            oscillators.push(
+                osc
             );
+
         }
-
-    },900);
-
-
-    /* ===============================================
-       IMPACT
-    =============================================== */
-
-    energy =
-        1.2 +
-        current*.5;
-
-    hitSound(
-        .8+current*.12
     );
 
-    if(navigator.vibrate){
 
-        navigator.vibrate([
-            18,
-            28,
-            45
-        ]);
+    /*
+       Slow breathing volume
+    */
 
-    }
+    const now =
+        audioContext.currentTime;
 
-}
+    master.gain
+        .exponentialRampToValueAtTime(
+            .12,
+            now+3
+        );
 
 
-/* =========================================================
-   MOTION
-========================================================= */
+    musicPlaying=true;
 
-let oldX=0;
-let oldY=0;
-let oldZ=0;
+    document.body
+        .classList
+        .add("playing");
 
-function motion(e){
 
-    if(!motionReady) return;
+    /*
+       Add subtle harmonics
+    */
 
-    const a =
-        e.accelerationIncludingGravity;
-
-    if(!a) return;
-
-    const x=a.x||0;
-    const y=a.y||0;
-    const z=a.z||0;
-
-    const delta =
-        Math.abs(x-oldX)+
-        Math.abs(y-oldY)+
-        Math.abs(z-oldZ);
-
-    oldX=x;
-    oldY=y;
-    oldZ=z;
-
-    if(delta>24){
-
-        transition();
-
-    }
+    musicTimer =
+        setInterval(
+            addHarmonic,
+            6500
+        );
 
 }
 
 
-/* =========================================================
-   ENABLE
-========================================================= */
+function addHarmonic(){
 
-async function enableMotion(){
+    if(!audioContext)
+        return;
 
-    audioInit();
+    const frequencies=[
+        220,
+        246.94,
+        293.66,
+        329.63
+    ];
 
-    if(
-        typeof DeviceMotionEvent!=="undefined" &&
-        typeof DeviceMotionEvent.requestPermission===
-        "function"
-    ){
+    const freq =
+        frequencies[
+            Math.floor(
+                Math.random()*
+                frequencies.length
+            )
+        ];
 
-        try{
 
-            const result =
-                await DeviceMotionEvent
-                    .requestPermission();
+    const osc =
+        audioContext
+            .createOscillator();
 
-            if(result!=="granted"){
-                return;
+    const gain =
+        audioContext
+            .createGain();
+
+
+    osc.type="sine";
+
+    osc.frequency.value=
+        freq;
+
+
+    const now =
+        audioContext.currentTime;
+
+
+    gain.gain.setValueAtTime(
+        .0001,
+        now
+    );
+
+    gain.gain
+        .exponentialRampToValueAtTime(
+            .018,
+            now+1.5
+        );
+
+    gain.gain
+        .exponentialRampToValueAtTime(
+            .0001,
+            now+6
+        );
+
+
+    osc.connect(gain);
+    gain.connect(master);
+
+    osc.start(now);
+    osc.stop(now+6.2);
+
+}
+
+
+function stopMusic(){
+
+    if(!audioContext)
+        return;
+
+    const now =
+        audioContext.currentTime;
+
+
+    master.gain
+        .exponentialRampToValueAtTime(
+            .0001,
+            now+1.2
+        );
+
+
+    setTimeout(
+        ()=>{
+            oscillators.forEach(
+                osc=>{
+                    try{
+                        osc.stop();
+                    }catch(e){}
+                }
+            );
+
+            oscillators=[];
+
+            if(musicTimer)
+                clearInterval(
+                    musicTimer
+                );
+
+            musicPlaying=false;
+
+            document.body
+                .classList
+                .remove("playing");
+
+        },
+        1400
+    );
+
+}
+
+
+document
+    .getElementById("music")
+    .addEventListener(
+        "click",
+        ()=>{
+
+            if(musicPlaying){
+                stopMusic();
+            }else{
+                startMusic();
             }
 
-        }catch(error){
-
-            console.log(error);
-
         }
-
-    }
-
-    window.addEventListener(
-        "devicemotion",
-        motion,
-        true
     );
 
-    motionReady=true;
-}
+
+/* =========================================================
+   TOUCH MOVEMENT
+========================================================= */
+
+let touchX=0;
+let touchY=0;
 
 
-enter.addEventListener(
-    "click",
-    async()=>{
+window.addEventListener(
+    "touchmove",
+    e=>{
 
-        await enableMotion();
+        if(
+            !e.touches[0]
+        )
+            return;
 
-        audioInit();
+        touchX =
+            e.touches[0].clientX;
 
-        if(audio){
-            audio.resume();
-        }
+        touchY =
+            e.touches[0].clientY;
 
-        intro.classList.add("hide");
 
-        setTimeout(()=>{
+        const x =
+            touchX/innerWidth-.5;
 
-            burst(
-                innerWidth*.5,
-                innerHeight*.5,
-                100
-            );
+        const y =
+            touchY/innerHeight-.5;
 
-        },500);
 
+        heroTitle.style.transform=
+            `
+            translate(
+                ${x*10}px,
+                ${y*6}px
+            )
+            `;
+
+    },
+    {
+        passive:true
     }
 );
 
@@ -1490,25 +2482,12 @@ window.addEventListener(
     e=>{
 
         if(
-            e.code==="Space" ||
-            e.code==="ArrowRight"
+            e.key.toLowerCase()==="m"
         ){
 
-            transition();
-
-        }
-
-        if(
-            e.code==="ArrowLeft"
-        ){
-
-            current =
-                Math.max(
-                    0,
-                    current-1
-                );
-
-            render();
+            document
+                .getElementById("music")
+                .click();
 
         }
 
@@ -1517,602 +2496,24 @@ window.addEventListener(
 
 
 /* =========================================================
-   SWIPE
+   PAGE VISIBILITY
 ========================================================= */
 
-let touchStart=null;
-
-window.addEventListener(
-    "touchstart",
-    e=>{
-
-        touchStart =
-            e.touches[0].clientX;
-
-    },
-    {
-        passive:true
-    }
-);
-
-window.addEventListener(
-    "touchend",
-    e=>{
-
-        if(touchStart===null) return;
-
-        const end =
-            e.changedTouches[0].clientX;
-
-        if(
-            touchStart-end>70
-        ){
-
-            transition();
-
-        }
-
-        touchStart=null;
-
-    },
-    {
-        passive:true
-    }
-);
-
-
-/* =========================================================
-   RENDER
-========================================================= */
-
-function render(){
-
-    const data =
-        scenes[current];
-
-    big.innerHTML =
-        data.words
-            .map(word =>
-                `<div class="line">
-                    <span class="word">${word}</span>
-                </div>`
-            )
-            .join("");
-
-    ghost.innerHTML =
-        data.words.join("<br>");
-
-    info.innerHTML =
-        data.text;
-
-    number.textContent =
-        String(current+1)
-            .padStart(2,"0");
-
-    point.style.top =
-        `${current*20}%`;
-
-}
-
-
-/* =========================================================
-   POINTER
-========================================================= */
-
-window.addEventListener(
-    "mousemove",
-    e=>{
-
-        targetX=e.clientX;
-        targetY=e.clientY;
-
-        cursor.classList.add("big");
-
-    }
-);
-
-window.addEventListener(
-    "mouseleave",
+document.addEventListener(
+    "visibilitychange",
     ()=>{
 
-        cursor.classList.remove("big");
-
-    }
-);
-
-
-function pointerLoop(){
-
-    mouseX +=
-        (targetX-mouseX)*.12;
-
-    mouseY +=
-        (targetY-mouseY)*.12;
-
-    cursor.style.left =
-        mouseX+"px";
-
-    cursor.style.top =
-        mouseY+"px";
-
-
-    /*
-       Subtle camera movement
-    */
-
-    const px =
-        (mouseX/innerWidth-.5)*16;
-
-    const py =
-        (mouseY/innerHeight-.5)*10;
-
-    if(!motionReady){
-
-        scene.style.transform=
-            `translate3d(
-                ${px}px,
-                ${py}px,
-                0
-            )`;
-
-    }
-
-    requestAnimationFrame(
-        pointerLoop
-    );
-
-}
-
-pointerLoop();
-
-
-/* =========================================================
-   DEVICE TILT
-========================================================= */
-
-window.addEventListener(
-    "deviceorientation",
-    e=>{
-
         if(
-            e.gamma===null ||
-            e.beta===null
-        ){
-            return;
-        }
-
-        const x =
-            Math.max(
-                -1,
-                Math.min(
-                    1,
-                    e.gamma/30
-                )
-            );
-
-        const y =
-            Math.max(
-                -1,
-                Math.min(
-                    1,
-                    e.beta/30
-                )
-            );
-
-        scene.style.transform=
-            `translate3d(
-                ${x*22}px,
-                ${y*15}px,
-                0
-            )`;
-
-    },
-    true
-);
-
-
-/* =========================================================
-   PARTICLES
-========================================================= */
-
-const particleCanvas =
-    document.getElementById(
-        "particles"
-    );
-
-const pctx =
-    particleCanvas.getContext("2d");
-
-let particles=[];
-
-function resizeCanvas(){
-
-    const dpr =
-        Math.min(
-            devicePixelRatio||1,
-            2
-        );
-
-    particleCanvas.width=
-        innerWidth*dpr;
-
-    particleCanvas.height=
-        innerHeight*dpr;
-
-    particleCanvas.style.width=
-        innerWidth+"px";
-
-    particleCanvas.style.height=
-        innerHeight+"px";
-
-    pctx.setTransform(
-        dpr,0,0,dpr,0,0
-    );
-
-}
-
-resizeCanvas();
-
-window.addEventListener(
-    "resize",
-    resizeCanvas
-);
-
-
-function createParticles(){
-
-    particles=[];
-
-    const count =
-        innerWidth<700
-            ? 130
-            : 240;
-
-    for(
-        let i=0;
-        i<count;
-        i++
-    ){
-
-        particles.push({
-
-            x:
-                Math.random()*innerWidth,
-
-            y:
-                Math.random()*innerHeight,
-
-            vx:
-                (Math.random()-.5)*.16,
-
-            vy:
-                (Math.random()-.5)*.16,
-
-            size:
-                Math.random()*.9+.15,
-
-            alpha:
-                Math.random()*.35+.03
-
-        });
-
-    }
-
-}
-
-createParticles();
-
-
-function particleLoop(){
-
-    pctx.clearRect(
-        0,
-        0,
-        innerWidth,
-        innerHeight
-    );
-
-    particles.forEach(p=>{
-
-        p.x+=p.vx;
-        p.y+=p.vy;
-
-        /*
-           Energy from shake
-        */
-
-        p.x +=
-            (Math.random()-.5)*
-            energy*.7;
-
-        p.y +=
-            (Math.random()-.5)*
-            energy*.7;
-
-        if(
-            p.x<0
-        ){
-            p.x=innerWidth;
-        }
-
-        if(
-            p.x>innerWidth
-        ){
-            p.x=0;
-        }
-
-        if(
-            p.y<0
-        ){
-            p.y=innerHeight;
-        }
-
-        if(
-            p.y>innerHeight
-        ){
-            p.y=0;
-        }
-
-        pctx.beginPath();
-
-        pctx.arc(
-            p.x,
-            p.y,
-            p.size,
-            0,
-            Math.PI*2
-        );
-
-        pctx.globalAlpha=
-            p.alpha;
-
-        pctx.fillStyle=
-            "#ded9cf";
-
-        pctx.fill();
-
-    });
-
-    pctx.globalAlpha=1;
-
-    energy*=.94;
-
-    requestAnimationFrame(
-        particleLoop
-    );
-
-}
-
-particleLoop();
-
-
-/* =========================================================
-   FIELD
-   Moving invisible "signal"
-========================================================= */
-
-const field =
-    document.getElementById(
-        "field"
-    );
-
-const fctx =
-    field.getContext("2d");
-
-function resizeField(){
-
-    const dpr =
-        Math.min(
-            devicePixelRatio||1,
-            2
-        );
-
-    field.width=
-        innerWidth*dpr;
-
-    field.height=
-        innerHeight*dpr;
-
-    fctx.setTransform(
-        dpr,0,0,dpr,0,0
-    );
-
-}
-
-resizeField();
-
-window.addEventListener(
-    "resize",
-    resizeField
-);
-
-let t=0;
-
-function fieldLoop(){
-
-    t+=.002;
-
-    fctx.clearRect(
-        0,
-        0,
-        innerWidth,
-        innerHeight
-    );
-
-    /*
-       Thousands of almost invisible
-       curved signal lines.
-    */
-
-    for(
-        let i=0;
-        i<16;
-        i++
-    ){
-
-        const y =
-            innerHeight*.5 +
-            Math.sin(
-                t*2+i*.7
-            )*(
-                80+i*9
-            );
-
-        fctx.beginPath();
-
-        for(
-            let x=0;
-            x<=innerWidth;
-            x+=18
+            document.hidden &&
+            musicPlaying
         ){
 
-            const yy =
-                y+
-                Math.sin(
-                    x*.008+
-                    t*4+
-                    i
-                )*
-                (8+current*4);
-
-            if(x===0){
-                fctx.moveTo(x,yy);
-            }else{
-                fctx.lineTo(x,yy);
-            }
-
-        }
-
-        fctx.strokeStyle=
-            "rgba(220,215,204,.025)";
-
-        fctx.lineWidth=
-            .5;
-
-        fctx.stroke();
-
-    }
-
-    requestAnimationFrame(
-        fieldLoop
-    );
-
-}
-
-fieldLoop();
-
-
-/* =========================================================
-   DISTORTION
-========================================================= */
-
-const distortion =
-    document.getElementById(
-        "distortion"
-    );
-
-const dctx =
-    distortion.getContext("2d");
-
-function resizeDistortion(){
-
-    const dpr =
-        Math.min(
-            devicePixelRatio||1,
-            2
-        );
-
-    distortion.width=
-        innerWidth*dpr;
-
-    distortion.height=
-        innerHeight*dpr;
-
-    dctx.setTransform(
-        dpr,0,0,dpr,0,0
-    );
-
-}
-
-resizeDistortion();
-
-window.addEventListener(
-    "resize",
-    resizeDistortion
-);
-
-
-function distortionLoop(){
-
-    dctx.clearRect(
-        0,
-        0,
-        innerWidth,
-        innerHeight
-    );
-
-    if(
-        energy>.25
-    ){
-
-        const intensity =
-            Math.min(
-                energy,
-                4
-            );
-
-        /*
-           Horizontal interference
-        */
-
-        for(
-            let i=0;
-            i<12*intensity;
-            i++
-        ){
-
-            const y =
-                Math.random()*
-                innerHeight;
-
-            const width =
-                Math.random()*
-                innerWidth*.35;
-
-            const x =
-                Math.random()*
-                (innerWidth-width);
-
-            dctx.fillStyle =
-                Math.random()>.5
-                    ? "rgba(255,255,255,.035)"
-                    : "rgba(180,200,255,.025)";
-
-            dctx.fillRect(
-                x,
-                y,
-                width,
-                Math.random()*2+1
-            );
+            stopMusic();
 
         }
 
     }
-
-    requestAnimationFrame(
-        distortionLoop
-    );
-
-}
-
-distortionLoop();
-
-
-/* =========================================================
-   INITIAL
-========================================================= */
-
-render();
+);
 
 </script>
 
