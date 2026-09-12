@@ -1,1423 +1,1318 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
 <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, viewport-fit=cover"
->
-
-<meta name="theme-color" content="#080807">
-
-<title>SHAB — Rebuild</title>
+<title>SHAB — Still Becoming</title>
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400&family=Manrope:wght@300;400;500;600&display=swap');
 
-/* =========================================================
-   RESET
-========================================================= */
+:root {
+    --bg: #090909;
+    --fg: #f0eee8;
+    --muted: #77746d;
+    --line: rgba(240,238,232,.12);
+    --petal: #ddd8cc;
+    --petal-dark: #a9a397;
+    --root: #817c70;
+    --accent: #d5c9a8;
+}
 
-*{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 html,
-body{
-    width:100%;
-    height:100%;
-    overflow:hidden;
-    background:#080807;
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: var(--bg);
 }
 
-body{
-    color:#eee9df;
-    font-family:
-        "Helvetica Neue",
-        Helvetica,
-        Arial,
-        sans-serif;
-
-    -webkit-font-smoothing:antialiased;
-    text-rendering:optimizeLegibility;
-    user-select:none;
-    -webkit-user-select:none;
+body {
+    color: var(--fg);
+    font-family: "Manrope", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    touch-action: manipulation;
+    user-select: none;
 }
-
 
 /* =========================================================
-   VARIABLES
+   MAIN
 ========================================================= */
 
-:root{
-
-    --cream:#eee8dc;
-    --soft:#aaa49a;
-    --dim:#67635c;
-    --gold:#d8bd83;
-
-    --progress:0%;
-
-    --mouseX:50%;
-    --mouseY:50%;
-
-    --stone:0;
-
-}
-
-
-/* =========================================================
-   MAIN WORLD
-========================================================= */
-
-#world{
-
-    position:fixed;
-    inset:0;
-
-    width:100%;
-    height:100%;
-
-    overflow:hidden;
-
+#app {
+    position: relative;
+    width: 100%;
+    height: 100svh;
+    min-height: 100svh;
+    overflow: hidden;
     background:
         radial-gradient(
-            ellipse at 50% 45%,
-            rgba(210,195,165,.075),
-            transparent 34%
+            circle at 50% 50%,
+            rgba(255,255,255,.035),
+            transparent 38%
         ),
-        #080807;
-
-    transition:
-        background 1.4s ease;
-
+        #090909;
+    transition: background 1.8s ease;
 }
 
-
-/* =========================================================
-   BACKGROUND WORLDS
-========================================================= */
-
-#world.stage1{
-
-    background:
-        radial-gradient(
-            ellipse at 50% 42%,
-            rgba(211,193,160,.10),
-            transparent 30%
-        ),
-        #080807;
-
-}
-
-
-#world.stage2{
-
-    background:
-        radial-gradient(
-            ellipse at 30% 35%,
-            rgba(120,145,130,.10),
-            transparent 30%
-        ),
-        radial-gradient(
-            ellipse at 75% 75%,
-            rgba(200,170,115,.08),
-            transparent 30%
-        ),
-        #070a08;
-
-}
-
-
-#world.stage3{
-
-    background:
-        linear-gradient(
-            rgba(255,255,255,.018) 1px,
-            transparent 1px
-        ),
-        linear-gradient(
-            90deg,
-            rgba(255,255,255,.018) 1px,
-            transparent 1px
-        ),
-        #08090a;
-
-    background-size:
-        70px 70px;
-
-}
-
-
-#world.stage4{
-
-    background:
-        radial-gradient(
-            ellipse at 50% 50%,
-            rgba(230,210,170,.14),
-            transparent 30%
-        ),
-        linear-gradient(
-            135deg,
-            #11100c,
-            #070706
-        );
-
-}
-
-
-#world.stage5{
-
-    background:
-        radial-gradient(
-            ellipse at 50% 48%,
-            rgba(236,224,200,.18),
-            transparent 23%
-        ),
-        #050505;
-
-}
-
-
-/* =========================================================
-   GRAIN
-========================================================= */
-
-.grain{
-
-    position:absolute;
-    inset:-50%;
-
-    pointer-events:none;
-
-    opacity:.07;
-
-    z-index:20;
-
+#app::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: .055;
     background-image:
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-
-    animation:
-        grain .22s steps(2) infinite;
-
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.45'/%3E%3C/svg%3E");
+    mix-blend-mode: screen;
 }
-
-@keyframes grain{
-
-    0%{transform:translate(0,0)}
-    25%{transform:translate(2%,-1%)}
-    50%{transform:translate(-1%,2%)}
-    75%{transform:translate(1%,1%)}
-    100%{transform:translate(-2%,-1%)}
-
-}
-
 
 /* =========================================================
-   VIGNETTE
+   ATMOSPHERE
 ========================================================= */
 
-.vignette{
-
-    position:absolute;
-    inset:0;
-
-    z-index:15;
-
-    pointer-events:none;
-
+#mist {
+    position: absolute;
+    inset: -20%;
+    pointer-events: none;
     background:
         radial-gradient(
-            ellipse at center,
-            transparent 38%,
-            rgba(0,0,0,.28) 75%,
-            rgba(0,0,0,.75) 100%
+            ellipse at 50% 55%,
+            rgba(230,225,211,.055),
+            transparent 28%
+        ),
+        radial-gradient(
+            ellipse at 30% 80%,
+            rgba(180,170,150,.035),
+            transparent 35%
         );
-
+    filter: blur(55px);
+    animation: mistMove 18s ease-in-out infinite alternate;
 }
 
-
-/* =========================================================
-   DUST CANVAS
-========================================================= */
-
-#dust{
-
-    position:absolute;
-    inset:0;
-
-    width:100%;
-    height:100%;
-
-    z-index:4;
-
-    pointer-events:none;
-
+@keyframes mistMove {
+    from {
+        transform: translate(-2%, -1%) scale(1);
+    }
+    to {
+        transform: translate(2%, 1%) scale(1.08);
+    }
 }
 
+#particles {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
 
 /* =========================================================
-   AMBIENT LIGHT
+   HEADER
 ========================================================= */
 
-.light{
+.header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding:
+        max(22px, env(safe-area-inset-top))
+        clamp(22px, 5vw, 70px)
+        0;
+    z-index: 20;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
-    position:absolute;
+.logo {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: .34em;
+}
 
-    width:55vmax;
-    height:55vmax;
+.header-meta {
+    font-family: "DM Mono", monospace;
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: .16em;
+    text-transform: uppercase;
+}
 
-    left:var(--mouseX);
-    top:var(--mouseY);
+/* =========================================================
+   STAGE COUNTER
+========================================================= */
+
+.stage-counter {
+    position: absolute;
+    top: 50%;
+    left: clamp(18px, 4vw, 60px);
+    transform: translateY(-50%);
+    z-index: 10;
+
+    writing-mode: vertical-rl;
+    transform-origin: center;
+
+    font-family: "DM Mono", monospace;
+    font-size: 9px;
+    letter-spacing: .22em;
+    color: var(--muted);
+    text-transform: uppercase;
+}
+
+/* =========================================================
+   MAIN TYPOGRAPHY
+========================================================= */
+
+.content {
+    position: absolute;
+    left: clamp(28px, 8vw, 130px);
+    bottom: clamp(40px, 9vh, 100px);
+    width: min(430px, 42vw);
+    z-index: 15;
+}
+
+.eyebrow {
+    font-family: "DM Mono", monospace;
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    margin-bottom: 17px;
+}
+
+.title {
+    font-size: clamp(42px, 6vw, 88px);
+    line-height: .92;
+    letter-spacing: -.055em;
+    font-weight: 400;
+    max-width: 500px;
+}
+
+.description {
+    margin-top: 23px;
+    color: #9a978f;
+    font-size: 12px;
+    line-height: 1.75;
+    max-width: 330px;
+}
+
+.meta {
+    display: flex;
+    gap: 24px;
+    margin-top: 25px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+
+    font-family: "DM Mono", monospace;
+    font-size: 8px;
+    color: #66635e;
+    text-transform: uppercase;
+    letter-spacing: .13em;
+}
+
+/* =========================================================
+   FLOWER STAGE
+========================================================= */
+
+.flower-zone {
+    position: absolute;
+    width: min(650px, 65vw);
+    height: min(650px, 65vw);
+
+    left: 58%;
+    top: 50%;
 
     transform:
-        translate(-50%,-50%);
+        translate(-50%, -50%)
+        scale(.9);
 
-    border-radius:50%;
+    z-index: 5;
+
+    transition:
+        transform 1.5s cubic-bezier(.16,1,.3,1);
+}
+
+.flower-zone.bloom {
+    transform:
+        translate(-50%, -50%)
+        scale(1.02);
+}
+
+/* soft halo */
+
+.halo {
+    position: absolute;
+    width: 48%;
+    height: 48%;
+    left: 50%;
+    top: 42%;
+    transform: translate(-50%, -50%);
+
+    border-radius: 50%;
 
     background:
         radial-gradient(
             circle,
-            rgba(235,220,190,.12),
-            rgba(235,220,190,.025) 35%,
+            rgba(235,229,211,.08),
             transparent 68%
         );
 
-    filter:blur(4px);
+    filter: blur(20px);
+    transition: opacity 2s ease;
+}
 
+/* =========================================================
+   SVG
+========================================================= */
+
+#flower {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.petal {
+    fill: url(#petalGradient);
+    stroke: rgba(255,255,255,.16);
+    stroke-width: 1;
+    transform-box: fill-box;
+    transform-origin: center;
     transition:
-        left 1s ease,
-        top 1s ease;
-
-    z-index:1;
-
+        transform 1.15s cubic-bezier(.16,1,.3,1),
+        opacity 1.1s ease,
+        filter 1.1s ease;
 }
 
-
-/* =========================================================
-   TOP BAR
-========================================================= */
-
-.topbar{
-
-    position:absolute;
-
-    left:0;
-    right:0;
-
-    top:0;
-
-    padding:
-        max(18px,env(safe-area-inset-top))
-        22px
-        18px;
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    z-index:50;
-
+.petal-shadow {
+    fill: rgba(0,0,0,.24);
+    filter: blur(8px);
 }
 
-
-.brand{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:9px;
-
+.center {
+    fill: #b7ae9c;
+    opacity: .9;
+    transition:
+        transform 1.4s cubic-bezier(.16,1,.3,1),
+        opacity 1s ease;
 }
 
-
-.brand-dot{
-
-    width:5px;
-    height:5px;
-
-    background:#d8c7a7;
-
-    border-radius:50%;
-
-    box-shadow:
-        0 0 14px #d8c7a7;
-
+.center-light {
+    fill: #eee8d9;
+    opacity: .25;
 }
 
-
-.mono{
-
-    font-family:
-        "DM Mono",
-        monospace;
-
-    font-size:9px;
-
-    letter-spacing:.19em;
-
-    text-transform:uppercase;
-
+.vein {
+    fill: none;
+    stroke: var(--root);
+    stroke-width: 1.2;
+    stroke-linecap: round;
+    opacity: 0;
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    transition:
+        opacity .8s ease,
+        stroke-dashoffset 2s cubic-bezier(.16,1,.3,1);
 }
 
-
-.counter{
-
-    color:#68645d;
-
+.vein.active {
+    opacity: .7;
+    stroke-dashoffset: 0;
 }
 
-
-/* =========================================================
-   MAIN CONTENT
-========================================================= */
-
-.content{
-
-    position:absolute;
-
-    inset:0;
-
-    z-index:10;
-
-    display:grid;
-
-    place-items:center;
-
-    pointer-events:none;
-
-}
-
-
-.text{
-
-    width:min(430px,82vw);
-
-    text-align:center;
-
-    position:relative;
-
-}
-
-
-/* =========================================================
-   STAGE LABEL
-========================================================= */
-
-.label{
-
-    color:#77736b;
-
-    margin-bottom:22px;
-
-}
-
-
-/* =========================================================
-   MAIN TITLE
-========================================================= */
-
-.title{
-
-    font-size:
-        clamp(
-            52px,
-            12vw,
-            125px
-        );
-
-    line-height:.82;
-
-    letter-spacing:-.085em;
-
-    font-weight:700;
-
-}
-
-
-.title em{
-
-    font-family:
-        Georgia,
-        "Times New Roman",
-        serif;
-
-    font-style:italic;
-
-    font-weight:400;
-
-}
-
-
-.outline{
-
-    color:transparent;
-
-    -webkit-text-stroke:
-        1px rgba(238,232,220,.48);
-
-}
-
-
-/* =========================================================
-   DESCRIPTION
-========================================================= */
-
-.description{
-
-    width:min(430px,85vw);
-
-    margin:
-        30px auto 0;
-
-    color:#918c83;
-
-    font-size:12px;
-
-    line-height:1.7;
-
-}
-
-
-/* =========================================================
-   META
-========================================================= */
-
-.meta{
-
-    margin-top:18px;
-
-    color:#57544e;
-
-}
-
-
-/* =========================================================
-   OBJECT STAGE
-========================================================= */
-
-.monument-wrap{
-
-    position:absolute;
-
-    left:50%;
-    top:50%;
-
-    width:min(330px,72vw);
-    height:min(610px,72vh);
-
-    transform:
-        translate(-50%,-50%);
-
-    z-index:5;
-
-    pointer-events:none;
-
-}
-
-
-/* =========================================================
-   STONE PILLAR
-========================================================= */
-
-.pillar{
-
-    position:absolute;
-
-    left:50%;
-    bottom:9%;
-
-    width:29%;
-    height:72%;
-
-    transform:
-        translateX(-50%);
-
-    background:
-
-        linear-gradient(
-            90deg,
-            #282724 0%,
-            #69645b 18%,
-            #37352f 43%,
-            #777166 65%,
-            #24231f 100%
-        );
-
-    clip-path:
-        polygon(
-            16% 0,
-            86% 0,
-            92% 8%,
-            84% 26%,
-            89% 45%,
-            80% 66%,
-            91% 100%,
-            8% 100%,
-            20% 66%,
-            11% 44%,
-            17% 24%,
-            8% 7%
-        );
-
-    filter:
-        drop-shadow(
-            0 25px 35px
-            rgba(0,0,0,.6)
-        );
-
-    opacity:
-        calc(.15 + var(--stone) * .85);
-
-    transform-origin:
-        50% 90%;
-
+.root {
+    fill: none;
+    stroke: #5d594f;
+    stroke-width: 1;
+    stroke-linecap: round;
+    opacity: 0;
+    stroke-dasharray: 500;
+    stroke-dashoffset: 500;
     transition:
         opacity 1s ease,
-        transform 1s cubic-bezier(.16,1,.3,1);
-
+        stroke-dashoffset 2.4s cubic-bezier(.16,1,.3,1);
 }
 
+.root.active {
+    opacity: .65;
+    stroke-dashoffset: 0;
+}
 
 /* =========================================================
-   PILLAR CAP
+   BROKEN STATES
 ========================================================= */
 
-.cap{
+#p1 {
+    transform: translate(-110px, -85px) rotate(-17deg);
+}
 
-    position:absolute;
+#p2 {
+    transform: translate(100px, -75px) rotate(19deg);
+}
 
-    left:50%;
-    top:12%;
+#p3 {
+    transform: translate(-125px, 45px) rotate(-14deg);
+}
 
-    width:45%;
-    height:10%;
+#p4 {
+    transform: translate(120px, 60px) rotate(17deg);
+}
 
-    transform:
-        translateX(-50%)
-        rotate(-3deg);
+#p5 {
+    transform: translate(-70px, 125px) rotate(-22deg);
+}
 
-    background:
-        linear-gradient(
-            90deg,
-            #272622,
-            #777166,
-            #2b2925
-        );
+#p6 {
+    transform: translate(75px, 120px) rotate(20deg);
+}
 
-    clip-path:
-        polygon(
-            6% 18%,
-            95% 0,
-            100% 75%,
-            89% 100%,
-            4% 83%
-        );
+/* repaired */
 
-    opacity:
-        calc(.08 + var(--stone) * .92);
+#flower.stage2 #p1 {
+    transform: translate(-48px, -35px) rotate(-7deg);
+}
+
+#flower.stage3 #p1,
+#flower.stage3 #p2 {
+    transform: translate(0) rotate(0);
+}
+
+#flower.stage4 #p3,
+#flower.stage4 #p4 {
+    transform: translate(0) rotate(0);
+}
+
+#flower.stage5 #p5,
+#flower.stage5 #p6 {
+    transform: translate(0) rotate(0);
+}
+
+#flower.stage6 .petal {
+    transform: translate(0) rotate(0) !important;
+    filter: brightness(1.05);
+}
+
+#flower.stage6 .center {
+    transform: scale(1.15);
+}
+
+/* =========================================================
+   INSTRUCTION
+========================================================= */
+
+.instruction {
+    position: absolute;
+    right: clamp(22px, 5vw, 70px);
+    bottom: clamp(35px, 7vh, 70px);
+    z-index: 20;
+
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    font-family: "DM Mono", monospace;
+    font-size: 8px;
+    color: #68655e;
+    text-transform: uppercase;
+    letter-spacing: .15em;
+}
+
+.shake-icon {
+    width: 27px;
+    height: 27px;
+    border: 1px solid rgba(255,255,255,.16);
+    border-radius: 50%;
+    position: relative;
+}
+
+.shake-icon::before,
+.shake-icon::after {
+    content: "";
+    position: absolute;
+    top: 8px;
+    width: 5px;
+    height: 9px;
+    border-top: 1px solid #aaa59a;
+    border-bottom: 1px solid #aaa59a;
+}
+
+.shake-icon::before {
+    left: 6px;
+}
+
+.shake-icon::after {
+    right: 6px;
+}
+
+/* =========================================================
+   MOTION PERMISSION
+========================================================= */
+
+.permission {
+    position: absolute;
+    inset: 0;
+    z-index: 100;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #090909;
 
     transition:
-        opacity 1s ease,
-        transform 1s cubic-bezier(.16,1,.3,1);
-
+        opacity .8s ease,
+        visibility .8s ease;
 }
 
+.permission.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
 
-/* =========================================================
-   BROKEN STONE FRAGMENTS
-========================================================= */
+.permission-inner {
+    width: min(420px, 80vw);
+    text-align: center;
+}
 
-.fragment{
+.permission-small {
+    font-family: "DM Mono", monospace;
+    color: #67645e;
+    font-size: 8px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    margin-bottom: 22px;
+}
 
-    position:absolute;
+.permission h1 {
+    font-size: clamp(36px, 8vw, 65px);
+    line-height: .95;
+    font-weight: 400;
+    letter-spacing: -.055em;
+}
 
-    background:
-        linear-gradient(
-            135deg,
-            #6d685e,
-            #262521 55%,
-            #8a8172
-        );
+.permission p {
+    margin: 22px auto 30px;
+    max-width: 320px;
 
-    box-shadow:
-        0 20px 35px
-        rgba(0,0,0,.5);
+    font-size: 12px;
+    line-height: 1.7;
+    color: #77736b;
+}
 
+#enableMotion {
+    border: 1px solid rgba(255,255,255,.2);
+    background: transparent;
+    color: #e9e5db;
+
+    padding: 14px 22px;
+
+    font-family: "DM Mono", monospace;
+    font-size: 9px;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+
+    cursor: pointer;
     transition:
-        transform 1s cubic-bezier(.16,1,.3,1),
-        opacity .8s ease;
-
+        background .3s ease,
+        color .3s ease;
 }
 
-
-.fragment.a{
-
-    width:23%;
-    height:17%;
-
-    left:12%;
-    top:27%;
-
-    clip-path:
-        polygon(
-            12% 0,
-            100% 18%,
-            77% 100%,
-            0 75%
-        );
-
-    transform:
-        translate(
-            calc(-40px - var(--stone) * -35px),
-            calc(-30px - var(--stone) * -85px)
-        )
-        rotate(
-            calc(-18deg + var(--stone) * 18deg)
-        );
-
+#enableMotion:hover {
+    background: #eeeae0;
+    color: #111;
 }
-
-
-.fragment.b{
-
-    width:24%;
-    height:20%;
-
-    right:8%;
-    top:39%;
-
-    clip-path:
-        polygon(
-            0 18%,
-            72% 0,
-            100% 80%,
-            22% 100%
-        );
-
-    transform:
-        translate(
-            calc(55px - var(--stone) * 55px),
-            calc(20px - var(--stone) * 95px)
-        )
-        rotate(
-            calc(21deg - var(--stone) * 21deg)
-        );
-
-}
-
-
-.fragment.c{
-
-    width:22%;
-    height:16%;
-
-    left:4%;
-    top:53%;
-
-    clip-path:
-        polygon(
-            15% 0,
-            100% 22%,
-            82% 100%,
-            0 72%
-        );
-
-    transform:
-        translate(
-            calc(-50px + var(--stone) * 50px),
-            calc(70px - var(--stone) * 60px)
-        )
-        rotate(
-            calc(-27deg + var(--stone) * 27deg)
-        );
-
-}
-
-
-.fragment.d{
-
-    width:20%;
-    height:14%;
-
-    right:4%;
-    top:66%;
-
-    clip-path:
-        polygon(
-            8% 14%,
-            90% 0,
-            100% 75%,
-            25% 100%
-        );
-
-    transform:
-        translate(
-            calc(50px - var(--stone) * 50px),
-            calc(80px - var(--stone) * 80px)
-        )
-        rotate(
-            calc(24deg - var(--stone) * 24deg)
-        );
-
-}
-
 
 /* =========================================================
-   CRACKS
+   FLASH
 ========================================================= */
 
-.cracks{
+#flash {
+    position: absolute;
+    inset: 0;
+    z-index: 90;
 
-    position:absolute;
+    background: rgba(245,240,225,.15);
 
-    left:50%;
-    top:26%;
-
-    width:35%;
-    height:48%;
-
-    transform:
-        translateX(-50%);
-
-    opacity:
-        calc(.15 + var(--stone) * .85);
-
-    transition:
-        opacity 1s ease;
-
+    opacity: 0;
+    pointer-events: none;
 }
 
-
-.crack{
-
-    position:absolute;
-
-    width:1px;
-
-    background:
-        linear-gradient(
-            to bottom,
-            transparent,
-            rgba(226,193,124,.95),
-            transparent
-        );
-
-    box-shadow:
-        0 0 8px
-        rgba(226,193,124,.4);
-
-    transform-origin:top;
-
+#flash.active {
+    animation: flash .45s ease-out;
 }
 
-
-.crack.one{
-
-    height:46%;
-
-    left:25%;
-    top:0;
-
-    transform:
-        rotate(18deg);
-
+@keyframes flash {
+    0% { opacity: 0; }
+    15% { opacity: 1; }
+    100% { opacity: 0; }
 }
-
-
-.crack.two{
-
-    height:38%;
-
-    left:56%;
-    top:19%;
-
-    transform:
-        rotate(-25deg);
-
-}
-
-
-.crack.three{
-
-    height:28%;
-
-    left:43%;
-    top:52%;
-
-    transform:
-        rotate(31deg);
-
-}
-
 
 /* =========================================================
-   ROOTS
+   SHAKE IMPACT
 ========================================================= */
 
-.roots{
-
-    position:absolute;
-
-    left:50%;
-    bottom:1%;
-
-    width:85%;
-    height:38%;
-
-    transform:
-        translateX(-50%);
-
-    opacity:
-        calc(var(--stone));
-
-    transition:
-        opacity 1s ease;
-
+.impact {
+    animation: impact .42s cubic-bezier(.2,.8,.2,1);
 }
 
-
-.root{
-
-    position:absolute;
-
-    height:1px;
-
-    background:
-        linear-gradient(
-            90deg,
-            transparent,
-            rgba(199,174,125,.85)
-        );
-
-    transform-origin:left center;
-
-    box-shadow:
-        0 0 8px
-        rgba(200,175,120,.3);
-
-}
-
-
-.root.r1{
-
-    width:60%;
-
-    left:20%;
-    bottom:15%;
-
-    transform:
-        rotate(14deg);
-
-}
-
-
-.root.r2{
-
-    width:47%;
-
-    left:28%;
-    bottom:22%;
-
-    transform:
-        rotate(-22deg);
-
-}
-
-
-.root.r3{
-
-    width:40%;
-
-    left:32%;
-    bottom:30%;
-
-    transform:
-        rotate(31deg);
-
-}
-
-
-.root.r4{
-
-    width:32%;
-
-    left:38%;
-    bottom:40%;
-
-    transform:
-        rotate(-34deg);
-
-}
-
-
-/* =========================================================
-   FLOWERS
-========================================================= */
-
-.flowers{
-
-    position:absolute;
-
-    left:50%;
-    top:40%;
-
-    width:75%;
-    height:45%;
-
-    transform:
-        translateX(-50%);
-
-    opacity:
-        calc(
-            max(
-                0,
-                (var(--stone) - .55) * 2.2
-            )
-        );
-
-    transition:
-        opacity 1.2s ease;
-
-}
-
-
-.flower{
-
-    position:absolute;
-
-    width:8px;
-    height:8px;
-
-    border-radius:50%;
-
-    background:#eee2cb;
-
-    box-shadow:
-        0 0 15px
-        rgba(238,226,203,.65);
-
-}
-
-
-.flower::before,
-.flower::after{
-
-    content:"";
-
-    position:absolute;
-
-    width:12px;
-    height:5px;
-
-    border-radius:50%;
-
-    background:#d8c7a8;
-
-    top:2px;
-
-}
-
-
-.flower::before{
-
-    left:-8px;
-
-}
-
-
-.flower::after{
-
-    right:-8px;
-
-}
-
-
-.flower.f1{
-    left:20%;
-    top:30%;
-}
-
-.flower.f2{
-    left:74%;
-    top:19%;
-}
-
-.flower.f3{
-    left:33%;
-    top:68%;
-}
-
-.flower.f4{
-    left:82%;
-    top:57%;
-}
-
-.flower.f5{
-    left:11%;
-    top:72%;
-}
-
-
-/* =========================================================
-   BASE
-========================================================= */
-
-.base{
-
-    position:absolute;
-
-    left:50%;
-    bottom:2%;
-
-    width:48%;
-    height:10%;
-
-    transform:
-        translateX(-50%);
-
-    background:
-        linear-gradient(
-            90deg,
-            #1e1d19,
-            #777066,
-            #292823
-        );
-
-    clip-path:
-        polygon(
-            6% 20%,
-            93% 0,
-            100% 70%,
-            87% 100%,
-            10% 88%,
-            0 55%
-        );
-
-    opacity:
-        calc(.3 + var(--stone) * .7);
-
-}
-
-
-/* =========================================================
-   WATER / REFLECTION
-========================================================= */
-
-.reflection{
-
-    position:absolute;
-
-    left:50%;
-    bottom:-1%;
-
-    width:120%;
-    height:12%;
-
-    transform:
-        translateX(-50%);
-
-    background:
-        repeating-linear-gradient(
-            0deg,
-            transparent 0,
-            transparent 7px,
-            rgba(220,210,190,.06) 8px
-        );
-
-    filter:blur(1px);
-
-    opacity:.7;
-
-}
-
-
-/* =========================================================
-   SHAKE GUIDE
-========================================================= */
-
-.guide{
-
-    position:absolute;
-
-    z-index:40;
-
-    left:50%;
-    bottom:
-        max(70px,env(safe-area-inset-bottom));
-
-    transform:
-        translateX(-50%);
-
-    text-align:center;
-
-    color:#858078;
-
-    transition:
-        opacity .6s ease,
-        transform .6s ease;
-
-}
-
-
-.guide.hide{
-
-    opacity:0;
-
-    transform:
-        translate(-50%,20px);
-
-}
-
-
-.shake-icon{
-
-    width:40px;
-    height:40px;
-
-    border:
-        1px solid
-        rgba(225,215,195,.3);
-
-    border-radius:50%;
-
-    display:grid;
-    place-items:center;
-
-    margin:
-        0 auto 10px;
-
-    color:#c9bda9;
-
-    animation:
-        pulse 2s infinite;
-
-}
-
-
-@keyframes pulse{
-
-    0%,
-    100%{
-        transform:scale(1);
+@keyframes impact {
+    0% {
+        transform: translate(-50%, -50%) scale(.9);
     }
 
-    50%{
-        transform:scale(1.12);
+    20% {
+        transform: translate(calc(-50% + 8px), -50%) scale(.94);
     }
 
+    40% {
+        transform: translate(calc(-50% - 6px), -50%) scale(.98);
+    }
+
+    70% {
+        transform: translate(calc(-50% + 2px), -50%) scale(1);
+    }
+
+    100% {
+        transform: translate(-50%, -50%) scale(.9);
+    }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+
+    .header {
+        padding-left: 22px;
+        padding-right: 22px;
+    }
+
+    .header-meta {
+        font-size: 7px;
+    }
+
+    .stage-counter {
+        left: 12px;
+        font-size: 7px;
+    }
+
+    .flower-zone {
+        width: 125vw;
+        height: 125vw;
+        left: 67%;
+        top: 40%;
+    }
+
+    .content {
+        left: 30px;
+        bottom: 80px;
+        width: calc(100vw - 60px);
+    }
+
+    .title {
+        font-size: clamp(39px, 12vw, 58px);
+    }
+
+    .description {
+        font-size: 11px;
+        max-width: 280px;
+        margin-top: 14px;
+    }
+
+    .meta {
+        margin-top: 17px;
+        gap: 14px;
+        max-width: 270px;
+        flex-wrap: wrap;
+    }
+
+    .instruction {
+        right: 20px;
+        top: 50%;
+        bottom: auto;
+        transform: translateY(-50%);
+        writing-mode: vertical-rl;
+    }
+
+    .shake-icon {
+        width: 24px;
+        height: 24px;
+    }
+}
+
+/* very small phones */
+
+@media (max-height: 700px) and (max-width: 700px) {
+
+    .flower-zone {
+        top: 35%;
+        width: 110vw;
+        height: 110vw;
+    }
+
+    .content {
+        bottom: 35px;
+    }
+
+    .description {
+        display: none;
+    }
+
+    .meta {
+        margin-top: 15px;
+    }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div id="app">
+
+    <div id="mist"></div>
+
+    <canvas id="particles"></canvas>
+
+    <!-- HEADER -->
+
+    <header class="header">
+        <div class="logo">SHAB</div>
+
+        <div class="header-meta">
+            B.COM / COMPUTER APPLICATIONS
+        </div>
+    </header>
+
+    <!-- STAGE -->
+
+    <div class="stage-counter">
+        <span id="stageNumber">01</span>
+        / 06
+    </div>
+
+    <!-- FLOWER -->
+
+    <div class="flower-zone" id="flowerZone">
+
+        <div class="halo"></div>
+
+        <svg
+            id="flower"
+            viewBox="0 0 600 600"
+            xmlns="http://www.w3.org/2000/svg"
+        >
+
+            <defs>
+
+                <linearGradient
+                    id="petalGradient"
+                    x1="0"
+                    y1="0"
+                    x2="1"
+                    y2="1"
+                >
+                    <stop
+                        offset="0%"
+                        stop-color="#eee9df"
+                    />
+
+                    <stop
+                        offset="55%"
+                        stop-color="#cfc9bc"
+                    />
+
+                    <stop
+                        offset="100%"
+                        stop-color="#999388"
+                    />
+                </linearGradient>
+
+                <radialGradient
+                    id="centerGradient"
+                >
+                    <stop
+                        offset="0%"
+                        stop-color="#f1ead9"
+                    />
+
+                    <stop
+                        offset="100%"
+                        stop-color="#9b927e"
+                    />
+                </radialGradient>
+
+                <filter id="softGlow">
+                    <feGaussianBlur
+                        stdDeviation="10"
+                    />
+                </filter>
+
+            </defs>
+
+            <!-- ROOTS -->
+
+            <path
+                class="root"
+                id="root1"
+                d="
+                M300 390
+                C298 430 278 455 250 480
+                C225 503 223 532 195 550
+                "
+            />
+
+            <path
+                class="root"
+                id="root2"
+                d="
+                M300 390
+                C305 438 330 456 350 481
+                C372 505 375 530 405 548
+                "
+            />
+
+            <path
+                class="root"
+                id="root3"
+                d="
+                M300 405
+                C290 448 288 478 270 505
+                C255 528 260 545 242 560
+                "
+            />
+
+            <!-- VEINS -->
+
+            <path
+                class="vein"
+                id="vein1"
+                d="M300 310 C260 275 225 245 190 215"
+            />
+
+            <path
+                class="vein"
+                id="vein2"
+                d="M300 310 C340 275 375 245 410 215"
+            />
+
+            <path
+                class="vein"
+                id="vein3"
+                d="M300 320 C250 320 205 315 165 300"
+            />
+
+            <path
+                class="vein"
+                id="vein4"
+                d="M300 320 C350 320 395 315 435 300"
+            />
+
+            <path
+                class="vein"
+                id="vein5"
+                d="M300 330 C275 365 260 390 250 425"
+            />
+
+            <path
+                class="vein"
+                id="vein6"
+                d="M300 330 C325 365 340 390 350 425"
+            />
+
+            <!-- SHADOWS -->
+
+            <ellipse
+                class="petal-shadow"
+                cx="300"
+                cy="330"
+                rx="145"
+                ry="125"
+            />
+
+            <!-- PETALS -->
+
+            <!-- top -->
+
+            <path
+                id="p1"
+                class="petal"
+                d="
+                M300 320
+                C250 280 235 215 275 135
+                C285 112 300 95 310 125
+                C340 205 330 260 300 320
+                Z
+                "
+            />
+
+            <!-- right -->
+
+            <path
+                id="p2"
+                class="petal"
+                d="
+                M315 320
+                C350 270 405 245 475 265
+                C498 272 510 285 484 300
+                C420 338 365 340 315 320
+                Z
+                "
+            />
+
+            <!-- left -->
+
+            <path
+                id="p3"
+                class="petal"
+                d="
+                M285 320
+                C250 270 195 245 125 265
+                C102 272 90 285 116 300
+                C180 338 235 340 285 320
+                Z
+                "
+            />
+
+            <!-- bottom right -->
+
+            <path
+                id="p4"
+                class="petal"
+                d="
+                M305 335
+                C355 345 400 390 410 455
+                C414 480 405 492 388 473
+                C340 430 310 385 305 335
+                Z
+                "
+            />
+
+            <!-- bottom left -->
+
+            <path
+                id="p5"
+                class="petal"
+                d="
+                M295 335
+                C245 345 200 390 190 455
+                C186 480 195 492 212 473
+                C260 430 290 385 295 335
+                Z
+                "
+            />
+
+            <!-- rear bottom -->
+
+            <path
+                id="p6"
+                class="petal"
+                d="
+                M300 335
+                C275 385 280 445 300 500
+                C307 518 316 518 322 500
+                C340 445 325 385 300 335
+                Z
+                "
+            />
+
+            <!-- CENTER -->
+
+            <circle
+                class="center"
+                cx="300"
+                cy="325"
+                r="38"
+                fill="url(#centerGradient)"
+            />
+
+            <circle
+                class="center-light"
+                cx="289"
+                cy="314"
+                r="10"
+            />
+
+        </svg>
+    </div>
+
+    <!-- CONTENT -->
+
+    <main class="content">
+
+        <div
+            class="eyebrow"
+            id="eyebrow"
+        >
+            01 / INTRODUCTION
+        </div>
+
+        <h1
+            class="title"
+            id="title"
+        >
+            Still<br>
+            becoming.
+        </h1>
+
+        <p
+            class="description"
+            id="description"
+        >
+            Somewhere between curiosity,
+            technology and everything
+            I haven't figured out yet.
+        </p>
+
+        <div class="meta">
+
+            <span id="meta1">
+                SHAB
+            </span>
+
+            <span id="meta2">
+                KERALA / INDIA
+            </span>
+
+        </div>
+
+    </main>
+
+    <!-- INSTRUCTION -->
+
+    <div class="instruction">
+
+        <div class="shake-icon"></div>
+
+        <span>
+            shake to rebuild
+        </span>
+
+    </div>
+
+    <!-- FLASH -->
+
+    <div id="flash"></div>
+
+    <!-- PERMISSION -->
+
+    <section
+        class="permission"
+        id="permission"
+    >
+
+        <div class="permission-inner">
+
+            <div class="permission-small">
+                interactive portfolio
+            </div>
+
+            <h1>
+                Move<br>
+                the story.
+            </h1>
+
+            <p>
+                This portfolio uses your phone's
+                motion sensor. Shake the phone
+                to rebuild what is broken.
+            </p>
+
+            <button id="enableMotion">
+                Enable motion
+            </button>
+
+        </div>
+
+    </section>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   DATA
+========================================================= */
+
+const stages = [
+
+    {
+        eyebrow: "01 / INTRODUCTION",
+        title: "Still<br>becoming.",
+        description:
+            "Somewhere between curiosity, technology and everything I haven't figured out yet.",
+        meta1: "SHAB",
+        meta2: "KERALA / INDIA"
+    },
+
+    {
+        eyebrow: "02 / STUDENT",
+        title: "Learning<br>how things work.",
+        description:
+            "B.Com Computer Applications. Business on one side. Technology on the other. I decided to stand awkwardly in the middle.",
+        meta1: "B.COM",
+        meta2: "COMPUTER APPLICATIONS"
+    },
+
+    {
+        eyebrow: "03 / BUILDER",
+        title: "Making<br>things real.",
+        description:
+            "Websites, experiments, interfaces and ideas that begin as 'this probably won't work' and occasionally prove otherwise.",
+        meta1: "BUILD",
+        meta2: "EXPERIMENT"
+    },
+
+    {
+        eyebrow: "04 / THINKER",
+        title: "Questioning<br>the obvious.",
+        description:
+            "Technology is interesting. Understanding why people use it, why they avoid it and what it changes is much more interesting.",
+        meta1: "THINK",
+        meta2: "OBSERVE"
+    },
+
+    {
+        eyebrow: "05 / INTERESTS",
+        title: "Following<br>curiosity.",
+        description:
+            "AI. Design. Science. Stories. Games. The strange edge where different ideas collide.",
+        meta1: "CURIOUS",
+        meta2: "ALWAYS"
+    },
+
+    {
+        eyebrow: "06 / NEXT",
+        title: "Not finished.",
+        description:
+            "The flower isn't perfect. Neither am I. That's sort of the point.",
+        meta1: "SHAB",
+        meta2: "STILL BECOMING"
+    }
+
+];
+
+
+/* =========================================================
+   ELEMENTS
+========================================================= */
+
+const app = document.getElementById("app");
+
+const flower = document.getElementById("flower");
+
+const flowerZone =
+    document.getElementById("flowerZone");
+
+const permission =
+    document.getElementById("permission");
+
+const enableMotion =
+    document.getElementById("enableMotion");
+
+const flash =
+    document.getElementById("flash");
+
+const stageNumber =
+    document.getElementById("stageNumber");
+
+const eyebrow =
+    document.getElementById("eyebrow");
+
+const title =
+    document.getElementById("title");
+
+const description =
+    document.getElementById("description");
+
+const meta1 =
+    document.getElementById("meta1");
+
+const meta2 =
+    document.getElementById("meta2");
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let stage = 0;
+
+let motionEnabled = false;
+
+let lastShake = 0;
+
+let shakeCooldown = 950;
+
+let lastX = null;
+let lastY = null;
+let lastZ = null;
+
+let soundEnabled = true;
+
+let audioContext = null;
+
+
+/* =========================================================
+   AUDIO
+========================================================= */
+
+function initAudio() {
+
+    if (audioContext) return;
+
+    audioContext =
+        new (
+            window.AudioContext ||
+            window.webkitAudioContext
+        )();
+
+}
+
+
+function impactSound(stage) {
+
+    if (!soundEnabled) return;
+
+    initAudio();
+
+    if (
+        audioContext.state === "suspended"
+    ) {
+        audioContext.resume();
+    }
+
+    const now =
+        audioContext.currentTime;
+
+    const oscillator =
+        audioContext.createOscillator();
+
+    const gain =
+        audioContext.createGain();
+
+    const frequencies = [
+        110,
+        135,
+        160,
+        190,
+        230,
+        280
+    ];
+
+    oscillator.frequency.setValueAtTime(
+        frequencies[stage],
+        now
+    );
+
+    oscillator.frequency.exponentialRampToValueAtTime(
+        frequencies[stage] * 2.1,
+        now + .45
+    );
+
+    oscillator.type = "sine";
+
+    gain.gain.setValueAtTime(
+        .0001,
+        now
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        .09,
+        now + .015
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        .0001,
+        now + .55
+    );
+
+    oscillator.connect(gain);
+    gain.connect(audioContext.destination);
+
+    oscillator.start(now);
+    oscillator.stop(now + .6);
+
+
+    /*
+       tiny ceramic click
+    */
+
+    const click =
+        audioContext.createOscillator();
+
+    const clickGain =
+        audioContext.createGain();
+
+    click.type = "triangle";
+
+    click.frequency.setValueAtTime(
+        900 + stage * 100,
+        now
+    );
+
+    clickGain.gain.setValueAtTime(
+        .035,
+        now
+    );
+
+    clickGain.gain.exponentialRampToValueAtTime(
+        .0001,
+        now + .12
+    );
+
+    click.connect(clickGain);
+    clickGain.connect(
+        audioContext.destination
+    );
+
+    click.start(now);
+    click.stop(now + .13);
 }
 
 
 /* =========================================================
-   PROGRESS
+   VIBRATION
 ========================================================= */
 
-.progress{
+function vibrate() {
 
-    position:absolute;
+    if (
+        "vibrate" in navigator
+    ) {
 
-    left:22px;
-    right:22px;
+        navigator.vibrate([
+            18,
+            25,
+            30
+        ]);
 
-    bottom:
-        max(20px,env(safe-area-inset-bottom));
-
-    z-index:45;
-
-}
-
-
-.progress-line{
-
-    height:1px;
-
-    background:
-        rgba(255,255,255,.1);
-
-}
-
-
-.progress-line span{
-
-    display:block;
-
-    height:100%;
-
-    width:var(--progress);
-
-    background:
-        #d6c9b4;
-
-    transition:
-        width .9s
-        cubic-bezier(.16,1,.3,1);
-
-}
-
-
-/* =========================================================
-   MOTION BUTTON
-========================================================= */
-
-.motion{
-
-    position:absolute;
-
-    top:
-        max(58px,calc(env(safe-area-inset-top) + 35px));
-
-    right:20px;
-
-    z-index:50;
-
-}
-
-
-button{
-
-    appearance:none;
-    -webkit-appearance:none;
-
-    border:
-        1px solid
-        rgba(255,255,255,.18);
-
-    border-radius:50px;
-
-    background:
-        rgba(10,10,9,.45);
-
-    color:#a7a197;
-
-    padding:
-        9px 13px;
-
-    font:
-        9px
-        "DM Mono",
-        monospace;
-
-    letter-spacing:.13em;
-
-    text-transform:uppercase;
-
-    backdrop-filter:
-        blur(12px);
-
-    -webkit-backdrop-filter:
-        blur(12px);
-
-}
-
-
-/* =========================================================
-   PERMISSION
-========================================================= */
-
-.permission{
-
-    position:absolute;
-
-    z-index:100;
-
-    left:15px;
-    right:15px;
-
-    bottom:
-        max(65px,env(safe-area-inset-bottom));
-
-    padding:18px;
-
-    display:none;
-
-    background:
-        rgba(14,14,12,.95);
-
-    border:
-        1px solid
-        rgba(255,255,255,.16);
-
-    backdrop-filter:
-        blur(20px);
-
-    -webkit-backdrop-filter:
-        blur(20px);
-
-    color:#aaa49b;
-
-    font-size:12px;
-
-    line-height:1.6;
-
-}
-
-
-.permission strong{
-
-    color:#eee8dc;
-
-}
-
-
-.permission button{
-
-    margin-top:12px;
-
-    background:#eee8dc;
-
-    color:#111;
-
-}
-
-
-/* =========================================================
-   SHAKE SCREEN
-========================================================= */
-
-.shake-screen{
-
-    animation:
-        screenShake .45s
-        cubic-bezier(.36,.07,.19,.97);
-
-}
-
-
-@keyframes screenShake{
-
-    0%{
-        transform:translate(0);
-    }
-
-    15%{
-        transform:translate(-10px,5px);
-    }
-
-    30%{
-        transform:translate(10px,-4px);
-    }
-
-    45%{
-        transform:translate(-7px,-5px);
-    }
-
-    60%{
-        transform:translate(5px,4px);
-    }
-
-    75%{
-        transform:translate(-2px,-2px);
-    }
-
-    100%{
-        transform:translate(0);
     }
 
 }
@@ -1427,1237 +1322,315 @@ button{
    CONTENT TRANSITION
 ========================================================= */
 
-.text.exit{
-
-    animation:
-        textOut .45s
-        cubic-bezier(.7,0,.3,1)
-        forwards;
-
-}
-
-
-.text.enter{
-
-    animation:
-        textIn .9s
-        cubic-bezier(.16,1,.3,1)
-        forwards;
-
-}
-
-
-@keyframes textOut{
-
-    from{
-        opacity:1;
-        transform:
-            scale(1)
-            translateY(0);
-        filter:blur(0);
-    }
-
-    to{
-        opacity:0;
-        transform:
-            scale(.88)
-            translateY(-35px);
-        filter:blur(12px);
-    }
-
-}
-
-
-@keyframes textIn{
-
-    from{
-        opacity:0;
-        transform:
-            scale(.88)
-            translateY(35px);
-        filter:blur(12px);
-    }
-
-    to{
-        opacity:1;
-        transform:
-            scale(1)
-            translateY(0);
-        filter:blur(0);
-    }
-
-}
-
-
-/* =========================================================
-   FINAL
-========================================================= */
-
-.final-link{
-
-    display:inline-block;
-
-    margin-top:25px;
-
-    color:#d8cbb7;
-
-    pointer-events:auto;
-
-    border-bottom:
-        1px solid
-        rgba(216,203,183,.35);
-
-    padding-bottom:5px;
-
-}
-
-
-/* =========================================================
-   MOBILE
-========================================================= */
-
-@media(max-width:700px){
-
-    .monument-wrap{
-
-        width:300px;
-        height:590px;
-
-        top:48%;
-
-    }
-
-
-    .text{
-
-        width:84vw;
-
-        transform:
-            translateY(-5px);
-
-    }
-
-
-    .title{
-
-        font-size:
-            clamp(
-                58px,
-                16vw,
-                105px
-            );
-
-    }
-
-
-    .description{
-
-        width:80vw;
-
-        margin-top:27px;
-
-        font-size:11px;
-
-    }
-
-
-    .monument-wrap{
-
-        opacity:.85;
-
-    }
-
-}
-
-
-/* =========================================================
-   LANDSCAPE
-========================================================= */
-
-@media(
-    orientation:landscape
-) and (max-height:600px){
-
-    .monument-wrap{
-
-        width:210px;
-        height:420px;
-
-        top:52%;
-
-    }
-
-
-    .text{
-
-        width:38vw;
-
-        margin-left:28vw;
-
-    }
-
-
-    .title{
-
-        font-size:
-            clamp(
-                45px,
-                8vw,
-                90px
-            );
-
-    }
-
-
-    .description{
-
-        margin-top:18px;
-
-    }
-
-}
-
-
-/* =========================================================
-   REDUCED MOTION
-========================================================= */
-
-@media(prefers-reduced-motion:reduce){
-
-    *,
-    *::before,
-    *::after{
-
-        animation-duration:
-            .01ms!important;
-
-        animation-iteration-count:
-            1!important;
-
-        transition-duration:
-            .01ms!important;
-
-    }
-
-}
-
-</style>
-
-</head>
-
-
-<body>
-
-
-<div
-    id="world"
-    class="stage0"
->
-
-
-    <!-- =====================================================
-         ATMOSPHERE
-    ====================================================== -->
-
-    <div class="light"></div>
-
-    <div class="texture"></div>
-
-    <div class="grain"></div>
-
-    <div class="vignette"></div>
-
-
-    <!-- =====================================================
-         PARTICLES
-    ====================================================== -->
-
-    <canvas id="dust"></canvas>
-
-
-    <!-- =====================================================
-         HEADER
-    ====================================================== -->
-
-    <header class="topbar">
-
-        <div class="brand">
-
-            <span class="brand-dot"></span>
-
-            <span class="mono">
-                SHAB
-            </span>
-
-        </div>
-
-
-        <div
-            class="counter mono"
-            id="counter"
-        >
-            01 / 06
-        </div>
-
-    </header>
-
-
-    <!-- =====================================================
-         MOTION BUTTON
-    ====================================================== -->
-
-    <div class="motion">
-
-        <button id="motionButton">
-            enable shake
-        </button>
-
-    </div>
-
-
-    <!-- =====================================================
-         MONUMENT
-    ====================================================== -->
-
-    <div class="monument-wrap">
-
-
-        <div class="pillar"></div>
-
-        <div class="cap"></div>
-
-
-        <div class="fragment a"></div>
-
-        <div class="fragment b"></div>
-
-        <div class="fragment c"></div>
-
-        <div class="fragment d"></div>
-
-
-        <div class="cracks">
-
-            <span class="crack one"></span>
-
-            <span class="crack two"></span>
-
-            <span class="crack three"></span>
-
-        </div>
-
-
-        <div class="roots">
-
-            <span class="root r1"></span>
-
-            <span class="root r2"></span>
-
-            <span class="root r3"></span>
-
-            <span class="root r4"></span>
-
-        </div>
-
-
-        <div class="flowers">
-
-            <span class="flower f1"></span>
-
-            <span class="flower f2"></span>
-
-            <span class="flower f3"></span>
-
-            <span class="flower f4"></span>
-
-            <span class="flower f5"></span>
-
-        </div>
-
-
-        <div class="base"></div>
-
-        <div class="reflection"></div>
-
-    </div>
-
-
-    <!-- =====================================================
-         TEXT
-    ====================================================== -->
-
-    <main class="content">
-
-        <div
-            class="text"
-            id="text"
-        ></div>
-
-    </main>
-
-
-    <!-- =====================================================
-         GUIDE
-    ====================================================== -->
-
-    <div
-        class="guide"
-        id="guide"
-    >
-
-        <div class="shake-icon">
-            ↯
-        </div>
-
-        <div class="mono">
-            shake to rebuild
-        </div>
-
-    </div>
-
-
-    <!-- =====================================================
-         PROGRESS
-    ====================================================== -->
-
-    <div class="progress">
-
-        <div class="progress-line">
-
-            <span></span>
-
-        </div>
-
-    </div>
-
-
-    <!-- =====================================================
-         PERMISSION
-    ====================================================== -->
-
-    <div
-        class="permission"
-        id="permission"
-    >
-
-        <strong>
-            Motion interaction
-        </strong>
-
-        <br>
-
-        Shake your phone to rebuild the world.
-        Your motion sensor is used only for this interaction.
-
-        <br>
-
-        <button id="allowMotion">
-            allow motion
-        </button>
-
-    </div>
-
-</div>
-
-
-<script>
-
-/* =========================================================
-   SCENES
-========================================================= */
-
-const scenes = [
-
-    {
-
-        label:
-            "01 / origin",
-
-        title:
-            `SHAB<br>
-             <span class="outline">IN THE</span><br>
-             <em>MIST.</em>`,
-
-        description:
-            `A digital portfolio about finding clarity inside chaos.`,
-
-        meta:
-            "Kerala · 2026",
-
-        status:
-            "Something broken can still become something beautiful."
-
-    },
-
-
-    {
-
-        label:
-            "02 / student",
-
-        title:
-            `<span class="outline">THE</span><br>
-             STUDENT.`,
-
-        description:
-            `B.Com Computer Applications student at Mampad College, learning where business and technology meet.`,
-
-        meta:
-            "B.Com Computer Applications · Mampad College",
-
-        status:
-            "One piece falls into place."
-
-    },
-
-
-    {
-
-        label:
-            "03 / builder",
-
-        title:
-            `CURIOUS<br>
-             <em>BY DEFAULT.</em>`,
-
-        description:
-            `Exploring artificial intelligence, data, technology and digital experiences by building, breaking and rebuilding.`,
-
-        meta:
-            "Explore · Experiment · Build",
-
-        status:
-            "Roots find connections before the branches do."
-
-    },
-
-
-    {
-
-        label:
-            "04 / thinker",
-
-        title:
-            `<span class="outline">FIND</span><br>
-             THE<br>
-             <em>PATTERN.</em>`,
-
-        description:
-            `Observe the noise. Question the obvious. Connect ideas that normally live apart.`,
-
-        meta:
-            "Question · Connect · Simplify",
-
-        status:
-            "The cracks become part of the structure."
-
-    },
-
-
-    {
-
-        label:
-            "05 / interests",
-
-        title:
-            `BUILD<br>
-             <span class="outline">THINGS</span><br>
-             <em>PEOPLE FEEL.</em>`,
-
-        description:
-            "",
-
-        meta:
-            "Artificial Intelligence · Data · Design",
-
-        status:
-            "Then something starts growing."
-
-    },
-
-
-    {
-
-        label:
-            "06 / next",
-
-        title:
-            `WHAT'S<br>
-             <span class="outline">NEXT?</span>`,
-
-        description:
-            `Still learning. Still experimenting. Still looking for the next interesting problem.`,
-
-        meta:
-            "SHAB · Kerala · India",
-
-        status:
-            "The monument is never really finished."
-
-    }
-
-];
-
-
-/* =========================================================
-   DOM
-========================================================= */
-
-const world =
-    document.getElementById(
-        "world"
-    );
-
-const text =
-    document.getElementById(
-        "text"
-    );
-
-const counter =
-    document.getElementById(
-        "counter"
-    );
-
-const guide =
-    document.getElementById(
-        "guide"
-    );
-
-const status =
-    document.getElementById(
-        "status"
-    );
-
-const motionButton =
-    document.getElementById(
-        "motionButton"
-    );
-
-const permission =
-    document.getElementById(
-        "permission"
-    );
-
-const progress =
-    document.querySelector(
-        ".progress-line span"
-    );
-
-
-/* =========================================================
-   STATE
-========================================================= */
-
-let current = 0;
-
-let locked = false;
-
-let motionEnabled = false;
-
-let shakeEnergy = 0;
-
-let lastShake = 0;
-
-
-/* =========================================================
-   RENDER TEXT
-========================================================= */
-
-function renderScene(
-    index,
-    animate = false
-){
+function updateContent() {
 
     const data =
-        scenes[index];
-
-
-    text.innerHTML = `
-
-        <div class="label mono">
-            ${data.label}
-        </div>
-
-        <div class="title">
-            ${data.title}
-        </div>
-
-        ${
-            data.description
-            ?
-            `
-            <div class="description">
-                ${data.description}
-            </div>
-            `
-            :
-            ""
-        }
-
-        <div class="meta mono">
-            ${data.meta}
-        </div>
-
-    `;
-
-
-    if(animate){
-
-        text.classList.remove(
-            "enter"
-        );
-
-        void text.offsetWidth;
-
-        text.classList.add(
-            "enter"
-        );
-
-    }
-
-
-    counter.textContent =
-        `${String(index + 1).padStart(2,"0")} / 06`;
-
-
-    progress.style.width =
-        `${((index + 1) / scenes.length) * 100}%`;
-
-
-    world.className =
-        `stage${index}`;
-
-}
-
-
-/* =========================================================
-   INITIAL
-========================================================= */
-
-renderScene(
-    0,
-    false
-);
-
-
-/* =========================================================
-   ROOT STYLE
-========================================================= */
-
-function setStone(
-    value
-){
-
-    document.documentElement
-        .style
-        .setProperty(
-            "--stone",
-            value
-        );
-
-}
-
-
-/* =========================================================
-   REBUILD VISUAL PROGRESS
-========================================================= */
-
-function updateMonument(){
+        stages[stage];
 
     /*
-        Each scene adds another layer
-        to the monument.
-
-        0 = completely broken
-        1 = completely restored
+       Fade old content
     */
 
-    const values = [
+    document.querySelector(".content")
+        .animate(
+            [
+                {
+                    opacity: 1,
+                    transform: "translateY(0)"
+                },
+                {
+                    opacity: 0,
+                    transform: "translateY(10px)"
+                },
+                {
+                    opacity: 1,
+                    transform: "translateY(0)"
+                }
+            ],
+            {
+                duration: 650,
+                easing: "cubic-bezier(.16,1,.3,1)"
+            }
+        );
 
-        0.08,
-        0.28,
-        0.48,
-        0.68,
-        0.84,
-        1
+
+    setTimeout(() => {
+
+        eyebrow.innerHTML =
+            data.eyebrow;
+
+        title.innerHTML =
+            data.title;
+
+        description.textContent =
+            data.description;
+
+        meta1.textContent =
+            data.meta1;
+
+        meta2.textContent =
+            data.meta2;
+
+        stageNumber.textContent =
+            String(stage + 1)
+                .padStart(2, "0");
+
+    }, 120);
+
+
+    /*
+       Background evolution
+    */
+
+    const backgrounds = [
+
+        "radial-gradient(circle at 50% 50%, rgba(255,255,255,.035), transparent 38%), #090909",
+
+        "radial-gradient(circle at 55% 48%, rgba(210,205,190,.045), transparent 40%), #0a0a09",
+
+        "radial-gradient(circle at 58% 45%, rgba(220,215,200,.05), transparent 42%), #0b0b0a",
+
+        "radial-gradient(circle at 50% 42%, rgba(200,195,180,.055), transparent 45%), #0b0b0a",
+
+        "radial-gradient(circle at 50% 40%, rgba(225,218,194,.07), transparent 48%), #0c0c0b",
+
+        "radial-gradient(circle at 50% 40%, rgba(235,225,200,.10), transparent 52%), #0d0d0c"
 
     ];
 
-
-    setStone(
-        values[current]
-    );
+    app.style.background =
+        backgrounds[stage];
 
 }
 
 
 /* =========================================================
-   NEXT
+   FLOWER STATE
 ========================================================= */
 
-function nextScene(){
+function updateFlower() {
 
-    if(locked)
-        return;
+    flower.className =
+        "";
 
+    flower.classList.add(
+        `stage${stage + 1}`
+    );
+
+
+    /*
+       Roots
+    */
+
+    if (stage >= 3) {
+
+        document.querySelectorAll(".root")
+            .forEach(root => {
+                root.classList.add("active");
+            });
+
+    }
+
+
+    /*
+       Veins
+    */
+
+    document.querySelectorAll(".vein")
+        .forEach((vein, index) => {
+
+            if (
+                index <= stage
+            ) {
+                vein.classList.add("active");
+            }
+
+        });
+
+
+    /*
+       Bloom
+    */
+
+    if (stage >= 4) {
+
+        flowerZone.classList.add(
+            "bloom"
+        );
+
+    }
+
+
+    /*
+       Final stage
+    */
+
+    if (stage === 5) {
+
+        flowerZone.animate(
+            [
+                {
+                    filter: "brightness(1)"
+                },
+                {
+                    filter: "brightness(1.3)"
+                },
+                {
+                    filter: "brightness(1)"
+                }
+            ],
+            {
+                duration: 1800,
+                easing: "ease-out"
+            }
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   ADVANCE STAGE
+========================================================= */
+
+function advanceStage() {
 
     const now =
-        Date.now();
+        performance.now();
 
-
-    /*
-        Prevent accidental multi-trigger.
-    */
-
-    if(
+    if (
         now - lastShake <
-        1200
-    ){
-
+        shakeCooldown
+    ) {
         return;
-
     }
 
-
-    lastShake =
-        now;
-
-
-    locked =
-        true;
-
-
-    /*
-        Physical feedback.
-    */
-
-    vibrate(
-        "heavy"
-    );
-
-
-    playImpact();
-
-
-    /*
-        Screen reacts.
-    */
-
-    world.classList.add(
-        "shake-screen"
-    );
-
-
-    /*
-        Text disappears.
-    */
-
-    text.classList.remove(
-        "enter"
-    );
-
-    text.classList.add(
-        "exit"
-    );
-
-
-    /*
-        Particle explosion.
-    */
-
-    explodeParticles();
-
-
-    /*
-        Hide guide.
-    */
-
-    guide.classList.add(
-        "hide"
-    );
-
-
-    /*
-        Advance after the
-        first part of the break.
-    */
-
-    setTimeout(
-        () => {
-
-            current =
-                (current + 1) %
-                scenes.length;
-
-
-            updateMonument();
-
-
-            renderScene(
-                current,
-                true
-            );
-
-
-            world.classList.remove(
-                "shake-screen"
-            );
-
-
-            /*
-                Allow next shake.
-            */
-
-            setTimeout(
-                () => {
-
-                    locked =
-                        false;
-
-                },
-                650
-            );
-
-        },
-        390
-    );
-
-}
-
-
-/* =========================================================
-   HAPTICS
-========================================================= */
-
-function vibrate(
-    type
-){
-
-    if(
-        !navigator.vibrate
-    ){
-
-        return;
-
-    }
-
-
-    const patterns = {
-
-        light:20,
-
-        medium:[
-            20,
-            20,
-            30
-        ],
-
-        heavy:[
-            35,
-            20,
-            50
-        ]
-
-    };
-
-
-    try{
-
-        navigator.vibrate(
-            patterns[type]
-        );
-
-    }
-
-    catch(error){}
-
-}
-
-
-/* =========================================================
-   AUDIO
-========================================================= */
-
-let audioContext = null;
-
-
-function initAudio(){
-
-    if(audioContext)
-        return;
-
-
-    const Audio =
-        window.AudioContext ||
-        window.webkitAudioContext;
-
-
-    if(!Audio)
-        return;
-
-
-    try{
-
-        audioContext =
-            new Audio();
-
-    }
-
-    catch(error){}
-
-}
-
-
-function playImpact(){
-
-    initAudio();
-
-
-    if(!audioContext)
-        return;
-
-
-    try{
-
-        if(
-            audioContext.state ===
-            "suspended"
-        ){
-
-            audioContext.resume();
-
-        }
-
-
-        const now =
-            audioContext.currentTime;
-
-
+    if (
+        stage >= stages.length - 1
+    ) {
         /*
-            Deep impact.
+           Restart quietly after final stage
         */
 
-        const low =
-            audioContext
-                .createOscillator();
+        stage = 0;
 
+        document.querySelectorAll(".root")
+            .forEach(root => {
+                root.classList.remove(
+                    "active"
+                );
+            });
 
-        const lowGain =
-            audioContext
-                .createGain();
+        document.querySelectorAll(".vein")
+            .forEach(vein => {
+                vein.classList.remove(
+                    "active"
+                );
+            });
 
-
-        low.type =
-            "sine";
-
-
-        low.frequency.setValueAtTime(
-            75,
-            now
+        flowerZone.classList.remove(
+            "bloom"
         );
 
+        updateFlower();
+        updateContent();
 
-        low.frequency.exponentialRampToValueAtTime(
-            32,
-            now + .55
-        );
-
-
-        lowGain.gain.setValueAtTime(
-            .0001,
-            now
-        );
-
-
-        lowGain.gain.exponentialRampToValueAtTime(
-            .055,
-            now + .025
-        );
-
-
-        lowGain.gain.exponentialRampToValueAtTime(
-            .0001,
-            now + .55
-        );
-
-
-        low.connect(
-            lowGain
-        );
-
-
-        lowGain.connect(
-            audioContext.destination
-        );
-
-
-        low.start(now);
-
-        low.stop(
-            now + .6
-        );
-
-
-        /*
-            Small crystalline layer.
-        */
-
-        const high =
-            audioContext
-                .createOscillator();
-
-
-        const highGain =
-            audioContext
-                .createGain();
-
-
-        high.type =
-            "sine";
-
-
-        high.frequency.value =
-            260 +
-            current * 25;
-
-
-        highGain.gain.setValueAtTime(
-            .0001,
-            now
-        );
-
-
-        highGain.gain.exponentialRampToValueAtTime(
-            .016,
-            now + .025
-        );
-
-
-        highGain.gain.exponentialRampToValueAtTime(
-            .0001,
-            now + .45
-        );
-
-
-        high.connect(
-            highGain
-        );
-
-
-        highGain.connect(
-            audioContext.destination
-        );
-
-
-        high.start(now);
-
-        high.stop(
-            now + .5
-        );
-
+        return;
     }
 
-    catch(error){}
+
+    lastShake = now;
+
+    stage++;
+
+    impactSound(stage);
+    vibrate();
+
+    flash.classList.remove("active");
+
+    void flash.offsetWidth;
+
+    flash.classList.add("active");
+
+
+    flowerZone.classList.remove(
+        "impact"
+    );
+
+    void flowerZone.offsetWidth;
+
+    flowerZone.classList.add(
+        "impact"
+    );
+
+
+    updateFlower();
+    updateContent();
 
 }
 
 
 /* =========================================================
-   iPHONE MOTION
+   MOTION DETECTION
 ========================================================= */
 
-let previous = {
+function handleMotion(event) {
 
-    x:0,
-    y:0,
-    z:0
-
-};
-
-
-function handleMotion(
-    event
-){
-
-    if(!motionEnabled)
+    if (!motionEnabled) {
         return;
+    }
 
-
-    const a =
+    const acc =
         event.accelerationIncludingGravity;
 
-
-    if(!a)
+    if (!acc) {
         return;
-
+    }
 
     const x =
-        Number(a.x) || 0;
-
+        acc.x || 0;
 
     const y =
-        Number(a.y) || 0;
-
+        acc.y || 0;
 
     const z =
-        Number(a.z) || 0;
+        acc.z || 0;
 
 
-    const dx =
-        x - previous.x;
+    if (
+        lastX === null
+    ) {
+
+        lastX = x;
+        lastY = y;
+        lastZ = z;
+
+        return;
+
+    }
 
 
-    const dy =
-        y - previous.y;
+    const delta =
+        Math.abs(x - lastX) +
+        Math.abs(y - lastY) +
+        Math.abs(z - lastZ);
 
 
-    const dz =
-        z - previous.z;
-
-
-    const movement =
-        Math.sqrt(
-            dx * dx +
-            dy * dy +
-            dz * dz
-        );
-
-
-    previous = {
-
-        x,
-        y,
-        z
-
-    };
+    lastX = x;
+    lastY = y;
+    lastZ = z;
 
 
     /*
-        Smooth the signal.
-
-        This is important because phone
-        accelerometers are noisy little
-        goblins.
+       Threshold deliberately
+       high enough to avoid
+       advancing while walking.
     */
 
-    shakeEnergy =
-        shakeEnergy * .78 +
-        movement;
+    if (delta > 24) {
 
-
-    /*
-        Deliberate shake.
-    */
-
-    if(
-        shakeEnergy > 21
-    ){
-
-        shakeEnergy =
-            0;
-
-
-        nextScene();
+        advanceStage();
 
     }
 
@@ -2668,164 +1641,112 @@ function handleMotion(
    ENABLE MOTION
 ========================================================= */
 
-async function enableMotion(){
+async function enableDeviceMotion() {
 
-    try{
+    initAudio();
 
-        initAudio();
+    /*
+       iOS
+    */
 
+    if (
+        typeof DeviceMotionEvent !==
+        "undefined" &&
+        typeof DeviceMotionEvent.requestPermission ===
+        "function"
+    ) {
 
-        /*
-            iOS requires permission
-            from a user gesture.
-        */
+        try {
 
-        if(
-
-            typeof DeviceMotionEvent !==
-            "undefined"
-
-            &&
-
-            typeof DeviceMotionEvent
-                .requestPermission ===
-            "function"
-
-        ){
-
-            const result =
-                await
-                DeviceMotionEvent
+            const permissionState =
+                await DeviceMotionEvent
                     .requestPermission();
 
-
-            if(
-                result !==
+            if (
+                permissionState !==
                 "granted"
-            ){
-
-                motionButton.textContent =
-                    "motion denied";
+            ) {
 
                 return;
 
             }
 
+        } catch (error) {
+
+            console.log(
+                "Motion permission error:",
+                error
+            );
+
+            return;
+
         }
 
-
-        window.addEventListener(
-            "devicemotion",
-            handleMotion,
-            true
-        );
-
-
-        motionEnabled =
-            true;
-
-
-        motionButton.textContent =
-            "shake active";
-
-
-        permission.style.display =
-            "none";
-
-
-        shakeEnergy =
-            0;
-
-
-        previous = {
-
-            x:0,
-            y:0,
-            z:0
-
-        };
-
-
-        vibrate(
-            "light"
-        );
-
-
-        /*
-            Audio unlock.
-        */
-
-        playImpact();
-
     }
 
-    catch(error){
 
-        console.error(
-            "Motion:",
-            error
-        );
+    window.addEventListener(
+        "devicemotion",
+        handleMotion,
+        true
+    );
 
 
-        motionButton.textContent =
-            "motion unavailable";
+    motionEnabled = true;
 
-    }
+    permission.classList.add(
+        "hidden"
+    );
+
+    /*
+       tiny opening sound
+    */
+
+    impactSound(0);
 
 }
 
 
 /* =========================================================
-   MOTION BUTTON
+   BUTTON
 ========================================================= */
 
-motionButton.addEventListener(
+enableMotion.addEventListener(
     "click",
-    () => {
-
-        if(motionEnabled){
-
-            window.removeEventListener(
-                "devicemotion",
-                handleMotion,
-                true
-            );
+    enableDeviceMotion
+);
 
 
-            motionEnabled =
-                false;
+/* =========================================================
+   DESKTOP FALLBACK
+========================================================= */
 
+let touchStartX = null;
 
-            motionButton.textContent =
-                "enable shake";
+window.addEventListener(
+    "keydown",
+    event => {
 
+        if (
+            event.code === "Space" ||
+            event.code === "ArrowRight"
+        ) {
 
-            return;
+            event.preventDefault();
 
-        }
-
-
-        if(
-
-            typeof DeviceMotionEvent !==
-            "undefined"
-
-            &&
-
-            typeof DeviceMotionEvent
-                .requestPermission ===
-            "function"
-
-        ){
-
-            permission.style.display =
-                "block";
+            advanceStage();
 
         }
 
-        else{
+        if (
+            event.code === "ArrowLeft"
+        ) {
 
-            enableMotion();
+            stage =
+                Math.max(0, stage - 1);
+
+            updateFlower();
+            updateContent();
 
         }
 
@@ -2833,211 +1754,166 @@ motionButton.addEventListener(
 );
 
 
-/* =========================================================
-   PERMISSION BUTTON
-========================================================= */
-
-document
-    .getElementById(
-        "allowMotion"
-    )
-    .addEventListener(
-        "click",
-        enableMotion
-    );
-
-
-/* =========================================================
-   POINTER ATMOSPHERE
-========================================================= */
+/*
+   Swipe support
+*/
 
 window.addEventListener(
-    "pointermove",
+    "touchstart",
     event => {
 
-        document.documentElement
-            .style
-            .setProperty(
-                "--mouseX",
-                event.clientX + "px"
-            );
-
-
-        document.documentElement
-            .style
-            .setProperty(
-                "--mouseY",
-                event.clientY + "px"
-            );
+        touchStartX =
+            event.touches[0].clientX;
 
     },
     {
-        passive:true
+        passive: true
     }
 );
 
-
-/* =========================================================
-   TOUCH ATMOSPHERE
-========================================================= */
-
 window.addEventListener(
-    "touchmove",
+    "touchend",
     event => {
 
-        const touch =
-            event.touches[0];
-
-
-        if(!touch)
+        if (
+            touchStartX === null
+        ) {
             return;
+        }
 
+        const endX =
+            event.changedTouches[0].clientX;
 
-        document.documentElement
-            .style
-            .setProperty(
-                "--mouseX",
-                touch.clientX + "px"
-            );
+        const distance =
+            endX - touchStartX;
 
+        if (
+            Math.abs(distance) > 70
+        ) {
 
-        document.documentElement
-            .style
-            .setProperty(
-                "--mouseY",
-                touch.clientY + "px"
-            );
+            if (distance < 0) {
+
+                advanceStage();
+
+            } else {
+
+                stage =
+                    Math.max(
+                        0,
+                        stage - 1
+                    );
+
+                updateFlower();
+                updateContent();
+
+            }
+
+        }
+
+        touchStartX = null;
 
     },
     {
-        passive:true
+        passive: true
     }
 );
 
 
 /* =========================================================
-   PARTICLE SYSTEM
+   PARTICLES
 ========================================================= */
 
 const canvas =
     document.getElementById(
-        "dust"
+        "particles"
     );
-
 
 const ctx =
-    canvas.getContext(
-        "2d"
-    );
-
-
-let W =
-    innerWidth;
-
-
-let H =
-    innerHeight;
-
-
-let DPR =
-    Math.min(
-        devicePixelRatio || 1,
-        2
-    );
-
+    canvas.getContext("2d");
 
 let particles = [];
 
-
-function resize(){
-
-    W =
-        innerWidth;
-
-
-    H =
-        innerHeight;
-
-
-    DPR =
-        Math.min(
-            devicePixelRatio || 1,
-            2
-        );
-
+function resizeCanvas() {
 
     canvas.width =
-        W * DPR;
-
+        window.innerWidth *
+        devicePixelRatio;
 
     canvas.height =
-        H * DPR;
-
+        window.innerHeight *
+        devicePixelRatio;
 
     canvas.style.width =
-        W + "px";
-
+        window.innerWidth + "px";
 
     canvas.style.height =
-        H + "px";
-
+        window.innerHeight + "px";
 
     ctx.setTransform(
-        DPR,
+        devicePixelRatio,
         0,
         0,
-        DPR,
+        devicePixelRatio,
         0,
         0
     );
 
-
-    createParticles();
-
 }
 
+resizeCanvas();
 
-function createParticles(){
-
-    const amount =
-        W < 700
-        ? 260
-        : 650;
-
-
-    particles =
-        [];
+window.addEventListener(
+    "resize",
+    resizeCanvas
+);
 
 
-    for(
+/*
+   Sparse atmospheric particles.
+   Not 4,000 glowing dots. Humanity
+   has suffered enough galaxy portfolios.
+*/
+
+function createParticles() {
+
+    particles = [];
+
+    const count =
+        window.innerWidth < 700
+            ? 45
+            : 75;
+
+    for (
         let i = 0;
-        i < amount;
+        i < count;
         i++
-    ){
+    ) {
 
         particles.push({
 
             x:
-                Math.random() * W,
+                Math.random() *
+                window.innerWidth,
 
             y:
-                Math.random() * H,
+                Math.random() *
+                window.innerHeight,
+
+            r:
+                Math.random() *
+                1.2 + .2,
 
             vx:
-                (Math.random()-.5)
-                * .18,
+                (Math.random() - .5) *
+                .12,
 
             vy:
-                (Math.random()-.5)
-                * .18,
+                Math.random() *
+                .18 + .03,
 
-            radius:
-                .25 +
-                Math.random() * 1.2,
-
-            alpha:
-                .08 +
-                Math.random() * .35
+            opacity:
+                Math.random() *
+                .35 + .05
 
         });
 
@@ -3045,330 +1921,88 @@ function createParticles(){
 
 }
 
-
-resize();
-
-
-window.addEventListener(
-    "resize",
-    resize,
-    {
-        passive:true
-    }
-);
+createParticles();
 
 
-/* =========================================================
-   PARTICLE EXPLOSION
-========================================================= */
-
-function explodeParticles(){
-
-    const cx =
-        W / 2;
-
-
-    const cy =
-        H / 2;
-
-
-    particles.forEach(
-        particle => {
-
-            const dx =
-                particle.x -
-                cx;
-
-
-            const dy =
-                particle.y -
-                cy;
-
-
-            const distance =
-                Math.hypot(
-                    dx,
-                    dy
-                ) || 1;
-
-
-            const force =
-                2 +
-                Math.random() * 5;
-
-
-            particle.vx +=
-                dx / distance *
-                force;
-
-
-            particle.vy +=
-                dy / distance *
-                force;
-
-        }
-    );
-
-}
-
-
-/* =========================================================
-   PARTICLE LOOP
-========================================================= */
-
-function draw(){
+function drawParticles() {
 
     ctx.clearRect(
         0,
         0,
-        W,
-        H
+        window.innerWidth,
+        window.innerHeight
     );
 
+    particles.forEach(p => {
 
-    const cx =
-        W / 2;
+        p.x += p.vx;
+        p.y += p.vy;
 
-
-    const cy =
-        H / 2;
-
-
-    particles.forEach(
-        p => {
-
-            /*
-                Gentle gravity toward
-                the monument.
-            */
-
-            p.vx +=
-                (cx - p.x) *
-                .0000012;
-
-
-            p.vy +=
-                (cy - p.y) *
-                .0000012;
-
-
-            p.vx *=
-                .985;
-
-
-            p.vy *=
-                .985;
-
-
-            p.x +=
-                p.vx;
-
-
-            p.y +=
-                p.vy;
-
-
-            /*
-                Wrap around.
-            */
-
-            if(
-                p.x < -10
-            )
-                p.x =
-                    W + 10;
-
-
-            if(
-                p.x > W + 10
-            )
-                p.x =
-                    -10;
-
-
-            if(
-                p.y < -10
-            )
-                p.y =
-                    H + 10;
-
-
-            if(
-                p.y > H + 10
-            )
-                p.y =
-                    -10;
-
-
-            ctx.beginPath();
-
-
-            ctx.arc(
-                p.x,
-                p.y,
-                p.radius,
-                0,
-                Math.PI * 2
-            );
-
-
-            ctx.fillStyle =
-                `rgba(
-                    222,
-                    215,
-                    201,
-                    ${p.alpha}
-                )`;
-
-
-            ctx.fill();
-
+        if (
+            p.y >
+            window.innerHeight + 10
+        ) {
+            p.y = -10;
+            p.x =
+                Math.random() *
+                window.innerWidth;
         }
-    );
 
+        if (
+            p.x <
+            -10
+        ) {
+            p.x =
+                window.innerWidth + 10;
+        }
+
+        if (
+            p.x >
+            window.innerWidth + 10
+        ) {
+            p.x = -10;
+        }
+
+        ctx.beginPath();
+
+        ctx.arc(
+            p.x,
+            p.y,
+            p.r,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.globalAlpha =
+            p.opacity;
+
+        ctx.fillStyle =
+            "#d8d3c8";
+
+        ctx.fill();
+
+    });
+
+    ctx.globalAlpha = 1;
 
     requestAnimationFrame(
-        draw
+        drawParticles
     );
 
 }
 
-
-draw();
-
-
-/* =========================================================
-   DESKTOP FALLBACK
-========================================================= */
-
-let pointerDown =
-    null;
-
-
-window.addEventListener(
-    "pointerdown",
-    event => {
-
-        pointerDown = {
-
-            x:event.clientX,
-
-            y:event.clientY
-
-        };
-
-    },
-    {
-        passive:true
-    }
-);
-
-
-window.addEventListener(
-    "pointerup",
-    event => {
-
-        if(!pointerDown)
-            return;
-
-
-        const dx =
-            event.clientX -
-            pointerDown.x;
-
-
-        const dy =
-            event.clientY -
-            pointerDown.y;
-
-
-        const distance =
-            Math.hypot(
-                dx,
-                dy
-            );
-
-
-        if(
-            distance > 120
-        ){
-
-            nextScene();
-
-        }
-
-
-        pointerDown =
-            null;
-
-    },
-    {
-        passive:true
-    }
-);
+drawParticles();
 
 
 /* =========================================================
-   KEYBOARD
+   INITIAL STATE
 ========================================================= */
 
-window.addEventListener(
-    "keydown",
-    event => {
+updateContent();
 
-        if(
-            event.code === "Space" ||
-            event.code === "ArrowRight"
-        ){
-
-            event.preventDefault();
-
-            nextScene();
-
-        }
-
-    }
-);
-
-
-/* =========================================================
-   AUDIO UNLOCK
-========================================================= */
-
-window.addEventListener(
-    "pointerdown",
-    () => {
-
-        initAudio();
-
-
-        if(
-            audioContext &&
-            audioContext.state ===
-            "suspended"
-        ){
-
-            audioContext.resume();
-
-        }
-
-    },
-    {
-        once:true,
-        passive:true
-    }
-);
-
-
-/* =========================================================
-   INITIAL MONUMENT STATE
-========================================================= */
-
-updateMonument();
-
+updateFlower();
 
 </script>
 
 </body>
-
 </html>
