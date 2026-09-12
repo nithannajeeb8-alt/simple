@@ -1,0 +1,1724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#08080a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+<title>CHAOS / CLARITY</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap');
+
+:root{
+    --bg:#08080a;
+    --fg:#f4f0e8;
+    --muted:#9d9a94;
+    --line:#29282b;
+    --accent:#d8c9aa;
+    --mx:50%;
+    --my:50%;
+    --tiltX:0deg;
+    --tiltY:0deg;
+}
+
+*{
+    box-sizing:border-box;
+}
+
+html{
+    scroll-behavior:smooth;
+    background:var(--bg);
+}
+
+body{
+    margin:0;
+    background:var(--bg);
+    color:var(--fg);
+    font-family:Manrope,sans-serif;
+    overflow-x:hidden;
+    cursor:none;
+}
+
+a{
+    color:inherit;
+    text-decoration:none;
+}
+
+/* GRAIN */
+
+.grain{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:50;
+    opacity:.055;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* CURSOR */
+
+.cursor{
+    position:fixed;
+    z-index:100;
+    width:18px;
+    height:18px;
+    border:1px solid white;
+    border-radius:50%;
+    pointer-events:none;
+    transform:translate(-50%,-50%);
+    mix-blend-mode:difference;
+    transition:
+        width .25s ease,
+        height .25s ease,
+        background .25s ease;
+}
+
+.cursor.big{
+    width:65px;
+    height:65px;
+    background:white;
+}
+
+/* HUD */
+
+.hud{
+    position:fixed;
+    z-index:40;
+    top:18px;
+    left:20px;
+    right:20px;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    font:11px 'DM Mono',monospace;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+
+    color:#c8c4bc;
+    mix-blend-mode:difference;
+}
+
+.hud button{
+    font:inherit;
+    color:inherit;
+    background:none;
+    border:1px solid #777;
+    padding:8px 12px;
+    border-radius:99px;
+    cursor:pointer;
+}
+
+/* HERO */
+
+.hero{
+    min-height:100svh;
+    min-height:100vh;
+    position:relative;
+    display:grid;
+    place-items:center;
+    overflow:hidden;
+}
+
+.hero-inner{
+    width:min(1200px,90vw);
+    position:relative;
+    z-index:5;
+
+    transform:
+        perspective(1000px)
+        rotateX(var(--tiltY))
+        rotateY(var(--tiltX));
+
+    transition:transform .25s ease-out;
+}
+
+.eyebrow{
+    font:11px 'DM Mono',monospace;
+    letter-spacing:.18em;
+    color:var(--muted);
+    margin-bottom:20px;
+}
+
+.title{
+    font-size:clamp(62px,13vw,190px);
+    line-height:.78;
+    letter-spacing:-.075em;
+    font-weight:800;
+    margin:0;
+}
+
+.title span{
+    display:block;
+}
+
+.ghost{
+    color:transparent;
+    -webkit-text-stroke:1px #706e6a;
+}
+
+.hero-note{
+    display:flex;
+    justify-content:space-between;
+    align-items:end;
+
+    margin-top:55px;
+    border-top:1px solid var(--line);
+    padding-top:15px;
+
+    color:#aaa69e;
+    font-size:13px;
+}
+
+.hero-note b{
+    color:#eee9df;
+}
+
+/* PARTICLES */
+
+#sand{
+    position:absolute;
+    inset:0;
+
+    width:100%;
+    height:100%;
+
+    z-index:2;
+    pointer-events:none;
+}
+
+/* ORB */
+
+.orb{
+    position:absolute;
+
+    width:min(55vw,680px);
+    height:min(55vw,680px);
+
+    left:var(--mx);
+    top:var(--my);
+
+    transform:translate(-50%,-50%);
+
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            circle at 38% 32%,
+            #eee7d8 0%,
+            #bdb6a8 8%,
+            #6c6a68 25%,
+            #202023 60%,
+            transparent 71%
+        );
+
+    filter:blur(2px);
+    opacity:.18;
+
+    z-index:1;
+
+    transition:
+        left .7s cubic-bezier(.2,.8,.2,1),
+        top .7s cubic-bezier(.2,.8,.2,1);
+}
+
+.orb::after{
+    content:"";
+
+    position:absolute;
+    inset:-20%;
+
+    border-radius:50%;
+    border:1px solid #cfc7b7;
+
+    opacity:.15;
+
+    animation:spin 18s linear infinite;
+}
+
+@keyframes spin{
+    to{
+        transform:rotate(360deg);
+    }
+}
+
+/* SCROLL */
+
+.scroll{
+    position:absolute;
+    bottom:24px;
+    left:50%;
+
+    transform:translateX(-50%);
+
+    font:10px 'DM Mono',monospace;
+    letter-spacing:.2em;
+
+    color:#777;
+
+    z-index:6;
+}
+
+.scroll i{
+    display:block;
+
+    width:1px;
+    height:45px;
+
+    background:#555;
+
+    margin:10px auto 0;
+
+    animation:pulse 1.5s infinite;
+}
+
+@keyframes pulse{
+    50%{
+        height:65px;
+        opacity:.25;
+    }
+}
+
+/* SECTIONS */
+
+section{
+    position:relative;
+    padding:150px 5vw;
+    border-top:1px solid var(--line);
+}
+
+.wrap{
+    max-width:1200px;
+    margin:auto;
+}
+
+.section-label{
+    font:10px 'DM Mono',monospace;
+    color:#777;
+    letter-spacing:.2em;
+    text-transform:uppercase;
+    margin-bottom:50px;
+}
+
+.statement{
+    font-size:clamp(36px,6.2vw,82px);
+    line-height:.98;
+    letter-spacing:-.055em;
+    max-width:1000px;
+}
+
+.statement em{
+    font-style:normal;
+    color:#777;
+}
+
+/* REVEAL */
+
+.reveal{
+    opacity:0;
+    transform:translateY(45px);
+
+    transition:
+        opacity .9s ease,
+        transform .9s cubic-bezier(.2,.8,.2,1);
+}
+
+.reveal.show{
+    opacity:1;
+    transform:none;
+}
+
+/* WORK */
+
+.work-grid{
+    display:grid;
+
+    grid-template-columns:repeat(12,1fr);
+
+    gap:18px;
+
+    margin-top:80px;
+}
+
+.card{
+    position:relative;
+
+    min-height:420px;
+
+    border:1px solid var(--line);
+
+    overflow:hidden;
+
+    background:#101013;
+
+    grid-column:span 7;
+
+    display:flex;
+    align-items:end;
+
+    padding:25px;
+
+    isolation:isolate;
+}
+
+.card:nth-child(2){
+    grid-column:span 5;
+    min-height:520px;
+}
+
+.card:nth-child(3){
+    grid-column:span 5;
+}
+
+.card:nth-child(4){
+    grid-column:span 7;
+}
+
+.card::before{
+    content:"";
+
+    position:absolute;
+    inset:0;
+
+    background:
+        radial-gradient(
+            circle at var(--px,50%) var(--py,50%),
+            rgba(235,225,205,.28),
+            transparent 27%
+        ),
+        linear-gradient(135deg,#1c1b1d,#08080a);
+
+    z-index:-2;
+
+    transform:scale(1);
+
+    transition:transform .8s ease;
+}
+
+.card:hover::before{
+    transform:scale(1.08);
+}
+
+.card .num{
+    position:absolute;
+
+    top:20px;
+    right:20px;
+
+    font:10px 'DM Mono';
+    color:#777;
+}
+
+.card h3{
+    font-size:clamp(28px,4vw,54px);
+    line-height:.9;
+    letter-spacing:-.05em;
+    margin:0;
+}
+
+.card p{
+    font-size:12px;
+    color:#aaa;
+    margin:12px 0 0;
+}
+
+/* PROCESS */
+
+.process{
+    display:grid;
+
+    grid-template-columns:1fr 2fr;
+
+    gap:50px;
+}
+
+.steps{
+    border-top:1px solid var(--line);
+}
+
+.step{
+    display:grid;
+
+    grid-template-columns:70px 1fr auto;
+
+    gap:20px;
+
+    padding:28px 0;
+
+    border-bottom:1px solid var(--line);
+
+    align-items:start;
+}
+
+.step span{
+    font:11px 'DM Mono';
+    color:#666;
+}
+
+.step h3{
+    margin:0;
+    font-size:25px;
+}
+
+.step p{
+    margin:8px 0 0;
+
+    color:#85817a;
+
+    font-size:13px;
+
+    max-width:580px;
+}
+
+.step b{
+    font:11px 'DM Mono';
+    font-weight:400;
+    color:#aaa;
+}
+
+/* CONTACT */
+
+.contact{
+    min-height:90vh;
+
+    display:flex;
+    align-items:center;
+}
+
+.contact h2{
+    font-size:clamp(55px,12vw,170px);
+
+    line-height:.78;
+
+    letter-spacing:-.08em;
+
+    margin:0;
+}
+
+.contact h2 span{
+    display:block;
+}
+
+.contact .line{
+    margin-top:55px;
+
+    display:flex;
+    justify-content:space-between;
+
+    border-top:1px solid var(--line);
+
+    padding-top:15px;
+
+    font:11px 'DM Mono';
+
+    color:#999;
+}
+
+/* CONTROLS */
+
+.sound{
+    position:fixed;
+
+    bottom:20px;
+    right:20px;
+
+    z-index:40;
+
+    border:1px solid #444;
+
+    background:#0d0d0f;
+
+    color:#eee;
+
+    border-radius:999px;
+
+    padding:11px 15px;
+
+    font:10px 'DM Mono';
+
+    letter-spacing:.08em;
+
+    cursor:pointer;
+}
+
+.permission{
+    position:fixed;
+
+    left:15px;
+    right:15px;
+    bottom:75px;
+
+    z-index:60;
+
+    padding:16px;
+
+    border:1px solid #39383a;
+
+    background:rgba(12,12,14,.92);
+
+    backdrop-filter:blur(15px);
+
+    font-size:12px;
+
+    color:#aaa;
+
+    display:none;
+}
+
+.permission button{
+    margin-top:10px;
+
+    background:#eee;
+
+    color:#111;
+
+    border:0;
+
+    border-radius:99px;
+
+    padding:9px 14px;
+
+    font-weight:700;
+
+    cursor:pointer;
+}
+
+/* FOOTER */
+
+.footer{
+    padding:25px 5vw;
+
+    border-top:1px solid var(--line);
+
+    display:flex;
+
+    justify-content:space-between;
+
+    color:#666;
+
+    font:10px 'DM Mono';
+}
+
+/* MOBILE */
+
+@media(max-width:700px){
+
+    body{
+        cursor:auto;
+    }
+
+    .cursor{
+        display:none;
+    }
+
+    .hud{
+        top:12px;
+        left:13px;
+        right:13px;
+    }
+
+    .hero-inner{
+        width:88vw;
+    }
+
+    .hero-note{
+        font-size:11px;
+        margin-top:35px;
+    }
+
+    .hero-note span:last-child{
+        max-width:130px;
+        text-align:right;
+    }
+
+    .orb{
+        width:100vw;
+        height:100vw;
+    }
+
+    .work-grid{
+        display:block;
+    }
+
+    .card,
+    .card:nth-child(n){
+        min-height:390px;
+        margin-bottom:12px;
+    }
+
+    .process{
+        grid-template-columns:1fr;
+        gap:35px;
+    }
+
+    .step{
+        grid-template-columns:40px 1fr;
+    }
+
+    .step b{
+        display:none;
+    }
+
+    section{
+        padding:110px 6vw;
+    }
+
+    .contact{
+        min-height:80vh;
+    }
+
+    .contact .line{
+        gap:20px;
+        flex-direction:column;
+    }
+
+    .footer{
+        gap:20px;
+        flex-direction:column;
+    }
+}
+
+/* REDUCED MOTION */
+
+@media(prefers-reduced-motion:reduce){
+
+    *,
+    *::before,
+    *::after{
+        scroll-behavior:auto !important;
+        animation-duration:.01ms !important;
+        transition-duration:.01ms !important;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="grain"></div>
+<div class="cursor"></div>
+
+<div class="hud">
+    <span>Portfolio / 2026</span>
+    <button id="motionBtn">motion: off</button>
+</div>
+
+<div class="permission" id="permission">
+    Tilt interaction is ready. iPhone requires permission before motion data can be used.
+    <br>
+    <button id="allowMotion">Enable motion</button>
+</div>
+
+<button class="sound" id="sound">
+    sound: off
+</button>
+
+<main>
+
+<!-- HERO -->
+
+<section class="hero">
+
+    <canvas id="sand"></canvas>
+
+    <div class="orb"></div>
+
+    <div class="hero-inner">
+
+        <div class="eyebrow">
+            A portfolio in controlled chaos
+        </div>
+
+        <h1 class="title">
+            <span>BEAUTY</span>
+            <span class="ghost">IN THE</span>
+            <span>MIST</span>
+        </h1>
+
+        <div class="hero-note">
+
+            <span>
+                <b>Finding form</b>
+                <br>
+                where everything moves.
+            </span>
+
+            <span>
+                Move your phone.
+                <br>
+                The page responds.
+            </span>
+
+        </div>
+
+    </div>
+
+    <div class="scroll">
+        ENTER THE WORK
+        <i></i>
+    </div>
+
+</section>
+
+
+<!-- PHILOSOPHY -->
+
+<section>
+
+    <div class="wrap">
+
+        <div class="section-label">
+            01 / philosophy
+        </div>
+
+        <div class="statement reveal">
+            I make things that feel
+            <em>quiet at first</em>,
+            then refuse to leave your head.
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- WORK -->
+
+<section>
+
+    <div class="wrap">
+
+        <div class="section-label">
+            02 / selected work
+        </div>
+
+        <div class="work-grid">
+
+            <a class="card reveal" href="#">
+                <span class="num">01</span>
+
+                <div>
+                    <h3>Nocturne</h3>
+                    <p>Identity / digital experience / 2026</p>
+                </div>
+            </a>
+
+            <a class="card reveal" href="#">
+                <span class="num">02</span>
+
+                <div>
+                    <h3>Afterglow</h3>
+                    <p>Art direction / motion / interaction</p>
+                </div>
+            </a>
+
+            <a class="card reveal" href="#">
+                <span class="num">03</span>
+
+                <div>
+                    <h3>Drift</h3>
+                    <p>Experimental interface / sound</p>
+                </div>
+            </a>
+
+            <a class="card reveal" href="#">
+                <span class="num">04</span>
+
+                <div>
+                    <h3>Untitled / 04</h3>
+                    <p>Visual system / web / culture</p>
+                </div>
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- PROCESS -->
+
+<section>
+
+    <div class="wrap process">
+
+        <div>
+
+            <div class="section-label">
+                03 / process
+            </div>
+
+            <div class="statement reveal"
+                 style="font-size:clamp(35px,5vw,65px)">
+                Less noise.
+                <br>
+                <em>More signal.</em>
+            </div>
+
+        </div>
+
+        <div class="steps">
+
+            <div class="step reveal">
+                <span>01</span>
+
+                <div>
+                    <h3>Observe</h3>
+                    <p>
+                        Find the human tension hiding underneath the brief.
+                    </p>
+                </div>
+
+                <b>LOOK</b>
+            </div>
+
+            <div class="step reveal">
+                <span>02</span>
+
+                <div>
+                    <h3>Distill</h3>
+                    <p>
+                        Remove everything that exists only because someone expected it.
+                    </p>
+                </div>
+
+                <b>EDIT</b>
+            </div>
+
+            <div class="step reveal">
+                <span>03</span>
+
+                <div>
+                    <h3>Compose</h3>
+                    <p>
+                        Build rhythm, typography, motion and atmosphere as one system.
+                    </p>
+                </div>
+
+                <b>MAKE</b>
+            </div>
+
+            <div class="step reveal">
+                <span>04</span>
+
+                <div>
+                    <h3>Disrupt</h3>
+                    <p>
+                        Leave one beautiful thing slightly unresolved.
+                    </p>
+                </div>
+
+                <b>FEEL</b>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- CONTACT -->
+
+<section class="contact">
+
+    <div class="wrap">
+
+        <div class="section-label">
+            04 / contact
+        </div>
+
+        <h2 class="reveal">
+            <span>LET'S MAKE</span>
+            <span class="ghost">SOMETHING</span>
+            <span>ALIVE.</span>
+        </h2>
+
+        <div class="line">
+
+            <span>
+                available for selected collaborations
+            </span>
+
+            <a href="mailto:hello@example.com">
+                hello@example.com ↗
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+</main>
+
+
+<footer class="footer">
+
+    <span>
+        © 2026 / NAME
+    </span>
+
+    <span>
+        Built for humans with functioning gyroscopes.
+    </span>
+
+</footer>
+
+
+<script>
+
+/* =========================================================
+   CORE
+========================================================= */
+
+const root = document.documentElement;
+
+const cursor = document.querySelector(".cursor");
+const orb = document.querySelector(".orb");
+
+const canvas = document.getElementById("sand");
+const ctx = canvas.getContext("2d", {
+    alpha:true
+});
+
+let W = 0;
+let H = 0;
+let DPR = 1;
+
+let particles = [];
+
+let pointer = {
+    x:0,
+    y:0
+};
+
+let motionEnabled = false;
+
+let ax = 0;
+let ay = 0;
+
+let animationFrame;
+
+
+/* =========================================================
+   CANVAS
+========================================================= */
+
+function resizeCanvas(){
+
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+    W = window.innerWidth;
+    H = window.innerHeight;
+
+    canvas.width = Math.floor(W * DPR);
+    canvas.height = Math.floor(H * DPR);
+
+    canvas.style.width = W + "px";
+    canvas.style.height = H + "px";
+
+    ctx.setTransform(
+        DPR,
+        0,
+        0,
+        DPR,
+        0,
+        0
+    );
+
+    pointer.x = W * .5;
+    pointer.y = H * .5;
+
+    createParticles();
+}
+
+
+function createParticles(){
+
+    const count =
+        W < 700
+        ? 420
+        : 850;
+
+    particles = [];
+
+    for(let i = 0; i < count; i++){
+
+        particles.push({
+
+            x:Math.random() * W,
+
+            y:Math.random() * H,
+
+            vx:(Math.random() - .5) * .2,
+
+            vy:(Math.random() - .5) * .2,
+
+            r:Math.random() * 1.3 + .2,
+
+            alpha:Math.random() * .55 + .08
+
+        });
+
+    }
+}
+
+
+window.addEventListener(
+    "resize",
+    resizeCanvas,
+    {passive:true}
+);
+
+resizeCanvas();
+
+
+/* =========================================================
+   POINTER
+========================================================= */
+
+window.addEventListener(
+    "pointermove",
+    function(e){
+
+        pointer.x = e.clientX;
+        pointer.y = e.clientY;
+
+        root.style.setProperty(
+            "--mx",
+            e.clientX + "px"
+        );
+
+        root.style.setProperty(
+            "--my",
+            e.clientY + "px"
+        );
+
+        if(cursor){
+
+            cursor.style.left =
+                e.clientX + "px";
+
+            cursor.style.top =
+                e.clientY + "px";
+
+        }
+
+        document
+            .querySelectorAll(".card")
+            .forEach(card => {
+
+                const rect =
+                    card.getBoundingClientRect();
+
+                if(
+                    e.clientX >= rect.left &&
+                    e.clientX <= rect.right &&
+                    e.clientY >= rect.top &&
+                    e.clientY <= rect.bottom
+                ){
+
+                    const px =
+                        ((e.clientX - rect.left) /
+                        rect.width) * 100;
+
+                    const py =
+                        ((e.clientY - rect.top) /
+                        rect.height) * 100;
+
+                    card.style.setProperty(
+                        "--px",
+                        px + "%"
+                    );
+
+                    card.style.setProperty(
+                        "--py",
+                        py + "%"
+                    );
+
+                }
+
+            });
+
+    },
+    {passive:true}
+);
+
+
+/* =========================================================
+   CURSOR
+========================================================= */
+
+document
+    .querySelectorAll(
+        "a,button"
+    )
+    .forEach(element => {
+
+        element.addEventListener(
+            "mouseenter",
+            () => cursor?.classList.add("big")
+        );
+
+        element.addEventListener(
+            "mouseleave",
+            () => cursor?.classList.remove("big")
+        );
+
+    });
+
+
+/* =========================================================
+   PARTICLE ENGINE
+========================================================= */
+
+function drawParticles(){
+
+    ctx.clearRect(
+        0,
+        0,
+        W,
+        H
+    );
+
+    for(const p of particles){
+
+        let dx =
+            p.x - pointer.x;
+
+        let dy =
+            p.y - pointer.y;
+
+        let distance =
+            Math.sqrt(
+                dx * dx +
+                dy * dy
+            );
+
+        if(distance < 1){
+            distance = 1;
+        }
+
+
+        /* Mouse influence */
+
+        const influence =
+            Math.max(
+                0,
+                1 - distance / 300
+            );
+
+        const swirl =
+            influence * .055;
+
+
+        p.vx +=
+            -dy * swirl;
+
+
+        p.vy +=
+            dx * swirl;
+
+
+        /* Phone motion */
+
+        if(motionEnabled){
+
+            p.vx +=
+                ax * .0009;
+
+            p.vy +=
+                ay * .0009;
+
+        }
+
+
+        /* Natural movement */
+
+        p.vx *= .985;
+        p.vy *= .985;
+
+
+        p.x += p.vx;
+        p.y += p.vy;
+
+
+        /* Wrap */
+
+        if(p.x < -10)
+            p.x = W + 10;
+
+        if(p.x > W + 10)
+            p.x = -10;
+
+        if(p.y < -10)
+            p.y = H + 10;
+
+        if(p.y > H + 10)
+            p.y = -10;
+
+
+        /* Draw */
+
+        ctx.beginPath();
+
+        ctx.arc(
+            p.x,
+            p.y,
+            p.r,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fillStyle =
+            `rgba(230,224,211,${p.alpha})`;
+
+        ctx.fill();
+
+    }
+
+    animationFrame =
+        requestAnimationFrame(drawParticles);
+}
+
+drawParticles();
+
+
+/* =========================================================
+   MOTION SENSOR
+========================================================= */
+
+const motionBtn =
+    document.getElementById("motionBtn");
+
+const permissionBox =
+    document.getElementById("permission");
+
+const allowMotion =
+    document.getElementById("allowMotion");
+
+
+function handleOrientation(event){
+
+    const gamma =
+        Number(event.gamma) || 0;
+
+    const beta =
+        Number(event.beta) || 0;
+
+
+    ax = Math.max(
+        -30,
+        Math.min(30,gamma)
+    );
+
+    ay = Math.max(
+        -30,
+        Math.min(30,beta)
+    );
+
+
+    root.style.setProperty(
+        "--tiltX",
+        Math.max(
+            -4,
+            Math.min(
+                4,
+                ax / 8
+            )
+        ) + "deg"
+    );
+
+
+    root.style.setProperty(
+        "--tiltY",
+        Math.max(
+            -4,
+            Math.min(
+                4,
+                ay / 15
+            )
+        ) + "deg"
+    );
+
+}
+
+
+async function enableMotion(){
+
+    try{
+
+        /*
+         iOS 13+
+         */
+
+        if(
+            typeof DeviceOrientationEvent !==
+            "undefined" &&
+            typeof DeviceOrientationEvent.requestPermission ===
+            "function"
+        ){
+
+            const permission =
+                await DeviceOrientationEvent.requestPermission();
+
+            if(permission !== "granted"){
+
+                motionBtn.textContent =
+                    "motion: denied";
+
+                return;
+            }
+
+        }
+
+
+        window.addEventListener(
+            "deviceorientation",
+            handleOrientation,
+            true
+        );
+
+
+        motionEnabled = true;
+
+        motionBtn.textContent =
+            "motion: on";
+
+        permissionBox.style.display =
+            "none";
+
+
+    }catch(error){
+
+        console.error(
+            "Motion error:",
+            error
+        );
+
+        motionBtn.textContent =
+            "motion: unavailable";
+
+    }
+
+}
+
+
+motionBtn.addEventListener(
+    "click",
+    function(){
+
+        if(motionEnabled){
+
+            motionEnabled = false;
+
+            window.removeEventListener(
+                "deviceorientation",
+                handleOrientation,
+                true
+            );
+
+            motionBtn.textContent =
+                "motion: off";
+
+            return;
+        }
+
+
+        /*
+         iPhone requires a user gesture.
+         */
+
+        if(
+            typeof DeviceOrientationEvent !==
+            "undefined" &&
+            typeof DeviceOrientationEvent.requestPermission ===
+            "function"
+        ){
+
+            permissionBox.style.display =
+                "block";
+
+        }else{
+
+            enableMotion();
+
+        }
+
+    }
+);
+
+
+allowMotion.addEventListener(
+    "click",
+    enableMotion
+);
+
+
+/* =========================================================
+   SOUND
+========================================================= */
+
+let audioContext = null;
+
+let soundEnabled = false;
+
+
+function playTone(){
+
+    try{
+
+        if(!audioContext){
+
+            audioContext =
+                new (
+                    window.AudioContext ||
+                    window.webkitAudioContext
+                )();
+
+        }
+
+
+        if(
+            audioContext.state ===
+            "suspended"
+        ){
+
+            audioContext.resume();
+
+        }
+
+
+        const oscillator =
+            audioContext.createOscillator();
+
+        const gain =
+            audioContext.createGain();
+
+
+        oscillator.type =
+            "sine";
+
+
+        oscillator.frequency.value =
+            110 +
+            Math.random() * 70;
+
+
+        gain.gain.setValueAtTime(
+            .0001,
+            audioContext.currentTime
+        );
+
+
+        gain.gain.exponentialRampToValueAtTime(
+            .018,
+            audioContext.currentTime + .04
+        );
+
+
+        gain.gain.exponentialRampToValueAtTime(
+            .0001,
+            audioContext.currentTime + .65
+        );
+
+
+        oscillator.connect(gain);
+
+        gain.connect(
+            audioContext.destination
+        );
+
+
+        oscillator.start();
+
+        oscillator.stop(
+            audioContext.currentTime + .7
+        );
+
+    }catch(error){
+
+        console.log(
+            "Audio unavailable"
+        );
+
+    }
+
+}
+
+
+const soundButton =
+    document.getElementById("sound");
+
+
+soundButton.addEventListener(
+    "click",
+    function(){
+
+        soundEnabled =
+            !soundEnabled;
+
+
+        soundButton.textContent =
+            "sound: " +
+            (soundEnabled
+                ? "on"
+                : "off"
+            );
+
+
+        if(soundEnabled){
+
+            playTone();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   SCROLL SOUND
+========================================================= */
+
+let lastSoundTime = 0;
+
+
+window.addEventListener(
+    "scroll",
+    function(){
+
+        if(!soundEnabled)
+            return;
+
+
+        const now =
+            Date.now();
+
+
+        /*
+         Prevent hundreds of sounds
+         during one scroll.
+        */
+
+        if(now - lastSoundTime < 180)
+            return;
+
+
+        lastSoundTime =
+            now;
+
+
+        if(Math.random() < .15){
+
+            playTone();
+
+        }
+
+    },
+    {passive:true}
+);
+
+
+/* =========================================================
+   REVEAL OBSERVER
+========================================================= */
+
+const observer =
+    new IntersectionObserver(
+        entries => {
+
+            entries.forEach(entry => {
+
+                if(entry.isIntersecting){
+
+                    entry.target
+                        .classList
+                        .add("show");
+
+                }
+
+            });
+
+        },
+        {
+            threshold:.12
+        }
+    );
+
+
+document
+    .querySelectorAll(".reveal")
+    .forEach(element => {
+
+        observer.observe(element);
+
+    });
+
+
+/* =========================================================
+   MOBILE TOUCH
+========================================================= */
+
+window.addEventListener(
+    "touchmove",
+    function(e){
+
+        if(!e.touches.length)
+            return;
+
+
+        const touch =
+            e.touches[0];
+
+
+        pointer.x =
+            touch.clientX;
+
+        pointer.y =
+            touch.clientY;
+
+
+        root.style.setProperty(
+            "--mx",
+            pointer.x + "px"
+        );
+
+        root.style.setProperty(
+            "--my",
+            pointer.y + "px"
+        );
+
+    },
+    {passive:true}
+);
+
+
+/* =========================================================
+   CLEANUP
+========================================================= */
+
+window.addEventListener(
+    "pagehide",
+    function(){
+
+        if(animationFrame){
+
+            cancelAnimationFrame(
+                animationFrame
+            );
+
+        }
+
+    }
+);
+
+</script>
+
+</body>
+</html>
