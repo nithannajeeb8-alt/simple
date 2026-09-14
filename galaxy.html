@@ -1,84 +1,156 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+>
+
 <meta name="theme-color" content="#050505">
 
-<title>Nithan — Portfolio</title>
+<title>Nithan — Commerce × Technology</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin>
+
+<link
+href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600;700;800&display=swap"
+rel="stylesheet">
+
 
 <style>
 
 /* =========================================================
-   ROOT
+   CORE
 ========================================================= */
 
 :root {
+
     --bg: #050505;
-    --white: #f4f4f2;
+    --white: #f5f5f3;
+
     --muted: #777;
     --dim: #444;
+
     --line: rgba(255,255,255,.10);
-    --soft-line: rgba(255,255,255,.055);
-    --ease: cubic-bezier(.16,1,.3,1);
+    --soft-line: rgba(255,255,255,.045);
+
+    --green: #8affc1;
+
+    --ease:
+        cubic-bezier(.16,1,.3,1);
+
 }
 
-
-/* =========================================================
-   RESET
-========================================================= */
 
 * {
+
     margin: 0;
     padding: 0;
+
     box-sizing: border-box;
+
 }
+
 
 html {
+
     scroll-behavior: smooth;
+
 }
+
 
 body {
+
     background: var(--bg);
+
     color: var(--white);
+
     font-family: Inter, sans-serif;
+
     overflow-x: hidden;
+
 }
+
 
 a {
-    color: inherit;
-    text-decoration: none;
-}
 
-button {
-    font: inherit;
+    color: inherit;
+
+    text-decoration: none;
+
 }
 
 
 /* =========================================================
-   BACKGROUND
+   FINANCE BACKGROUND
 ========================================================= */
 
-#spaceCanvas {
+#financeCanvas {
+
     position: fixed;
+
     inset: 0;
+
     width: 100%;
     height: 100%;
+
     z-index: -10;
+
     pointer-events: none;
+
 }
 
-.background-glow {
+
+.background-grid {
+
     position: fixed;
-    width: 450px;
-    height: 450px;
-    border-radius: 50%;
+
+    inset: 0;
+
+    z-index: -9;
+
     pointer-events: none;
+
+    opacity: .35;
+
+    background-image:
+
+        linear-gradient(
+            rgba(255,255,255,.025) 1px,
+            transparent 1px
+        ),
+
+        linear-gradient(
+            90deg,
+            rgba(255,255,255,.025) 1px,
+            transparent 1px
+        );
+
+    background-size:
+        70px 70px;
+
+}
+
+
+.background-glow {
+
+    position: fixed;
+
+    width: 500px;
+    height: 500px;
+
+    border-radius: 50%;
+
+    pointer-events: none;
+
     z-index: -5;
 
     background:
@@ -88,7 +160,9 @@ button {
             transparent 70%
         );
 
-    transform: translate(-50%, -50%);
+    transform:
+        translate(-50%,-50%);
+
 }
 
 
@@ -97,15 +171,25 @@ button {
 ========================================================= */
 
 body::after {
+
     content: "";
+
     position: fixed;
+
     inset: 0;
+
     pointer-events: none;
+
     z-index: 9000;
+
     opacity: .025;
 
     background-image:
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+
+        url(
+        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"
+        );
+
 }
 
 
@@ -114,30 +198,52 @@ body::after {
 ========================================================= */
 
 .cursor {
+
     position: fixed;
+
     width: 6px;
     height: 6px;
-    background: white;
+
     border-radius: 50%;
+
+    background: white;
+
     pointer-events: none;
+
     z-index: 9999;
-    transform: translate(-50%, -50%);
+
+    transform:
+        translate(-50%,-50%);
+
     mix-blend-mode: difference;
+
 }
 
+
 .cursor-ring {
+
     position: fixed;
-    width: 34px;
-    height: 34px;
-    border: 1px solid rgba(255,255,255,.4);
+
+    width: 32px;
+    height: 32px;
+
+    border:
+        1px solid
+        rgba(255,255,255,.35);
+
     border-radius: 50%;
+
     pointer-events: none;
+
     z-index: 9998;
-    transform: translate(-50%, -50%);
+
+    transform:
+        translate(-50%,-50%);
 
     transition:
         width .35s var(--ease),
         height .35s var(--ease);
+
 }
 
 
@@ -146,73 +252,125 @@ body::after {
 ========================================================= */
 
 .nav {
+
     position: fixed;
+
     top: 0;
     left: 0;
 
     width: 100%;
-    height: 90px;
 
-    padding: 25px 5vw;
+    height: 88px;
+
+    padding:
+        25px 5vw;
 
     display: flex;
-    justify-content: space-between;
+
     align-items: center;
+
+    justify-content:
+        space-between;
 
     z-index: 500;
 
     background:
         linear-gradient(
             to bottom,
-            rgba(5,5,5,.75),
+            rgba(5,5,5,.9),
             transparent
         );
+
 }
+
 
 .brand {
-    font-family: "DM Mono", monospace;
+
+    font-family:
+        "DM Mono",
+        monospace;
+
     font-size: 12px;
+
     letter-spacing: .18em;
+
 }
+
 
 .brand span {
+
     color: #555;
+
 }
+
 
 .nav-links {
+
     display: flex;
+
     gap: 30px;
+
 }
+
 
 .nav-links a {
-    font-family: "DM Mono", monospace;
-    font-size: 9px;
-    letter-spacing: .18em;
+
+    font-family:
+        "DM Mono",
+        monospace;
+
     color: #666;
 
-    transition: color .3s ease;
+    font-size: 9px;
+
+    letter-spacing: .18em;
+
+    transition:
+        color .3s ease;
+
 }
+
 
 .nav-links a:hover {
+
     color: white;
+
 }
+
 
 .nav-status {
+
     display: flex;
+
     align-items: center;
+
     gap: 8px;
 
-    font-family: "DM Mono", monospace;
-    font-size: 8px;
     color: #555;
+
+    font-family:
+        "DM Mono",
+        monospace;
+
+    font-size: 8px;
+
 }
 
+
 .status-dot {
+
     width: 5px;
     height: 5px;
-    background: white;
+
     border-radius: 50%;
-    box-shadow: 0 0 12px white;
+
+    background:
+        var(--green);
+
+    box-shadow:
+        0 0 12px
+        rgba(138,255,193,.7);
+
 }
 
 
@@ -221,275 +379,463 @@ body::after {
 ========================================================= */
 
 .hero {
-    min-height: 100svh;
+
+    min-height:
+        100svh;
 
     position: relative;
-
-    display: flex;
-    align-items: center;
 
     padding:
-        150px 5vw
-        100px;
+        145px 5vw
+        90px;
+
+    display: flex;
+
+    align-items:
+        center;
 
     overflow: hidden;
+
 }
+
 
 .hero-content {
+
     width: 100%;
+
     position: relative;
+
     z-index: 10;
+
 }
 
-.mini-label {
-    font-family: "DM Mono", monospace;
+
+.eyebrow {
+
+    font-family:
+        "DM Mono",
+        monospace;
+
     font-size: 9px;
+
+    letter-spacing: .32em;
+
     color: #555;
-    letter-spacing: .35em;
+
 }
+
 
 .hero-title {
+
     position: relative;
+
     width: max-content;
-    margin-top: 32px;
+
+    margin-top: 35px;
+
 }
+
 
 .hero-title h1 {
-    font-size: clamp(80px, 15vw, 220px);
-    line-height: .75;
 
-    letter-spacing: -.095em;
+    font-size:
+        clamp(
+            80px,
+            15vw,
+            220px
+        );
+
+    line-height: .76;
+
+    letter-spacing: -.1em;
+
     font-weight: 700;
+
 }
 
+
 .hero-outline {
+
     position: absolute;
 
+    top: 75%;
+
     left: 5px;
-    top: 76%;
-
-    font-size: clamp(80px, 15vw, 220px);
-    line-height: .75;
-
-    letter-spacing: -.095em;
-    font-weight: 700;
 
     color: transparent;
 
     -webkit-text-stroke:
-        1px rgba(255,255,255,.22);
+        1px
+        rgba(255,255,255,.2);
+
+    font-size:
+        clamp(
+            80px,
+            15vw,
+            220px
+        );
+
+    line-height: .76;
+
+    letter-spacing: -.1em;
 
     z-index: -1;
+
 }
 
-.hero-info {
-    margin-top: 145px;
+
+.hero-sub {
+
+    margin-top: 125px;
+
+    max-width: 500px;
+
 }
+
 
 .hero-role {
-    font-family: "DM Mono", monospace;
-    font-size: 9px;
+
     color: #666;
-    letter-spacing: .25em;
 
-    margin-bottom: 20px;
+    font-family:
+        "DM Mono",
+        monospace;
+
+    font-size: 9px;
+
+    letter-spacing: .22em;
+
+    margin-bottom: 22px;
+
 }
 
-.hero-description {
-    max-width: 450px;
-}
 
-.hero-description p {
+.hero-sub p {
+
+    color: #858585;
+
     font-size: 17px;
+
     line-height: 1.7;
-    color: #808080;
+
 }
 
-.hero-description strong {
+
+.hero-sub strong {
+
     color: white;
+
     font-weight: 400;
+
 }
 
 
 /* =========================================================
-   HERO OBJECT
+   FINANCE TERMINAL
 ========================================================= */
 
-.hero-object {
+.hero-terminal {
+
     position: absolute;
 
-    right: 7vw;
+    right: 5vw;
+
     top: 50%;
 
-    width: min(32vw, 420px);
-    aspect-ratio: 1;
+    width: 340px;
 
     transform:
-        translate(
-            var(--object-x, 0px),
-            calc(-50% + var(--object-y, 0px))
-        );
+        translateY(-50%);
 
-    transition:
-        transform .8s var(--ease);
+    border:
+        1px solid
+        rgba(255,255,255,.12);
 
-    z-index: 2;
+    background:
+        rgba(8,8,8,.72);
+
+    backdrop-filter:
+        blur(14px);
+
+    box-shadow:
+        0 30px 100px
+        rgba(0,0,0,.5);
+
 }
 
-.chrome-object {
+
+.terminal-head {
+
+    display: flex;
+
+    justify-content:
+        space-between;
+
+    padding:
+        13px 16px;
+
+    border-bottom:
+        1px solid
+        var(--line);
+
+    color: #555;
+
+    font-family:
+        "DM Mono",
+        monospace;
+
+    font-size: 7px;
+
+    letter-spacing: .15em;
+
+}
+
+
+.terminal-row {
+
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr 1fr;
+
+    padding:
+        18px 16px;
+
+    border-bottom:
+        1px solid
+        var(--soft-line);
+
+}
+
+
+.metric-label {
+
+    display: block;
+
+    color: #555;
+
+    font-family:
+        "DM Mono",
+        monospace;
+
+    font-size: 7px;
+
+    margin-bottom: 8px;
+
+}
+
+
+.metric-value {
+
+    font-family:
+        "DM Mono",
+        monospace;
+
+    font-size: 17px;
+
+}
+
+
+.positive {
+
+    color:
+        var(--green);
+
+}
+
+
+.terminal-chart {
+
+    height: 105px;
+
+    padding:
+        15px;
+
+}
+
+
+.chart-svg {
+
     width: 100%;
     height: 100%;
 
-    border-radius: 50%;
+    overflow: visible;
 
-    background:
-        radial-gradient(
-            circle at 29% 23%,
-            #fff 0%,
-            #aaa 4%,
-            #555 10%,
-            #202020 25%,
-            #090909 55%,
-            #000 77%
-        );
+}
 
-    box-shadow:
-        inset -55px -55px 110px #000,
-        inset 25px 20px 50px rgba(255,255,255,.13),
-        -25px -20px 90px rgba(255,255,255,.06);
+
+.chart-line {
+
+    fill: none;
+
+    stroke: white;
+
+    stroke-width: 1.5;
+
+    stroke-dasharray:
+        500;
+
+    stroke-dashoffset:
+        500;
 
     animation:
-        objectFloat 8s ease-in-out infinite;
+        chartDraw 3s
+        var(--ease)
+        forwards;
+
 }
 
-.chrome-object::before {
-    content: "";
 
-    position: absolute;
-    inset: -2px;
+@keyframes chartDraw {
 
-    border-radius: 50%;
+    to {
 
-    border:
-        1px solid rgba(255,255,255,.22);
-}
+        stroke-dashoffset: 0;
 
-.chrome-object::after {
-    content: "";
-
-    position: absolute;
-
-    width: 140%;
-    height: 17%;
-
-    left: -20%;
-    top: 43%;
-
-    border-radius: 50%;
-
-    border-top:
-        1px solid rgba(255,255,255,.55);
-
-    transform: rotate(-18deg);
-}
-
-@keyframes objectFloat {
-    0%, 100% {
-        transform: translateY(0);
     }
 
-    50% {
-        transform: translateY(-18px);
-    }
 }
 
-.object-label {
-    position: absolute;
-    right: 0;
-    bottom: -35px;
+
+.chart-area {
+
+    fill:
+        rgba(255,255,255,.035);
+
+}
+
+
+.terminal-foot {
+
+    padding:
+        11px 16px;
 
     color: #444;
 
-    font-family: "DM Mono", monospace;
-    font-size: 8px;
-    letter-spacing: .2em;
+    font-family:
+        "DM Mono",
+        monospace;
+
+    font-size: 7px;
+
 }
 
 
 /* =========================================================
-   SCROLL
+   STRIP
 ========================================================= */
 
-.scroll-marker {
-    position: absolute;
-
-    left: 5vw;
-    bottom: 35px;
-
-    display: flex;
-    align-items: center;
-    gap: 14px;
-
-    font-family: "DM Mono", monospace;
-    font-size: 8px;
-    color: #555;
-    letter-spacing: .2em;
-}
-
-.scroll-marker span {
-    width: 45px;
-    height: 1px;
-    background: #555;
-}
-
-
-/* =========================================================
-   INFO STRIP
-========================================================= */
-
-.info-strip {
-    display: flex;
-    justify-content: space-between;
-
-    padding:
-        20px 5vw;
+.ticker {
 
     border-top:
-        1px solid var(--line);
+        1px solid
+        var(--line);
 
     border-bottom:
-        1px solid var(--line);
+        1px solid
+        var(--line);
 
-    font-family:
-        "DM Mono", monospace;
+    overflow:
+        hidden;
+
+}
+
+
+.ticker-track {
+
+    display: flex;
+
+    width: max-content;
+
+    animation:
+        tickerMove 25s
+        linear infinite;
+
+}
+
+
+.ticker-item {
+
+    padding:
+        18px 30px;
+
+    border-right:
+        1px solid
+        var(--line);
 
     color: #555;
+
+    font-family:
+        "DM Mono",
+        monospace;
+
     font-size: 8px;
+
     letter-spacing: .15em;
+
+}
+
+
+.ticker-item b {
+
+    color: #aaa;
+
+    font-weight: 400;
+
+}
+
+
+.ticker-up {
+
+    color:
+        var(--green) !important;
+
+}
+
+
+@keyframes tickerMove {
+
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-50%);
+    }
+
 }
 
 
 /* =========================================================
-   SECTIONS
+   GENERIC
 ========================================================= */
 
 .section {
+
     padding:
         170px 5vw;
 
     border-bottom:
-        1px solid var(--line);
+        1px solid
+        var(--line);
+
 }
 
-.section-label {
-    margin-bottom: 80px;
 
-    font-family:
-        "DM Mono", monospace;
+.section-label {
 
     color: #4c4c4c;
+
+    font-family:
+        "DM Mono",
+        monospace;
+
     font-size: 9px;
+
     letter-spacing: .27em;
+
+    margin-bottom: 80px;
+
 }
 
 
@@ -498,67 +844,131 @@ body::after {
 ========================================================= */
 
 .about-grid {
+
     display: grid;
 
     grid-template-columns:
-        1.15fr .85fr;
+        1.1fr .9fr;
 
     gap: 10vw;
+
 }
 
-.about-heading {
+
+.big-heading {
+
     font-size:
-        clamp(55px, 7vw, 105px);
+        clamp(
+            55px,
+            7vw,
+            105px
+        );
 
     line-height: .87;
+
     letter-spacing: -.075em;
+
     font-weight: 400;
+
 }
 
-.about-heading span {
+
+.big-heading span {
+
     color: transparent;
 
     -webkit-text-stroke:
-        1px rgba(255,255,255,.25);
+        1px
+        rgba(255,255,255,.25);
+
 }
 
+
 .about-copy {
+
     max-width: 500px;
 
     color: #777;
 
     font-size: 15px;
+
     line-height: 2;
+
 }
+
 
 .about-copy p + p {
+
     margin-top: 25px;
+
 }
+
 
 .about-copy strong {
+
     color: #ddd;
+
     font-weight: 400;
+
 }
 
-.about-numbers {
-    display: flex;
-    gap: 55px;
+
+.stats {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
 
     margin-top: 60px;
+
+    border-top:
+        1px solid
+        var(--line);
+
 }
 
-.number strong {
-    display: block;
 
-    font-size: 34px;
-    font-weight: 400;
-    letter-spacing: -.05em;
+.stat {
+
+    padding:
+        25px 0;
+
+    border-right:
+        1px solid
+        var(--line);
+
 }
 
-.number span {
+
+.stat:not(:first-child) {
+
+    padding-left: 20px;
+
+}
+
+
+.stat:last-child {
+
+    border-right: none;
+
+}
+
+
+.stat-number {
+
+    font-size: 30px;
+
+    letter-spacing: -.06em;
+
+}
+
+
+.stat-label {
+
     display: block;
 
-    margin-top: 8px;
+    margin-top: 7px;
 
     color: #555;
 
@@ -566,7 +976,178 @@ body::after {
         "DM Mono", monospace;
 
     font-size: 7px;
+
+}
+
+
+/* =========================================================
+   BUSINESS METRICS
+========================================================= */
+
+.metrics {
+
+    padding:
+        150px 5vw;
+
+    border-bottom:
+        1px solid
+        var(--line);
+
+}
+
+
+.metrics-header {
+
+    display: flex;
+
+    justify-content:
+        space-between;
+
+    align-items:
+        flex-end;
+
+    margin-bottom: 80px;
+
+}
+
+
+.metrics-title {
+
+    font-size:
+        clamp(
+            55px,
+            9vw,
+            130px
+        );
+
+    line-height: .8;
+
+    letter-spacing: -.09em;
+
+}
+
+
+.metrics-title span {
+
+    color: transparent;
+
+    -webkit-text-stroke:
+        1px
+        rgba(255,255,255,.25);
+
+}
+
+
+.metrics-note {
+
+    max-width: 300px;
+
+    color: #666;
+
+    font-family:
+        "DM Mono", monospace;
+
+    font-size: 8px;
+
+    line-height: 1.8;
+
+}
+
+
+.metric-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(4,1fr);
+
+    border-top:
+        1px solid
+        var(--line);
+
+    border-left:
+        1px solid
+        var(--line);
+
+}
+
+
+.metric-card {
+
+    min-height: 220px;
+
+    padding:
+        25px;
+
+    border-right:
+        1px solid
+        var(--line);
+
+    border-bottom:
+        1px solid
+        var(--line);
+
+    position: relative;
+
+    overflow: hidden;
+
+    transition:
+        background .4s ease;
+
+}
+
+
+.metric-card:hover {
+
+    background:
+        rgba(255,255,255,.025);
+
+}
+
+
+.metric-card-label {
+
+    color: #555;
+
+    font-family:
+        "DM Mono", monospace;
+
+    font-size: 7px;
+
     letter-spacing: .15em;
+
+}
+
+
+.metric-card-value {
+
+    margin-top: 50px;
+
+    font-size:
+        clamp(
+            32px,
+            4vw,
+            55px
+        );
+
+    letter-spacing: -.07em;
+
+}
+
+
+.metric-card-sub {
+
+    position: absolute;
+
+    bottom: 25px;
+
+    color: #555;
+
+    font-family:
+        "DM Mono", monospace;
+
+    font-size: 7px;
+
 }
 
 
@@ -575,48 +1156,70 @@ body::after {
 ========================================================= */
 
 .work {
+
     padding:
         170px 0;
 
     border-bottom:
-        1px solid var(--line);
+        1px solid
+        var(--line);
+
 }
+
 
 .work-header {
+
     padding:
         0 5vw;
+
 }
+
 
 .work-title {
+
     font-size:
-        clamp(75px, 13vw, 180px);
+        clamp(
+            75px,
+            13vw,
+            180px
+        );
 
     line-height: .76;
+
     letter-spacing: -.095em;
-    font-weight: 600;
+
 }
 
+
 .work-title span {
+
     color: transparent;
 
     -webkit-text-stroke:
-        1px rgba(255,255,255,.25);
+        1px
+        rgba(255,255,255,.25);
+
 }
+
 
 .projects {
-    margin-top: 120px;
+
+    margin-top:
+        110px;
 
     border-top:
-        1px solid var(--line);
+        1px solid
+        var(--line);
+
 }
 
+
 .project {
-    position: relative;
 
     min-height: 180px;
 
     padding:
-        35px 5vw;
+        30px 5vw;
 
     display: grid;
 
@@ -626,18 +1229,26 @@ body::after {
     align-items: center;
 
     border-bottom:
-        1px solid var(--line);
+        1px solid
+        var(--line);
+
+    position: relative;
 
     overflow: hidden;
 
     transition:
-        padding .6s var(--ease);
+        padding .6s
+        var(--ease);
+
 }
 
+
 .project::before {
+
     content: "";
 
     position: absolute;
+
     inset: 0;
 
     background:
@@ -651,19 +1262,32 @@ body::after {
         translateX(-100%);
 
     transition:
-        transform .7s var(--ease);
+        transform .7s
+        var(--ease);
+
 }
+
 
 .project:hover {
-    padding-left: 6vw;
+
+    padding-left:
+        6vw;
+
 }
+
 
 .project:hover::before {
-    transform: translateX(0);
+
+    transform:
+        translateX(0);
+
 }
 
+
 .project-index {
+
     position: relative;
+
     z-index: 2;
 
     color: #444;
@@ -672,28 +1296,32 @@ body::after {
         "DM Mono", monospace;
 
     font-size: 9px;
+
 }
 
+
 .project-name {
+
     position: relative;
+
     z-index: 2;
 
     font-size:
-        clamp(30px, 5vw, 65px);
+        clamp(
+            30px,
+            5vw,
+            65px
+        );
 
-    font-weight: 400;
     letter-spacing: -.055em;
 
-    transition:
-        transform .6s var(--ease);
 }
 
-.project:hover .project-name {
-    transform: translateX(15px);
-}
 
 .project-meta {
+
     position: relative;
+
     z-index: 2;
 
     color: #555;
@@ -702,7 +1330,7 @@ body::after {
         "DM Mono", monospace;
 
     font-size: 8px;
-    letter-spacing: .15em;
+
 }
 
 
@@ -711,41 +1339,63 @@ body::after {
 ========================================================= */
 
 .skills {
+
     padding:
         170px 5vw;
 
     border-bottom:
-        1px solid var(--line);
+        1px solid
+        var(--line);
 
-    overflow: hidden;
 }
+
 
 .skills-intro {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
 
-    margin-bottom: 100px;
+    display: flex;
+
+    justify-content:
+        space-between;
+
+    align-items:
+        flex-end;
+
+    margin-bottom:
+        90px;
+
 }
+
 
 .skills-heading {
+
     font-size:
-        clamp(65px, 10vw, 150px);
+        clamp(
+            60px,
+            10vw,
+            145px
+        );
 
     line-height: .8;
+
     letter-spacing: -.09em;
-    font-weight: 500;
+
 }
 
+
 .skills-heading span {
+
     color: transparent;
 
     -webkit-text-stroke:
-        1px rgba(255,255,255,.25);
+        1px
+        rgba(255,255,255,.25);
+
 }
 
+
 .skills-copy {
-    width: 300px;
+
+    max-width: 300px;
 
     color: #666;
 
@@ -753,252 +1403,517 @@ body::after {
         "DM Mono", monospace;
 
     font-size: 9px;
+
     line-height: 1.9;
+
 }
 
 
 /* =========================================================
-   SKILL DECK
+   SKILL CARDS
 ========================================================= */
 
-.skill-deck {
+.skill-grid {
+
     display: grid;
 
     grid-template-columns:
-        repeat(6, 1fr);
+        repeat(3,1fr);
 
-    min-height: 540px;
+    gap: 1px;
 
-    border-top:
-        1px solid var(--line);
+    background:
+        var(--line);
 
-    border-bottom:
-        1px solid var(--line);
+    border:
+        1px solid
+        var(--line);
+
 }
 
-.skill-card {
-    position: relative;
 
-    min-width: 0;
+.skill {
+
+    min-height:
+        280px;
 
     padding:
-        28px 20px;
+        28px;
 
-    border-right:
-        1px solid var(--line);
+    background:
+        var(--bg);
+
+    position: relative;
 
     overflow: hidden;
 
-    background:
-        rgba(0,0,0,.1);
-
     transition:
-        background .4s ease,
-        flex .7s var(--ease);
+        background .5s ease;
+
 }
 
-.skill-card:last-child {
-    border-right: none;
-}
 
-.skill-card:hover,
-.skill-card.active {
+.skill:hover {
+
     background:
-        rgba(255,255,255,.035);
+        #0b0b0b;
+
 }
 
-.skill-card-top {
-    display: flex;
-    justify-content: space-between;
+
+.skill-number {
+
+    color: #444;
 
     font-family:
         "DM Mono", monospace;
+
+    font-size: 8px;
+
+}
+
+
+.skill-icon {
+
+    position: absolute;
+
+    right: 25px;
+
+    top: 23px;
 
     color: #555;
-    font-size: 8px;
+
+    font-family:
+        "DM Mono", monospace;
+
+    font-size: 20px;
+
 }
 
-.skill-card-symbol {
-    color: #777;
-}
 
-.skill-card-main {
-    position: absolute;
+.skill h3 {
 
-    left: 30px;
-    bottom: 95px;
+    margin-top: 80px;
 
-    transform:
-        rotate(-90deg);
+    font-size: 30px;
 
-    transform-origin:
-        left top;
+    letter-spacing: -.06em;
 
-    white-space: nowrap;
-
-    transition:
-        transform .7s var(--ease),
-        bottom .7s var(--ease);
-}
-
-.skill-card-main h3 {
-    font-size: 27px;
     font-weight: 400;
 
-    letter-spacing: -.05em;
 }
 
-.skill-card.active .skill-card-main,
-.skill-card:hover .skill-card-main {
-    transform: rotate(0);
-    bottom: 125px;
-}
 
-.skill-card.active .skill-card-main h3,
-.skill-card:hover .skill-card-main h3 {
-    font-size:
-        clamp(30px, 3.8vw, 52px);
-}
+.skill p {
 
-.skill-detail {
-    position: absolute;
+    margin-top: 15px;
 
-    left: 30px;
-    right: 25px;
-    bottom: 40px;
+    max-width: 280px;
 
-    color: #777;
+    color: #666;
 
     font-family:
         "DM Mono", monospace;
 
     font-size: 8px;
-    line-height: 1.7;
 
-    opacity: 0;
+    line-height: 1.8;
 
-    transform:
-        translateY(12px);
-
-    transition:
-        opacity .4s ease,
-        transform .5s var(--ease);
 }
 
-.skill-card.active .skill-detail,
-.skill-card:hover .skill-detail {
-    opacity: 1;
 
-    transform:
-        translateY(0);
-}
+.skill-bar {
 
-.skill-meter {
     position: absolute;
 
-    left: 30px;
-    right: 25px;
-    bottom: 17px;
+    left: 28px;
+    right: 28px;
+    bottom: 25px;
 
     height: 1px;
 
     background:
         rgba(255,255,255,.08);
+
 }
 
-.skill-meter span {
+
+.skill-bar span {
+
     display: block;
 
-    height: 100%;
-
     width: 0;
+
+    height: 100%;
 
     background:
         white;
 
     transition:
-        width 1s var(--ease);
+        width 1s
+        var(--ease);
+
 }
 
-.skill-card.active .skill-meter span,
-.skill-card:hover .skill-meter span {
-    width: var(--skill);
+
+.skill:hover
+.skill-bar span {
+
+    width:
+        var(--level);
+
 }
 
 
 /* =========================================================
-   LAB
+   CALCULATOR
 ========================================================= */
 
-.lab {
+.calculator {
+
     padding:
         170px 5vw;
 
     border-bottom:
-        1px solid var(--line);
+        1px solid
+        var(--line);
+
 }
 
-.lab-grid {
+
+.calc-grid {
+
     display: grid;
 
     grid-template-columns:
         1fr 1fr;
 
     gap: 10vw;
+
 }
 
-.lab-heading {
+
+.calc-heading {
+
     font-size:
-        clamp(55px, 8vw, 110px);
+        clamp(
+            55px,
+            8vw,
+            110px
+        );
 
-    line-height: .85;
+    line-height: .84;
+
     letter-spacing: -.08em;
-    font-weight: 400;
+
 }
 
-.lab-heading span {
+
+.calc-heading span {
+
     color: transparent;
 
     -webkit-text-stroke:
-        1px rgba(255,255,255,.25);
+        1px
+        rgba(255,255,255,.25);
+
 }
 
-.lab-list {
-    border-top:
-        1px solid var(--line);
+
+.calc-description {
+
+    max-width: 420px;
+
+    margin-top: 35px;
+
+    color: #666;
+
+    font-size: 13px;
+
+    line-height: 1.8;
+
 }
 
-.lab-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+
+.calc-box {
+
+    border:
+        1px solid
+        var(--line);
 
     padding:
-        27px 0;
+        28px;
 
-    border-bottom:
-        1px solid var(--line);
+    background:
+        rgba(255,255,255,.015);
 
-    transition:
-        padding .5s var(--ease);
 }
 
-.lab-item:hover {
-    padding-left: 20px;
+
+.calc-field {
+
+    margin-bottom:
+        25px;
+
 }
 
-.lab-item-title {
-    font-size: 18px;
-    font-weight: 400;
-}
 
-.lab-item-meta {
+.calc-field label {
+
+    display: block;
+
+    margin-bottom:
+        9px;
+
     color: #555;
 
     font-family:
         "DM Mono", monospace;
 
     font-size: 8px;
+
+}
+
+
+.calc-field input {
+
+    width: 100%;
+
+    padding:
+        14px 0;
+
+    border: none;
+
+    border-bottom:
+        1px solid
+        var(--line);
+
+    outline: none;
+
+    background: transparent;
+
+    color: white;
+
+    font-family:
+        "DM Mono", monospace;
+
+    font-size: 16px;
+
+}
+
+
+.calc-result {
+
+    margin-top:
+        35px;
+
+    padding-top:
+        25px;
+
+    border-top:
+        1px solid
+        var(--line);
+
+}
+
+
+.calc-result-label {
+
+    color: #555;
+
+    font-family:
+        "DM Mono", monospace;
+
+    font-size: 8px;
+
+}
+
+
+.calc-result-value {
+
+    margin-top:
+        8px;
+
+    font-size:
+        55px;
+
+    letter-spacing:
+        -.07em;
+
+}
+
+
+.calc-button {
+
+    width: 100%;
+
+    margin-top:
+        20px;
+
+    padding:
+        15px;
+
+    border:
+        1px solid
+        rgba(255,255,255,.2);
+
+    background:
+        transparent;
+
+    color: white;
+
+    font-family:
+        "DM Mono", monospace;
+
+    font-size: 8px;
+
+    letter-spacing: .15em;
+
+    cursor: pointer;
+
+    transition:
+        background .3s,
+        color .3s;
+
+}
+
+
+.calc-button:hover {
+
+    background: white;
+
+    color: black;
+
+}
+
+
+/* =========================================================
+   LEDGER
+========================================================= */
+
+.ledger {
+
+    padding:
+        170px 5vw;
+
+    border-bottom:
+        1px solid
+        var(--line);
+
+}
+
+
+.ledger-header {
+
+    display: flex;
+
+    justify-content:
+        space-between;
+
+    align-items:
+        flex-end;
+
+    margin-bottom:
+        70px;
+
+}
+
+
+.ledger-title {
+
+    font-size:
+        clamp(
+            55px,
+            8vw,
+            110px
+        );
+
+    line-height: .85;
+
+    letter-spacing: -.08em;
+
+}
+
+
+.ledger-title span {
+
+    color: transparent;
+
+    -webkit-text-stroke:
+        1px
+        rgba(255,255,255,.25);
+
+}
+
+
+.ledger-table {
+
+    border-top:
+        1px solid
+        var(--line);
+
+}
+
+
+.ledger-row {
+
+    display: grid;
+
+    grid-template-columns:
+        100px 1.5fr 1fr 1fr;
+
+    padding:
+        20px 0;
+
+    border-bottom:
+        1px solid
+        var(--line);
+
+    font-family:
+        "DM Mono", monospace;
+
+    font-size: 8px;
+
+    color: #777;
+
+    transition:
+        padding .4s
+        var(--ease);
+
+}
+
+
+.ledger-row:hover {
+
+    padding-left:
+        15px;
+
+    background:
+        rgba(255,255,255,.015);
+
+}
+
+
+.ledger-head {
+
+    color: #444;
+
+}
+
+
+.credit {
+
+    color:
+        var(--green);
+
+}
+
+
+.debit {
+
+    color:
+        #aaa;
+
 }
 
 
@@ -1007,21 +1922,30 @@ body::after {
 ========================================================= */
 
 .journey {
+
     padding:
         170px 5vw;
 
     border-bottom:
-        1px solid var(--line);
+        1px solid
+        var(--line);
+
 }
 
+
 .timeline {
-    max-width: 900px;
+
+    max-width:
+        900px;
 
     margin:
         100px auto 0;
+
 }
 
+
 .timeline-item {
+
     display: grid;
 
     grid-template-columns:
@@ -1031,34 +1955,46 @@ body::after {
         35px 0;
 
     border-top:
-        1px solid var(--line);
+        1px solid
+        var(--line);
+
 }
 
+
 .timeline-year {
+
     color: #555;
 
     font-family:
         "DM Mono", monospace;
 
     font-size: 9px;
+
 }
+
 
 .timeline-title {
-    font-size: 26px;
+
+    font-size:
+        25px;
+
     font-weight: 400;
 
-    letter-spacing: -.03em;
 }
 
+
 .timeline-text {
-    max-width: 500px;
 
     margin-top: 10px;
+
+    max-width: 500px;
 
     color: #666;
 
     font-size: 12px;
+
     line-height: 1.8;
+
 }
 
 
@@ -1067,43 +2003,71 @@ body::after {
 ========================================================= */
 
 .contact {
-    min-height: 100svh;
+
+    min-height:
+        100svh;
 
     padding:
         170px 5vw
-        90px;
+        80px;
 
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+
+    flex-direction:
+        column;
+
+    justify-content:
+        space-between;
 
     border-bottom:
-        1px solid var(--line);
+        1px solid
+        var(--line);
+
 }
+
 
 .contact-title {
+
     font-size:
-        clamp(80px, 14vw, 200px);
+        clamp(
+            80px,
+            14vw,
+            200px
+        );
 
     line-height: .75;
+
     letter-spacing: -.095em;
-    font-weight: 600;
+
 }
 
+
 .contact-title span {
+
     color: transparent;
 
     -webkit-text-stroke:
-        1px rgba(255,255,255,.25);
+        1px
+        rgba(255,255,255,.25);
+
 }
+
 
 .contact-bottom {
+
     display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
+
+    justify-content:
+        space-between;
+
+    align-items:
+        flex-end;
+
 }
 
+
 .contact-description {
+
     max-width: 300px;
 
     color: #666;
@@ -1112,19 +2076,28 @@ body::after {
         "DM Mono", monospace;
 
     font-size: 9px;
+
     line-height: 1.8;
+
 }
 
+
 .contact-button {
+
     width: 150px;
     height: 150px;
 
     display: flex;
-    justify-content: center;
-    align-items: center;
+
+    justify-content:
+        center;
+
+    align-items:
+        center;
 
     border:
-        1px solid rgba(255,255,255,.2);
+        1px solid
+        rgba(255,255,255,.2);
 
     border-radius: 50%;
 
@@ -1132,20 +2105,27 @@ body::after {
         "DM Mono", monospace;
 
     font-size: 9px;
-    letter-spacing: .15em;
+
+    letter-spacing: .13em;
 
     transition:
-        background .4s ease,
-        color .4s ease,
-        transform .5s var(--ease);
+        background .4s,
+        color .4s,
+        transform .5s
+        var(--ease);
+
 }
 
+
 .contact-button:hover {
+
     background: white;
+
     color: black;
 
     transform:
         scale(1.08);
+
 }
 
 
@@ -1154,34 +2134,38 @@ body::after {
 ========================================================= */
 
 footer {
+
     padding:
-        32px 5vw;
+        30px 5vw;
 
     display: flex;
-    justify-content: space-between;
-    align-items: center;
 
-    color: #4b4b4b;
+    justify-content:
+        space-between;
+
+    color: #444;
 
     font-family:
         "DM Mono", monospace;
 
     font-size: 8px;
-    letter-spacing: .15em;
+
 }
+
 
 .socials {
+
     display: flex;
+
     gap: 25px;
+
 }
 
-.socials a {
-    transition:
-        color .3s ease;
-}
 
 .socials a:hover {
+
     color: white;
+
 }
 
 
@@ -1190,19 +2174,26 @@ footer {
 ========================================================= */
 
 .reveal {
+
     opacity: 0;
+
     transform:
-        translateY(35px);
+        translateY(30px);
 
     transition:
         opacity .9s ease,
         transform 1s var(--ease);
+
 }
 
+
 .reveal.visible {
+
     opacity: 1;
+
     transform:
         translateY(0);
+
 }
 
 
@@ -1210,164 +2201,281 @@ footer {
    MOBILE
 ========================================================= */
 
-@media(max-width: 800px) {
+@media(max-width:800px) {
+
 
     .cursor,
     .cursor-ring {
+
         display: none;
+
     }
+
 
     .nav {
+
         height: 75px;
-        padding: 20px 22px;
+
+        padding:
+            20px 22px;
+
     }
+
 
     .nav-links {
-        gap: 14px;
+
+        gap: 13px;
+
     }
+
 
     .nav-links a {
+
         font-size: 7px;
+
     }
 
+
     .nav-status {
+
         display: none;
+
     }
 
 
     /* HERO */
 
     .hero {
-        min-height: 100svh;
+
+        min-height:
+            100svh;
 
         padding:
-            125px 22px
-            75px;
+            120px 22px
+            70px;
 
         align-items:
             flex-start;
+
     }
 
-    .mini-label {
-        font-size: 8px;
-    }
 
     .hero-title h1,
     .hero-outline {
-        font-size: 21vw;
+
+        font-size:
+            21vw;
+
     }
 
-    .hero-info {
+
+    .hero-sub {
+
         margin-top:
-            105px;
-    }
+            100px;
 
-    .hero-role {
-        font-size: 8px;
-    }
-
-    .hero-description {
-        max-width: 300px;
-    }
-
-    .hero-description p {
-        font-size: 14px;
-    }
-
-    .hero-object {
-        width: 190px;
-
-        right: -35px;
-
-        top: 61%;
-
-        opacity: .55;
-    }
-
-    .scroll-marker {
-        display: none;
     }
 
 
-    /* STRIP */
+    .hero-sub p {
 
-    .info-strip {
+        font-size:
+            14px;
+
+    }
+
+
+    .hero-terminal {
+
+        width:
+            300px;
+
+        right:
+            -40px;
+
+        top:
+            66%;
+
+        opacity:
+            .75;
+
+        transform:
+            scale(.82)
+            translateY(-50%);
+
+    }
+
+
+    /* TICKER */
+
+    .ticker-item {
+
         padding:
-            18px 22px;
+            16px 20px;
 
-        font-size: 6px;
-    }
+        font-size:
+            7px;
 
-    .info-strip span:nth-child(2) {
-        display: none;
     }
 
 
     /* SECTIONS */
 
     .section,
+    .metrics,
     .skills,
-    .lab,
+    .calculator,
+    .ledger,
     .journey {
+
         padding:
             110px 22px;
-    }
 
-    .section-label {
-        margin-bottom:
-            50px;
     }
 
 
     /* ABOUT */
 
     .about-grid {
+
         grid-template-columns:
             1fr;
 
-        gap: 55px;
+        gap:
+            55px;
+
     }
 
-    .about-heading {
-        font-size: 51px;
+
+    .big-heading {
+
+        font-size:
+            51px;
+
     }
+
 
     .about-copy {
-        font-size: 14px;
+
+        font-size:
+            14px;
+
     }
 
-    .about-numbers {
-        gap: 30px;
+
+    /* STATS */
+
+    .stats {
+
+        gap:
+            0;
+
     }
 
-    .number strong {
-        font-size: 27px;
+
+    .stat {
+
+        padding:
+            20px 0;
+
+    }
+
+
+    .stat-number {
+
+        font-size:
+            24px;
+
+    }
+
+
+    /* METRICS */
+
+    .metrics-header {
+
+        display:
+            block;
+
+        margin-bottom:
+            60px;
+
+    }
+
+
+    .metrics-note {
+
+        margin-top:
+            30px;
+
+    }
+
+
+    .metric-grid {
+
+        grid-template-columns:
+            repeat(2,1fr);
+
+    }
+
+
+    .metric-card {
+
+        min-height:
+            170px;
+
+        padding:
+            20px;
+
+    }
+
+
+    .metric-card-value {
+
+        margin-top:
+            35px;
+
+        font-size:
+            32px;
+
     }
 
 
     /* WORK */
 
     .work {
+
         padding:
             110px 0;
+
     }
+
 
     .work-header {
+
         padding:
             0 22px;
+
     }
+
 
     .work-title {
+
         font-size:
-            76px;
+            75px;
+
     }
+
 
     .projects {
+
         margin-top:
-            75px;
+            70px;
+
     }
 
+
     .project {
+
         min-height:
             145px;
 
@@ -1376,175 +2484,190 @@ footer {
 
         grid-template-columns:
             42px 1fr;
+
     }
+
 
     .project:hover {
+
         padding-left:
-            30px;
+            28px;
+
     }
+
 
     .project-name {
+
         font-size:
             29px;
+
     }
 
+
     .project-meta {
+
         grid-column:
             2;
 
         margin-top:
-            8px;
+            7px;
+
     }
 
 
     /* SKILLS */
 
     .skills-intro {
-        display: block;
+
+        display:
+            block;
 
         margin-bottom:
-            65px;
+            60px;
+
     }
+
 
     .skills-heading {
+
         font-size:
-            62px;
+            60px;
+
     }
+
 
     .skills-copy {
-        width: 270px;
 
         margin-top:
-            35px;
-    }
+            30px;
 
-    .skill-deck {
-        display: block;
-
-        min-height:
-            auto;
-    }
-
-    .skill-card {
-        min-height:
-            88px;
-
-        border-right:
-            none;
-
-        border-bottom:
-            1px solid var(--line);
-
-        padding:
-            25px;
-    }
-
-    .skill-card:last-child {
-        border-bottom:
-            none;
-    }
-
-    .skill-card-main,
-    .skill-card.active .skill-card-main,
-    .skill-card:hover .skill-card-main {
-        position:
-            relative;
-
-        left: auto;
-        bottom: auto;
-
-        transform: none;
-
-        margin-top:
-            35px;
-    }
-
-    .skill-card-main h3,
-    .skill-card.active .skill-card-main h3,
-    .skill-card:hover .skill-card-main h3 {
-        font-size:
-            27px;
-    }
-
-    .skill-card.active {
-        min-height:
-            235px;
-    }
-
-    .skill-card.active .skill-card-main h3 {
-        font-size:
-            38px;
-    }
-
-    .skill-detail {
-        position:
-            relative;
-
-        left: auto;
-        right: auto;
-        bottom: auto;
-
-        margin-top:
-            22px;
-    }
-
-    .skill-meter {
-        left: 25px;
-        right: 25px;
-        bottom: 14px;
     }
 
 
-    /* LAB */
+    .skill-grid {
 
-    .lab-grid {
         grid-template-columns:
             1fr;
 
-        gap: 60px;
     }
 
-    .lab-heading {
+
+    .skill {
+
+        min-height:
+            230px;
+
+    }
+
+
+    /* CALCULATOR */
+
+    .calc-grid {
+
+        grid-template-columns:
+            1fr;
+
+        gap:
+            60px;
+
+    }
+
+
+    .calc-heading {
+
         font-size:
             55px;
+
+    }
+
+
+    .calc-result-value {
+
+        font-size:
+            48px;
+
+    }
+
+
+    /* LEDGER */
+
+    .ledger-header {
+
+        display:
+            block;
+
+    }
+
+
+    .ledger-table {
+
+        overflow-x:
+            auto;
+
+    }
+
+
+    .ledger-row {
+
+        min-width:
+            600px;
+
+        grid-template-columns:
+            80px 1.5fr 1fr 1fr;
+
     }
 
 
     /* JOURNEY */
 
     .timeline {
+
         margin-top:
             60px;
+
     }
+
 
     .timeline-item {
+
         grid-template-columns:
             65px 1fr;
+
     }
 
+
     .timeline-title {
+
         font-size:
             21px;
+
     }
 
 
     /* CONTACT */
 
     .contact {
+
         min-height:
             85svh;
 
         padding:
             110px 22px
             60px;
+
     }
+
 
     .contact-title {
+
         font-size:
             22vw;
+
     }
 
+
     .contact-bottom {
+
         flex-direction:
             column;
 
@@ -1552,21 +2675,26 @@ footer {
             flex-start;
 
         gap:
-            45px;
+            40px;
+
     }
 
+
     .contact-button {
+
         width:
             110px;
 
         height:
             110px;
+
     }
 
 
     /* FOOTER */
 
     footer {
+
         padding:
             28px 22px;
 
@@ -1575,41 +2703,24 @@ footer {
 
         gap:
             20px;
+
     }
 
+
     .socials {
+
         width:
             100%;
 
         order:
             3;
-    }
 
-}
-
-
-/* =========================================================
-   REDUCED MOTION
-========================================================= */
-
-@media(prefers-reduced-motion: reduce) {
-
-    *,
-    *::before,
-    *::after {
-        animation-duration:
-            .01ms !important;
-
-        transition-duration:
-            .01ms !important;
-
-        scroll-behavior:
-            auto !important;
     }
 
 }
 
 </style>
+
 </head>
 
 
@@ -1620,7 +2731,9 @@ footer {
      BACKGROUND
 ===================================================== -->
 
-<canvas id="spaceCanvas"></canvas>
+<canvas id="financeCanvas"></canvas>
+
+<div class="background-grid"></div>
 
 <div class="background-glow"></div>
 
@@ -1630,27 +2743,44 @@ footer {
 ===================================================== -->
 
 <div class="cursor"></div>
+
 <div class="cursor-ring"></div>
 
 
 <!-- =====================================================
-     NAVIGATION
+     NAV
 ===================================================== -->
 
 <nav class="nav">
 
     <a href="#home" class="brand">
-        NITHAN <span>/01</span>
+
+        NITHAN
+        <span>/01</span>
+
     </a>
+
 
     <div class="nav-links">
 
-        <a href="#about">ABOUT</a>
-        <a href="#work">WORK</a>
-        <a href="#skills">SKILLS</a>
-        <a href="#contact">CONTACT</a>
+        <a href="#about">
+            ABOUT
+        </a>
+
+        <a href="#work">
+            WORK
+        </a>
+
+        <a href="#skills">
+            SKILLS
+        </a>
+
+        <a href="#contact">
+            CONTACT
+        </a>
 
     </div>
+
 
     <div class="nav-status">
 
@@ -1667,89 +2797,284 @@ footer {
      HERO
 ===================================================== -->
 
-<section class="hero" id="home">
+<section
+    class="hero"
+    id="home"
+>
+
 
     <div class="hero-content reveal">
 
-        <div class="mini-label">
-            PORTFOLIO / 2026
+
+        <div class="eyebrow">
+
+            COMMERCE × TECHNOLOGY / 2026
+
         </div>
 
 
         <div class="hero-title">
 
-            <h1>NITHAN</h1>
+            <h1>
+                NITHAN
+            </h1>
+
 
             <div class="hero-outline">
-                V—01
-            </div>
 
-        </div>
-
-
-        <div class="hero-info">
-
-            <div class="hero-description">
-
-                <div class="hero-role">
-                    STUDENT / DEVELOPER / EXPLORER
-                </div>
-
-                <p>
-                    I build
-                    <strong>digital experiences</strong>
-                    where technology, design and curiosity
-                    collide.
-                </p>
+                B—01
 
             </div>
 
         </div>
 
-    </div>
+
+        <div class="hero-sub">
 
 
-    <!-- OBJECT -->
+            <div class="hero-role">
 
-    <div class="hero-object" id="heroObject">
+                B.COM STUDENT /
+                DEVELOPER /
+                EXPLORER
 
-        <div class="chrome-object"></div>
+            </div>
 
-        <div class="object-label">
-            OBJECT / 001
+
+            <p>
+
+                Exploring the intersection of
+                <strong>
+                    business, data and technology
+                </strong>
+                and turning ideas into useful
+                digital experiences.
+
+            </p>
+
+
         </div>
 
-    </div>
-
-
-    <div class="scroll-marker">
-
-        <span></span>
-
-        SCROLL TO EXPLORE
 
     </div>
+
+
+    <!-- =================================================
+         FINANCIAL TERMINAL
+    ================================================= -->
+
+    <div class="hero-terminal">
+
+
+        <div class="terminal-head">
+
+            <span>
+                BUSINESS / OVERVIEW
+            </span>
+
+            <span>
+                01—26
+            </span>
+
+        </div>
+
+
+        <div class="terminal-row">
+
+
+            <div>
+
+                <span class="metric-label">
+                    GROWTH
+                </span>
+
+                <span class="metric-value positive">
+                    +18.6%
+                </span>
+
+            </div>
+
+
+            <div>
+
+                <span class="metric-label">
+                    ROI
+                </span>
+
+                <span class="metric-value">
+                    14.2%
+                </span>
+
+            </div>
+
+
+            <div>
+
+                <span class="metric-label">
+                    MARGIN
+                </span>
+
+                <span class="metric-value">
+                    32%
+                </span>
+
+            </div>
+
+
+        </div>
+
+
+        <div class="terminal-chart">
+
+            <svg
+                class="chart-svg"
+                viewBox="0 0 300 90"
+                preserveAspectRatio="none"
+            >
+
+                <path
+                    class="chart-area"
+                    d="
+                    M0 78
+                    L25 70
+                    L50 74
+                    L75 57
+                    L100 64
+                    L125 48
+                    L150 55
+                    L175 32
+                    L200 41
+                    L225 25
+                    L250 30
+                    L275 12
+                    L300 18
+                    L300 90
+                    L0 90
+                    Z
+                    "
+                />
+
+                <path
+                    class="chart-line"
+                    d="
+                    M0 78
+                    L25 70
+                    L50 74
+                    L75 57
+                    L100 64
+                    L125 48
+                    L150 55
+                    L175 32
+                    L200 41
+                    L225 25
+                    L250 30
+                    L275 12
+                    L300 18
+                    "
+                />
+
+            </svg>
+
+        </div>
+
+
+        <div class="terminal-foot">
+
+            INDEX / PERFORMANCE / TREND
+
+        </div>
+
+
+    </div>
+
 
 </section>
 
 
 <!-- =====================================================
-     INFO
+     TICKER
 ===================================================== -->
 
-<div class="info-strip">
+<div class="ticker">
 
-    <span>
-        AVAILABLE FOR SELECTED PROJECTS
-    </span>
+    <div class="ticker-track">
 
-    <span>
-        INDIA / 2026
-    </span>
 
-    <span>
-        BUILD × LEARN × REPEAT
-    </span>
+        <div class="ticker-item">
+            ACCOUNTING
+            <b>01</b>
+        </div>
+
+
+        <div class="ticker-item">
+            FINANCE
+            <b class="ticker-up">↑</b>
+        </div>
+
+
+        <div class="ticker-item">
+            BUSINESS ANALYTICS
+            <b>03</b>
+        </div>
+
+
+        <div class="ticker-item">
+            ECONOMICS
+            <b>04</b>
+        </div>
+
+
+        <div class="ticker-item">
+            DIGITAL BUSINESS
+            <b class="ticker-up">↑</b>
+        </div>
+
+
+        <div class="ticker-item">
+            DATA
+            <b>06</b>
+        </div>
+
+
+        <!-- duplicate -->
+
+        <div class="ticker-item">
+            ACCOUNTING
+            <b>01</b>
+        </div>
+
+
+        <div class="ticker-item">
+            FINANCE
+            <b class="ticker-up">↑</b>
+        </div>
+
+
+        <div class="ticker-item">
+            BUSINESS ANALYTICS
+            <b>03</b>
+        </div>
+
+
+        <div class="ticker-item">
+            ECONOMICS
+            <b>04</b>
+        </div>
+
+
+        <div class="ticker-item">
+            DIGITAL BUSINESS
+            <b class="ticker-up">↑</b>
+        </div>
+
+
+        <div class="ticker-item">
+            DATA
+            <b>06</b>
+        </div>
+
+
+    </div>
 
 </div>
 
@@ -1758,23 +3083,29 @@ footer {
      ABOUT
 ===================================================== -->
 
-<section class="section" id="about">
+<section
+    class="section"
+    id="about"
+>
+
 
     <div class="section-label reveal">
-        01 / ABOUT
+
+        01 / PROFILE
+
     </div>
 
 
     <div class="about-grid">
 
 
-        <div class="about-heading reveal">
+        <div class="big-heading reveal">
 
-            CURIOUS
+            BUSINESS
             <br>
 
             <span>
-                BY DEFAULT.
+                MEETS CODE.
             </span>
 
         </div>
@@ -1782,69 +3113,226 @@ footer {
 
         <div class="about-copy reveal">
 
+
             <p>
-                I'm a student interested in the space
-                where
+
+                I'm a B.Com student interested in
+                understanding how businesses work
+                and how technology can make them
+                better.
+
+            </p>
+
+
+            <p>
+
+                That means looking beyond code:
+                understanding
                 <strong>
-                    technology, business and design
+                    numbers, decisions,
+                    markets and people
                 </strong>
-                overlap.
+                matters too.
+
             </p>
 
 
             <p>
-                I like taking ideas from rough thoughts
-                to things people can actually interact
-                with.
+
+                My interests sit somewhere between
+                commerce, technology, data and
+                creative problem solving.
+
             </p>
 
 
-            <p>
-                The goal isn't to know everything.
-                It's to keep learning fast enough to
-                build interesting things.
-            </p>
+            <div class="stats">
 
 
-            <div class="about-numbers">
+                <div class="stat">
 
-                <div class="number">
+                    <div
+                        class="stat-number"
+                        data-count="01"
+                    >
+                        01
+                    </div>
 
-                    <strong>01</strong>
-
-                    <span>
-                        MINDSET
+                    <span class="stat-label">
+                        DEGREE
                     </span>
 
                 </div>
 
 
-                <div class="number">
+                <div class="stat">
 
-                    <strong>∞</strong>
+                    <div class="stat-number">
+                        ∞
+                    </div>
 
-                    <span>
+                    <span class="stat-label">
                         CURIOSITY
                     </span>
 
                 </div>
 
 
-                <div class="number">
+                <div class="stat">
 
-                    <strong>24/7</strong>
+                    <div class="stat-number">
+                        24/7
+                    </div>
 
-                    <span>
+                    <span class="stat-label">
                         LEARNING
                     </span>
 
                 </div>
 
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+</section>
+
+
+<!-- =====================================================
+     BUSINESS METRICS
+===================================================== -->
+
+<section class="metrics">
+
+
+    <div class="section-label reveal">
+
+        02 / BUSINESS THINKING
+
+    </div>
+
+
+    <div class="metrics-header">
+
+
+        <div class="metrics-title reveal">
+
+            NUMBERS
+            <br>
+
+            <span>
+                TELL STORIES.
+            </span>
+
+        </div>
+
+
+        <div class="metrics-note reveal">
+
+            Commerce isn't only about calculations.
+            It's about understanding what those
+            calculations actually mean.
+
+        </div>
+
+
+    </div>
+
+
+    <div class="metric-grid reveal">
+
+
+        <div class="metric-card">
+
+            <div class="metric-card-label">
+                ROI
+            </div>
+
+            <div
+                class="metric-card-value"
+                data-target="14.2"
+                data-suffix="%"
+            >
+                0%
+            </div>
+
+            <div class="metric-card-sub">
+                RETURN ON INVESTMENT
             </div>
 
         </div>
 
+
+        <div class="metric-card">
+
+            <div class="metric-card-label">
+                CAGR
+            </div>
+
+            <div
+                class="metric-card-value"
+                data-target="12.8"
+                data-suffix="%"
+            >
+                0%
+            </div>
+
+            <div class="metric-card-sub">
+                COMPOUND GROWTH
+            </div>
+
+        </div>
+
+
+        <div class="metric-card">
+
+            <div class="metric-card-label">
+                MARGIN
+            </div>
+
+            <div
+                class="metric-card-value"
+                data-target="32"
+                data-suffix="%"
+            >
+                0%
+            </div>
+
+            <div class="metric-card-sub">
+                OPERATING EFFICIENCY
+            </div>
+
+        </div>
+
+
+        <div class="metric-card">
+
+            <div class="metric-card-label">
+                GROWTH
+            </div>
+
+            <div
+                class="metric-card-value"
+                data-target="18.6"
+                data-suffix="%"
+            >
+                0%
+            </div>
+
+            <div class="metric-card-sub">
+                YEAR OVER YEAR
+            </div>
+
+        </div>
+
+
     </div>
+
 
 </section>
 
@@ -1853,13 +3341,21 @@ footer {
      WORK
 ===================================================== -->
 
-<section class="work" id="work">
+<section
+    class="work"
+    id="work"
+>
+
 
     <div class="work-header">
 
+
         <div class="section-label reveal">
-            02 / SELECTED WORK
+
+            03 / SELECTED WORK
+
         </div>
+
 
         <div class="work-title reveal">
 
@@ -1872,71 +3368,84 @@ footer {
 
         </div>
 
+
     </div>
 
 
     <div class="projects">
 
 
-        <a href="#" class="project reveal">
+        <a
+            href="#"
+            class="project reveal"
+        >
 
             <div class="project-index">
                 01
             </div>
 
             <div class="project-name">
-                ORBIT
+                BUSINESS DASHBOARD
             </div>
 
             <div class="project-meta">
-                WEB / EXPERIMENT
+                DATA / UI
             </div>
 
         </a>
 
 
-        <a href="#" class="project reveal">
+        <a
+            href="#"
+            class="project reveal"
+        >
 
             <div class="project-index">
                 02
             </div>
 
             <div class="project-name">
-                DATA / V02
+                DATA ANALYTICS
             </div>
 
             <div class="project-meta">
-                ANALYTICS
+                PYTHON / DATA
             </div>
 
         </a>
 
 
-        <a href="#" class="project reveal">
+        <a
+            href="#"
+            class="project reveal"
+        >
 
             <div class="project-index">
                 03
             </div>
 
             <div class="project-name">
-                UNKNOWN
+                DIGITAL BUSINESS
             </div>
 
             <div class="project-meta">
-                EXPERIMENT
+                WEB / CONCEPT
             </div>
 
         </a>
 
 
-        <a href="#" class="project reveal">
+        <a
+            href="#"
+            class="project reveal"
+        >
 
             <div class="project-index">
                 04
             </div>
 
             <div class="project-name">
-                NEXT
+                NEXT PROJECT
             </div>
 
             <div class="project-meta">
@@ -1948,6 +3457,7 @@ footer {
 
     </div>
 
+
 </section>
 
 
@@ -1955,22 +3465,29 @@ footer {
      SKILLS
 ===================================================== -->
 
-<section class="skills" id="skills">
+<section
+    class="skills"
+    id="skills"
+>
+
 
     <div class="section-label reveal">
-        03 / CAPABILITIES
+
+        04 / CAPABILITIES
+
     </div>
 
 
     <div class="skills-intro reveal">
 
+
         <div class="skills-heading">
 
-            WHAT I
+            BUSINESS
             <br>
 
             <span>
-                WORK WITH.
+                TOOLKIT.
             </span>
 
         </div>
@@ -1978,286 +3495,191 @@ footer {
 
         <div class="skills-copy">
 
-            Not a list of software icons.
-            A growing toolkit shaped by
-            building, experimenting and
-            breaking things.
+            A combination of commerce,
+            technology and analytical thinking.
 
         </div>
 
+
     </div>
 
 
-    <!-- SKILL DECK -->
+    <div class="skill-grid reveal">
 
-    <div class="skill-deck reveal">
-
-
-        <!-- WEB -->
 
         <article
-            class="skill-card active"
-            style="--skill:88%"
+            class="skill"
+            style="--level:82%"
         >
 
-            <div class="skill-card-top">
-
-                <span>
-                    01
-                </span>
-
-                <span class="skill-card-symbol">
-                    /
-                </span>
-
+            <div class="skill-number">
+                01
             </div>
 
-
-            <div class="skill-card-main">
-
-                <h3>
-                    WEB
-                </h3>
-
+            <div class="skill-icon">
+                ₹
             </div>
 
+            <h3>
+                ACCOUNTING
+            </h3>
 
-            <div class="skill-detail">
+            <p>
+                Understanding financial records,
+                transactions and how businesses
+                track performance.
+            </p>
 
-                Responsive interfaces,
-                modern layouts and
-                interactive experiences.
-
-            </div>
-
-
-            <div class="skill-meter">
+            <div class="skill-bar">
                 <span></span>
             </div>
 
         </article>
 
 
-        <!-- JAVASCRIPT -->
-
         <article
-            class="skill-card"
-            style="--skill:72%"
+            class="skill"
+            style="--level:76%"
         >
 
-            <div class="skill-card-top">
-
-                <span>
-                    02
-                </span>
-
-                <span class="skill-card-symbol">
-                    /
-                </span>
-
+            <div class="skill-number">
+                02
             </div>
 
-
-            <div class="skill-card-main">
-
-                <h3>
-                    JAVASCRIPT
-                </h3>
-
+            <div class="skill-icon">
+                %
             </div>
 
+            <h3>
+                FINANCE
+            </h3>
 
-            <div class="skill-detail">
+            <p>
+                Working with concepts such as
+                returns, margins, investment and
+                financial decisions.
+            </p>
 
-                Interaction,
-                animation,
-                DOM systems and
-                creative experiments.
-
-            </div>
-
-
-            <div class="skill-meter">
+            <div class="skill-bar">
                 <span></span>
             </div>
 
         </article>
 
 
-        <!-- PYTHON -->
-
         <article
-            class="skill-card"
-            style="--skill:68%"
+            class="skill"
+            style="--level:72%"
         >
 
-            <div class="skill-card-top">
-
-                <span>
-                    03
-                </span>
-
-                <span class="skill-card-symbol">
-                    /
-                </span>
-
+            <div class="skill-number">
+                03
             </div>
 
-
-            <div class="skill-card-main">
-
-                <h3>
-                    PYTHON
-                </h3>
-
+            <div class="skill-icon">
+                ∑
             </div>
 
+            <h3>
+                ANALYTICS
+            </h3>
 
-            <div class="skill-detail">
+            <p>
+                Turning raw numbers into patterns,
+                insights and better decisions.
+            </p>
 
-                Automation,
-                scripting, data work
-                and experimentation.
-
-            </div>
-
-
-            <div class="skill-meter">
+            <div class="skill-bar">
                 <span></span>
             </div>
 
         </article>
 
 
-        <!-- DATA -->
-
         <article
-            class="skill-card"
-            style="--skill:64%"
+            class="skill"
+            style="--level:68%"
         >
 
-            <div class="skill-card-top">
-
-                <span>
-                    04
-                </span>
-
-                <span class="skill-card-symbol">
-                    /
-                </span>
-
+            <div class="skill-number">
+                04
             </div>
 
-
-            <div class="skill-card-main">
-
-                <h3>
-                    DATA
-                </h3>
-
+            <div class="skill-icon">
+                $
             </div>
 
+            <h3>
+                ECONOMICS
+            </h3>
 
-            <div class="skill-detail">
+            <p>
+                Understanding markets, incentives,
+                demand and how economic forces
+                shape businesses.
+            </p>
 
-                Finding patterns,
-                cleaning information
-                and extracting insights.
-
-            </div>
-
-
-            <div class="skill-meter">
+            <div class="skill-bar">
                 <span></span>
             </div>
 
         </article>
 
 
-        <!-- UI -->
-
         <article
-            class="skill-card"
-            style="--skill:79%"
+            class="skill"
+            style="--level:80%"
         >
 
-            <div class="skill-card-top">
-
-                <span>
-                    05
-                </span>
-
-                <span class="skill-card-symbol">
-                    /
-                </span>
-
+            <div class="skill-number">
+                05
             </div>
 
-
-            <div class="skill-card-main">
-
-                <h3>
-                    UI / UX
-                </h3>
-
+            <div class="skill-icon">
+                ◫
             </div>
 
+            <h3>
+                WEB
+            </h3>
 
-            <div class="skill-detail">
+            <p>
+                Building responsive interfaces and
+                digital experiences with modern web
+                technologies.
+            </p>
 
-                Visual hierarchy,
-                interaction design
-                and intentional interfaces.
-
-            </div>
-
-
-            <div class="skill-meter">
+            <div class="skill-bar">
                 <span></span>
             </div>
 
         </article>
 
 
-        <!-- CREATIVE -->
-
         <article
-            class="skill-card"
-            style="--skill:74%"
+            class="skill"
+            style="--level:70%"
         >
 
-            <div class="skill-card-top">
-
-                <span>
-                    06
-                </span>
-
-                <span class="skill-card-symbol">
-                    /
-                </span>
-
+            <div class="skill-number">
+                06
             </div>
 
-
-            <div class="skill-card-main">
-
-                <h3>
-                    CREATIVE TECH
-                </h3>
-
+            <div class="skill-icon">
+                &lt;/&gt;
             </div>
 
+            <h3>
+                PROGRAMMING
+            </h3>
 
-            <div class="skill-detail">
+            <p>
+                Using code to automate tasks,
+                experiment and solve practical
+                problems.
+            </p>
 
-                Code as a medium for
-                visual experiments and
-                unusual interfaces.
-
-            </div>
-
-
-            <div class="skill-meter">
+            <div class="skill-bar">
                 <span></span>
             </div>
 
@@ -2265,107 +3687,291 @@ footer {
 
 
     </div>
+
 
 </section>
 
 
 <!-- =====================================================
-     LAB
+     ROI CALCULATOR
 ===================================================== -->
 
-<section class="lab" id="lab">
+<section class="calculator">
+
 
     <div class="section-label reveal">
-        04 / LAB
+
+        05 / INTERACTIVE
+
     </div>
 
 
-    <div class="lab-grid">
+    <div class="calc-grid">
 
 
-        <div class="lab-heading reveal">
+        <div class="reveal">
 
-            CURRENTLY
+
+            <div class="calc-heading">
+
+                MAKE THE
+                <br>
+
+                <span>
+                    NUMBERS MOVE.
+                </span>
+
+            </div>
+
+
+            <p class="calc-description">
+
+                A small interactive example of how
+                commerce concepts can become useful
+                digital tools.
+
+            </p>
+
+
+        </div>
+
+
+        <div class="calc-box reveal">
+
+
+            <div class="calc-field">
+
+                <label>
+                    INITIAL INVESTMENT
+                </label>
+
+                <input
+                    id="investment"
+                    type="number"
+                    value="10000"
+                >
+
+            </div>
+
+
+            <div class="calc-field">
+
+                <label>
+                    FINAL VALUE
+                </label>
+
+                <input
+                    id="finalValue"
+                    type="number"
+                    value="12500"
+                >
+
+            </div>
+
+
+            <button
+                class="calc-button"
+                id="calculateROI"
+            >
+
+                CALCULATE ROI ↗
+
+            </button>
+
+
+            <div class="calc-result">
+
+                <div class="calc-result-label">
+
+                    RETURN ON INVESTMENT
+
+                </div>
+
+
+                <div
+                    class="calc-result-value"
+                    id="roiResult"
+                >
+
+                    25.00%
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+</section>
+
+
+<!-- =====================================================
+     LEDGER
+===================================================== -->
+
+<section class="ledger">
+
+
+    <div class="section-label reveal">
+
+        06 / LEDGER
+
+    </div>
+
+
+    <div class="ledger-header">
+
+
+        <div class="ledger-title reveal">
+
+            EVERY
             <br>
 
             <span>
-                EXPLORING.
+                NUMBER COUNTS.
             </span>
 
         </div>
 
 
-        <div class="lab-list reveal">
+    </div>
 
 
-            <div class="lab-item">
-
-                <div class="lab-item-title">
-                    Creative Web
-                </div>
-
-                <div class="lab-item-meta">
-                    ACTIVE
-                </div>
-
-            </div>
+    <div class="ledger-table reveal">
 
 
-            <div class="lab-item">
+        <div class="ledger-row ledger-head">
 
-                <div class="lab-item-title">
-                    Data Analytics
-                </div>
+            <span>
+                DATE
+            </span>
 
-                <div class="lab-item-meta">
-                    LEARNING
-                </div>
+            <span>
+                TRANSACTION
+            </span>
 
-            </div>
+            <span>
+                TYPE
+            </span>
 
-
-            <div class="lab-item">
-
-                <div class="lab-item-title">
-                    AI Interfaces
-                </div>
-
-                <div class="lab-item-meta">
-                    EXPLORING
-                </div>
-
-            </div>
-
-
-            <div class="lab-item">
-
-                <div class="lab-item-title">
-                    3D Web
-                </div>
-
-                <div class="lab-item-meta">
-                    EXPERIMENTAL
-                </div>
-
-            </div>
-
-
-            <div class="lab-item">
-
-                <div class="lab-item-title">
-                    Automation
-                </div>
-
-                <div class="lab-item-meta">
-                    NEXT
-                </div>
-
-            </div>
-
+            <span>
+                VALUE
+            </span>
 
         </div>
 
+
+        <div class="ledger-row">
+
+            <span>
+                08.01
+            </span>
+
+            <span>
+                DIGITAL PROJECT
+            </span>
+
+            <span class="credit">
+                CREDIT
+            </span>
+
+            <span>
+                ₹12,500
+            </span>
+
+        </div>
+
+
+        <div class="ledger-row">
+
+            <span>
+                14.01
+            </span>
+
+            <span>
+                SOFTWARE
+            </span>
+
+            <span class="debit">
+                DEBIT
+            </span>
+
+            <span>
+                ₹2,400
+            </span>
+
+        </div>
+
+
+        <div class="ledger-row">
+
+            <span>
+                21.01
+            </span>
+
+            <span>
+                ANALYTICS PROJECT
+            </span>
+
+            <span class="credit">
+                CREDIT
+            </span>
+
+            <span>
+                ₹18,200
+            </span>
+
+        </div>
+
+
+        <div class="ledger-row">
+
+            <span>
+                03.02
+            </span>
+
+            <span>
+                DEVELOPMENT
+            </span>
+
+            <span class="debit">
+                DEBIT
+            </span>
+
+            <span>
+                ₹3,100
+            </span>
+
+        </div>
+
+
+        <div class="ledger-row">
+
+            <span>
+                11.02
+            </span>
+
+            <span>
+                NEW PROJECT
+            </span>
+
+            <span class="credit">
+                CREDIT
+            </span>
+
+            <span>
+                ₹24,600
+            </span>
+
+        </div>
+
+
     </div>
+
 
 </section>
 
@@ -2376,18 +3982,21 @@ footer {
 
 <section class="journey">
 
+
     <div class="section-label reveal">
-        05 / JOURNEY
+
+        07 / JOURNEY
+
     </div>
 
 
     <div class="work-title reveal">
 
-        STILL
+        LEARNING
         <br>
 
         <span>
-            BECOMING.
+            IN PROGRESS.
         </span>
 
     </div>
@@ -2405,13 +4014,14 @@ footer {
             <div>
 
                 <div class="timeline-title">
-                    START
+                    FOUNDATION
                 </div>
 
                 <div class="timeline-text">
 
-                    Started exploring technology,
-                    coding and the web.
+                    Started building a stronger
+                    understanding of commerce and
+                    technology.
 
                 </div>
 
@@ -2434,8 +4044,8 @@ footer {
 
                 <div class="timeline-text">
 
-                    Began combining development,
-                    design and business thinking.
+                    Began exploring web development,
+                    data and creative digital projects.
 
                 </div>
 
@@ -2453,14 +4063,13 @@ footer {
             <div>
 
                 <div class="timeline-title">
-                    BUILD
+                    COMBINE
                 </div>
 
                 <div class="timeline-text">
 
-                    Building more ambitious projects
-                    and strengthening the technical
-                    foundation.
+                    Bringing commerce, analytics and
+                    technology together.
 
                 </div>
 
@@ -2478,13 +4087,13 @@ footer {
             <div>
 
                 <div class="timeline-title">
-                    UNKNOWN
+                    BUILD
                 </div>
 
                 <div class="timeline-text">
 
-                    The interesting part is not knowing
-                    exactly where this goes.
+                    Turning what I learn into things
+                    that actually work.
 
                 </div>
 
@@ -2495,6 +4104,7 @@ footer {
 
     </div>
 
+
 </section>
 
 
@@ -2502,10 +4112,16 @@ footer {
      CONTACT
 ===================================================== -->
 
-<section class="contact" id="contact">
+<section
+    class="contact"
+    id="contact"
+>
+
 
     <div class="section-label reveal">
-        06 / CONTACT
+
+        08 / CONTACT
+
     </div>
 
 
@@ -2526,12 +4142,16 @@ footer {
 
         <div class="contact-description">
 
-            HAVE AN IDEA?
+            BUSINESS IDEA?
+            <br>
+            DIGITAL PROJECT?
+            <br>
+            SOMETHING EXPERIMENTAL?
 
             <br><br>
 
-            Let's turn it into something
-            people can actually interact with.
+            Let's turn an idea into something
+            useful.
 
         </div>
 
@@ -2548,6 +4168,7 @@ footer {
 
     </div>
 
+
 </section>
 
 
@@ -2556,6 +4177,7 @@ footer {
 ===================================================== -->
 
 <footer>
+
 
     <div>
         NITHAN.IN
@@ -2580,8 +4202,9 @@ footer {
 
 
     <div>
-        V1.0 / 2026
+        COMMERCE × TECH / 2026
     </div>
+
 
 </footer>
 
@@ -2589,13 +4212,7 @@ footer {
 <script>
 
 /* =========================================================
-   EVERYTHING BELOW IS PROGRESSIVE ENHANCEMENT
-   The actual website remains visible if JS fails.
-========================================================= */
-
-
-/* =========================================================
-   CUSTOM CURSOR
+   CURSOR
 ========================================================= */
 
 try {
@@ -2615,13 +4232,13 @@ try {
 
     document.addEventListener(
         "mousemove",
-        function(event) {
+        function(e) {
 
             mouseX =
-                event.clientX;
+                e.clientX;
 
             mouseY =
-                event.clientY;
+                e.clientY;
 
 
             cursor.style.left =
@@ -2630,11 +4247,24 @@ try {
             cursor.style.top =
                 mouseY + "px";
 
+
+            const glow =
+                document.querySelector(
+                    ".background-glow"
+                );
+
+
+            glow.style.left =
+                mouseX + "px";
+
+            glow.style.top =
+                mouseY + "px";
+
         }
     );
 
 
-    function cursorLoop() {
+    function animateCursor() {
 
         ringX +=
             (mouseX - ringX) * .12;
@@ -2651,55 +4281,53 @@ try {
 
 
         requestAnimationFrame(
-            cursorLoop
+            animateCursor
         );
 
     }
 
 
-    cursorLoop();
+    animateCursor();
 
 
     document
-        .querySelectorAll("a, button, .skill-card")
-        .forEach(function(element) {
+        .querySelectorAll(
+            "a, button, .skill, .metric-card, .project"
+        )
+        .forEach(
+            function(element) {
 
-            element.addEventListener(
-                "mouseenter",
-                function() {
+                element.addEventListener(
+                    "mouseenter",
+                    function() {
 
-                    ring.style.width =
-                        "55px";
+                        ring.style.width =
+                            "55px";
 
-                    ring.style.height =
-                        "55px";
+                        ring.style.height =
+                            "55px";
 
-                }
-            );
+                    }
+                );
 
 
-            element.addEventListener(
-                "mouseleave",
-                function() {
+                element.addEventListener(
+                    "mouseleave",
+                    function() {
 
-                    ring.style.width =
-                        "34px";
+                        ring.style.width =
+                            "32px";
 
-                    ring.style.height =
-                        "34px";
+                        ring.style.height =
+                            "32px";
 
-                }
-            );
+                    }
+                );
 
-        });
+            }
+        );
 
-} catch(error) {
-
-    console.warn(
-        "Cursor enhancement disabled."
-    );
-
-}
+} catch(e) {}
 
 
 /* =========================================================
@@ -2708,138 +4336,57 @@ try {
 
 try {
 
-    const object =
-        document.getElementById(
-            "heroObject"
-        );
-
-
-    const glow =
+    const terminal =
         document.querySelector(
-            ".background-glow"
+            ".hero-terminal"
         );
 
 
     document.addEventListener(
         "mousemove",
-        function(event) {
+        function(e) {
 
             if(
                 window.innerWidth <= 800
-            ) {
+            )
                 return;
-            }
 
 
             const x =
                 (
-                    event.clientX /
+                    e.clientX /
                     window.innerWidth -
                     .5
-                ) * 30;
+                ) * 20;
 
 
             const y =
                 (
-                    event.clientY /
+                    e.clientY /
                     window.innerHeight -
                     .5
-                ) * 30;
+                ) * 20;
 
 
-            object.style.setProperty(
-                "--object-x",
-                x + "px"
-            );
-
-
-            object.style.setProperty(
-                "--object-y",
-                y + "px"
-            );
-
-
-            glow.style.left =
-                event.clientX + "px";
-
-
-            glow.style.top =
-                event.clientY + "px";
+            terminal.style.transform =
+                `translate(
+                    ${x}px,
+                    calc(-50% + ${y}px)
+                )`;
 
         }
     );
 
-} catch(error) {
-
-    console.warn(
-        "Parallax disabled."
-    );
-
-}
+} catch(e) {}
 
 
 /* =========================================================
-   SKILL CARDS
+   SCROLL REVEALS
 ========================================================= */
 
 try {
 
-    const cards =
-        document.querySelectorAll(
-            ".skill-card"
-        );
-
-
-    cards.forEach(
-        function(card) {
-
-            card.addEventListener(
-                "click",
-                function() {
-
-                    cards.forEach(
-                        function(other) {
-
-                            if(
-                                other !== card
-                            ) {
-
-                                other.classList.remove(
-                                    "active"
-                                );
-
-                            }
-
-                        }
-                    );
-
-
-                    card.classList.toggle(
-                        "active"
-                    );
-
-                }
-            );
-
-        }
-    );
-
-} catch(error) {
-
-    console.warn(
-        "Skill interaction disabled."
-    );
-
-}
-
-
-/* =========================================================
-   SCROLL REVEAL
-========================================================= */
-
-try {
-
-    const revealElements =
+    const elements =
         document.querySelectorAll(
             ".reveal"
         );
@@ -2880,7 +4427,7 @@ try {
             );
 
 
-        revealElements.forEach(
+        elements.forEach(
             function(element) {
 
                 observer.observe(
@@ -2893,7 +4440,7 @@ try {
 
     } else {
 
-        revealElements.forEach(
+        elements.forEach(
             function(element) {
 
                 element.classList.add(
@@ -2905,7 +4452,7 @@ try {
 
     }
 
-} catch(error) {
+} catch(e) {
 
     document
         .querySelectorAll(".reveal")
@@ -2923,15 +4470,239 @@ try {
 
 
 /* =========================================================
-   SPACE ENGINE
+   METRIC COUNTERS
+========================================================= */
+
+try {
+
+    const metricValues =
+        document.querySelectorAll(
+            ".metric-card-value"
+        );
+
+
+    const metricObserver =
+        new IntersectionObserver(
+            function(entries) {
+
+                entries.forEach(
+                    function(entry) {
+
+                        if(
+                            !entry.isIntersecting
+                        )
+                            return;
+
+
+                        const element =
+                            entry.target;
+
+
+                        const target =
+                            parseFloat(
+                                element.dataset.target
+                            );
+
+
+                        const suffix =
+                            element.dataset.suffix ||
+                            "";
+
+
+                        let start = 0;
+
+                        const duration =
+                            1200;
+
+                        const startTime =
+                            performance.now();
+
+
+                        function update(
+                            currentTime
+                        ) {
+
+                            const progress =
+                                Math.min(
+                                    (
+                                        currentTime -
+                                        startTime
+                                    ) / duration,
+                                    1
+                                );
+
+
+                            const eased =
+                                1 -
+                                Math.pow(
+                                    1 - progress,
+                                    3
+                                );
+
+
+                            const value =
+                                start +
+                                (
+                                    target -
+                                    start
+                                ) *
+                                eased;
+
+
+                            element.textContent =
+                                value.toFixed(1) +
+                                suffix;
+
+
+                            if(
+                                progress < 1
+                            ) {
+
+                                requestAnimationFrame(
+                                    update
+                                );
+
+                            }
+
+                        }
+
+
+                        requestAnimationFrame(
+                            update
+                        );
+
+
+                        metricObserver.unobserve(
+                            element
+                        );
+
+                    }
+                );
+
+            },
+            {
+                threshold: .5
+            }
+        );
+
+
+    metricValues.forEach(
+        function(element) {
+
+            metricObserver.observe(
+                element
+            );
+
+        }
+    );
+
+} catch(e) {}
+
+
+/* =========================================================
+   ROI CALCULATOR
+========================================================= */
+
+try {
+
+    const investment =
+        document.getElementById(
+            "investment"
+        );
+
+
+    const finalValue =
+        document.getElementById(
+            "finalValue"
+        );
+
+
+    const result =
+        document.getElementById(
+            "roiResult"
+        );
+
+
+    const button =
+        document.getElementById(
+            "calculateROI"
+        );
+
+
+    function calculateROI() {
+
+        const initial =
+            parseFloat(
+                investment.value
+            ) || 0;
+
+
+        const final =
+            parseFloat(
+                finalValue.value
+            ) || 0;
+
+
+        if(
+            initial <= 0
+        ) {
+
+            result.textContent =
+                "0.00%";
+
+            return;
+
+        }
+
+
+        const roi =
+            (
+                (
+                    final -
+                    initial
+                ) /
+                initial
+            ) * 100;
+
+
+        result.textContent =
+            roi.toFixed(2) +
+            "%";
+
+    }
+
+
+    button.addEventListener(
+        "click",
+        calculateROI
+    );
+
+
+    investment.addEventListener(
+        "input",
+        calculateROI
+    );
+
+
+    finalValue.addEventListener(
+        "input",
+        calculateROI
+    );
+
+} catch(e) {}
+
+
+/* =========================================================
+   FINANCIAL BACKGROUND
 ========================================================= */
 
 try {
 
     const canvas =
         document.getElementById(
-            "spaceCanvas"
+            "financeCanvas"
         );
+
 
     const ctx =
         canvas.getContext("2d");
@@ -2941,23 +4712,18 @@ try {
     let height = 0;
 
 
-    let stars = [];
-    let meteors = [];
+    let particles = [];
 
 
     const mobile =
         window.innerWidth <= 800;
 
 
-    const starCount =
-        mobile ? 130 : 300;
+    const particleCount =
+        mobile ? 35 : 75;
 
 
-    /* ---------------------------------------------
-       RESIZE
-    --------------------------------------------- */
-
-    function resizeCanvas() {
+    function resize() {
 
         const ratio =
             Math.min(
@@ -2999,31 +4765,27 @@ try {
     }
 
 
-    resizeCanvas();
+    resize();
 
 
     window.addEventListener(
         "resize",
-        resizeCanvas
+        resize
     );
 
 
-    /* ---------------------------------------------
-       STARS
-    --------------------------------------------- */
+    function createParticles() {
 
-    function makeStars() {
-
-        stars = [];
+        particles = [];
 
 
         for(
             let i = 0;
-            i < starCount;
+            i < particleCount;
             i++
         ) {
 
-            stars.push({
+            particles.push({
 
                 x:
                     Math.random() *
@@ -3033,27 +4795,20 @@ try {
                     Math.random() *
                     height,
 
-                radius:
-                    Math.random() < .94
-                    ?
-                    Math.random() * .65 + .15
-                    :
-                    Math.random() * 1.2 + .5,
-
-                alpha:
-                    Math.random() *
-                    .45 +
-                    .08,
-
-                phase:
-                    Math.random() *
-                    Math.PI *
-                    2,
-
                 speed:
                     Math.random() *
-                    .018 +
-                    .003
+                    .15 +
+                    .04,
+
+                length:
+                    Math.random() *
+                    35 +
+                    10,
+
+                opacity:
+                    Math.random() *
+                    .14 +
+                    .025
 
             });
 
@@ -3062,111 +4817,8 @@ try {
     }
 
 
-    makeStars();
+    createParticles();
 
-
-    /* ---------------------------------------------
-       SHOOTING STAR
-    --------------------------------------------- */
-
-    function createMeteor() {
-
-        const fromLeft =
-            Math.random() > .5;
-
-
-        const meteor = {
-
-            x:
-                fromLeft
-                ?
-                Math.random() *
-                width *
-                .65
-                :
-                width *
-                .35 +
-                Math.random() *
-                width *
-                .65,
-
-            y:
-                Math.random() *
-                height *
-                .55,
-
-            angle:
-                fromLeft
-                ?
-                Math.PI *
-                (.12 + Math.random()*.09)
-                :
-                Math.PI *
-                (.82 + Math.random()*.09),
-
-            speed:
-                Math.random() * 5 + 8,
-
-            length:
-                Math.random() * 100 + 70,
-
-            life: 0,
-
-            maxLife:
-                Math.random() * 30 + 35,
-
-            alpha:
-                Math.random() * .35 + .35
-
-        };
-
-
-        meteors.push(
-            meteor
-        );
-
-    }
-
-
-    /* ---------------------------------------------
-       METEOR TIMER
-    --------------------------------------------- */
-
-    function meteorTimer() {
-
-        const delay =
-            Math.random() *
-            2500 +
-            1000;
-
-
-        setTimeout(
-            function() {
-
-                if(
-                    meteors.length < 2
-                ) {
-
-                    createMeteor();
-
-                }
-
-
-                meteorTimer();
-
-            },
-            delay
-        );
-
-    }
-
-
-    meteorTimer();
-
-
-    /* ---------------------------------------------
-       DRAW
-    --------------------------------------------- */
 
     function draw() {
 
@@ -3178,190 +4830,70 @@ try {
         );
 
 
-        /* STARS */
-
-        stars.forEach(
-            function(star) {
-
-                star.phase +=
-                    star.speed;
+        particles.forEach(
+            function(particle) {
 
 
-                const pulse =
-                    Math.sin(
-                        star.phase
-                    );
-
-
-                const alpha =
-                    Math.max(
-                        .025,
-                        star.alpha +
-                        pulse * .09
-                    );
-
-
-                ctx.beginPath();
-
-
-                ctx.arc(
-                    star.x,
-                    star.y,
-                    star.radius,
-                    0,
-                    Math.PI * 2
-                );
-
-
-                ctx.fillStyle =
-                    "rgba(255,255,255," +
-                    alpha +
-                    ")";
-
-
-                ctx.fill();
-
-            }
-        );
-
-
-        /* METEORS */
-
-        meteors.forEach(
-            function(meteor, index) {
-
-                meteor.life++;
-
-
-                meteor.x +=
-                    Math.cos(
-                        meteor.angle
-                    ) *
-                    meteor.speed;
-
-
-                meteor.y +=
-                    Math.sin(
-                        meteor.angle
-                    ) *
-                    meteor.speed;
-
-
-                const progress =
-                    meteor.life /
-                    meteor.maxLife;
-
-
-                let fade = 1;
+                particle.x +=
+                    particle.speed;
 
 
                 if(
-                    progress < .15
+                    particle.x >
+                    width + 50
                 ) {
 
-                    fade =
-                        progress / .15;
+                    particle.x =
+                        -50;
 
                 }
 
 
-                if(
-                    progress > .7
-                ) {
-
-                    fade =
-                        (1 - progress) / .3;
-
-                }
-
-
-                const alpha =
-                    meteor.alpha *
-                    fade;
-
-
-                const tailX =
-                    meteor.x -
-                    Math.cos(
-                        meteor.angle
-                    ) *
-                    meteor.length;
-
-
-                const tailY =
-                    meteor.y -
-                    Math.sin(
-                        meteor.angle
-                    ) *
-                    meteor.length;
-
-
-                const gradient =
-                    ctx.createLinearGradient(
-                        tailX,
-                        tailY,
-                        meteor.x,
-                        meteor.y
-                    );
-
-
-                gradient.addColorStop(
-                    0,
-                    "rgba(255,255,255,0)"
-                );
-
-
-                gradient.addColorStop(
-                    .65,
-                    "rgba(255,255,255," +
-                    alpha * .25 +
-                    ")"
-                );
-
-
-                gradient.addColorStop(
-                    1,
-                    "rgba(255,255,255," +
-                    alpha +
-                    ")"
-                );
+                /*
+                 * These are intentionally
+                 * horizontal data/ledger traces,
+                 * replacing the shooting stars.
+                 */
 
 
                 ctx.beginPath();
 
 
                 ctx.moveTo(
-                    tailX,
-                    tailY
+                    particle.x,
+                    particle.y
                 );
 
 
                 ctx.lineTo(
-                    meteor.x,
-                    meteor.y
+                    particle.x -
+                    particle.length,
+                    particle.y
                 );
 
 
                 ctx.strokeStyle =
-                    gradient;
+                    "rgba(255,255,255," +
+                    particle.opacity +
+                    ")";
 
 
                 ctx.lineWidth =
-                    .8;
+                    .5;
 
 
                 ctx.stroke();
 
 
-                /* bright head */
+                /* tiny data point */
 
                 ctx.beginPath();
 
 
                 ctx.arc(
-                    meteor.x,
-                    meteor.y,
-                    1.25,
+                    particle.x,
+                    particle.y,
+                    .7,
                     0,
                     Math.PI * 2
                 );
@@ -3369,39 +4901,12 @@ try {
 
                 ctx.fillStyle =
                     "rgba(255,255,255," +
-                    alpha +
+                    particle.opacity * 2 +
                     ")";
-
-
-                ctx.shadowBlur =
-                    14;
-
-                ctx.shadowColor =
-                    "white";
 
 
                 ctx.fill();
 
-
-                ctx.shadowBlur =
-                    0;
-
-
-                if(
-                    meteor.life >
-                    meteor.maxLife ||
-                    meteor.x < -200 ||
-                    meteor.x > width + 200 ||
-                    meteor.y < -200 ||
-                    meteor.y > height + 200
-                ) {
-
-                    meteors.splice(
-                        index,
-                        1
-                    );
-
-                }
 
             }
         );
@@ -3416,43 +4921,113 @@ try {
 
     draw();
 
-} catch(error) {
+} catch(e) {
 
     console.warn(
-        "Space animation disabled.",
-        error
+        "Financial background disabled."
     );
 
 }
 
 
 /* =========================================================
-   INITIAL STATE
+   ACTIVE NAV
+========================================================= */
+
+try {
+
+    const sections =
+        document.querySelectorAll(
+            "section[id]"
+        );
+
+
+    const links =
+        document.querySelectorAll(
+            ".nav-links a"
+        );
+
+
+    const navObserver =
+        new IntersectionObserver(
+            function(entries) {
+
+                entries.forEach(
+                    function(entry) {
+
+                        if(
+                            !entry.isIntersecting
+                        )
+                            return;
+
+
+                        links.forEach(
+                            function(link) {
+
+                                link.style.color =
+                                    "#666";
+
+                            }
+                        );
+
+
+                        const active =
+                            document.querySelector(
+                                `.nav-links a[href="#${entry.target.id}"]`
+                            );
+
+
+                        if(active) {
+
+                            active.style.color =
+                                "white";
+
+                        }
+
+                    }
+                );
+
+            },
+            {
+                threshold: .45
+            }
+        );
+
+
+    sections.forEach(
+        function(section) {
+
+            navObserver.observe(
+                section
+            );
+
+        }
+    );
+
+} catch(e) {}
+
+
+/* =========================================================
+   HERO ALWAYS VISIBLE
 ========================================================= */
 
 window.addEventListener(
     "load",
     function() {
 
-        /*
-         * If the browser doesn't trigger
-         * IntersectionObserver properly,
-         * make the hero visible.
-         */
+        document
+            .querySelectorAll(
+                ".hero .reveal"
+            )
+            .forEach(
+                function(element) {
 
-        const hero =
-            document.querySelector(
-                ".hero-content"
+                    element.classList.add(
+                        "visible"
+                    );
+
+                }
             );
-
-
-        if(hero) {
-
-            hero.classList.add(
-                "visible"
-            );
-
-        }
 
     }
 );
