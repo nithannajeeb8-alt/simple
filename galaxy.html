@@ -3,19 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
-<title>NITHAN / V-01</title>
+<title>Nithan — Portfolio</title>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-    --bg: #020204;
-    --white: #f5f5f5;
-    --muted: #777982;
-    --line: rgba(255,255,255,.10);
-    --green: #70ffae;
+    --bg: #080808;
+    --text: #f4f4f2;
+    --muted: #777;
+    --line: rgba(255,255,255,.12);
+    --soft: rgba(255,255,255,.05);
 }
 
 * {
@@ -30,794 +30,581 @@ html {
 
 body {
     background: var(--bg);
-    color: var(--white);
+    color: var(--text);
     font-family: Inter, sans-serif;
     overflow-x: hidden;
 }
 
-/* =====================================
-   BACKGROUND
-===================================== */
+a {
+    color: inherit;
+    text-decoration: none;
+}
 
-body::before {
+
+/* =========================================
+   CUSTOM CURSOR
+========================================= */
+
+.cursor {
+    position: fixed;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: white;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    mix-blend-mode: difference;
+    transition: transform .15s ease;
+}
+
+.cursor-ring {
+    position: fixed;
+    width: 34px;
+    height: 34px;
+    border: 1px solid rgba(255,255,255,.5);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition:
+        width .3s ease,
+        height .3s ease;
+}
+
+
+/* =========================================
+   GRAIN
+========================================= */
+
+body::after {
     content: "";
     position: fixed;
     inset: 0;
     pointer-events: none;
-    z-index: 999;
-    opacity: .045;
-
-    background-image:
-        repeating-linear-gradient(
-            0deg,
-            rgba(255,255,255,.8) 0px,
-            rgba(255,255,255,.8) 1px,
-            transparent 1px,
-            transparent 4px
-        );
-}
-
-.noise {
-    position: fixed;
-    inset: -50%;
-    width: 200%;
-    height: 200%;
-    pointer-events: none;
-    z-index: 998;
+    z-index: 9997;
     opacity: .025;
 
     background-image:
-        url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E");
-
-    animation: noise .15s infinite;
-}
-
-@keyframes noise {
-    0% { transform: translate(0,0); }
-    25% { transform: translate(2%,-2%); }
-    50% { transform: translate(-2%,2%); }
-    75% { transform: translate(2%,2%); }
-    100% { transform: translate(-2%,-2%); }
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
 }
 
 
-/* =====================================
-   STAR FIELD
-===================================== */
-
-.stars {
-    position: fixed;
-    inset: 0;
-    z-index: -3;
-    overflow: hidden;
-}
-
-.star {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    background: white;
-    border-radius: 50%;
-    opacity: .45;
-    animation: twinkle 4s infinite ease-in-out;
-}
-
-@keyframes twinkle {
-    0%,100% { opacity: .15; }
-    50% { opacity: .8; }
-}
-
-
-/* =====================================
-   NAV
-===================================== */
+/* =========================================
+   NAVIGATION
+========================================= */
 
 nav {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    height: 92px;
-    padding: 30px 5vw;
+
+    padding: 28px 5vw;
 
     display: flex;
     align-items: center;
     justify-content: space-between;
 
     z-index: 100;
-
-    mix-blend-mode: difference;
 }
 
 .logo {
-    font-family: "Space Mono", monospace;
-    font-size: 14px;
-    letter-spacing: .3em;
-    font-weight: 700;
+    font-family: "DM Mono", monospace;
+    font-size: 12px;
+    letter-spacing: .2em;
 }
 
 .logo span {
-    display: block;
-    color: #777;
-    font-size: 9px;
-    margin-top: 6px;
-    letter-spacing: .28em;
+    color: #666;
 }
 
-.nav-links {
+.nav {
     display: flex;
-    gap: 38px;
+    gap: 30px;
 }
 
-.nav-links a {
-    color: white;
-    text-decoration: none;
-    font-family: "Space Mono", monospace;
+.nav a {
+    font-family: "DM Mono", monospace;
     font-size: 10px;
-    letter-spacing: .2em;
-    opacity: .65;
-    transition: .3s;
+    letter-spacing: .15em;
+    color: #888;
+
+    transition: color .3s;
 }
 
-.nav-links a:hover {
-    opacity: 1;
+.nav a:hover {
+    color: white;
 }
 
 
-/* =====================================
+/* =========================================
    HERO
-===================================== */
+========================================= */
 
 .hero {
-    height: 100vh;
-    min-height: 760px;
+    min-height: 100vh;
     position: relative;
-    overflow: hidden;
+
+    padding:
+        150px 5vw
+        80px;
+
     display: flex;
     align-items: center;
+
+    overflow: hidden;
 }
 
-.hero-content {
+.hero-inner {
     width: 100%;
-    padding: 0 6vw;
-    position: relative;
-    z-index: 10;
-}
-
-.eyebrow {
-    font-family: "Space Mono", monospace;
-    color: #888;
-    font-size: 11px;
-    letter-spacing: .45em;
-    margin-bottom: 30px;
-}
-
-.title {
-    position: relative;
-    width: max-content;
-}
-
-.title h1 {
-    font-size: clamp(80px, 14vw, 210px);
-    line-height: .78;
-    letter-spacing: -.08em;
-    font-weight: 800;
-}
-
-.outline {
-    position: absolute;
-    left: 4px;
-    top: 72%;
-    font-size: clamp(80px, 14vw, 210px);
-    line-height: .8;
-    font-weight: 800;
-    letter-spacing: -.08em;
-
-    color: transparent;
-    -webkit-text-stroke: 1px rgba(255,255,255,.4);
-
-    pointer-events: none;
-}
-
-.subtitle {
-    margin-top: 120px;
-
-    font-family: "Space Mono", monospace;
-    font-size: 11px;
-    letter-spacing: .4em;
-    color: #777;
-}
-
-.description {
-    width: 360px;
-    margin-top: 30px;
-
-    font-size: 15px;
-    line-height: 1.8;
-    color: #85868d;
-}
-
-
-/* =====================================
-   EXPLORER FIGURE
-===================================== */
-
-.explorer {
-    position: absolute;
-    right: 3%;
-    bottom: -5%;
-    width: min(48vw, 650px);
-    height: 85vh;
-
-    pointer-events: none;
-}
-
-.body {
-    position: absolute;
-    bottom: 0;
-    left: 28%;
-    width: 45%;
-    height: 65%;
-
-    border-radius: 45% 45% 5% 5%;
-
-    background:
-        linear-gradient(
-            90deg,
-            #030305 0%,
-            #14151a 45%,
-            #020204 70%
-        );
-
-    box-shadow:
-        -30px 0 80px rgba(255,255,255,.025),
-        30px 0 100px rgba(0,0,0,.9);
-
-    transform: perspective(800px) rotateY(-8deg);
-}
-
-.head {
-    position: absolute;
-    left: 35%;
-    top: 5%;
-    width: 31%;
-    aspect-ratio: 1;
-
-    border-radius: 50%;
-
-    background:
-        radial-gradient(
-            circle at 35% 25%,
-            #303139 0%,
-            #111218 30%,
-            #020204 70%
-        );
-
-    box-shadow:
-        -10px -10px 40px rgba(255,255,255,.04);
-}
-
-.head::after {
-    content: "";
-    position: absolute;
-    inset: 10% 8% 18% 12%;
-    border-radius: 50%;
-
-    background:
-        radial-gradient(
-            circle at 45% 40%,
-            #06070a,
-            #000 65%
-        );
-
-    border: 1px solid rgba(255,255,255,.08);
-}
-
-.shoulder {
-    position: absolute;
-    left: 15%;
-    bottom: 43%;
-    width: 72%;
-    height: 16%;
-
-    border-radius: 50%;
-
-    background: #08090c;
-
-    transform: rotate(-7deg);
-}
-
-.pack {
-    position: absolute;
-    right: 2%;
-    bottom: 15%;
-    width: 27%;
-    height: 40%;
-
-    background:
-        linear-gradient(
-            90deg,
-            #07080b,
-            #15161b,
-            #030305
-        );
-
-    border: 1px solid rgba(255,255,255,.07);
-}
-
-.pack::before,
-.pack::after {
-    content: "";
-    position: absolute;
-    left: 15%;
-    right: 15%;
-    height: 1px;
-    background: rgba(255,255,255,.1);
-}
-
-.pack::before {
-    top: 25%;
-}
-
-.pack::after {
-    top: 50%;
-}
-
-
-/* =====================================
-   EARTH
-===================================== */
-
-.earth {
-    position: absolute;
-    right: -15%;
-    bottom: -45%;
-    width: 1000px;
-    height: 1000px;
-
-    border-radius: 50%;
-
-    background:
-        radial-gradient(
-            circle at 45% 30%,
-            #222831,
-            #0a0d12 45%,
-            #020204 67%
-        );
-
-    box-shadow:
-        inset -100px -60px 180px #000,
-        0 -20px 100px rgba(130,170,255,.12);
-
-    z-index: -1;
-}
-
-.earth::before {
-    content: "";
-    position: absolute;
-    top: 10%;
-    left: -4%;
-    width: 110%;
-    height: 5px;
-
-    background: rgba(170,205,255,.75);
-
-    filter: blur(5px);
-
-    box-shadow:
-        0 0 30px rgba(150,190,255,.7);
-}
-
-
-/* =====================================
-   STATUS
-===================================== */
-
-.status {
-    display: flex;
-    gap: 70px;
-    margin-top: 70px;
-}
-
-.stat-label {
-    font-family: "Space Mono", monospace;
-    color: #777;
-    font-size: 9px;
-    margin-bottom: 14px;
-}
-
-.stat-value {
-    font-family: "Space Mono", monospace;
-    font-size: 13px;
-    font-weight: 700;
-}
-
-.online {
-    color: var(--green);
-}
-
-.online::before {
-    content: "";
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    margin-right: 10px;
-    background: var(--green);
-    border-radius: 50%;
-    box-shadow: 0 0 15px var(--green);
-}
-
-
-/* =====================================
-   SCROLL INDICATOR
-===================================== */
-
-.scroll {
-    position: absolute;
-    right: 5vw;
-    bottom: 40px;
-
-    font-family: "Space Mono", monospace;
-    font-size: 9px;
-    letter-spacing: .3em;
-    color: #666;
-
-    writing-mode: vertical-rl;
-}
-
-.scroll::before {
-    content: "";
-    display: block;
-    height: 70px;
-    width: 1px;
-    background: #555;
-    margin-bottom: 20px;
-}
-
-
-/* =====================================
-   SECTIONS
-===================================== */
-
-section {
-    position: relative;
-}
-
-.menu-section {
-    border-top: 1px solid var(--line);
-
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-}
-
-.menu-card {
-    min-height: 230px;
-    padding: 40px;
-
-    border-right: 1px solid var(--line);
-
-    transition:
-        background .4s,
-        transform .4s;
-}
-
-.menu-card:last-child {
-    border-right: none;
-}
-
-.menu-card:hover {
-    background: rgba(255,255,255,.025);
-}
-
-.menu-number {
-    font-family: "Space Mono", monospace;
-    font-size: 9px;
-    color: #555;
-}
-
-.menu-card h2 {
-    margin-top: 50px;
-    font-size: 19px;
-    font-weight: 500;
-}
-
-.menu-card p {
-    margin-top: 15px;
-    color: #65666d;
-    font-family: "Space Mono", monospace;
-    font-size: 10px;
-    line-height: 1.7;
-}
-
-.arrow {
-    margin-top: 30px;
-    display: block;
-    color: #888;
-}
-
-
-/* =====================================
-   MANIFESTO
-===================================== */
-
-.manifesto {
-    min-height: 70vh;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    text-align: center;
-
-    border-bottom: 1px solid var(--line);
-
-    overflow: hidden;
-}
-
-.orbit {
-    position: absolute;
-    width: 500px;
-    height: 500px;
-
-    border: 1px solid rgba(255,255,255,.07);
-    border-radius: 50%;
-
-    animation: rotate 30s linear infinite;
-}
-
-.orbit::before {
-    content: "";
-    position: absolute;
-
-    width: 8px;
-    height: 8px;
-
-    border-radius: 50%;
-    background: white;
-
-    top: 50%;
-    left: -4px;
-
-    box-shadow: 0 0 25px white;
-}
-
-.orbit.two {
-    width: 700px;
-    height: 260px;
-    transform: rotate(-15deg);
-}
-
-.orbit.three {
-    width: 850px;
-    height: 350px;
-    transform: rotate(25deg);
-}
-
-@keyframes rotate {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-.manifesto-content {
     position: relative;
     z-index: 5;
 }
 
-.manifesto-small {
-    font-family: "Space Mono", monospace;
-    color: #777;
+.kicker {
+    font-family: "DM Mono", monospace;
     font-size: 10px;
-    letter-spacing: .5em;
+    letter-spacing: .35em;
+    color: #666;
+
+    margin-bottom: 35px;
 }
 
-.manifesto h2 {
-    margin-top: 25px;
-
-    font-size: clamp(35px, 7vw, 100px);
-    font-weight: 400;
-    letter-spacing: -.05em;
+.hero-title {
+    position: relative;
 }
 
-
-/* =====================================
-   PROJECTS
-===================================== */
-
-.projects {
-    padding: 150px 6vw;
+.hero-title h1 {
+    font-size: clamp(80px, 15vw, 220px);
+    font-weight: 700;
+    line-height: .78;
+    letter-spacing: -.085em;
 }
 
-.section-top {
+.hero-title .ghost {
+    position: absolute;
+    left: 5px;
+    top: 73%;
+
+    font-size: clamp(80px, 15vw, 220px);
+    font-weight: 700;
+    line-height: .78;
+    letter-spacing: -.085em;
+
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(255,255,255,.25);
+
+    z-index: -1;
+}
+
+.hero-bottom {
+    margin-top: 150px;
+
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
-
-    margin-bottom: 90px;
 }
 
-.section-number {
-    font-family: "Space Mono", monospace;
+.intro {
+    max-width: 430px;
+}
+
+.role {
+    font-family: "DM Mono", monospace;
     font-size: 10px;
-    color: #666;
+    letter-spacing: .25em;
+    color: #777;
+
+    margin-bottom: 22px;
 }
 
-.section-title {
-    font-size: clamp(50px, 9vw, 130px);
+.intro p {
+    font-size: 18px;
+    line-height: 1.6;
+    color: #999;
+}
+
+.intro strong {
+    color: white;
+    font-weight: 400;
+}
+
+
+/* =========================================
+   FLOATING ORB
+========================================= */
+
+.visual {
+    position: absolute;
+
+    right: 8vw;
+    top: 50%;
+
+    width: min(34vw, 430px);
+    aspect-ratio: 1;
+
+    transform:
+        translateY(-50%)
+        translate(
+            var(--mouse-x, 0px),
+            var(--mouse-y, 0px)
+        );
+
+    transition: transform .5s cubic-bezier(.16,1,.3,1);
+
+    z-index: 2;
+}
+
+.orb {
+    width: 100%;
+    height: 100%;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle at 30% 25%,
+            #ffffff 0%,
+            #777 4%,
+            #252525 15%,
+            #0c0c0c 48%,
+            #020202 75%
+        );
+
+    box-shadow:
+        -30px -25px 70px rgba(255,255,255,.08),
+        inset -40px -50px 100px #000,
+        inset 20px 15px 50px rgba(255,255,255,.12);
+
+    position: relative;
+
+    animation: float 7s ease-in-out infinite;
+}
+
+.orb::before {
+    content: "";
+
+    position: absolute;
+    inset: -3px;
+
+    border-radius: 50%;
+
+    border: 1px solid rgba(255,255,255,.2);
+
+    box-shadow:
+        0 0 60px rgba(255,255,255,.04);
+}
+
+.orb::after {
+    content: "";
+
+    position: absolute;
+
+    width: 130%;
+    height: 18%;
+
+    left: -15%;
+    top: 42%;
+
+    border-radius: 50%;
+
+    border-top: 1px solid rgba(255,255,255,.4);
+    border-bottom: 1px solid rgba(255,255,255,.05);
+
+    transform: rotate(-18deg);
+
+    filter: blur(.3px);
+}
+
+@keyframes float {
+    0%,100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+.orb-label {
+    position: absolute;
+    bottom: -40px;
+    right: 0;
+
+    font-family: "DM Mono", monospace;
+    font-size: 9px;
+    letter-spacing: .2em;
+
+    color: #555;
+}
+
+
+/* =========================================
+   SCROLL
+========================================= */
+
+.scroll {
+    position: absolute;
+
+    bottom: 40px;
+    left: 5vw;
+
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    font-family: "DM Mono", monospace;
+    font-size: 9px;
+    color: #555;
+    letter-spacing: .2em;
+}
+
+.scroll-line {
+    width: 55px;
+    height: 1px;
+    background: #555;
+}
+
+
+/* =========================================
+   INTRO BAR
+========================================= */
+
+.intro-bar {
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+
+    padding: 22px 5vw;
+
+    display: flex;
+    justify-content: space-between;
+
+    font-family: "DM Mono", monospace;
+    font-size: 9px;
+    letter-spacing: .18em;
+
+    color: #555;
+}
+
+
+/* =========================================
+   ABOUT
+========================================= */
+
+.section {
+    padding: 160px 5vw;
+    border-bottom: 1px solid var(--line);
+}
+
+.section-label {
+    font-family: "DM Mono", monospace;
+    font-size: 9px;
+    letter-spacing: .25em;
+    color: #555;
+
+    margin-bottom: 70px;
+}
+
+.about-grid {
+    display: grid;
+    grid-template-columns: 1.2fr .8fr;
+    gap: 10vw;
+}
+
+.about-title {
+    font-size: clamp(50px, 7vw, 100px);
+    line-height: .95;
+    letter-spacing: -.06em;
+    font-weight: 400;
+}
+
+.about-copy {
+    color: #777;
+    font-size: 16px;
+    line-height: 1.9;
+    max-width: 480px;
+}
+
+.about-copy p + p {
+    margin-top: 25px;
+}
+
+.about-copy strong {
+    color: #ddd;
+    font-weight: 400;
+}
+
+
+/* =========================================
+   SELECTED WORK
+========================================= */
+
+.work {
+    padding: 160px 5vw;
+    border-bottom: 1px solid var(--line);
+}
+
+.work-title {
+    font-size: clamp(70px, 12vw, 170px);
     font-weight: 500;
-    letter-spacing: -.07em;
+    letter-spacing: -.09em;
+    line-height: .8;
+
+    margin-bottom: 120px;
 }
 
 .project {
-    border-top: 1px solid var(--line);
-
-    padding: 35px 0;
-
     display: grid;
-    grid-template-columns: 80px 1fr 220px;
+    grid-template-columns: 80px 1fr 160px;
+
     align-items: center;
 
-    transition: padding .4s;
+    padding: 32px 0;
+
+    border-top: 1px solid var(--line);
+
+    transition:
+        padding .4s ease,
+        background .4s ease;
+}
+
+.project:last-child {
+    border-bottom: 1px solid var(--line);
 }
 
 .project:hover {
-    padding-left: 20px;
-    padding-right: 20px;
+    padding-left: 25px;
+    padding-right: 25px;
+    background: rgba(255,255,255,.025);
 }
 
-.project-num {
-    font-family: "Space Mono", monospace;
-    color: #555;
+.project-number {
+    font-family: "DM Mono", monospace;
+    color: #444;
     font-size: 10px;
 }
 
 .project-name {
     font-size: clamp(25px, 4vw, 55px);
-    font-weight: 400;
     letter-spacing: -.04em;
+    font-weight: 400;
 }
 
 .project-type {
-    font-family: "Space Mono", monospace;
-    color: #666;
+    font-family: "DM Mono", monospace;
+    color: #555;
     font-size: 9px;
-    letter-spacing: .2em;
+    letter-spacing: .15em;
 }
 
 
-/* =====================================
-   ABOUT
-===================================== */
-
-.about {
-    min-height: 80vh;
-    padding: 150px 6vw;
-
-    border-top: 1px solid var(--line);
-
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10vw;
-}
-
-.about-big {
-    font-size: clamp(40px, 6vw, 85px);
-    letter-spacing: -.06em;
-    line-height: .95;
-}
-
-.about-copy {
-    padding-top: 30px;
-
-    color: #777;
-    font-size: 16px;
-    line-height: 2;
-    max-width: 500px;
-}
-
-.about-copy strong {
-    color: white;
-    font-weight: 500;
-}
-
-
-/* =====================================
+/* =========================================
    SKILLS
-===================================== */
+========================================= */
 
 .skills {
-    padding: 100px 6vw;
-    border-top: 1px solid var(--line);
+    padding: 160px 5vw;
+    border-bottom: 1px solid var(--line);
 }
 
-.skill-grid {
-    margin-top: 70px;
-
+.skills-grid {
     display: grid;
     grid-template-columns: repeat(3,1fr);
 
     border-top: 1px solid var(--line);
     border-left: 1px solid var(--line);
+
+    margin-top: 70px;
 }
 
 .skill {
-    padding: 35px;
+    padding: 40px;
 
     border-right: 1px solid var(--line);
     border-bottom: 1px solid var(--line);
 
-    font-family: "Space Mono", monospace;
+    transition: background .3s;
 }
 
-.skill span {
-    color: #555;
+.skill:hover {
+    background: rgba(255,255,255,.025);
+}
+
+.skill-number {
+    font-family: "DM Mono", monospace;
+    color: #444;
     font-size: 9px;
 }
 
 .skill h3 {
-    margin-top: 20px;
-    font-family: Inter, sans-serif;
+    margin-top: 55px;
+
     font-size: 22px;
     font-weight: 400;
 }
 
 
-/* =====================================
+/* =========================================
    CONTACT
-===================================== */
+========================================= */
 
 .contact {
-    min-height: 80vh;
-    padding: 150px 6vw;
+    min-height: 85vh;
 
-    border-top: 1px solid var(--line);
+    padding: 160px 5vw;
 
-    position: relative;
-    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    border-bottom: 1px solid var(--line);
 }
 
-.contact h2 {
+.contact-title {
     font-size: clamp(70px, 13vw, 190px);
+    line-height: .78;
     letter-spacing: -.09em;
-    line-height: .8;
+    font-weight: 600;
 }
 
-.contact-outline {
+.contact-title span {
     color: transparent;
-    -webkit-text-stroke: 1px rgba(255,255,255,.25);
+    -webkit-text-stroke: 1px rgba(255,255,255,.3);
 }
 
-.contact-email {
+.email {
     display: inline-block;
+
     margin-top: 100px;
 
-    color: white;
-    text-decoration: none;
-
-    font-family: "Space Mono", monospace;
-    font-size: 12px;
-    letter-spacing: .15em;
+    font-family: "DM Mono", monospace;
+    font-size: 13px;
+    letter-spacing: .12em;
 
     border-bottom: 1px solid #555;
+
     padding-bottom: 12px;
+
+    width: max-content;
 }
 
 
-/* =====================================
+/* =========================================
    FOOTER
-===================================== */
+========================================= */
 
 footer {
-    padding: 40px 6vw;
-
-    border-top: 1px solid var(--line);
+    padding: 35px 5vw;
 
     display: flex;
     justify-content: space-between;
     align-items: center;
 
-    font-family: "Space Mono", monospace;
+    font-family: "DM Mono", monospace;
     font-size: 9px;
     color: #555;
+
     letter-spacing: .15em;
 }
 
@@ -827,9 +614,7 @@ footer {
 }
 
 .socials a {
-    color: #777;
-    text-decoration: none;
-    transition: .3s;
+    transition: color .3s;
 }
 
 .socials a:hover {
@@ -837,150 +622,150 @@ footer {
 }
 
 
-/* =====================================
-   REVEAL ANIMATION
-===================================== */
+/* =========================================
+   REVEAL
+========================================= */
 
 .reveal {
     opacity: 0;
-    transform: translateY(40px);
+    transform: translateY(35px);
+
     transition:
-        opacity 1s ease,
-        transform 1s cubic-bezier(.16,1,.3,1);
+        opacity .9s ease,
+        transform .9s cubic-bezier(.16,1,.3,1);
 }
 
-.reveal.visible {
+.reveal.show {
     opacity: 1;
     transform: translateY(0);
 }
 
 
-/* =====================================
+/* =========================================
    MOBILE
-===================================== */
+========================================= */
 
 @media(max-width: 800px) {
 
+    .cursor,
+    .cursor-ring {
+        display: none;
+    }
+
     nav {
-        padding: 22px 25px;
+        padding: 22px 22px;
     }
 
-    .nav-links {
-        gap: 15px;
+    .nav {
+        gap: 16px;
     }
 
-    .nav-links a {
+    .nav a {
         font-size: 8px;
     }
 
     .hero {
-        min-height: 850px;
+        min-height: 100svh;
+
+        padding:
+            135px 22px
+            80px;
+
         align-items: flex-start;
-        padding-top: 170px;
     }
 
-    .hero-content {
-        padding: 0 25px;
+    .kicker {
+        margin-bottom: 35px;
     }
 
-    .title h1,
-    .outline {
-        font-size: 82px;
+    .hero-title h1,
+    .hero-title .ghost {
+        font-size: 21vw;
     }
 
-    .subtitle {
+    .hero-bottom {
         margin-top: 100px;
-        font-size: 8px;
+        display: block;
     }
 
-    .description {
-        width: 270px;
-        font-size: 13px;
+    .intro {
+        max-width: 310px;
     }
 
-    .explorer {
-        width: 100vw;
-        height: 65vh;
-        right: -25vw;
-        bottom: -8%;
-        opacity: .75;
-    }
-
-    .earth {
-        width: 650px;
-        height: 650px;
-        right: -55%;
-        bottom: -35%;
-    }
-
-    .status {
-        gap: 25px;
-        margin-top: 45px;
-    }
-
-    .stat-label {
-        font-size: 7px;
-    }
-
-    .stat-value {
-        font-size: 10px;
-    }
-
-    .menu-section {
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .menu-card {
-        min-height: 180px;
-        padding: 25px;
-    }
-
-    .menu-card h2 {
-        margin-top: 30px;
+    .intro p {
         font-size: 15px;
     }
 
-    .manifesto {
-        min-height: 60vh;
+    .visual {
+        width: 190px;
+        right: -30px;
+        top: 57%;
+        opacity: .65;
     }
 
-    .orbit {
-        width: 350px;
-        height: 350px;
+    .orb-label {
+        display: none;
     }
 
-    .orbit.two {
-        width: 500px;
-        height: 200px;
+    .scroll {
+        display: none;
     }
 
-    .orbit.three {
-        width: 600px;
-        height: 250px;
+    .intro-bar {
+        padding: 18px 22px;
+        font-size: 7px;
     }
 
-    .projects,
-    .about,
+    .intro-bar span:last-child {
+        display: none;
+    }
+
+    .section,
+    .work,
+    .skills,
     .contact {
-        padding: 100px 25px;
+        padding: 100px 22px;
     }
 
-    .project {
-        grid-template-columns: 45px 1fr;
+    .section-label {
+        margin-bottom: 50px;
     }
 
-    .project-type {
-        grid-column: 2;
-        margin-top: 8px;
-    }
-
-    .about {
+    .about-grid {
         grid-template-columns: 1fr;
         gap: 50px;
     }
 
-    .skill-grid {
+    .about-title {
+        font-size: 50px;
+    }
+
+    .about-copy {
+        font-size: 14px;
+    }
+
+    .work-title {
+        font-size: 75px;
+        margin-bottom: 75px;
+    }
+
+    .project {
+        grid-template-columns: 40px 1fr;
+        padding: 28px 0;
+    }
+
+    .project-type {
+        grid-column: 2;
+        margin-top: 10px;
+    }
+
+    .project-name {
+        font-size: 28px;
+    }
+
+    .skills-grid {
         grid-template-columns: 1fr 1fr;
+        margin-top: 50px;
     }
 
     .skill {
@@ -988,13 +773,33 @@ footer {
     }
 
     .skill h3 {
-        font-size: 16px;
+        margin-top: 40px;
+        font-size: 15px;
+    }
+
+    .contact {
+        min-height: 75svh;
+    }
+
+    .contact-title {
+        font-size: 22vw;
+    }
+
+    .email {
+        margin-top: 70px;
+        font-size: 10px;
     }
 
     footer {
-        flex-direction: column;
+        padding: 30px 22px;
+
+        flex-wrap: wrap;
         gap: 25px;
-        align-items: flex-start;
+    }
+
+    .socials {
+        order: 3;
+        width: 100%;
     }
 }
 </style>
@@ -1003,80 +808,69 @@ footer {
 
 <body>
 
-<div class="noise"></div>
-<div class="stars" id="stars"></div>
+
+<!-- CURSOR -->
+
+<div class="cursor"></div>
+<div class="cursor-ring"></div>
 
 
-<!-- ================= NAV ================= -->
+<!-- NAV -->
 
 <nav>
+
     <div class="logo">
-        N / 01
-        <span>CREATIVE THINKER</span>
+        NITHAN <span>/ 01</span>
     </div>
 
-    <div class="nav-links">
-        <a href="#home">HOME</a>
+    <div class="nav">
+
         <a href="#about">ABOUT</a>
-        <a href="#projects">PROJECTS</a>
+        <a href="#work">WORK</a>
+        <a href="#skills">SKILLS</a>
         <a href="#contact">CONTACT</a>
+
     </div>
+
 </nav>
 
 
-<!-- ================= HERO ================= -->
-
-<main id="home">
+<!-- HERO -->
 
 <section class="hero">
 
-    <div class="hero-content reveal">
+    <div class="hero-inner reveal">
 
-        <div class="eyebrow">
+        <div class="kicker">
             PORTFOLIO / 2026
         </div>
 
-        <div class="title">
+
+        <div class="hero-title">
 
             <h1>NITHAN</h1>
 
-            <div class="outline">
-                V-01
+            <div class="ghost">
+                V—01
             </div>
 
         </div>
 
-        <div class="subtitle">
-            STUDENT / DEVELOPER / EXPLORER
-        </div>
 
-        <p class="description">
-            Building ideas at the intersection of
-            technology, design and real-world impact.
-        </p>
+        <div class="hero-bottom">
 
+            <div class="intro">
 
-        <div class="status">
-
-            <div>
-                <div class="stat-label">STATUS</div>
-                <div class="stat-value online">
-                    ONLINE
+                <div class="role">
+                    STUDENT / DEVELOPER / EXPLORER
                 </div>
-            </div>
 
-            <div>
-                <div class="stat-label">MODE</div>
-                <div class="stat-value">
-                    CREATIVE
-                </div>
-            </div>
+                <p>
+                    I build <strong>digital experiences</strong>
+                    that sit somewhere between technology,
+                    design and curiosity.
+                </p>
 
-            <div>
-                <div class="stat-label">VERSION</div>
-                <div class="stat-value">
-                    01.26
-                </div>
             </div>
 
         </div>
@@ -1084,201 +878,78 @@ footer {
     </div>
 
 
-    <!-- HUMAN EXPLORER -->
+    <!-- SIMPLE HERO VISUAL -->
 
-    <div class="explorer">
+    <div class="visual">
 
-        <div class="earth"></div>
+        <div class="orb"></div>
 
-        <div class="body"></div>
-        <div class="head"></div>
-        <div class="shoulder"></div>
-        <div class="pack"></div>
+        <div class="orb-label">
+            OBJECT / 001
+        </div>
 
     </div>
 
 
     <div class="scroll">
-        SCROLL TO EXPLORE
-    </div>
 
-</section>
-
-
-<!-- ================= MENU ================= -->
-
-<section class="menu-section">
-
-    <a class="menu-card reveal" href="#about">
-        <div class="menu-number">01</div>
-
-        <h2>ABOUT</h2>
-
-        <p>
-            Who I am<br>
-            & what I do
-        </p>
-
-        <span class="arrow">↗</span>
-    </a>
-
-
-    <a class="menu-card reveal" href="#skills">
-        <div class="menu-number">02</div>
-
-        <h2>SKILLS</h2>
-
-        <p>
-            Things I<br>
-            work with
-        </p>
-
-        <span class="arrow">↗</span>
-    </a>
-
-
-    <a class="menu-card reveal" href="#projects">
-        <div class="menu-number">03</div>
-
-        <h2>PROJECTS</h2>
-
-        <p>
-            Things I've<br>
-            built
-        </p>
-
-        <span class="arrow">↗</span>
-    </a>
-
-
-    <a class="menu-card reveal" href="#contact">
-        <div class="menu-number">04</div>
-
-        <h2>CONTACT</h2>
-
-        <p>
-            Let's create<br>
-            something
-        </p>
-
-        <span class="arrow">↗</span>
-    </a>
-
-</section>
-
-
-<!-- ================= MANIFESTO ================= -->
-
-<section class="manifesto">
-
-    <div class="orbit"></div>
-    <div class="orbit two"></div>
-    <div class="orbit three"></div>
-
-    <div class="manifesto-content reveal">
-
-        <div class="manifesto-small">
-            TURNING
-        </div>
-
-        <h2>
-            CURIOSITY<br>
-            INTO IMPACT
-        </h2>
+        <span class="scroll-line"></span>
+        SCROLL
 
     </div>
 
 </section>
 
 
-<!-- ================= ABOUT ================= -->
+<!-- INFO -->
 
-<section class="about" id="about">
+<div class="intro-bar">
 
-    <div class="reveal">
+    <span>AVAILABLE FOR SELECTED PROJECTS</span>
 
-        <div class="section-number">
-            01 / ABOUT
-        </div>
+    <span>INDIA / 2026</span>
 
-        <div class="about-big">
+    <span>BUILD × LEARN × REPEAT</span>
+
+</div>
+
+
+<!-- ABOUT -->
+
+<section class="section" id="about">
+
+    <div class="section-label reveal">
+        01 / ABOUT
+    </div>
+
+    <div class="about-grid">
+
+        <div class="about-title reveal">
+
             CURIOUS<br>
             BY DEFAULT.
+
         </div>
 
-    </div>
 
+        <div class="about-copy reveal">
 
-    <div class="about-copy reveal">
+            <p>
+                I'm a student interested in the space where
+                <strong>technology, business and design</strong>
+                overlap.
+            </p>
 
-        <p>
-            I'm a student who likes understanding how things
-            work, breaking them apart, and occasionally
-            rebuilding them better.
-        </p>
+            <p>
+                I enjoy taking an idea from a rough thought
+                to something people can actually interact with.
+            </p>
 
-        <br>
+            <p>
+                Currently learning, experimenting and building
+                things that probably didn't need to exist.
+            </p>
 
-        <p>
-            My interests sit somewhere between
-            <strong>technology, business, design and the web.</strong>
-        </p>
-
-        <br>
-
-        <p>
-            I don't want to simply consume technology.
-            I want to build things with it.
-        </p>
-
-    </div>
-
-</section>
-
-
-<!-- ================= SKILLS ================= -->
-
-<section class="skills" id="skills">
-
-    <div class="section-number reveal">
-        02 / SYSTEMS
-    </div>
-
-    <div class="section-title reveal">
-        SKILLS
-    </div>
-
-
-    <div class="skill-grid">
-
-        <div class="skill reveal">
-            <span>01</span>
-            <h3>HTML / CSS</h3>
-        </div>
-
-        <div class="skill reveal">
-            <span>02</span>
-            <h3>JAVASCRIPT</h3>
-        </div>
-
-        <div class="skill reveal">
-            <span>03</span>
-            <h3>UI / UX</h3>
-        </div>
-
-        <div class="skill reveal">
-            <span>04</span>
-            <h3>PYTHON</h3>
-        </div>
-
-        <div class="skill reveal">
-            <span>05</span>
-            <h3>DATA</h3>
-        </div>
-
-        <div class="skill reveal">
-            <span>06</span>
-            <h3>CREATIVE TECH</h3>
         </div>
 
     </div>
@@ -1286,31 +957,22 @@ footer {
 </section>
 
 
-<!-- ================= PROJECTS ================= -->
+<!-- WORK -->
 
-<section class="projects" id="projects">
+<section class="work" id="work">
 
-    <div class="section-top reveal">
-
-        <div class="section-number">
-            03 / SELECTED WORK
-        </div>
-
-        <div class="section-number">
-            2024 — 2026
-        </div>
-
+    <div class="section-label reveal">
+        02 / SELECTED WORK
     </div>
 
-
-    <div class="section-title reveal">
+    <div class="work-title reveal">
         PROJECTS
     </div>
 
 
-    <div class="project reveal">
+    <a href="#" class="project reveal">
 
-        <div class="project-num">
+        <div class="project-number">
             01
         </div>
 
@@ -1322,38 +984,88 @@ footer {
             WEB / EXPERIMENT
         </div>
 
-    </div>
+    </a>
 
 
-    <div class="project reveal">
+    <a href="#" class="project reveal">
 
-        <div class="project-num">
+        <div class="project-number">
             02
         </div>
 
         <div class="project-name">
-            DATA / V-02
+            DATA / V02
         </div>
 
         <div class="project-type">
-            DATA / ANALYTICS
+            ANALYTICS
         </div>
 
-    </div>
+    </a>
 
 
-    <div class="project reveal">
+    <a href="#" class="project reveal">
 
-        <div class="project-num">
+        <div class="project-number">
             03
         </div>
 
         <div class="project-name">
-            UNKNOWN
+            NEXT
         </div>
 
         <div class="project-type">
             CURRENTLY BUILDING
+        </div>
+
+    </a>
+
+</section>
+
+
+<!-- SKILLS -->
+
+<section class="skills" id="skills">
+
+    <div class="section-label reveal">
+        03 / CAPABILITIES
+    </div>
+
+    <div class="work-title reveal">
+        SKILLS
+    </div>
+
+
+    <div class="skills-grid">
+
+        <div class="skill reveal">
+            <div class="skill-number">01</div>
+            <h3>WEB DEVELOPMENT</h3>
+        </div>
+
+        <div class="skill reveal">
+            <div class="skill-number">02</div>
+            <h3>JAVASCRIPT</h3>
+        </div>
+
+        <div class="skill reveal">
+            <div class="skill-number">03</div>
+            <h3>PYTHON</h3>
+        </div>
+
+        <div class="skill reveal">
+            <div class="skill-number">04</div>
+            <h3>DATA ANALYTICS</h3>
+        </div>
+
+        <div class="skill reveal">
+            <div class="skill-number">05</div>
+            <h3>UI / UX</h3>
+        </div>
+
+        <div class="skill reveal">
+            <div class="skill-number">06</div>
+            <h3>CREATIVE TECH</h3>
         </div>
 
     </div>
@@ -1361,32 +1073,27 @@ footer {
 </section>
 
 
-<!-- ================= CONTACT ================= -->
+<!-- CONTACT -->
 
 <section class="contact" id="contact">
 
-    <div class="section-number reveal">
+    <div class="section-label reveal">
         04 / CONTACT
     </div>
 
-    <br><br>
 
     <div class="reveal">
 
-        <h2>
+        <div class="contact-title">
             LET'S<br>
-            BUILD
-        </h2>
-
-        <h2 class="contact-outline">
-            SOMETHING.
-        </h2>
+            <span>BUILD.</span>
+        </div>
 
     </div>
 
 
     <a
-        class="contact-email"
+        class="email"
         href="mailto:hello@nithan.in"
     >
         HELLO@NITHAN.IN ↗
@@ -1394,16 +1101,13 @@ footer {
 
 </section>
 
-</main>
 
-
-<!-- ================= FOOTER ================= -->
+<!-- FOOTER -->
 
 <footer>
 
     <div>
-        NITHAN.IN<br>
-        <span>BUILD × LEARN × REPEAT</span>
+        NITHAN.IN
     </div>
 
     <div class="socials">
@@ -1415,8 +1119,7 @@ footer {
     </div>
 
     <div>
-        V1.0<br>
-        STILL EXPLORING
+        V1.0 / 2026
     </div>
 
 </footer>
@@ -1424,117 +1127,143 @@ footer {
 
 <script>
 
-/* =====================================
-   GENERATE STARS
-===================================== */
+/* =========================================
+   CURSOR
+========================================= */
 
-const starContainer =
-    document.getElementById("stars");
+const cursor = document.querySelector(".cursor");
+const ring = document.querySelector(".cursor-ring");
 
-for(let i = 0; i < 180; i++){
+let mouseX = 0;
+let mouseY = 0;
 
-    const star =
-        document.createElement("div");
+let ringX = 0;
+let ringY = 0;
 
-    star.className = "star";
+document.addEventListener("mousemove", e => {
 
-    star.style.left =
-        Math.random() * 100 + "%";
+    mouseX = e.clientX;
+    mouseY = e.clientY;
 
-    star.style.top =
-        Math.random() * 100 + "%";
+    cursor.style.left = mouseX + "px";
+    cursor.style.top = mouseY + "px";
 
-    const size =
-        Math.random() > .92 ? 2 : 1;
+});
 
-    star.style.width = size + "px";
-    star.style.height = size + "px";
 
-    star.style.animationDelay =
-        Math.random() * 5 + "s";
+function animateCursor() {
 
-    starContainer.appendChild(star);
+    ringX += (mouseX - ringX) * .12;
+    ringY += (mouseY - ringY) * .12;
+
+    ring.style.left = ringX + "px";
+    ring.style.top = ringY + "px";
+
+    requestAnimationFrame(animateCursor);
 }
 
+animateCursor();
 
-/* =====================================
+
+/* =========================================
+   ORB PARALLAX
+========================================= */
+
+const visual = document.querySelector(".visual");
+
+document.addEventListener("mousemove", e => {
+
+    if(window.innerWidth < 800) return;
+
+    const x =
+        (e.clientX / window.innerWidth - .5) * 30;
+
+    const y =
+        (e.clientY / window.innerHeight - .5) * 30;
+
+    visual.style.setProperty(
+        "--mouse-x",
+        x + "px"
+    );
+
+    visual.style.setProperty(
+        "--mouse-y",
+        y + "px"
+    );
+
+});
+
+
+/* =========================================
+   HOVER CURSOR
+========================================= */
+
+document.querySelectorAll("a").forEach(link => {
+
+    link.addEventListener("mouseenter", () => {
+
+        ring.style.width = "55px";
+        ring.style.height = "55px";
+
+    });
+
+    link.addEventListener("mouseleave", () => {
+
+        ring.style.width = "34px";
+        ring.style.height = "34px";
+
+    });
+
+});
+
+
+/* =========================================
    SCROLL REVEAL
-===================================== */
+========================================= */
 
 const observer =
-    new IntersectionObserver(
-        entries => {
+new IntersectionObserver(entries => {
 
-            entries.forEach(entry => {
+    entries.forEach(entry => {
 
-                if(entry.isIntersecting){
+        if(entry.isIntersecting) {
 
-                    entry.target
-                        .classList
-                        .add("visible");
+            entry.target.classList.add("show");
 
-                }
-
-            });
-
-        },
-        {
-            threshold: .12
         }
-    );
+
+    });
+
+}, {
+    threshold: .12
+});
 
 
 document
-    .querySelectorAll(".reveal")
-    .forEach(el => observer.observe(el));
+.querySelectorAll(".reveal")
+.forEach(el => observer.observe(el));
 
 
-/* =====================================
-   MOUSE PARALLAX
-===================================== */
+/* =========================================
+   SMALL PARALLAX ON HERO
+========================================= */
 
-const explorer =
-    document.querySelector(".explorer");
+window.addEventListener("scroll", () => {
 
-document.addEventListener(
-    "mousemove",
-    e => {
+    const scroll =
+        window.scrollY;
 
-        const x =
-            (e.clientX / window.innerWidth - .5);
+    const orb =
+        document.querySelector(".visual");
 
-        const y =
-            (e.clientY / window.innerHeight - .5);
+    if(window.innerWidth > 800) {
 
-        explorer.style.transform =
-            `translate(${x * 18}px, ${y * 12}px)`;
+        orb.style.marginTop =
+            scroll * .12 + "px";
 
     }
-);
 
-
-/* =====================================
-   TITLE MOVEMENT
-===================================== */
-
-const title =
-    document.querySelector(".title");
-
-document.addEventListener(
-    "mousemove",
-    e => {
-
-        const x =
-            (e.clientX / window.innerWidth - .5);
-
-        const y =
-            (e.clientY / window.innerHeight - .5);
-
-        title.style.transform =
-            `translate(${x * -8}px, ${y * -5}px)`;
-
-    }
-);
+});
 
 </script>
 
