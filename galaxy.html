@@ -1,310 +1,328 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
 <meta charset="UTF-8">
-
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
->
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#050505">
 
-<title>Nithan — Commerce × Technology</title>
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-
-<link rel="preconnect"
-      href="https://fonts.gstatic.com"
-      crossorigin>
-
-<link
-href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600;700;800&display=swap"
-rel="stylesheet">
-
+<title>NITHAN / 01</title>
 
 <style>
 
 /* =========================================================
-   CORE
+   RESET
+========================================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background: #050505;
+    color: #e9e9e9;
+    font-family: Arial, Helvetica, sans-serif;
+    overflow-x: hidden;
+}
+
+button,
+a {
+    font: inherit;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+
+/* =========================================================
+   VARIABLES
 ========================================================= */
 
 :root {
 
     --bg: #050505;
-    --white: #f5f5f3;
+    --panel: rgba(12,12,12,.72);
+    --line: rgba(255,255,255,.09);
 
+    --text: #eeeeee;
     --muted: #777;
-    --dim: #444;
+    --dim: #464646;
 
-    --line: rgba(255,255,255,.10);
-    --soft-line: rgba(255,255,255,.045);
+    --green: #64f7a2;
 
-    --green: #8affc1;
-
-    --ease:
-        cubic-bezier(.16,1,.3,1);
-
-}
-
-
-* {
-
-    margin: 0;
-    padding: 0;
-
-    box-sizing: border-box;
-
-}
-
-
-html {
-
-    scroll-behavior: smooth;
-
-}
-
-
-body {
-
-    background: var(--bg);
-
-    color: var(--white);
-
-    font-family: Inter, sans-serif;
-
-    overflow-x: hidden;
-
-}
-
-
-a {
-
-    color: inherit;
-
-    text-decoration: none;
+    --max: 1280px;
 
 }
 
 
 /* =========================================================
-   FINANCE BACKGROUND
+   CALCULATION BACKGROUND
 ========================================================= */
 
-#financeCanvas {
+.calculation-field {
 
     position: fixed;
 
     inset: 0;
 
-    width: 100%;
-    height: 100%;
-
-    z-index: -10;
-
     pointer-events: none;
+
+    overflow: hidden;
+
+    z-index: 0;
 
 }
 
 
-.background-grid {
+.calc-symbol {
+
+    position: absolute;
+
+    font-family: monospace;
+
+    font-size: var(--size);
+
+    color: rgba(255,255,255,var(--opacity));
+
+    font-weight: 400;
+
+    white-space: nowrap;
+
+    animation:
+        calcFly
+        var(--duration)
+        linear
+        infinite;
+
+    animation-delay: var(--delay);
+
+}
+
+
+@keyframes calcFly {
+
+    0% {
+
+        transform:
+            translate3d(
+                0,
+                0,
+                0
+            )
+            rotate(var(--rotation));
+
+        opacity: 0;
+
+    }
+
+    10% {
+
+        opacity:
+            var(--opacity);
+
+    }
+
+    70% {
+
+        opacity:
+            var(--opacity);
+
+    }
+
+    100% {
+
+        transform:
+            translate3d(
+                var(--travel-x),
+                var(--travel-y),
+                0
+            )
+            rotate(
+                calc(
+                    var(--rotation) + 30deg
+                )
+            );
+
+        opacity: 0;
+
+    }
+
+}
+
+
+.calc-trail {
+
+    position: absolute;
+
+    width: var(--width);
+
+    height: 1px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,255,255,.18),
+            transparent
+        );
+
+    animation:
+        trailMove
+        var(--duration)
+        linear
+        infinite;
+
+    animation-delay: var(--delay);
+
+}
+
+
+@keyframes trailMove {
+
+    0% {
+
+        transform:
+            translate(0,0)
+            rotate(var(--angle));
+
+        opacity: 0;
+
+    }
+
+    15% {
+
+        opacity: .3;
+
+    }
+
+    65% {
+
+        opacity: .12;
+
+    }
+
+    100% {
+
+        transform:
+            translate(
+                var(--travel-x),
+                var(--travel-y)
+            )
+            rotate(var(--angle));
+
+        opacity: 0;
+
+    }
+
+}
+
+
+/* =========================================================
+   GRID
+========================================================= */
+
+.grid {
 
     position: fixed;
 
     inset: 0;
 
-    z-index: -9;
-
     pointer-events: none;
 
-    opacity: .35;
+    z-index: 0;
+
+    opacity: .25;
 
     background-image:
-
         linear-gradient(
-            rgba(255,255,255,.025) 1px,
+            rgba(255,255,255,.035) 1px,
             transparent 1px
         ),
-
         linear-gradient(
             90deg,
-            rgba(255,255,255,.025) 1px,
+            rgba(255,255,255,.035) 1px,
             transparent 1px
         );
 
     background-size:
-        70px 70px;
+        80px 80px;
 
 }
 
 
-.background-glow {
-
-    position: fixed;
-
-    width: 500px;
-    height: 500px;
-
-    border-radius: 50%;
-
-    pointer-events: none;
-
-    z-index: -5;
-
-    background:
-        radial-gradient(
-            circle,
-            rgba(255,255,255,.035),
-            transparent 70%
-        );
-
-    transform:
-        translate(-50%,-50%);
-
-}
-
-
-/* =========================================================
-   GRAIN
-========================================================= */
-
-body::after {
+.grid::after {
 
     content: "";
 
-    position: fixed;
+    position: absolute;
 
     inset: 0;
 
-    pointer-events: none;
-
-    z-index: 9000;
-
-    opacity: .025;
-
-    background-image:
-
-        url(
-        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"
+    background:
+        radial-gradient(
+            circle at 60% 40%,
+            rgba(255,255,255,.05),
+            transparent 40%
         );
 
 }
 
 
 /* =========================================================
-   CURSOR
+   TOP NAV
 ========================================================= */
 
-.cursor {
+header {
 
-    position: fixed;
+    position: relative;
 
-    width: 6px;
-    height: 6px;
+    z-index: 20;
 
-    border-radius: 50%;
+    max-width: var(--max);
 
-    background: white;
-
-    pointer-events: none;
-
-    z-index: 9999;
-
-    transform:
-        translate(-50%,-50%);
-
-    mix-blend-mode: difference;
-
-}
-
-
-.cursor-ring {
-
-    position: fixed;
-
-    width: 32px;
-    height: 32px;
-
-    border:
-        1px solid
-        rgba(255,255,255,.35);
-
-    border-radius: 50%;
-
-    pointer-events: none;
-
-    z-index: 9998;
-
-    transform:
-        translate(-50%,-50%);
-
-    transition:
-        width .35s var(--ease),
-        height .35s var(--ease);
-
-}
-
-
-/* =========================================================
-   NAV
-========================================================= */
-
-.nav {
-
-    position: fixed;
-
-    top: 0;
-    left: 0;
-
-    width: 100%;
-
-    height: 88px;
+    margin: auto;
 
     padding:
-        25px 5vw;
+        34px 42px;
 
     display: flex;
 
+    justify-content: space-between;
+
     align-items: center;
 
-    justify-content:
-        space-between;
-
-    z-index: 500;
-
-    background:
-        linear-gradient(
-            to bottom,
-            rgba(5,5,5,.9),
-            transparent
-        );
+    border-bottom:
+        1px solid var(--line);
 
 }
 
 
-.brand {
+.logo {
 
-    font-family:
-        "DM Mono",
-        monospace;
+    font-family: monospace;
 
-    font-size: 12px;
+    letter-spacing: .28em;
 
-    letter-spacing: .18em;
+    font-size: 15px;
 
 }
 
 
-.brand span {
+.logo span {
 
     color: #555;
 
 }
 
 
-.nav-links {
+nav {
 
     display: flex;
 
@@ -313,17 +331,15 @@ body::after {
 }
 
 
-.nav-links a {
+nav a {
 
-    font-family:
-        "DM Mono",
-        monospace;
+    font-family: monospace;
+
+    font-size: 11px;
+
+    letter-spacing: .2em;
 
     color: #666;
-
-    font-size: 9px;
-
-    letter-spacing: .18em;
 
     transition:
         color .3s ease;
@@ -331,45 +347,22 @@ body::after {
 }
 
 
-.nav-links a:hover {
+nav a:hover {
 
     color: white;
 
 }
 
 
-.nav-status {
+/* =========================================================
+   MAIN
+========================================================= */
 
-    display: flex;
+main {
 
-    align-items: center;
+    position: relative;
 
-    gap: 8px;
-
-    color: #555;
-
-    font-family:
-        "DM Mono",
-        monospace;
-
-    font-size: 8px;
-
-}
-
-
-.status-dot {
-
-    width: 5px;
-    height: 5px;
-
-    border-radius: 50%;
-
-    background:
-        var(--green);
-
-    box-shadow:
-        0 0 12px
-        rgba(138,255,193,.7);
+    z-index: 2;
 
 }
 
@@ -380,58 +373,39 @@ body::after {
 
 .hero {
 
-    min-height:
-        100svh;
+    max-width: var(--max);
 
-    position: relative;
+    margin: auto;
+
+    min-height: 850px;
 
     padding:
-        145px 5vw
-        90px;
-
-    display: flex;
-
-    align-items:
-        center;
-
-    overflow: hidden;
-
-}
-
-
-.hero-content {
-
-    width: 100%;
+        70px 42px
+        100px;
 
     position: relative;
-
-    z-index: 10;
 
 }
 
 
 .eyebrow {
 
-    font-family:
-        "DM Mono",
-        monospace;
+    font-family: monospace;
 
-    font-size: 9px;
+    letter-spacing: .35em;
 
-    letter-spacing: .32em;
+    color: #707070;
 
-    color: #555;
+    font-size: 12px;
 
 }
 
 
 .hero-title {
 
+    margin-top: 45px;
+
     position: relative;
-
-    width: max-content;
-
-    margin-top: 35px;
 
 }
 
@@ -442,14 +416,16 @@ body::after {
         clamp(
             80px,
             15vw,
-            220px
+            210px
         );
 
-    line-height: .76;
+    line-height: .8;
 
-    letter-spacing: -.1em;
+    letter-spacing:
+        -.07em;
 
-    font-weight: 700;
+    font-weight:
+        800;
 
 }
 
@@ -458,72 +434,75 @@ body::after {
 
     position: absolute;
 
-    top: 75%;
+    top: 35px;
 
-    left: 5px;
+    left: 8px;
+
+    z-index: -1;
+
+    font-size:
+        clamp(
+            90px,
+            15vw,
+            210px
+        );
+
+    line-height: .8;
+
+    letter-spacing:
+        -.07em;
 
     color: transparent;
 
     -webkit-text-stroke:
-        1px
-        rgba(255,255,255,.2);
-
-    font-size:
-        clamp(
-            80px,
-            15vw,
-            220px
-        );
-
-    line-height: .76;
-
-    letter-spacing: -.1em;
-
-    z-index: -1;
+        1px rgba(255,255,255,.14);
 
 }
 
 
 .hero-sub {
 
-    margin-top: 125px;
+    margin-top: 110px;
 
-    max-width: 500px;
+    max-width: 680px;
 
 }
 
 
 .hero-role {
 
+    font-family: monospace;
+
+    font-size: 12px;
+
+    letter-spacing: .3em;
+
     color: #666;
 
-    font-family:
-        "DM Mono",
-        monospace;
-
-    font-size: 9px;
-
-    letter-spacing: .22em;
-
-    margin-bottom: 22px;
+    margin-bottom: 35px;
 
 }
 
 
-.hero-sub p {
+.hero-description {
 
-    color: #858585;
+    font-size:
+        clamp(
+            23px,
+            3vw,
+            38px
+        );
 
-    font-size: 17px;
+    line-height: 1.35;
 
-    line-height: 1.7;
+    color: #777;
 
 }
 
 
-.hero-sub strong {
+.hero-description strong {
 
-    color: white;
+    color: #e8e8e8;
 
     font-weight: 400;
 
@@ -531,112 +510,66 @@ body::after {
 
 
 /* =========================================================
-   FINANCE TERMINAL
+   BUSINESS PANEL
 ========================================================= */
 
-.hero-terminal {
+.business-panel {
 
     position: absolute;
 
-    right: 5vw;
+    right: 0;
 
-    top: 50%;
+    bottom: 90px;
 
-    width: 340px;
+    width: 620px;
 
-    transform:
-        translateY(-50%);
+    max-width: 58%;
 
     border:
-        1px solid
-        rgba(255,255,255,.12);
+        1px solid var(--line);
 
     background:
         rgba(8,8,8,.72);
 
     backdrop-filter:
-        blur(14px);
+        blur(12px);
 
-    box-shadow:
-        0 30px 100px
-        rgba(0,0,0,.5);
+    padding: 28px;
 
 }
 
 
-.terminal-head {
+.panel-top {
 
     display: flex;
 
     justify-content:
         space-between;
 
-    padding:
-        13px 16px;
-
     border-bottom:
-        1px solid
-        var(--line);
+        1px solid var(--line);
+
+    padding-bottom: 18px;
+
+    margin-bottom: 22px;
+
+}
+
+
+.panel-label {
+
+    font-family: monospace;
+
+    font-size: 10px;
+
+    letter-spacing: .25em;
 
     color: #555;
 
-    font-family:
-        "DM Mono",
-        monospace;
-
-    font-size: 7px;
-
-    letter-spacing: .15em;
-
 }
 
 
-.terminal-row {
-
-    display: grid;
-
-    grid-template-columns:
-        1fr 1fr 1fr;
-
-    padding:
-        18px 16px;
-
-    border-bottom:
-        1px solid
-        var(--soft-line);
-
-}
-
-
-.metric-label {
-
-    display: block;
-
-    color: #555;
-
-    font-family:
-        "DM Mono",
-        monospace;
-
-    font-size: 7px;
-
-    margin-bottom: 8px;
-
-}
-
-
-.metric-value {
-
-    font-family:
-        "DM Mono",
-        monospace;
-
-    font-size: 17px;
-
-}
-
-
-.positive {
+.live {
 
     color:
         var(--green);
@@ -644,19 +577,104 @@ body::after {
 }
 
 
-.terminal-chart {
+.live::before {
 
-    height: 105px;
+    content: "";
 
-    padding:
-        15px;
+    display: inline-block;
+
+    width: 6px;
+
+    height: 6px;
+
+    border-radius: 50%;
+
+    background:
+        var(--green);
+
+    margin-right: 7px;
+
+    box-shadow:
+        0 0 12px var(--green);
 
 }
 
 
-.chart-svg {
+.metrics {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    border-bottom:
+        1px solid var(--line);
+
+    padding-bottom: 22px;
+
+}
+
+
+.metric small {
+
+    display: block;
+
+    color: #555;
+
+    font-family: monospace;
+
+    font-size: 9px;
+
+    letter-spacing: .15em;
+
+    margin-bottom: 8px;
+
+}
+
+
+.metric strong {
+
+    font-family: monospace;
+
+    font-size: 23px;
+
+    font-weight: 400;
+
+}
+
+
+.metric:first-child strong {
+
+    color:
+        var(--green);
+
+}
+
+
+/* =========================================================
+   CHART
+========================================================= */
+
+.chart-wrap {
+
+    padding-top: 25px;
+
+}
+
+
+.chart {
 
     width: 100%;
+
+    height: 150px;
+
+}
+
+
+.chart svg {
+
+    width: 100%;
+
     height: 100%;
 
     overflow: visible;
@@ -668,31 +686,13 @@ body::after {
 
     fill: none;
 
-    stroke: white;
+    stroke: #aaa;
 
     stroke-width: 1.5;
 
-    stroke-dasharray:
-        500;
+    stroke-linecap: round;
 
-    stroke-dashoffset:
-        500;
-
-    animation:
-        chartDraw 3s
-        var(--ease)
-        forwards;
-
-}
-
-
-@keyframes chartDraw {
-
-    to {
-
-        stroke-dashoffset: 0;
-
-    }
+    stroke-linejoin: round;
 
 }
 
@@ -700,141 +700,94 @@ body::after {
 .chart-area {
 
     fill:
-        rgba(255,255,255,.035);
+        rgba(255,255,255,.025);
 
 }
 
 
-.terminal-foot {
+.chart-dot {
 
-    padding:
-        11px 16px;
-
-    color: #444;
-
-    font-family:
-        "DM Mono",
-        monospace;
-
-    font-size: 7px;
+    fill:
+        #ddd;
 
 }
 
 
-/* =========================================================
-   STRIP
-========================================================= */
+.chart-caption {
 
-.ticker {
+    margin-top: 12px;
 
-    border-top:
-        1px solid
-        var(--line);
+    font-family: monospace;
 
-    border-bottom:
-        1px solid
-        var(--line);
+    font-size: 9px;
 
-    overflow:
-        hidden;
+    letter-spacing: .18em;
 
-}
-
-
-.ticker-track {
-
-    display: flex;
-
-    width: max-content;
-
-    animation:
-        tickerMove 25s
-        linear infinite;
-
-}
-
-
-.ticker-item {
-
-    padding:
-        18px 30px;
-
-    border-right:
-        1px solid
-        var(--line);
-
-    color: #555;
-
-    font-family:
-        "DM Mono",
-        monospace;
-
-    font-size: 8px;
-
-    letter-spacing: .15em;
-
-}
-
-
-.ticker-item b {
-
-    color: #aaa;
-
-    font-weight: 400;
-
-}
-
-
-.ticker-up {
-
-    color:
-        var(--green) !important;
-
-}
-
-
-@keyframes tickerMove {
-
-    from {
-        transform: translateX(0);
-    }
-
-    to {
-        transform: translateX(-50%);
-    }
+    color: #4c4c4c;
 
 }
 
 
 /* =========================================================
-   GENERIC
+   SECTION
 ========================================================= */
 
 .section {
 
-    padding:
-        170px 5vw;
+    max-width: var(--max);
 
-    border-bottom:
-        1px solid
-        var(--line);
+    margin: auto;
+
+    padding:
+        150px 42px;
+
+    border-top:
+        1px solid var(--line);
 
 }
 
 
-.section-label {
+.section-head {
 
-    color: #4c4c4c;
+    display: flex;
 
-    font-family:
-        "DM Mono",
-        monospace;
+    justify-content:
+        space-between;
 
-    font-size: 9px;
+    align-items:
+        flex-end;
 
-    letter-spacing: .27em;
+    margin-bottom: 70px;
 
-    margin-bottom: 80px;
+}
+
+
+.section-number {
+
+    font-family: monospace;
+
+    font-size: 11px;
+
+    color: #555;
+
+    letter-spacing: .25em;
+
+}
+
+
+.section-title {
+
+    font-size:
+        clamp(
+            50px,
+            8vw,
+            105px
+        );
+
+    letter-spacing:
+        -.06em;
+
+    line-height: .9;
 
 }
 
@@ -848,244 +801,201 @@ body::after {
     display: grid;
 
     grid-template-columns:
-        1.1fr .9fr;
+        1fr 1fr;
 
-    gap: 10vw;
+    gap: 100px;
 
 }
 
 
-.big-heading {
+.about-text {
 
-    font-size:
-        clamp(
-            55px,
-            7vw,
-            105px
-        );
+    font-size: 25px;
 
-    line-height: .87;
+    line-height: 1.55;
 
-    letter-spacing: -.075em;
+    color: #888;
+
+}
+
+
+.about-text strong {
+
+    color: #eee;
 
     font-weight: 400;
 
 }
 
 
-.big-heading span {
-
-    color: transparent;
-
-    -webkit-text-stroke:
-        1px
-        rgba(255,255,255,.25);
-
-}
-
-
-.about-copy {
-
-    max-width: 500px;
-
-    color: #777;
-
-    font-size: 15px;
-
-    line-height: 2;
-
-}
-
-
-.about-copy p + p {
-
-    margin-top: 25px;
-
-}
-
-
-.about-copy strong {
-
-    color: #ddd;
-
-    font-weight: 400;
-
-}
-
-
-.stats {
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(3,1fr);
-
-    margin-top: 60px;
+.about-facts {
 
     border-top:
-        1px solid
-        var(--line);
+        1px solid var(--line);
 
 }
 
 
-.stat {
-
-    padding:
-        25px 0;
-
-    border-right:
-        1px solid
-        var(--line);
-
-}
-
-
-.stat:not(:first-child) {
-
-    padding-left: 20px;
-
-}
-
-
-.stat:last-child {
-
-    border-right: none;
-
-}
-
-
-.stat-number {
-
-    font-size: 30px;
-
-    letter-spacing: -.06em;
-
-}
-
-
-.stat-label {
-
-    display: block;
-
-    margin-top: 7px;
-
-    color: #555;
-
-    font-family:
-        "DM Mono", monospace;
-
-    font-size: 7px;
-
-}
-
-
-/* =========================================================
-   BUSINESS METRICS
-========================================================= */
-
-.metrics {
-
-    padding:
-        150px 5vw;
-
-    border-bottom:
-        1px solid
-        var(--line);
-
-}
-
-
-.metrics-header {
+.fact {
 
     display: flex;
 
     justify-content:
         space-between;
 
-    align-items:
-        flex-end;
+    padding:
+        18px 0;
 
-    margin-bottom: 80px;
+    border-bottom:
+        1px solid var(--line);
 
-}
+    font-family: monospace;
 
-
-.metrics-title {
-
-    font-size:
-        clamp(
-            55px,
-            9vw,
-            130px
-        );
-
-    line-height: .8;
-
-    letter-spacing: -.09em;
+    font-size: 11px;
 
 }
 
 
-.metrics-title span {
+.fact span:first-child {
 
-    color: transparent;
-
-    -webkit-text-stroke:
-        1px
-        rgba(255,255,255,.25);
+    color: #555;
 
 }
 
 
-.metrics-note {
+/* =========================================================
+   SKILLS
+========================================================= */
 
-    max-width: 300px;
-
-    color: #666;
-
-    font-family:
-        "DM Mono", monospace;
-
-    font-size: 8px;
-
-    line-height: 1.8;
-
-}
-
-
-.metric-grid {
+.skills-layout {
 
     display: grid;
 
     grid-template-columns:
-        repeat(4,1fr);
+        1fr 1fr;
 
-    border-top:
-        1px solid
-        var(--line);
-
-    border-left:
-        1px solid
-        var(--line);
+    gap: 100px;
 
 }
 
 
-.metric-card {
+.skill-intro {
 
-    min-height: 220px;
+    color: #777;
+
+    font-size: 21px;
+
+    line-height: 1.6;
+
+}
+
+
+.skill-list {
+
+    border-top:
+        1px solid var(--line);
+
+}
+
+
+.skill {
 
     padding:
-        25px;
-
-    border-right:
-        1px solid
-        var(--line);
+        25px 0;
 
     border-bottom:
-        1px solid
+        1px solid var(--line);
+
+}
+
+
+.skill-row {
+
+    display: flex;
+
+    justify-content:
+        space-between;
+
+    margin-bottom: 13px;
+
+    font-family: monospace;
+
+    font-size: 11px;
+
+}
+
+
+.skill-name {
+
+    letter-spacing: .1em;
+
+}
+
+
+.skill-percent {
+
+    color: #666;
+
+}
+
+
+.skill-bar {
+
+    height: 2px;
+
+    background:
+        rgba(255,255,255,.08);
+
+    overflow: hidden;
+
+}
+
+
+.skill-fill {
+
+    width: 0;
+
+    height: 100%;
+
+    background:
+        #ddd;
+
+    transition:
+        width 1.5s cubic-bezier(.2,.7,.2,1);
+
+}
+
+
+/* =========================================================
+   PROJECTS
+========================================================= */
+
+.projects {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2,1fr);
+
+    gap: 1px;
+
+    background:
         var(--line);
+
+    border:
+        1px solid var(--line);
+
+}
+
+
+.project {
+
+    min-height: 340px;
+
+    padding: 32px;
+
+    background:
+        #070707;
 
     position: relative;
 
@@ -1097,903 +1007,165 @@ body::after {
 }
 
 
-.metric-card:hover {
-
-    background:
-        rgba(255,255,255,.025);
-
-}
-
-
-.metric-card-label {
-
-    color: #555;
-
-    font-family:
-        "DM Mono", monospace;
-
-    font-size: 7px;
-
-    letter-spacing: .15em;
-
-}
-
-
-.metric-card-value {
-
-    margin-top: 50px;
-
-    font-size:
-        clamp(
-            32px,
-            4vw,
-            55px
-        );
-
-    letter-spacing: -.07em;
-
-}
-
-
-.metric-card-sub {
-
-    position: absolute;
-
-    bottom: 25px;
-
-    color: #555;
-
-    font-family:
-        "DM Mono", monospace;
-
-    font-size: 7px;
-
-}
-
-
-/* =========================================================
-   WORK
-========================================================= */
-
-.work {
-
-    padding:
-        170px 0;
-
-    border-bottom:
-        1px solid
-        var(--line);
-
-}
-
-
-.work-header {
-
-    padding:
-        0 5vw;
-
-}
-
-
-.work-title {
-
-    font-size:
-        clamp(
-            75px,
-            13vw,
-            180px
-        );
-
-    line-height: .76;
-
-    letter-spacing: -.095em;
-
-}
-
-
-.work-title span {
-
-    color: transparent;
-
-    -webkit-text-stroke:
-        1px
-        rgba(255,255,255,.25);
-
-}
-
-
-.projects {
-
-    margin-top:
-        110px;
-
-    border-top:
-        1px solid
-        var(--line);
-
-}
-
-
-.project {
-
-    min-height: 180px;
-
-    padding:
-        30px 5vw;
-
-    display: grid;
-
-    grid-template-columns:
-        80px 1fr 180px;
-
-    align-items: center;
-
-    border-bottom:
-        1px solid
-        var(--line);
-
-    position: relative;
-
-    overflow: hidden;
-
-    transition:
-        padding .6s
-        var(--ease);
-
-}
-
-
-.project::before {
-
-    content: "";
-
-    position: absolute;
-
-    inset: 0;
-
-    background:
-        linear-gradient(
-            90deg,
-            rgba(255,255,255,.035),
-            transparent
-        );
-
-    transform:
-        translateX(-100%);
-
-    transition:
-        transform .7s
-        var(--ease);
-
-}
-
-
 .project:hover {
 
-    padding-left:
-        6vw;
+    background:
+        #0d0d0d;
 
 }
 
 
-.project:hover::before {
+.project-number {
 
-    transform:
-        translateX(0);
-
-}
-
-
-.project-index {
-
-    position: relative;
-
-    z-index: 2;
+    font-family: monospace;
 
     color: #444;
 
-    font-family:
-        "DM Mono", monospace;
-
-    font-size: 9px;
+    font-size: 10px;
 
 }
 
 
-.project-name {
-
-    position: relative;
-
-    z-index: 2;
-
-    font-size:
-        clamp(
-            30px,
-            5vw,
-            65px
-        );
-
-    letter-spacing: -.055em;
-
-}
-
-
-.project-meta {
-
-    position: relative;
-
-    z-index: 2;
-
-    color: #555;
-
-    font-family:
-        "DM Mono", monospace;
-
-    font-size: 8px;
-
-}
-
-
-/* =========================================================
-   SKILLS
-========================================================= */
-
-.skills {
-
-    padding:
-        170px 5vw;
-
-    border-bottom:
-        1px solid
-        var(--line);
-
-}
-
-
-.skills-intro {
-
-    display: flex;
-
-    justify-content:
-        space-between;
-
-    align-items:
-        flex-end;
-
-    margin-bottom:
-        90px;
-
-}
-
-
-.skills-heading {
-
-    font-size:
-        clamp(
-            60px,
-            10vw,
-            145px
-        );
-
-    line-height: .8;
-
-    letter-spacing: -.09em;
-
-}
-
-
-.skills-heading span {
-
-    color: transparent;
-
-    -webkit-text-stroke:
-        1px
-        rgba(255,255,255,.25);
-
-}
-
-
-.skills-copy {
-
-    max-width: 300px;
-
-    color: #666;
-
-    font-family:
-        "DM Mono", monospace;
-
-    font-size: 9px;
-
-    line-height: 1.9;
-
-}
-
-
-/* =========================================================
-   SKILL CARDS
-========================================================= */
-
-.skill-grid {
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(3,1fr);
-
-    gap: 1px;
-
-    background:
-        var(--line);
-
-    border:
-        1px solid
-        var(--line);
-
-}
-
-
-.skill {
-
-    min-height:
-        280px;
-
-    padding:
-        28px;
-
-    background:
-        var(--bg);
-
-    position: relative;
-
-    overflow: hidden;
-
-    transition:
-        background .5s ease;
-
-}
-
-
-.skill:hover {
-
-    background:
-        #0b0b0b;
-
-}
-
-
-.skill-number {
-
-    color: #444;
-
-    font-family:
-        "DM Mono", monospace;
-
-    font-size: 8px;
-
-}
-
-
-.skill-icon {
+.project h3 {
 
     position: absolute;
 
-    right: 25px;
+    left: 32px;
 
-    top: 23px;
+    bottom: 70px;
 
-    color: #555;
+    font-size: 38px;
 
-    font-family:
-        "DM Mono", monospace;
-
-    font-size: 20px;
-
-}
-
-
-.skill h3 {
-
-    margin-top: 80px;
-
-    font-size: 30px;
-
-    letter-spacing: -.06em;
+    letter-spacing:
+        -.04em;
 
     font-weight: 400;
 
 }
 
 
-.skill p {
-
-    margin-top: 15px;
-
-    max-width: 280px;
-
-    color: #666;
-
-    font-family:
-        "DM Mono", monospace;
-
-    font-size: 8px;
-
-    line-height: 1.8;
-
-}
-
-
-.skill-bar {
+.project p {
 
     position: absolute;
 
-    left: 28px;
-    right: 28px;
-    bottom: 25px;
+    left: 32px;
 
-    height: 1px;
-
-    background:
-        rgba(255,255,255,.08);
-
-}
-
-
-.skill-bar span {
-
-    display: block;
-
-    width: 0;
-
-    height: 100%;
-
-    background:
-        white;
-
-    transition:
-        width 1s
-        var(--ease);
-
-}
-
-
-.skill:hover
-.skill-bar span {
-
-    width:
-        var(--level);
-
-}
-
-
-/* =========================================================
-   CALCULATOR
-========================================================= */
-
-.calculator {
-
-    padding:
-        170px 5vw;
-
-    border-bottom:
-        1px solid
-        var(--line);
-
-}
-
-
-.calc-grid {
-
-    display: grid;
-
-    grid-template-columns:
-        1fr 1fr;
-
-    gap: 10vw;
-
-}
-
-
-.calc-heading {
-
-    font-size:
-        clamp(
-            55px,
-            8vw,
-            110px
-        );
-
-    line-height: .84;
-
-    letter-spacing: -.08em;
-
-}
-
-
-.calc-heading span {
-
-    color: transparent;
-
-    -webkit-text-stroke:
-        1px
-        rgba(255,255,255,.25);
-
-}
-
-
-.calc-description {
-
-    max-width: 420px;
-
-    margin-top: 35px;
-
-    color: #666;
-
-    font-size: 13px;
-
-    line-height: 1.8;
-
-}
-
-
-.calc-box {
-
-    border:
-        1px solid
-        var(--line);
-
-    padding:
-        28px;
-
-    background:
-        rgba(255,255,255,.015);
-
-}
-
-
-.calc-field {
-
-    margin-bottom:
-        25px;
-
-}
-
-
-.calc-field label {
-
-    display: block;
-
-    margin-bottom:
-        9px;
+    bottom: 32px;
 
     color: #555;
 
-    font-family:
-        "DM Mono", monospace;
+    font-family: monospace;
 
-    font-size: 8px;
+    font-size: 10px;
 
-}
-
-
-.calc-field input {
-
-    width: 100%;
-
-    padding:
-        14px 0;
-
-    border: none;
-
-    border-bottom:
-        1px solid
-        var(--line);
-
-    outline: none;
-
-    background: transparent;
-
-    color: white;
-
-    font-family:
-        "DM Mono", monospace;
-
-    font-size: 16px;
+    letter-spacing: .12em;
 
 }
 
 
-.calc-result {
+.project-symbol {
 
-    margin-top:
-        35px;
+    position: absolute;
 
-    padding-top:
-        25px;
+    right: 30px;
 
-    border-top:
-        1px solid
-        var(--line);
+    top: 30px;
 
-}
+    font-family: monospace;
 
+    font-size: 80px;
 
-.calc-result-label {
-
-    color: #555;
-
-    font-family:
-        "DM Mono", monospace;
-
-    font-size: 8px;
-
-}
-
-
-.calc-result-value {
-
-    margin-top:
-        8px;
-
-    font-size:
-        55px;
-
-    letter-spacing:
-        -.07em;
-
-}
-
-
-.calc-button {
-
-    width: 100%;
-
-    margin-top:
-        20px;
-
-    padding:
-        15px;
-
-    border:
-        1px solid
-        rgba(255,255,255,.2);
-
-    background:
-        transparent;
-
-    color: white;
-
-    font-family:
-        "DM Mono", monospace;
-
-    font-size: 8px;
-
-    letter-spacing: .15em;
-
-    cursor: pointer;
+    color: #171717;
 
     transition:
-        background .3s,
-        color .3s;
+        transform .6s ease;
 
 }
 
 
-.calc-button:hover {
+.project:hover .project-symbol {
 
-    background: white;
-
-    color: black;
+    transform:
+        rotate(15deg)
+        scale(1.1);
 
 }
 
 
 /* =========================================================
-   LEDGER
+   EDUCATION
 ========================================================= */
-
-.ledger {
-
-    padding:
-        170px 5vw;
-
-    border-bottom:
-        1px solid
-        var(--line);
-
-}
-
-
-.ledger-header {
-
-    display: flex;
-
-    justify-content:
-        space-between;
-
-    align-items:
-        flex-end;
-
-    margin-bottom:
-        70px;
-
-}
-
-
-.ledger-title {
-
-    font-size:
-        clamp(
-            55px,
-            8vw,
-            110px
-        );
-
-    line-height: .85;
-
-    letter-spacing: -.08em;
-
-}
-
-
-.ledger-title span {
-
-    color: transparent;
-
-    -webkit-text-stroke:
-        1px
-        rgba(255,255,255,.25);
-
-}
-
-
-.ledger-table {
-
-    border-top:
-        1px solid
-        var(--line);
-
-}
-
-
-.ledger-row {
-
-    display: grid;
-
-    grid-template-columns:
-        100px 1.5fr 1fr 1fr;
-
-    padding:
-        20px 0;
-
-    border-bottom:
-        1px solid
-        var(--line);
-
-    font-family:
-        "DM Mono", monospace;
-
-    font-size: 8px;
-
-    color: #777;
-
-    transition:
-        padding .4s
-        var(--ease);
-
-}
-
-
-.ledger-row:hover {
-
-    padding-left:
-        15px;
-
-    background:
-        rgba(255,255,255,.015);
-
-}
-
-
-.ledger-head {
-
-    color: #444;
-
-}
-
-
-.credit {
-
-    color:
-        var(--green);
-
-}
-
-
-.debit {
-
-    color:
-        #aaa;
-
-}
-
-
-/* =========================================================
-   JOURNEY
-========================================================= */
-
-.journey {
-
-    padding:
-        170px 5vw;
-
-    border-bottom:
-        1px solid
-        var(--line);
-
-}
-
 
 .timeline {
 
-    max-width:
-        900px;
-
-    margin:
-        100px auto 0;
+    border-left:
+        1px solid var(--line);
 
 }
 
 
 .timeline-item {
 
-    display: grid;
-
-    grid-template-columns:
-        120px 1fr;
+    position: relative;
 
     padding:
-        35px 0;
-
-    border-top:
-        1px solid
-        var(--line);
+        0 0 70px 45px;
 
 }
 
 
-.timeline-year {
+.timeline-item::before {
+
+    content: "";
+
+    position: absolute;
+
+    width: 7px;
+
+    height: 7px;
+
+    border-radius: 50%;
+
+    background: #ddd;
+
+    left: -4px;
+
+    top: 5px;
+
+}
+
+
+.timeline-date {
+
+    font-family: monospace;
+
+    font-size: 10px;
 
     color: #555;
 
-    font-family:
-        "DM Mono", monospace;
+    letter-spacing: .2em;
 
-    font-size: 9px;
+    margin-bottom: 14px;
 
 }
 
 
-.timeline-title {
+.timeline-item h3 {
 
-    font-size:
-        25px;
+    font-size: 30px;
 
     font-weight: 400;
 
+    margin-bottom: 8px;
+
 }
 
 
-.timeline-text {
-
-    margin-top: 10px;
-
-    max-width: 500px;
+.timeline-item p {
 
     color: #666;
 
-    font-size: 12px;
-
-    line-height: 1.8;
+    line-height: 1.6;
 
 }
 
@@ -2004,24 +1176,7 @@ body::after {
 
 .contact {
 
-    min-height:
-        100svh;
-
-    padding:
-        170px 5vw
-        80px;
-
-    display: flex;
-
-    flex-direction:
-        column;
-
-    justify-content:
-        space-between;
-
-    border-bottom:
-        1px solid
-        var(--line);
+    min-height: 600px;
 
 }
 
@@ -2030,101 +1185,70 @@ body::after {
 
     font-size:
         clamp(
-            80px,
-            14vw,
-            200px
+            65px,
+            12vw,
+            170px
         );
 
-    line-height: .75;
+    line-height: .85;
 
-    letter-spacing: -.095em;
-
-}
-
-
-.contact-title span {
-
-    color: transparent;
-
-    -webkit-text-stroke:
-        1px
-        rgba(255,255,255,.25);
+    letter-spacing:
+        -.07em;
 
 }
 
 
-.contact-bottom {
+.contact-copy {
+
+    max-width: 600px;
+
+    margin-top: 50px;
+
+    color: #777;
+
+    font-size: 21px;
+
+    line-height: 1.5;
+
+}
+
+
+.contact-links {
 
     display: flex;
 
-    justify-content:
-        space-between;
+    gap: 35px;
 
-    align-items:
-        flex-end;
+    margin-top: 55px;
 
 }
 
 
-.contact-description {
+.contact-links a {
 
-    max-width: 300px;
+    font-family: monospace;
 
-    color: #666;
+    font-size: 11px;
 
-    font-family:
-        "DM Mono", monospace;
+    letter-spacing: .2em;
 
-    font-size: 9px;
+    border-bottom:
+        1px solid #444;
 
-    line-height: 1.8;
-
-}
-
-
-.contact-button {
-
-    width: 150px;
-    height: 150px;
-
-    display: flex;
-
-    justify-content:
-        center;
-
-    align-items:
-        center;
-
-    border:
-        1px solid
-        rgba(255,255,255,.2);
-
-    border-radius: 50%;
-
-    font-family:
-        "DM Mono", monospace;
-
-    font-size: 9px;
-
-    letter-spacing: .13em;
+    padding-bottom: 7px;
 
     transition:
-        background .4s,
-        color .4s,
-        transform .5s
-        var(--ease);
+        border-color .3s ease,
+        color .3s ease;
 
 }
 
 
-.contact-button:hover {
+.contact-links a:hover {
 
-    background: white;
+    color: white;
 
-    color: black;
-
-    transform:
-        scale(1.08);
+    border-color: white;
 
 }
 
@@ -2135,36 +1259,28 @@ body::after {
 
 footer {
 
+    border-top:
+        1px solid var(--line);
+
+    max-width: var(--max);
+
+    margin: auto;
+
     padding:
-        30px 5vw;
+        25px 42px;
 
     display: flex;
 
     justify-content:
         space-between;
 
+    font-family: monospace;
+
+    font-size: 9px;
+
+    letter-spacing: .18em;
+
     color: #444;
-
-    font-family:
-        "DM Mono", monospace;
-
-    font-size: 8px;
-
-}
-
-
-.socials {
-
-    display: flex;
-
-    gap: 25px;
-
-}
-
-
-.socials a:hover {
-
-    color: white;
 
 }
 
@@ -2178,11 +1294,11 @@ footer {
     opacity: 0;
 
     transform:
-        translateY(30px);
+        translateY(35px);
 
     transition:
         opacity .9s ease,
-        transform 1s var(--ease);
+        transform .9s ease;
 
 }
 
@@ -2201,459 +1317,172 @@ footer {
    MOBILE
 ========================================================= */
 
-@media(max-width:800px) {
+@media(max-width: 800px) {
 
 
-    .cursor,
-    .cursor-ring {
-
-        display: none;
-
-    }
-
-
-    .nav {
-
-        height: 75px;
+    header {
 
         padding:
-            20px 22px;
+            28px 22px;
 
     }
 
 
-    .nav-links {
+    nav {
 
-        gap: 13px;
-
-    }
-
-
-    .nav-links a {
-
-        font-size: 7px;
+        gap: 15px;
 
     }
 
 
-    .nav-status {
+    nav a {
 
-        display: none;
+        font-size: 8px;
+
+        letter-spacing: .12em;
 
     }
 
-
-    /* HERO */
 
     .hero {
 
-        min-height:
-            100svh;
+        min-height: 900px;
 
         padding:
-            120px 22px
-            70px;
-
-        align-items:
-            flex-start;
+            55px 22px 80px;
 
     }
 
 
-    .hero-title h1,
-    .hero-outline {
+    .hero-title {
+
+        margin-top: 55px;
+
+    }
+
+
+    .hero-title h1 {
 
         font-size:
-            21vw;
+            clamp(
+                65px,
+                20vw,
+                110px
+            );
+
+    }
+
+
+    .hero-outline {
+
+        top: 25px;
+
+        font-size:
+            clamp(
+                70px,
+                20vw,
+                110px
+            );
 
     }
 
 
     .hero-sub {
 
-        margin-top:
-            100px;
+        margin-top: 100px;
 
     }
 
 
-    .hero-sub p {
+    .hero-description {
 
-        font-size:
-            14px;
-
-    }
-
-
-    .hero-terminal {
-
-        width:
-            300px;
-
-        right:
-            -40px;
-
-        top:
-            66%;
-
-        opacity:
-            .75;
-
-        transform:
-            scale(.82)
-            translateY(-50%);
+        font-size: 22px;
 
     }
 
 
-    /* TICKER */
+    .business-panel {
 
-    .ticker-item {
+        position: absolute;
+
+        left: 22px;
+
+        right: 22px;
+
+        bottom: 45px;
+
+        width: auto;
+
+        max-width: none;
+
+        padding: 20px;
+
+    }
+
+
+    .metrics {
+
+        gap: 10px;
+
+    }
+
+
+    .metric strong {
+
+        font-size: 18px;
+
+    }
+
+
+    .section {
 
         padding:
-            16px 20px;
-
-        font-size:
-            7px;
+            100px 22px;
 
     }
 
 
-    /* SECTIONS */
+    .section-head {
 
-    .section,
-    .metrics,
-    .skills,
-    .calculator,
-    .ledger,
-    .journey {
-
-        padding:
-            110px 22px;
+        margin-bottom: 50px;
 
     }
 
 
-    /* ABOUT */
+    .section-title {
 
-    .about-grid {
-
-        grid-template-columns:
-            1fr;
-
-        gap:
-            55px;
+        font-size: 58px;
 
     }
 
 
-    .big-heading {
+    .about-grid,
+    .skills-layout {
 
-        font-size:
-            51px;
+        grid-template-columns: 1fr;
 
-    }
-
-
-    .about-copy {
-
-        font-size:
-            14px;
+        gap: 60px;
 
     }
 
 
-    /* STATS */
+    .about-text {
 
-    .stats {
-
-        gap:
-            0;
-
-    }
-
-
-    .stat {
-
-        padding:
-            20px 0;
-
-    }
-
-
-    .stat-number {
-
-        font-size:
-            24px;
-
-    }
-
-
-    /* METRICS */
-
-    .metrics-header {
-
-        display:
-            block;
-
-        margin-bottom:
-            60px;
-
-    }
-
-
-    .metrics-note {
-
-        margin-top:
-            30px;
-
-    }
-
-
-    .metric-grid {
-
-        grid-template-columns:
-            repeat(2,1fr);
-
-    }
-
-
-    .metric-card {
-
-        min-height:
-            170px;
-
-        padding:
-            20px;
-
-    }
-
-
-    .metric-card-value {
-
-        margin-top:
-            35px;
-
-        font-size:
-            32px;
-
-    }
-
-
-    /* WORK */
-
-    .work {
-
-        padding:
-            110px 0;
-
-    }
-
-
-    .work-header {
-
-        padding:
-            0 22px;
-
-    }
-
-
-    .work-title {
-
-        font-size:
-            75px;
+        font-size: 21px;
 
     }
 
 
     .projects {
 
-        margin-top:
-            70px;
+        grid-template-columns: 1fr;
 
     }
 
 
     .project {
 
-        min-height:
-            145px;
-
-        padding:
-            28px 22px;
-
-        grid-template-columns:
-            42px 1fr;
-
-    }
-
-
-    .project:hover {
-
-        padding-left:
-            28px;
-
-    }
-
-
-    .project-name {
-
-        font-size:
-            29px;
-
-    }
-
-
-    .project-meta {
-
-        grid-column:
-            2;
-
-        margin-top:
-            7px;
-
-    }
-
-
-    /* SKILLS */
-
-    .skills-intro {
-
-        display:
-            block;
-
-        margin-bottom:
-            60px;
-
-    }
-
-
-    .skills-heading {
-
-        font-size:
-            60px;
-
-    }
-
-
-    .skills-copy {
-
-        margin-top:
-            30px;
-
-    }
-
-
-    .skill-grid {
-
-        grid-template-columns:
-            1fr;
-
-    }
-
-
-    .skill {
-
-        min-height:
-            230px;
-
-    }
-
-
-    /* CALCULATOR */
-
-    .calc-grid {
-
-        grid-template-columns:
-            1fr;
-
-        gap:
-            60px;
-
-    }
-
-
-    .calc-heading {
-
-        font-size:
-            55px;
-
-    }
-
-
-    .calc-result-value {
-
-        font-size:
-            48px;
-
-    }
-
-
-    /* LEDGER */
-
-    .ledger-header {
-
-        display:
-            block;
-
-    }
-
-
-    .ledger-table {
-
-        overflow-x:
-            auto;
-
-    }
-
-
-    .ledger-row {
-
-        min-width:
-            600px;
-
-        grid-template-columns:
-            80px 1.5fr 1fr 1fr;
-
-    }
-
-
-    /* JOURNEY */
-
-    .timeline {
-
-        margin-top:
-            60px;
-
-    }
-
-
-    .timeline-item {
-
-        grid-template-columns:
-            65px 1fr;
-
-    }
-
-
-    .timeline-title {
-
-        font-size:
-            21px;
-
-    }
-
-
-    /* CONTACT */
-
-    .contact {
-
-        min-height:
-            85svh;
-
-        padding:
-            110px 22px
-            60px;
+        min-height: 280px;
 
     }
 
@@ -2661,713 +1490,310 @@ footer {
     .contact-title {
 
         font-size:
-            22vw;
+            70px;
 
     }
 
-
-    .contact-bottom {
-
-        flex-direction:
-            column;
-
-        align-items:
-            flex-start;
-
-        gap:
-            40px;
-
-    }
-
-
-    .contact-button {
-
-        width:
-            110px;
-
-        height:
-            110px;
-
-    }
-
-
-    /* FOOTER */
 
     footer {
 
         padding:
-            28px 22px;
-
-        flex-wrap:
-            wrap;
-
-        gap:
-            20px;
+            25px 22px;
 
     }
 
+}
 
-    .socials {
 
-        width:
-            100%;
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
 
-        order:
-            3;
+@media(prefers-reduced-motion: reduce) {
+
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+
+        animation-duration:
+            .01ms !important;
+
+        animation-iteration-count:
+            1 !important;
+
+        transition-duration:
+            .01ms !important;
 
     }
 
 }
 
 </style>
-
 </head>
 
 
 <body>
 
 
-<!-- =====================================================
+<!-- =======================================================
      BACKGROUND
-===================================================== -->
+======================================================= -->
 
-<canvas id="financeCanvas"></canvas>
+<div class="grid"></div>
 
-<div class="background-grid"></div>
-
-<div class="background-glow"></div>
-
-
-<!-- =====================================================
-     CURSOR
-===================================================== -->
-
-<div class="cursor"></div>
-
-<div class="cursor-ring"></div>
+<div
+    class="calculation-field"
+    id="calculationField">
+</div>
 
 
-<!-- =====================================================
+<!-- =======================================================
      NAV
-===================================================== -->
+======================================================= -->
 
-<nav class="nav">
+<header>
 
-    <a href="#home" class="brand">
-
-        NITHAN
-        <span>/01</span>
-
-    </a>
-
-
-    <div class="nav-links">
-
-        <a href="#about">
-            ABOUT
-        </a>
-
-        <a href="#work">
-            WORK
-        </a>
-
-        <a href="#skills">
-            SKILLS
-        </a>
-
-        <a href="#contact">
-            CONTACT
-        </a>
-
+    <div class="logo">
+        NITHAN <span>/01</span>
     </div>
 
+    <nav>
 
-    <div class="nav-status">
+        <a href="#about">ABOUT</a>
 
-        <span class="status-dot"></span>
+        <a href="#work">WORK</a>
 
-        ONLINE
+        <a href="#skills">SKILLS</a>
 
-    </div>
+        <a href="#contact">CONTACT</a>
 
-</nav>
+    </nav>
+
+</header>
 
 
-<!-- =====================================================
+<main>
+
+
+<!-- =======================================================
      HERO
-===================================================== -->
+======================================================= -->
 
-<section
-    class="hero"
-    id="home"
->
+<section class="hero">
 
-
-    <div class="hero-content reveal">
+    <div class="eyebrow">
+        COMMERCE × TECHNOLOGY / 2026
+    </div>
 
 
-        <div class="eyebrow">
+    <div class="hero-title">
 
-            COMMERCE × TECHNOLOGY / 2026
-
+        <div class="hero-outline">
+            B-01
         </div>
 
-
-        <div class="hero-title">
-
-            <h1>
-                NITHAN
-            </h1>
-
-
-            <div class="hero-outline">
-
-                B—01
-
-            </div>
-
-        </div>
-
-
-        <div class="hero-sub">
-
-
-            <div class="hero-role">
-
-                B.COM STUDENT /
-                DEVELOPER /
-                EXPLORER
-
-            </div>
-
-
-            <p>
-
-                Exploring the intersection of
-                <strong>
-                    business, data and technology
-                </strong>
-                and turning ideas into useful
-                digital experiences.
-
-            </p>
-
-
-        </div>
-
+        <h1>
+            NITHAN
+        </h1>
 
     </div>
 
 
-    <!-- =================================================
-         FINANCIAL TERMINAL
-    ================================================= -->
+    <div class="hero-sub">
 
-    <div class="hero-terminal">
+        <div class="hero-role">
+            B.COM STUDENT / DEVELOPER / EXPLORER
+        </div>
+
+        <p class="hero-description">
+            Exploring the intersection of
+            <strong>business, data and technology</strong>
+            and turning ideas into useful digital experiences.
+        </p>
+
+    </div>
 
 
-        <div class="terminal-head">
+    <!-- BUSINESS DATA PANEL -->
 
-            <span>
+    <div class="business-panel">
+
+        <div class="panel-top">
+
+            <div class="panel-label">
                 BUSINESS / OVERVIEW
-            </span>
+            </div>
 
-            <span>
-                01—26
-            </span>
+            <div class="panel-label live">
+                LIVE
+            </div>
 
         </div>
 
 
-        <div class="terminal-row">
+        <div class="metrics">
 
+            <div class="metric">
 
-            <div>
-
-                <span class="metric-label">
+                <small>
                     GROWTH
-                </span>
+                </small>
 
-                <span class="metric-value positive">
+                <strong id="growth">
                     +18.6%
-                </span>
+                </strong>
 
             </div>
 
 
-            <div>
+            <div class="metric">
 
-                <span class="metric-label">
+                <small>
                     ROI
-                </span>
+                </small>
 
-                <span class="metric-value">
+                <strong id="roi">
                     14.2%
-                </span>
+                </strong>
 
             </div>
 
 
-            <div>
+            <div class="metric">
 
-                <span class="metric-label">
+                <small>
                     MARGIN
-                </span>
+                </small>
 
-                <span class="metric-value">
+                <strong id="margin">
                     32%
-                </span>
+                </strong>
 
             </div>
 
-
         </div>
 
 
-        <div class="terminal-chart">
+        <div class="chart-wrap">
 
-            <svg
-                class="chart-svg"
-                viewBox="0 0 300 90"
-                preserveAspectRatio="none"
-            >
+            <div class="chart">
 
-                <path
-                    class="chart-area"
-                    d="
-                    M0 78
-                    L25 70
-                    L50 74
-                    L75 57
-                    L100 64
-                    L125 48
-                    L150 55
-                    L175 32
-                    L200 41
-                    L225 25
-                    L250 30
-                    L275 12
-                    L300 18
-                    L300 90
-                    L0 90
-                    Z
-                    "
-                />
+                <svg
+                    viewBox="0 0 600 150"
+                    preserveAspectRatio="none">
 
-                <path
-                    class="chart-line"
-                    d="
-                    M0 78
-                    L25 70
-                    L50 74
-                    L75 57
-                    L100 64
-                    L125 48
-                    L150 55
-                    L175 32
-                    L200 41
-                    L225 25
-                    L250 30
-                    L275 12
-                    L300 18
-                    "
-                />
+                    <polygon
+                        class="chart-area"
+                        id="chartArea"
+                        points="">
+                    </polygon>
 
-            </svg>
+                    <polyline
+                        class="chart-line"
+                        id="chartLine"
+                        points="">
+                    </polyline>
+
+                </svg>
+
+            </div>
+
+            <div class="chart-caption">
+                INDEX / PERFORMANCE / TREND
+            </div>
 
         </div>
-
-
-        <div class="terminal-foot">
-
-            INDEX / PERFORMANCE / TREND
-
-        </div>
-
 
     </div>
-
 
 </section>
 
 
-<!-- =====================================================
-     TICKER
-===================================================== -->
-
-<div class="ticker">
-
-    <div class="ticker-track">
-
-
-        <div class="ticker-item">
-            ACCOUNTING
-            <b>01</b>
-        </div>
-
-
-        <div class="ticker-item">
-            FINANCE
-            <b class="ticker-up">↑</b>
-        </div>
-
-
-        <div class="ticker-item">
-            BUSINESS ANALYTICS
-            <b>03</b>
-        </div>
-
-
-        <div class="ticker-item">
-            ECONOMICS
-            <b>04</b>
-        </div>
-
-
-        <div class="ticker-item">
-            DIGITAL BUSINESS
-            <b class="ticker-up">↑</b>
-        </div>
-
-
-        <div class="ticker-item">
-            DATA
-            <b>06</b>
-        </div>
-
-
-        <!-- duplicate -->
-
-        <div class="ticker-item">
-            ACCOUNTING
-            <b>01</b>
-        </div>
-
-
-        <div class="ticker-item">
-            FINANCE
-            <b class="ticker-up">↑</b>
-        </div>
-
-
-        <div class="ticker-item">
-            BUSINESS ANALYTICS
-            <b>03</b>
-        </div>
-
-
-        <div class="ticker-item">
-            ECONOMICS
-            <b>04</b>
-        </div>
-
-
-        <div class="ticker-item">
-            DIGITAL BUSINESS
-            <b class="ticker-up">↑</b>
-        </div>
-
-
-        <div class="ticker-item">
-            DATA
-            <b>06</b>
-        </div>
-
-
-    </div>
-
-</div>
-
-
-<!-- =====================================================
+<!-- =======================================================
      ABOUT
-===================================================== -->
+======================================================= -->
 
 <section
-    class="section"
-    id="about"
->
+    class="section reveal"
+    id="about">
 
+    <div class="section-head">
 
-    <div class="section-label reveal">
+        <div class="section-number">
+            01 / ABOUT
+        </div>
 
-        01 / PROFILE
+        <h2 class="section-title">
+            ABOUT
+        </h2>
 
     </div>
 
 
     <div class="about-grid">
 
+        <p class="about-text">
 
-        <div class="big-heading reveal">
+            I'm a B.Com student interested in what happens when
+            <strong>commerce meets technology</strong>.
 
-            BUSINESS
-            <br>
+            I like understanding businesses, working with data,
+            experimenting with digital products and building things
+            that are actually useful.
 
-            <span>
-                MEETS CODE.
-            </span>
-
-        </div>
-
-
-        <div class="about-copy reveal">
+        </p>
 
 
-            <p>
+        <div class="about-facts">
 
-                I'm a B.Com student interested in
-                understanding how businesses work
-                and how technology can make them
-                better.
-
-            </p>
-
-
-            <p>
-
-                That means looking beyond code:
-                understanding
-                <strong>
-                    numbers, decisions,
-                    markets and people
-                </strong>
-                matters too.
-
-            </p>
-
-
-            <p>
-
-                My interests sit somewhere between
-                commerce, technology, data and
-                creative problem solving.
-
-            </p>
-
-
-            <div class="stats">
-
-
-                <div class="stat">
-
-                    <div
-                        class="stat-number"
-                        data-count="01"
-                    >
-                        01
-                    </div>
-
-                    <span class="stat-label">
-                        DEGREE
-                    </span>
-
-                </div>
-
-
-                <div class="stat">
-
-                    <div class="stat-number">
-                        ∞
-                    </div>
-
-                    <span class="stat-label">
-                        CURIOSITY
-                    </span>
-
-                </div>
-
-
-                <div class="stat">
-
-                    <div class="stat-number">
-                        24/7
-                    </div>
-
-                    <span class="stat-label">
-                        LEARNING
-                    </span>
-
-                </div>
-
-
+            <div class="fact">
+                <span>FIELD</span>
+                <span>COMMERCE</span>
             </div>
 
+            <div class="fact">
+                <span>FOCUS</span>
+                <span>DATA + TECHNOLOGY</span>
+            </div>
+
+            <div class="fact">
+                <span>APPROACH</span>
+                <span>CURIOUS / PRACTICAL</span>
+            </div>
+
+            <div class="fact">
+                <span>STATUS</span>
+                <span>LEARNING</span>
+            </div>
 
         </div>
 
-
     </div>
-
 
 </section>
 
 
-<!-- =====================================================
-     BUSINESS METRICS
-===================================================== -->
-
-<section class="metrics">
-
-
-    <div class="section-label reveal">
-
-        02 / BUSINESS THINKING
-
-    </div>
-
-
-    <div class="metrics-header">
-
-
-        <div class="metrics-title reveal">
-
-            NUMBERS
-            <br>
-
-            <span>
-                TELL STORIES.
-            </span>
-
-        </div>
-
-
-        <div class="metrics-note reveal">
-
-            Commerce isn't only about calculations.
-            It's about understanding what those
-            calculations actually mean.
-
-        </div>
-
-
-    </div>
-
-
-    <div class="metric-grid reveal">
-
-
-        <div class="metric-card">
-
-            <div class="metric-card-label">
-                ROI
-            </div>
-
-            <div
-                class="metric-card-value"
-                data-target="14.2"
-                data-suffix="%"
-            >
-                0%
-            </div>
-
-            <div class="metric-card-sub">
-                RETURN ON INVESTMENT
-            </div>
-
-        </div>
-
-
-        <div class="metric-card">
-
-            <div class="metric-card-label">
-                CAGR
-            </div>
-
-            <div
-                class="metric-card-value"
-                data-target="12.8"
-                data-suffix="%"
-            >
-                0%
-            </div>
-
-            <div class="metric-card-sub">
-                COMPOUND GROWTH
-            </div>
-
-        </div>
-
-
-        <div class="metric-card">
-
-            <div class="metric-card-label">
-                MARGIN
-            </div>
-
-            <div
-                class="metric-card-value"
-                data-target="32"
-                data-suffix="%"
-            >
-                0%
-            </div>
-
-            <div class="metric-card-sub">
-                OPERATING EFFICIENCY
-            </div>
-
-        </div>
-
-
-        <div class="metric-card">
-
-            <div class="metric-card-label">
-                GROWTH
-            </div>
-
-            <div
-                class="metric-card-value"
-                data-target="18.6"
-                data-suffix="%"
-            >
-                0%
-            </div>
-
-            <div class="metric-card-sub">
-                YEAR OVER YEAR
-            </div>
-
-        </div>
-
-
-    </div>
-
-
-</section>
-
-
-<!-- =====================================================
+<!-- =======================================================
      WORK
-===================================================== -->
+======================================================= -->
 
 <section
-    class="work"
-    id="work"
->
+    class="section reveal"
+    id="work">
 
+    <div class="section-head">
 
-    <div class="work-header">
-
-
-        <div class="section-label reveal">
-
-            03 / SELECTED WORK
-
+        <div class="section-number">
+            02 / SELECTED WORK
         </div>
 
-
-        <div class="work-title reveal">
-
-            THINGS
-            <br>
-
-            <span>
-                I'VE BUILT.
-            </span>
-
-        </div>
-
+        <h2 class="section-title">
+            WORK
+        </h2>
 
     </div>
 
@@ -3375,425 +1801,253 @@ footer {
     <div class="projects">
 
 
-        <a
-            href="#"
-            class="project reveal"
-        >
+        <article class="project">
 
-            <div class="project-index">
-                01
+            <div class="project-number">
+                PROJECT / 01
             </div>
 
-            <div class="project-name">
-                BUSINESS DASHBOARD
-            </div>
-
-            <div class="project-meta">
-                DATA / UI
-            </div>
-
-        </a>
-
-
-        <a
-            href="#"
-            class="project reveal"
-        >
-
-            <div class="project-index">
-                02
-            </div>
-
-            <div class="project-name">
-                DATA ANALYTICS
-            </div>
-
-            <div class="project-meta">
-                PYTHON / DATA
-            </div>
-
-        </a>
-
-
-        <a
-            href="#"
-            class="project reveal"
-        >
-
-            <div class="project-index">
-                03
-            </div>
-
-            <div class="project-name">
-                DIGITAL BUSINESS
-            </div>
-
-            <div class="project-meta">
-                WEB / CONCEPT
-            </div>
-
-        </a>
-
-
-        <a
-            href="#"
-            class="project reveal"
-        >
-
-            <div class="project-index">
-                04
-            </div>
-
-            <div class="project-name">
-                NEXT PROJECT
-            </div>
-
-            <div class="project-meta">
-                IN DEVELOPMENT
-            </div>
-
-        </a>
-
-
-    </div>
-
-
-</section>
-
-
-<!-- =====================================================
-     SKILLS
-===================================================== -->
-
-<section
-    class="skills"
-    id="skills"
->
-
-
-    <div class="section-label reveal">
-
-        04 / CAPABILITIES
-
-    </div>
-
-
-    <div class="skills-intro reveal">
-
-
-        <div class="skills-heading">
-
-            BUSINESS
-            <br>
-
-            <span>
-                TOOLKIT.
-            </span>
-
-        </div>
-
-
-        <div class="skills-copy">
-
-            A combination of commerce,
-            technology and analytical thinking.
-
-        </div>
-
-
-    </div>
-
-
-    <div class="skill-grid reveal">
-
-
-        <article
-            class="skill"
-            style="--level:82%"
-        >
-
-            <div class="skill-number">
-                01
-            </div>
-
-            <div class="skill-icon">
+            <div class="project-symbol">
                 ₹
             </div>
 
             <h3>
-                ACCOUNTING
+                Finance
             </h3>
 
             <p>
-                Understanding financial records,
-                transactions and how businesses
-                track performance.
+                FINANCIAL THINKING / ANALYSIS
             </p>
-
-            <div class="skill-bar">
-                <span></span>
-            </div>
 
         </article>
 
 
-        <article
-            class="skill"
-            style="--level:76%"
-        >
+        <article class="project">
 
-            <div class="skill-number">
-                02
+            <div class="project-number">
+                PROJECT / 02
             </div>
 
-            <div class="skill-icon">
+            <div class="project-symbol">
+                Σ
+            </div>
+
+            <h3>
+                Analytics
+            </h3>
+
+            <p>
+                DATA / PATTERNS / DECISIONS
+            </p>
+
+        </article>
+
+
+        <article class="project">
+
+            <div class="project-number">
+                PROJECT / 03
+            </div>
+
+            <div class="project-symbol">
+                ×
+            </div>
+
+            <h3>
+                Digital
+            </h3>
+
+            <p>
+                WEB / DESIGN / DEVELOPMENT
+            </p>
+
+        </article>
+
+
+        <article class="project">
+
+            <div class="project-number">
+                PROJECT / 04
+            </div>
+
+            <div class="project-symbol">
                 %
             </div>
 
             <h3>
-                FINANCE
+                Business
             </h3>
 
             <p>
-                Working with concepts such as
-                returns, margins, investment and
-                financial decisions.
+                STRATEGY / COMMERCE / GROWTH
             </p>
-
-            <div class="skill-bar">
-                <span></span>
-            </div>
-
-        </article>
-
-
-        <article
-            class="skill"
-            style="--level:72%"
-        >
-
-            <div class="skill-number">
-                03
-            </div>
-
-            <div class="skill-icon">
-                ∑
-            </div>
-
-            <h3>
-                ANALYTICS
-            </h3>
-
-            <p>
-                Turning raw numbers into patterns,
-                insights and better decisions.
-            </p>
-
-            <div class="skill-bar">
-                <span></span>
-            </div>
-
-        </article>
-
-
-        <article
-            class="skill"
-            style="--level:68%"
-        >
-
-            <div class="skill-number">
-                04
-            </div>
-
-            <div class="skill-icon">
-                $
-            </div>
-
-            <h3>
-                ECONOMICS
-            </h3>
-
-            <p>
-                Understanding markets, incentives,
-                demand and how economic forces
-                shape businesses.
-            </p>
-
-            <div class="skill-bar">
-                <span></span>
-            </div>
-
-        </article>
-
-
-        <article
-            class="skill"
-            style="--level:80%"
-        >
-
-            <div class="skill-number">
-                05
-            </div>
-
-            <div class="skill-icon">
-                ◫
-            </div>
-
-            <h3>
-                WEB
-            </h3>
-
-            <p>
-                Building responsive interfaces and
-                digital experiences with modern web
-                technologies.
-            </p>
-
-            <div class="skill-bar">
-                <span></span>
-            </div>
-
-        </article>
-
-
-        <article
-            class="skill"
-            style="--level:70%"
-        >
-
-            <div class="skill-number">
-                06
-            </div>
-
-            <div class="skill-icon">
-                &lt;/&gt;
-            </div>
-
-            <h3>
-                PROGRAMMING
-            </h3>
-
-            <p>
-                Using code to automate tasks,
-                experiment and solve practical
-                problems.
-            </p>
-
-            <div class="skill-bar">
-                <span></span>
-            </div>
 
         </article>
 
 
     </div>
-
 
 </section>
 
 
-<!-- =====================================================
-     ROI CALCULATOR
-===================================================== -->
+<!-- =======================================================
+     SKILLS
+======================================================= -->
 
-<section class="calculator">
+<section
+    class="section reveal"
+    id="skills">
 
+    <div class="section-head">
 
-    <div class="section-label reveal">
+        <div class="section-number">
+            03 / CAPABILITIES
+        </div>
 
-        05 / INTERACTIVE
+        <h2 class="section-title">
+            SKILLS
+        </h2>
 
     </div>
 
 
-    <div class="calc-grid">
+    <div class="skills-layout">
 
 
-        <div class="reveal">
+        <p class="skill-intro">
+
+            A combination of commerce fundamentals,
+            analytical thinking and technology.
+
+            Instead of a static skills table,
+            the interface treats capability like a
+            continuously developing system.
+
+        </p>
 
 
-            <div class="calc-heading">
-
-                MAKE THE
-                <br>
-
-                <span>
-                    NUMBERS MOVE.
-                </span>
-
-            </div>
+        <div class="skill-list">
 
 
-            <p class="calc-description">
+            <div
+                class="skill"
+                data-level="82">
 
-                A small interactive example of how
-                commerce concepts can become useful
-                digital tools.
+                <div class="skill-row">
 
-            </p>
+                    <span class="skill-name">
+                        BUSINESS ANALYSIS
+                    </span>
 
-
-        </div>
-
-
-        <div class="calc-box reveal">
-
-
-            <div class="calc-field">
-
-                <label>
-                    INITIAL INVESTMENT
-                </label>
-
-                <input
-                    id="investment"
-                    type="number"
-                    value="10000"
-                >
-
-            </div>
-
-
-            <div class="calc-field">
-
-                <label>
-                    FINAL VALUE
-                </label>
-
-                <input
-                    id="finalValue"
-                    type="number"
-                    value="12500"
-                >
-
-            </div>
-
-
-            <button
-                class="calc-button"
-                id="calculateROI"
-            >
-
-                CALCULATE ROI ↗
-
-            </button>
-
-
-            <div class="calc-result">
-
-                <div class="calc-result-label">
-
-                    RETURN ON INVESTMENT
+                    <span class="skill-percent">
+                        82%
+                    </span>
 
                 </div>
 
+                <div class="skill-bar">
 
-                <div
-                    class="calc-result-value"
-                    id="roiResult"
-                >
+                    <div class="skill-fill"></div>
 
-                    25.00%
+                </div>
+
+            </div>
+
+
+            <div
+                class="skill"
+                data-level="76">
+
+                <div class="skill-row">
+
+                    <span class="skill-name">
+                        ACCOUNTING
+                    </span>
+
+                    <span class="skill-percent">
+                        76%
+                    </span>
+
+                </div>
+
+                <div class="skill-bar">
+
+                    <div class="skill-fill"></div>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="skill"
+                data-level="79">
+
+                <div class="skill-row">
+
+                    <span class="skill-name">
+                        DATA ANALYTICS
+                    </span>
+
+                    <span class="skill-percent">
+                        79%
+                    </span>
+
+                </div>
+
+                <div class="skill-bar">
+
+                    <div class="skill-fill"></div>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="skill"
+                data-level="72">
+
+                <div class="skill-row">
+
+                    <span class="skill-name">
+                        WEB DEVELOPMENT
+                    </span>
+
+                    <span class="skill-percent">
+                        72%
+                    </span>
+
+                </div>
+
+                <div class="skill-bar">
+
+                    <div class="skill-fill"></div>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="skill"
+                data-level="68">
+
+                <div class="skill-row">
+
+                    <span class="skill-name">
+                        UI / UX
+                    </span>
+
+                    <span class="skill-percent">
+                        68%
+                    </span>
+
+                </div>
+
+                <div class="skill-bar">
+
+                    <div class="skill-fill"></div>
 
                 </div>
 
@@ -3802,202 +2056,27 @@ footer {
 
         </div>
 
-
     </div>
-
 
 </section>
 
 
-<!-- =====================================================
-     LEDGER
-===================================================== -->
+<!-- =======================================================
+     EDUCATION
+======================================================= -->
 
-<section class="ledger">
+<section
+    class="section reveal">
 
+    <div class="section-head">
 
-    <div class="section-label reveal">
-
-        06 / LEDGER
-
-    </div>
-
-
-    <div class="ledger-header">
-
-
-        <div class="ledger-title reveal">
-
-            EVERY
-            <br>
-
-            <span>
-                NUMBER COUNTS.
-            </span>
-
+        <div class="section-number">
+            04 / EDUCATION
         </div>
 
-
-    </div>
-
-
-    <div class="ledger-table reveal">
-
-
-        <div class="ledger-row ledger-head">
-
-            <span>
-                DATE
-            </span>
-
-            <span>
-                TRANSACTION
-            </span>
-
-            <span>
-                TYPE
-            </span>
-
-            <span>
-                VALUE
-            </span>
-
-        </div>
-
-
-        <div class="ledger-row">
-
-            <span>
-                08.01
-            </span>
-
-            <span>
-                DIGITAL PROJECT
-            </span>
-
-            <span class="credit">
-                CREDIT
-            </span>
-
-            <span>
-                ₹12,500
-            </span>
-
-        </div>
-
-
-        <div class="ledger-row">
-
-            <span>
-                14.01
-            </span>
-
-            <span>
-                SOFTWARE
-            </span>
-
-            <span class="debit">
-                DEBIT
-            </span>
-
-            <span>
-                ₹2,400
-            </span>
-
-        </div>
-
-
-        <div class="ledger-row">
-
-            <span>
-                21.01
-            </span>
-
-            <span>
-                ANALYTICS PROJECT
-            </span>
-
-            <span class="credit">
-                CREDIT
-            </span>
-
-            <span>
-                ₹18,200
-            </span>
-
-        </div>
-
-
-        <div class="ledger-row">
-
-            <span>
-                03.02
-            </span>
-
-            <span>
-                DEVELOPMENT
-            </span>
-
-            <span class="debit">
-                DEBIT
-            </span>
-
-            <span>
-                ₹3,100
-            </span>
-
-        </div>
-
-
-        <div class="ledger-row">
-
-            <span>
-                11.02
-            </span>
-
-            <span>
-                NEW PROJECT
-            </span>
-
-            <span class="credit">
-                CREDIT
-            </span>
-
-            <span>
-                ₹24,600
-            </span>
-
-        </div>
-
-
-    </div>
-
-
-</section>
-
-
-<!-- =====================================================
-     JOURNEY
-===================================================== -->
-
-<section class="journey">
-
-
-    <div class="section-label reveal">
-
-        07 / JOURNEY
-
-    </div>
-
-
-    <div class="work-title reveal">
-
-        LEARNING
-        <br>
-
-        <span>
-            IN PROGRESS.
-        </span>
+        <h2 class="section-title">
+            PATH
+        </h2>
 
     </div>
 
@@ -4005,189 +2084,98 @@ footer {
     <div class="timeline">
 
 
-        <div class="timeline-item reveal">
+        <div class="timeline-item">
 
-            <div class="timeline-year">
-                2024
+            <div class="timeline-date">
+                2023 — PRESENT
             </div>
 
-            <div>
+            <h3>
+                B.Com
+            </h3>
 
-                <div class="timeline-title">
-                    FOUNDATION
-                </div>
-
-                <div class="timeline-text">
-
-                    Started building a stronger
-                    understanding of commerce and
-                    technology.
-
-                </div>
-
-            </div>
+            <p>
+                Commerce, business fundamentals,
+                accounting, economics and technology.
+            </p>
 
         </div>
 
 
-        <div class="timeline-item reveal">
+        <div class="timeline-item">
 
-            <div class="timeline-year">
-                2025
+            <div class="timeline-date">
+                CURRENT
             </div>
 
-            <div>
+            <h3>
+                Independent Learning
+            </h3>
 
-                <div class="timeline-title">
-                    EXPERIMENT
-                </div>
-
-                <div class="timeline-text">
-
-                    Began exploring web development,
-                    data and creative digital projects.
-
-                </div>
-
-            </div>
+            <p>
+                Exploring data analytics, web development,
+                digital products and modern technology.
+            </p>
 
         </div>
 
 
-        <div class="timeline-item reveal">
+        <div class="timeline-item">
 
-            <div class="timeline-year">
-                2026
-            </div>
-
-            <div>
-
-                <div class="timeline-title">
-                    COMBINE
-                </div>
-
-                <div class="timeline-text">
-
-                    Bringing commerce, analytics and
-                    technology together.
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div class="timeline-item reveal">
-
-            <div class="timeline-year">
+            <div class="timeline-date">
                 NEXT
             </div>
 
-            <div>
+            <h3>
+                Build / Learn / Repeat
+            </h3>
 
-                <div class="timeline-title">
-                    BUILD
-                </div>
-
-                <div class="timeline-text">
-
-                    Turning what I learn into things
-                    that actually work.
-
-                </div>
-
-            </div>
+            <p>
+                Turning academic knowledge into practical
+                projects and real-world experience.
+            </p>
 
         </div>
 
 
     </div>
 
-
 </section>
 
 
-<!-- =====================================================
+<!-- =======================================================
      CONTACT
-===================================================== -->
+======================================================= -->
 
 <section
-    class="contact"
-    id="contact"
->
+    class="section contact reveal"
+    id="contact">
 
-
-    <div class="section-label reveal">
-
-        08 / CONTACT
-
+    <div class="section-number">
+        05 / CONTACT
     </div>
 
 
-    <div class="contact-title reveal">
-
-        LET'S
-        <br>
-
-        <span>
-            BUILD.
-        </span>
-
-    </div>
+    <h2 class="contact-title">
+        LET'S<br>
+        BUILD.
+    </h2>
 
 
-    <div class="contact-bottom">
+    <p class="contact-copy">
+
+        Interested in technology, business,
+        data or interesting ideas?
+
+        That's generally where the fun begins.
+
+    </p>
 
 
-        <div class="contact-description">
+    <div class="contact-links">
 
-            BUSINESS IDEA?
-            <br>
-            DIGITAL PROJECT?
-            <br>
-            SOMETHING EXPERIMENTAL?
-
-            <br><br>
-
-            Let's turn an idea into something
-            useful.
-
-        </div>
-
-
-        <a
-            href="mailto:hello@nithan.in"
-            class="contact-button"
-        >
-
-            GET IN TOUCH ↗
-
-        </a>
-
-
-    </div>
-
-
-</section>
-
-
-<!-- =====================================================
-     FOOTER
-===================================================== -->
-
-<footer>
-
-
-    <div>
-        NITHAN.IN
-    </div>
-
-
-    <div class="socials">
-
-        <a href="#">
-            GITHUB
+        <a href="mailto:hello@example.com">
+            EMAIL
         </a>
 
         <a href="#">
@@ -4195,736 +2183,640 @@ footer {
         </a>
 
         <a href="#">
-            INSTAGRAM
+            GITHUB
         </a>
 
     </div>
 
+</section>
 
-    <div>
-        COMMERCE × TECH / 2026
-    </div>
 
+</main>
+
+
+<!-- =======================================================
+     FOOTER
+======================================================= -->
+
+<footer>
+
+    <span>
+        NITHAN / 01
+    </span>
+
+    <span>
+        COMMERCE × TECHNOLOGY
+    </span>
+
+    <span>
+        2026
+    </span>
 
 </footer>
+
 
 
 <script>
 
 /* =========================================================
-   CURSOR
+   CALCULATION PARTICLES
 ========================================================= */
 
-try {
-
-    const cursor =
-        document.querySelector(".cursor");
-
-    const ring =
-        document.querySelector(".cursor-ring");
-
-    let mouseX = 0;
-    let mouseY = 0;
-
-    let ringX = 0;
-    let ringY = 0;
-
-
-    document.addEventListener(
-        "mousemove",
-        function(e) {
-
-            mouseX =
-                e.clientX;
-
-            mouseY =
-                e.clientY;
-
-
-            cursor.style.left =
-                mouseX + "px";
-
-            cursor.style.top =
-                mouseY + "px";
-
-
-            const glow =
-                document.querySelector(
-                    ".background-glow"
-                );
-
-
-            glow.style.left =
-                mouseX + "px";
-
-            glow.style.top =
-                mouseY + "px";
-
-        }
+const field =
+    document.getElementById(
+        "calculationField"
     );
 
 
-    function animateCursor() {
+const symbols = [
 
-        ringX +=
-            (mouseX - ringX) * .12;
+    "+",
+    "−",
+    "×",
+    "÷",
+    "%",
+    "₹",
+    "=",
+    "Σ",
+    "∑",
+    "ROI",
+    "CAGR",
+    "01",
+    "10%",
+    "32%",
+    "₹+"
 
-        ringY +=
-            (mouseY - ringY) * .12;
-
-
-        ring.style.left =
-            ringX + "px";
-
-        ring.style.top =
-            ringY + "px";
-
-
-        requestAnimationFrame(
-            animateCursor
-        );
-
-    }
+];
 
 
-    animateCursor();
+const mobile =
+    window.innerWidth <= 800;
 
 
-    document
-        .querySelectorAll(
-            "a, button, .skill, .metric-card, .project"
-        )
-        .forEach(
-            function(element) {
+/*
+    Large moving calculation symbols
+*/
 
-                element.addEventListener(
-                    "mouseenter",
-                    function() {
-
-                        ring.style.width =
-                            "55px";
-
-                        ring.style.height =
-                            "55px";
-
-                    }
-                );
+const symbolCount =
+    mobile ? 12 : 25;
 
 
-                element.addEventListener(
-                    "mouseleave",
-                    function() {
+for (
+    let i = 0;
+    i < symbolCount;
+    i++
+) {
 
-                        ring.style.width =
-                            "32px";
-
-                        ring.style.height =
-                            "32px";
-
-                    }
-                );
-
-            }
-        );
-
-} catch(e) {}
-
-
-/* =========================================================
-   HERO PARALLAX
-========================================================= */
-
-try {
-
-    const terminal =
-        document.querySelector(
-            ".hero-terminal"
+    const el =
+        document.createElement(
+            "span"
         );
 
 
-    document.addEventListener(
-        "mousemove",
-        function(e) {
+    el.className =
+        "calc-symbol";
 
-            if(
-                window.innerWidth <= 800
+
+    el.textContent =
+        symbols[
+            Math.floor(
+                Math.random() *
+                symbols.length
             )
-                return;
+        ];
 
 
-            const x =
-                (
-                    e.clientX /
-                    window.innerWidth -
-                    .5
-                ) * 20;
+    const size =
+        Math.random() * 12 + 7;
 
 
-            const y =
-                (
-                    e.clientY /
-                    window.innerHeight -
-                    .5
-                ) * 20;
+    const opacity =
+        Math.random() * .11 + .035;
 
 
-            terminal.style.transform =
-                `translate(
-                    ${x}px,
-                    calc(-50% + ${y}px)
-                )`;
+    const duration =
+        Math.random() * 9 + 8;
 
-        }
+
+    el.style.left =
+        Math.random() * 100 + "%";
+
+
+    el.style.top =
+        Math.random() * 100 + "%";
+
+
+    el.style.setProperty(
+        "--size",
+        size + "px"
     );
 
-} catch(e) {}
+
+    el.style.setProperty(
+        "--opacity",
+        opacity
+    );
 
 
-/* =========================================================
-   SCROLL REVEALS
-========================================================= */
+    el.style.setProperty(
+        "--duration",
+        duration + "s"
+    );
 
-try {
 
-    const elements =
-        document.querySelectorAll(
-            ".reveal"
+    el.style.setProperty(
+        "--delay",
+        -(Math.random() * duration) + "s"
+    );
+
+
+    el.style.setProperty(
+        "--travel-x",
+        (
+            180 +
+            Math.random() * 450
+        ) + "px"
+    );
+
+
+    el.style.setProperty(
+        "--travel-y",
+        (
+            100 +
+            Math.random() * 350
+        ) + "px"
+    );
+
+
+    el.style.setProperty(
+        "--rotation",
+        (
+            Math.random() * 40 -
+            20
+        ) + "deg"
+    );
+
+
+    field.appendChild(el);
+
+}
+
+
+/*
+    Calculation shooting trails
+*/
+
+const trailCount =
+    mobile ? 4 : 9;
+
+
+for (
+    let i = 0;
+    i < trailCount;
+    i++
+) {
+
+    const trail =
+        document.createElement(
+            "span"
         );
 
 
-    if(
-        "IntersectionObserver"
-        in window
-    ) {
+    trail.className =
+        "calc-trail";
 
 
-        const observer =
-            new IntersectionObserver(
-                function(entries) {
-
-                    entries.forEach(
-                        function(entry) {
-
-                            if(
-                                entry.isIntersecting
-                            ) {
-
-                                entry.target
-                                    .classList
-                                    .add(
-                                        "visible"
-                                    );
-
-                            }
-
-                        }
-                    );
-
-                },
-                {
-                    threshold: .08
-                }
-            );
+    trail.style.left =
+        Math.random() * 100 + "%";
 
 
-        elements.forEach(
-            function(element) {
-
-                observer.observe(
-                    element
-                );
-
-            }
-        );
+    trail.style.top =
+        Math.random() * 100 + "%";
 
 
-    } else {
+    trail.style.setProperty(
+        "--width",
+        (
+            40 +
+            Math.random() * 100
+        ) + "px"
+    );
 
-        elements.forEach(
-            function(element) {
 
-                element.classList.add(
-                    "visible"
-                );
+    trail.style.setProperty(
+        "--angle",
+        (
+            20 +
+            Math.random() * 35
+        ) + "deg"
+    );
 
-            }
-        );
 
-    }
+    trail.style.setProperty(
+        "--travel-x",
+        (
+            200 +
+            Math.random() * 400
+        ) + "px"
+    );
 
-} catch(e) {
 
-    document
-        .querySelectorAll(".reveal")
-        .forEach(
-            function(element) {
+    trail.style.setProperty(
+        "--travel-y",
+        (
+            100 +
+            Math.random() * 250
+        ) + "px"
+    );
 
-                element.classList.add(
-                    "visible"
-                );
 
-            }
-        );
+    trail.style.setProperty(
+        "--duration",
+        (
+            4 +
+            Math.random() * 5
+        ) + "s"
+    );
+
+
+    trail.style.setProperty(
+        "--delay",
+        -Math.random() * 6 + "s"
+    );
+
+
+    field.appendChild(trail);
 
 }
 
 
 /* =========================================================
-   METRIC COUNTERS
+   LIVE BUSINESS NUMBERS
 ========================================================= */
 
-try {
+let growth =
+    18.6;
 
-    const metricValues =
-        document.querySelectorAll(
-            ".metric-card-value"
+let roi =
+    14.2;
+
+let margin =
+    32;
+
+
+function fluctuate(
+    value,
+    amount
+) {
+
+    return (
+        value +
+        (Math.random() * amount * 2 - amount)
+    );
+
+}
+
+
+function updateMetrics() {
+
+    growth =
+        fluctuate(
+            growth,
+            .18
+        );
+
+    roi =
+        fluctuate(
+            roi,
+            .12
+        );
+
+    margin =
+        fluctuate(
+            margin,
+            .35
         );
 
 
-    const metricObserver =
-        new IntersectionObserver(
-            function(entries) {
+    /*
+        Keep the numbers believable
+    */
 
-                entries.forEach(
-                    function(entry) {
-
-                        if(
-                            !entry.isIntersecting
-                        )
-                            return;
-
-
-                        const element =
-                            entry.target;
+    growth =
+        Math.max(
+            12,
+            Math.min(
+                24,
+                growth
+            )
+        );
 
 
-                        const target =
-                            parseFloat(
-                                element.dataset.target
+    roi =
+        Math.max(
+            9,
+            Math.min(
+                19,
+                roi
+            )
+        );
+
+
+    margin =
+        Math.max(
+            25,
+            Math.min(
+                40,
+                margin
+            )
+        );
+
+
+    document.getElementById(
+        "growth"
+    ).textContent =
+        "+" +
+        growth.toFixed(1) +
+        "%";
+
+
+    document.getElementById(
+        "roi"
+    ).textContent =
+        roi.toFixed(1) +
+        "%";
+
+
+    document.getElementById(
+        "margin"
+    ).textContent =
+        Math.round(margin) +
+        "%";
+
+}
+
+
+setInterval(
+    updateMetrics,
+    1800
+);
+
+
+/* =========================================================
+   ANIMATED BUSINESS CHART
+========================================================= */
+
+const chartLine =
+    document.getElementById(
+        "chartLine"
+    );
+
+
+const chartArea =
+    document.getElementById(
+        "chartArea"
+    );
+
+
+let chartValues = [
+
+    72,
+    77,
+    74,
+    84,
+    80,
+    90,
+    86,
+    98,
+    92,
+    104,
+    100,
+    113,
+    108,
+    119
+
+];
+
+
+function drawChart() {
+
+    const width =
+        600;
+
+    const height =
+        150;
+
+
+    const step =
+        width /
+        (chartValues.length - 1);
+
+
+    const points =
+        chartValues.map(
+            (value, index) => {
+
+                const x =
+                    index * step;
+
+                const y =
+                    height -
+                    value;
+
+                return (
+                    x +
+                    "," +
+                    y
+                );
+
+            }
+        ).join(" ");
+
+
+    chartLine.setAttribute(
+        "points",
+        points
+    );
+
+
+    chartArea.setAttribute(
+        "points",
+        "0,150 " +
+        points +
+        " 600,150"
+    );
+
+}
+
+
+drawChart();
+
+
+function updateChart() {
+
+    const last =
+        chartValues[
+            chartValues.length - 1
+        ];
+
+
+    const next =
+        last +
+        (
+            Math.random() * 24 -
+            9
+        );
+
+
+    chartValues.shift();
+
+
+    chartValues.push(
+        Math.max(
+            40,
+            Math.min(
+                135,
+                next
+            )
+        )
+    );
+
+
+    drawChart();
+
+}
+
+
+setInterval(
+    updateChart,
+    1400
+);
+
+
+/* =========================================================
+   SCROLL REVEAL
+========================================================= */
+
+const revealElements =
+    document.querySelectorAll(
+        ".reveal"
+    );
+
+
+const observer =
+    new IntersectionObserver(
+        entries => {
+
+            entries.forEach(
+                entry => {
+
+                    if (
+                        entry.isIntersecting
+                    ) {
+
+                        entry.target
+                            .classList
+                            .add("visible");
+
+
+                        /*
+                            Animate skills when
+                            the section enters view.
+                        */
+
+                        entry.target
+                            .querySelectorAll(
+                                ".skill"
+                            )
+                            .forEach(
+                                skill => {
+
+                                    const level =
+                                        skill.dataset.level;
+
+                                    const fill =
+                                        skill.querySelector(
+                                            ".skill-fill"
+                                        );
+
+                                    if (fill) {
+
+                                        setTimeout(
+                                            () => {
+
+                                                fill.style.width =
+                                                    level + "%";
+
+                                            },
+                                            200
+                                        );
+
+                                    }
+
+                                }
                             );
 
-
-                        const suffix =
-                            element.dataset.suffix ||
-                            "";
-
-
-                        let start = 0;
-
-                        const duration =
-                            1200;
-
-                        const startTime =
-                            performance.now();
-
-
-                        function update(
-                            currentTime
-                        ) {
-
-                            const progress =
-                                Math.min(
-                                    (
-                                        currentTime -
-                                        startTime
-                                    ) / duration,
-                                    1
-                                );
-
-
-                            const eased =
-                                1 -
-                                Math.pow(
-                                    1 - progress,
-                                    3
-                                );
-
-
-                            const value =
-                                start +
-                                (
-                                    target -
-                                    start
-                                ) *
-                                eased;
-
-
-                            element.textContent =
-                                value.toFixed(1) +
-                                suffix;
-
-
-                            if(
-                                progress < 1
-                            ) {
-
-                                requestAnimationFrame(
-                                    update
-                                );
-
-                            }
-
-                        }
-
-
-                        requestAnimationFrame(
-                            update
-                        );
-
-
-                        metricObserver.unobserve(
-                            element
-                        );
-
                     }
-                );
-
-            },
-            {
-                threshold: .5
-            }
-        );
-
-
-    metricValues.forEach(
-        function(element) {
-
-            metricObserver.observe(
-                element
-            );
-
-        }
-    );
-
-} catch(e) {}
-
-
-/* =========================================================
-   ROI CALCULATOR
-========================================================= */
-
-try {
-
-    const investment =
-        document.getElementById(
-            "investment"
-        );
-
-
-    const finalValue =
-        document.getElementById(
-            "finalValue"
-        );
-
-
-    const result =
-        document.getElementById(
-            "roiResult"
-        );
-
-
-    const button =
-        document.getElementById(
-            "calculateROI"
-        );
-
-
-    function calculateROI() {
-
-        const initial =
-            parseFloat(
-                investment.value
-            ) || 0;
-
-
-        const final =
-            parseFloat(
-                finalValue.value
-            ) || 0;
-
-
-        if(
-            initial <= 0
-        ) {
-
-            result.textContent =
-                "0.00%";
-
-            return;
-
-        }
-
-
-        const roi =
-            (
-                (
-                    final -
-                    initial
-                ) /
-                initial
-            ) * 100;
-
-
-        result.textContent =
-            roi.toFixed(2) +
-            "%";
-
-    }
-
-
-    button.addEventListener(
-        "click",
-        calculateROI
-    );
-
-
-    investment.addEventListener(
-        "input",
-        calculateROI
-    );
-
-
-    finalValue.addEventListener(
-        "input",
-        calculateROI
-    );
-
-} catch(e) {}
-
-
-/* =========================================================
-   FINANCIAL BACKGROUND
-========================================================= */
-
-try {
-
-    const canvas =
-        document.getElementById(
-            "financeCanvas"
-        );
-
-
-    const ctx =
-        canvas.getContext("2d");
-
-
-    let width = 0;
-    let height = 0;
-
-
-    let particles = [];
-
-
-    const mobile =
-        window.innerWidth <= 800;
-
-
-    const particleCount =
-        mobile ? 35 : 75;
-
-
-    function resize() {
-
-        const ratio =
-            Math.min(
-                window.devicePixelRatio || 1,
-                2
-            );
-
-
-        width =
-            window.innerWidth;
-
-        height =
-            window.innerHeight;
-
-
-        canvas.width =
-            width * ratio;
-
-        canvas.height =
-            height * ratio;
-
-
-        canvas.style.width =
-            width + "px";
-
-        canvas.style.height =
-            height + "px";
-
-
-        ctx.setTransform(
-            ratio,
-            0,
-            0,
-            ratio,
-            0,
-            0
-        );
-
-    }
-
-
-    resize();
-
-
-    window.addEventListener(
-        "resize",
-        resize
-    );
-
-
-    function createParticles() {
-
-        particles = [];
-
-
-        for(
-            let i = 0;
-            i < particleCount;
-            i++
-        ) {
-
-            particles.push({
-
-                x:
-                    Math.random() *
-                    width,
-
-                y:
-                    Math.random() *
-                    height,
-
-                speed:
-                    Math.random() *
-                    .15 +
-                    .04,
-
-                length:
-                    Math.random() *
-                    35 +
-                    10,
-
-                opacity:
-                    Math.random() *
-                    .14 +
-                    .025
-
-            });
-
-        }
-
-    }
-
-
-    createParticles();
-
-
-    function draw() {
-
-        ctx.clearRect(
-            0,
-            0,
-            width,
-            height
-        );
-
-
-        particles.forEach(
-            function(particle) {
-
-
-                particle.x +=
-                    particle.speed;
-
-
-                if(
-                    particle.x >
-                    width + 50
-                ) {
-
-                    particle.x =
-                        -50;
 
                 }
+            );
+
+        },
+        {
+            threshold: .18
+        }
+    );
 
 
-                /*
-                 * These are intentionally
-                 * horizontal data/ledger traces,
-                 * replacing the shooting stars.
-                 */
+revealElements.forEach(
+    element => {
 
-
-                ctx.beginPath();
-
-
-                ctx.moveTo(
-                    particle.x,
-                    particle.y
-                );
-
-
-                ctx.lineTo(
-                    particle.x -
-                    particle.length,
-                    particle.y
-                );
-
-
-                ctx.strokeStyle =
-                    "rgba(255,255,255," +
-                    particle.opacity +
-                    ")";
-
-
-                ctx.lineWidth =
-                    .5;
-
-
-                ctx.stroke();
-
-
-                /* tiny data point */
-
-                ctx.beginPath();
-
-
-                ctx.arc(
-                    particle.x,
-                    particle.y,
-                    .7,
-                    0,
-                    Math.PI * 2
-                );
-
-
-                ctx.fillStyle =
-                    "rgba(255,255,255," +
-                    particle.opacity * 2 +
-                    ")";
-
-
-                ctx.fill();
-
-
-            }
-        );
-
-
-        requestAnimationFrame(
-            draw
+        observer.observe(
+            element
         );
 
     }
+);
 
 
-    draw();
+/* =========================================================
+   MOUSE PARALLAX
+========================================================= */
 
-} catch(e) {
+if (
+    window.matchMedia(
+        "(pointer:fine)"
+    ).matches
+) {
 
-    console.warn(
-        "Financial background disabled."
+    document.addEventListener(
+        "mousemove",
+        event => {
+
+            const x =
+                (
+                    event.clientX /
+                    window.innerWidth -
+                    .5
+                ) * 12;
+
+
+            const y =
+                (
+                    event.clientY /
+                    window.innerHeight -
+                    .5
+                ) * 12;
+
+
+            document
+                .querySelector(
+                    ".calculation-field"
+                )
+                .style.transform =
+                    `translate(${x}px,${y}px)`;
+
+        }
     );
 
 }
@@ -4934,100 +2826,70 @@ try {
    ACTIVE NAV
 ========================================================= */
 
-try {
-
-    const sections =
-        document.querySelectorAll(
-            "section[id]"
-        );
+const sections =
+    document.querySelectorAll(
+        "section[id]"
+    );
 
 
-    const links =
-        document.querySelectorAll(
-            ".nav-links a"
-        );
+const navLinks =
+    document.querySelectorAll(
+        "nav a"
+    );
 
 
-    const navObserver =
-        new IntersectionObserver(
-            function(entries) {
+const navObserver =
+    new IntersectionObserver(
+        entries => {
 
-                entries.forEach(
-                    function(entry) {
+            entries.forEach(
+                entry => {
 
-                        if(
-                            !entry.isIntersecting
-                        )
-                            return;
+                    if (
+                        entry.isIntersecting
+                    ) {
 
-
-                        links.forEach(
-                            function(link) {
+                        navLinks.forEach(
+                            link => {
 
                                 link.style.color =
                                     "#666";
 
+                                if (
+                                    link.getAttribute(
+                                        "href"
+                                    ) ===
+                                    "#" +
+                                    entry.target.id
+                                ) {
+
+                                    link.style.color =
+                                        "#fff";
+
+                                }
+
                             }
                         );
 
-
-                        const active =
-                            document.querySelector(
-                                `.nav-links a[href="#${entry.target.id}"]`
-                            );
-
-
-                        if(active) {
-
-                            active.style.color =
-                                "white";
-
-                        }
-
                     }
-                );
-
-            },
-            {
-                threshold: .45
-            }
-        );
-
-
-    sections.forEach(
-        function(section) {
-
-            navObserver.observe(
-                section
-            );
-
-        }
-    );
-
-} catch(e) {}
-
-
-/* =========================================================
-   HERO ALWAYS VISIBLE
-========================================================= */
-
-window.addEventListener(
-    "load",
-    function() {
-
-        document
-            .querySelectorAll(
-                ".hero .reveal"
-            )
-            .forEach(
-                function(element) {
-
-                    element.classList.add(
-                        "visible"
-                    );
 
                 }
             );
+
+        },
+        {
+            rootMargin:
+                "-35% 0px -55% 0px"
+        }
+    );
+
+
+sections.forEach(
+    section => {
+
+        navObserver.observe(
+            section
+        );
 
     }
 );
