@@ -1,133 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
 <meta charset="UTF-8">
-
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
->
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#050505">
 
-<title>Nithan — Creative Developer</title>
+<title>Nithan — Portfolio</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-<link rel="preconnect"
-      href="https://fonts.gstatic.com"
-      crossorigin>
-
-<link
-href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600;700;800&display=swap"
-rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
 
 /* =========================================================
-   CORE
+   ROOT
 ========================================================= */
 
 :root {
-
     --bg: #050505;
-    --white: #f5f5f3;
+    --white: #f4f4f2;
     --muted: #777;
-    --dim: #414141;
-
+    --dim: #444;
     --line: rgba(255,255,255,.10);
-    --line-soft: rgba(255,255,255,.055);
-
+    --soft-line: rgba(255,255,255,.055);
     --ease: cubic-bezier(.16,1,.3,1);
-
-}
-
-
-* {
-
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-
-}
-
-
-html {
-
-    scroll-behavior: smooth;
-
-}
-
-
-body {
-
-    background: var(--bg);
-
-    color: var(--white);
-
-    font-family: Inter, sans-serif;
-
-    overflow-x: hidden;
-
-}
-
-
-body,
-a,
-button {
-
-    cursor: none;
-
-}
-
-
-a {
-
-    color: inherit;
-
-    text-decoration: none;
-
-}
-
-
-button {
-
-    font-family: inherit;
-
 }
 
 
 /* =========================================================
-   SPACE BACKGROUND
+   RESET
 ========================================================= */
 
-#space {
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-    position: fixed;
+html {
+    scroll-behavior: smooth;
+}
 
-    inset: 0;
+body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: Inter, sans-serif;
+    overflow-x: hidden;
+}
 
-    width: 100%;
-    height: 100%;
+a {
+    color: inherit;
+    text-decoration: none;
+}
 
-    z-index: -20;
-
-    pointer-events: none;
-
+button {
+    font: inherit;
 }
 
 
-.space-glow {
+/* =========================================================
+   BACKGROUND
+========================================================= */
 
+#spaceCanvas {
     position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -10;
+    pointer-events: none;
+}
 
-    width: 550px;
-    height: 550px;
-
+.background-glow {
+    position: fixed;
+    width: 450px;
+    height: 450px;
     border-radius: 50%;
+    pointer-events: none;
+    z-index: -5;
 
     background:
         radial-gradient(
@@ -136,13 +88,7 @@ button {
             transparent 70%
         );
 
-    transform:
-        translate(-50%,-50%);
-
-    pointer-events: none;
-
-    z-index: -10;
-
+    transform: translate(-50%, -50%);
 }
 
 
@@ -151,24 +97,15 @@ button {
 ========================================================= */
 
 body::after {
-
     content: "";
-
     position: fixed;
-
     inset: 0;
-
-    z-index: 9990;
-
     pointer-events: none;
-
+    z-index: 9000;
     opacity: .025;
 
     background-image:
-        url(
-        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"
-        );
-
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
 }
 
 
@@ -177,173 +114,105 @@ body::after {
 ========================================================= */
 
 .cursor {
-
     position: fixed;
-
-    width: 7px;
-    height: 7px;
-
-    border-radius: 50%;
-
+    width: 6px;
+    height: 6px;
     background: white;
-
+    border-radius: 50%;
     pointer-events: none;
-
-    z-index: 10000;
-
-    transform:
-        translate(-50%,-50%);
-
+    z-index: 9999;
+    transform: translate(-50%, -50%);
     mix-blend-mode: difference;
-
 }
 
-
 .cursor-ring {
-
     position: fixed;
-
     width: 34px;
     height: 34px;
-
-    border:
-        1px solid
-        rgba(255,255,255,.4);
-
+    border: 1px solid rgba(255,255,255,.4);
     border-radius: 50%;
-
     pointer-events: none;
-
-    z-index: 9999;
-
-    transform:
-        translate(-50%,-50%);
+    z-index: 9998;
+    transform: translate(-50%, -50%);
 
     transition:
-        width .4s var(--ease),
-        height .4s var(--ease),
-        background .3s;
-
+        width .35s var(--ease),
+        height .35s var(--ease);
 }
 
 
 /* =========================================================
-   NAVIGATION
+   NAV
 ========================================================= */
 
 .nav {
-
     position: fixed;
-
     top: 0;
     left: 0;
 
     width: 100%;
-
     height: 90px;
 
-    padding:
-        26px 5vw;
+    padding: 25px 5vw;
 
     display: flex;
-
-    justify-content:
-        space-between;
-
-    align-items:
-        center;
+    justify-content: space-between;
+    align-items: center;
 
     z-index: 500;
 
+    background:
+        linear-gradient(
+            to bottom,
+            rgba(5,5,5,.75),
+            transparent
+        );
 }
-
 
 .brand {
-
-    font-family:
-        "DM Mono",
-        monospace;
-
+    font-family: "DM Mono", monospace;
     font-size: 12px;
-
     letter-spacing: .18em;
-
 }
-
 
 .brand span {
-
     color: #555;
-
 }
-
 
 .nav-links {
-
     display: flex;
-
     gap: 30px;
-
 }
-
 
 .nav-links a {
-
-    font-family:
-        "DM Mono",
-        monospace;
-
+    font-family: "DM Mono", monospace;
     font-size: 9px;
-
     letter-spacing: .18em;
-
     color: #666;
 
-    transition:
-        color .3s ease;
-
+    transition: color .3s ease;
 }
-
 
 .nav-links a:hover {
-
     color: white;
-
 }
-
 
 .nav-status {
-
     display: flex;
+    align-items: center;
+    gap: 8px;
 
-    align-items:
-        center;
-
-    gap: 9px;
-
-    font-family:
-        "DM Mono",
-        monospace;
-
+    font-family: "DM Mono", monospace;
     font-size: 8px;
-
     color: #555;
-
 }
 
-
 .status-dot {
-
     width: 5px;
     height: 5px;
-
-    border-radius: 50%;
-
     background: white;
-
-    box-shadow:
-        0 0 12px white;
-
+    border-radius: 50%;
+    box-shadow: 0 0 12px white;
 }
 
 
@@ -352,90 +221,57 @@ body::after {
 ========================================================= */
 
 .hero {
-
     min-height: 100svh;
 
     position: relative;
 
     display: flex;
-
     align-items: center;
 
     padding:
-        140px 5vw
-        90px;
+        150px 5vw
+        100px;
 
     overflow: hidden;
-
 }
-
 
 .hero-content {
-
-    position: relative;
-
-    z-index: 10;
-
     width: 100%;
-
+    position: relative;
+    z-index: 10;
 }
-
 
 .mini-label {
-
-    font-family:
-        "DM Mono",
-        monospace;
-
-    color: #555;
-
+    font-family: "DM Mono", monospace;
     font-size: 9px;
-
-    letter-spacing: .3em;
-
+    color: #555;
+    letter-spacing: .35em;
 }
-
 
 .hero-title {
-
-    margin-top: 32px;
-
     position: relative;
-
     width: max-content;
-
+    margin-top: 32px;
 }
 
-
 .hero-title h1 {
-
-    font-size:
-        clamp(85px, 15vw, 220px);
-
+    font-size: clamp(80px, 15vw, 220px);
     line-height: .75;
 
     letter-spacing: -.095em;
-
     font-weight: 700;
-
 }
 
-
 .hero-outline {
-
     position: absolute;
 
     left: 5px;
+    top: 76%;
 
-    top: 74%;
-
-    font-size:
-        clamp(85px, 15vw, 220px);
-
+    font-size: clamp(80px, 15vw, 220px);
     line-height: .75;
 
     letter-spacing: -.095em;
-
     font-weight: 700;
 
     color: transparent;
@@ -444,66 +280,34 @@ body::after {
         1px rgba(255,255,255,.22);
 
     z-index: -1;
-
 }
-
 
 .hero-info {
-
     margin-top: 145px;
-
-    display: flex;
-
-    justify-content:
-        space-between;
-
-    align-items:
-        flex-end;
-
 }
-
-
-.hero-description {
-
-    max-width: 430px;
-
-}
-
 
 .hero-role {
-
-    font-family:
-        "DM Mono",
-        monospace;
-
-    color: #666;
-
+    font-family: "DM Mono", monospace;
     font-size: 9px;
+    color: #666;
+    letter-spacing: .25em;
 
-    letter-spacing: .22em;
-
-    margin-bottom: 22px;
-
+    margin-bottom: 20px;
 }
 
+.hero-description {
+    max-width: 450px;
+}
 
 .hero-description p {
-
-    color: #858585;
-
     font-size: 17px;
-
     line-height: 1.7;
-
+    color: #808080;
 }
 
-
 .hero-description strong {
-
     color: white;
-
     font-weight: 400;
-
 }
 
 
@@ -512,91 +316,71 @@ body::after {
 ========================================================= */
 
 .hero-object {
-
     position: absolute;
 
-    right: 8vw;
-
+    right: 7vw;
     top: 50%;
 
-    width:
-        min(31vw,420px);
-
+    width: min(32vw, 420px);
     aspect-ratio: 1;
 
     transform:
-        translateY(-50%)
         translate(
-            var(--object-x,0px),
-            var(--object-y,0px)
+            var(--object-x, 0px),
+            calc(-50% + var(--object-y, 0px))
         );
 
     transition:
         transform .8s var(--ease);
 
+    z-index: 2;
 }
 
-
-.chrome {
-
+.chrome-object {
     width: 100%;
     height: 100%;
 
     border-radius: 50%;
 
     background:
-
         radial-gradient(
-            circle at 30% 24%,
+            circle at 29% 23%,
             #fff 0%,
             #aaa 4%,
-            #505050 10%,
-            #181818 28%,
-            #080808 57%,
-            #000 76%
+            #555 10%,
+            #202020 25%,
+            #090909 55%,
+            #000 77%
         );
 
     box-shadow:
-
-        inset -45px -55px 100px #000,
-
-        inset 25px 20px 50px
-        rgba(255,255,255,.15),
-
-        -20px -20px 80px
-        rgba(255,255,255,.07);
+        inset -55px -55px 110px #000,
+        inset 25px 20px 50px rgba(255,255,255,.13),
+        -25px -20px 90px rgba(255,255,255,.06);
 
     animation:
-        floatObject 8s ease-in-out infinite;
-
+        objectFloat 8s ease-in-out infinite;
 }
 
-
-.chrome::before {
-
+.chrome-object::before {
     content: "";
 
     position: absolute;
-
     inset: -2px;
 
     border-radius: 50%;
 
     border:
-        1px solid
-        rgba(255,255,255,.25);
-
+        1px solid rgba(255,255,255,.22);
 }
 
-
-.chrome::after {
-
+.chrome-object::after {
     content: "";
 
     position: absolute;
 
     width: 140%;
-    height: 16%;
+    height: 17%;
 
     left: -20%;
     top: 43%;
@@ -604,96 +388,58 @@ body::after {
     border-radius: 50%;
 
     border-top:
-        1px solid
-        rgba(255,255,255,.55);
+        1px solid rgba(255,255,255,.55);
 
-    transform:
-        rotate(-19deg);
-
+    transform: rotate(-18deg);
 }
 
-
-@keyframes floatObject {
-
-    0%,
-    100% {
-
-        transform:
-            translateY(0);
-
+@keyframes objectFloat {
+    0%, 100% {
+        transform: translateY(0);
     }
 
     50% {
-
-        transform:
-            translateY(-18px);
-
+        transform: translateY(-18px);
     }
-
 }
 
-
 .object-label {
-
     position: absolute;
-
     right: 0;
-
     bottom: -35px;
-
-    font-family:
-        "DM Mono",
-        monospace;
 
     color: #444;
 
+    font-family: "DM Mono", monospace;
     font-size: 8px;
-
-    letter-spacing: .18em;
-
+    letter-spacing: .2em;
 }
 
 
 /* =========================================================
-   SCROLL MARKER
+   SCROLL
 ========================================================= */
 
 .scroll-marker {
-
     position: absolute;
 
+    left: 5vw;
     bottom: 35px;
 
-    left: 5vw;
-
     display: flex;
-
-    align-items:
-        center;
-
+    align-items: center;
     gap: 14px;
 
-    font-family:
-        "DM Mono",
-        monospace;
-
-    color: #555;
-
+    font-family: "DM Mono", monospace;
     font-size: 8px;
-
+    color: #555;
     letter-spacing: .2em;
-
 }
 
-
 .scroll-marker span {
-
     width: 45px;
-
     height: 1px;
-
     background: #555;
-
 }
 
 
@@ -702,6 +448,11 @@ body::after {
 ========================================================= */
 
 .info-strip {
+    display: flex;
+    justify-content: space-between;
+
+    padding:
+        20px 5vw;
 
     border-top:
         1px solid var(--line);
@@ -709,56 +460,36 @@ body::after {
     border-bottom:
         1px solid var(--line);
 
-    display: flex;
-
-    justify-content:
-        space-between;
-
-    padding:
-        21px 5vw;
-
     font-family:
-        "DM Mono",
-        monospace;
+        "DM Mono", monospace;
 
     color: #555;
-
     font-size: 8px;
-
     letter-spacing: .15em;
-
 }
 
 
 /* =========================================================
-   GENERIC SECTION
+   SECTIONS
 ========================================================= */
 
 .section {
-
     padding:
         170px 5vw;
 
     border-bottom:
         1px solid var(--line);
-
 }
 
-
 .section-label {
-
-    font-family:
-        "DM Mono",
-        monospace;
-
-    font-size: 9px;
-
-    letter-spacing: .25em;
-
-    color: #4c4c4c;
-
     margin-bottom: 80px;
 
+    font-family:
+        "DM Mono", monospace;
+
+    color: #4c4c4c;
+    font-size: 9px;
+    letter-spacing: .27em;
 }
 
 
@@ -767,110 +498,75 @@ body::after {
 ========================================================= */
 
 .about-grid {
-
     display: grid;
 
     grid-template-columns:
         1.15fr .85fr;
 
     gap: 10vw;
-
 }
 
-
 .about-heading {
-
     font-size:
         clamp(55px, 7vw, 105px);
 
-    line-height: .88;
-
-    letter-spacing: -.07em;
-
+    line-height: .87;
+    letter-spacing: -.075em;
     font-weight: 400;
-
 }
 
-
 .about-heading span {
-
     color: transparent;
 
     -webkit-text-stroke:
-        1px rgba(255,255,255,.28);
-
+        1px rgba(255,255,255,.25);
 }
 
-
 .about-copy {
-
     max-width: 500px;
 
     color: #777;
 
     font-size: 15px;
-
     line-height: 2;
-
 }
-
 
 .about-copy p + p {
-
     margin-top: 25px;
-
 }
-
 
 .about-copy strong {
-
     color: #ddd;
-
     font-weight: 400;
-
 }
-
 
 .about-numbers {
-
     display: flex;
-
-    gap: 60px;
+    gap: 55px;
 
     margin-top: 60px;
-
 }
-
 
 .number strong {
-
     display: block;
 
-    font-size: 35px;
-
+    font-size: 34px;
     font-weight: 400;
-
     letter-spacing: -.05em;
-
 }
 
-
 .number span {
-
     display: block;
 
     margin-top: 8px;
 
-    font-family:
-        "DM Mono",
-        monospace;
-
-    font-size: 7px;
-
     color: #555;
 
-    letter-spacing: .15em;
+    font-family:
+        "DM Mono", monospace;
 
+    font-size: 7px;
+    letter-spacing: .15em;
 }
 
 
@@ -879,63 +575,45 @@ body::after {
 ========================================================= */
 
 .work {
-
     padding:
         170px 0;
 
     border-bottom:
         1px solid var(--line);
-
 }
-
 
 .work-header {
-
     padding:
         0 5vw;
-
 }
 
-
 .work-title {
-
     font-size:
         clamp(75px, 13vw, 180px);
 
-    line-height: .75;
-
+    line-height: .76;
     letter-spacing: -.095em;
-
     font-weight: 600;
-
 }
 
-
 .work-title span {
-
     color: transparent;
 
     -webkit-text-stroke:
         1px rgba(255,255,255,.25);
-
 }
 
-
 .projects {
-
     margin-top: 120px;
 
     border-top:
         1px solid var(--line);
-
 }
 
-
 .project {
-
     position: relative;
 
-    min-height: 190px;
+    min-height: 180px;
 
     padding:
         35px 5vw;
@@ -945,8 +623,7 @@ body::after {
     grid-template-columns:
         80px 1fr 180px;
 
-    align-items:
-        center;
+    align-items: center;
 
     border-bottom:
         1px solid var(--line);
@@ -955,16 +632,12 @@ body::after {
 
     transition:
         padding .6s var(--ease);
-
 }
 
-
 .project::before {
-
     content: "";
 
     position: absolute;
-
     inset: 0;
 
     background:
@@ -979,86 +652,57 @@ body::after {
 
     transition:
         transform .7s var(--ease);
-
 }
-
 
 .project:hover {
-
-    padding-left:
-        6vw;
-
+    padding-left: 6vw;
 }
-
 
 .project:hover::before {
-
-    transform:
-        translateX(0);
-
+    transform: translateX(0);
 }
 
-
 .project-index {
-
     position: relative;
-
     z-index: 2;
-
-    font-family:
-        "DM Mono",
-        monospace;
 
     color: #444;
 
-    font-size: 9px;
+    font-family:
+        "DM Mono", monospace;
 
+    font-size: 9px;
 }
 
-
 .project-name {
-
     position: relative;
-
     z-index: 2;
 
     font-size:
         clamp(30px, 5vw, 65px);
 
-    letter-spacing: -.055em;
-
     font-weight: 400;
+    letter-spacing: -.055em;
 
     transition:
         transform .6s var(--ease);
-
 }
-
 
 .project:hover .project-name {
-
-    transform:
-        translateX(15px);
-
+    transform: translateX(15px);
 }
 
-
 .project-meta {
-
     position: relative;
-
     z-index: 2;
 
     color: #555;
 
     font-family:
-        "DM Mono",
-        monospace;
+        "DM Mono", monospace;
 
     font-size: 8px;
-
     letter-spacing: .15em;
-
 }
 
 
@@ -1067,7 +711,6 @@ body::after {
 ========================================================= */
 
 .skills {
-
     padding:
         170px 5vw;
 
@@ -1075,64 +718,42 @@ body::after {
         1px solid var(--line);
 
     overflow: hidden;
-
 }
-
 
 .skills-intro {
-
     display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
 
-    justify-content:
-        space-between;
-
-    align-items:
-        flex-end;
-
-    margin-bottom:
-        100px;
-
+    margin-bottom: 100px;
 }
 
-
 .skills-heading {
-
     font-size:
         clamp(65px, 10vw, 150px);
 
     line-height: .8;
-
     letter-spacing: -.09em;
-
     font-weight: 500;
-
 }
 
-
 .skills-heading span {
-
     color: transparent;
 
     -webkit-text-stroke:
         1px rgba(255,255,255,.25);
-
 }
 
-
 .skills-copy {
-
     width: 300px;
 
     color: #666;
 
     font-family:
-        "DM Mono",
-        monospace;
+        "DM Mono", monospace;
 
     font-size: 9px;
-
     line-height: 1.9;
-
 }
 
 
@@ -1141,105 +762,71 @@ body::after {
 ========================================================= */
 
 .skill-deck {
-
-    width: 100%;
-
     display: grid;
 
     grid-template-columns:
         repeat(6, 1fr);
 
-    min-height: 530px;
+    min-height: 540px;
 
     border-top:
         1px solid var(--line);
 
     border-bottom:
         1px solid var(--line);
-
 }
 
-
 .skill-card {
-
     position: relative;
 
     min-width: 0;
 
     padding:
-        30px 20px;
+        28px 20px;
 
     border-right:
         1px solid var(--line);
 
     overflow: hidden;
 
-    display: flex;
-
-    flex-direction:
-        column;
-
-    justify-content:
-        space-between;
+    background:
+        rgba(0,0,0,.1);
 
     transition:
-        flex .7s var(--ease),
-        background .6s ease,
-        width .7s var(--ease);
-
+        background .4s ease,
+        flex .7s var(--ease);
 }
-
 
 .skill-card:last-child {
-
     border-right: none;
-
 }
 
-
-.skill-card:hover {
-
+.skill-card:hover,
+.skill-card.active {
     background:
         rgba(255,255,255,.035);
-
 }
-
 
 .skill-card-top {
-
     display: flex;
-
-    justify-content:
-        space-between;
+    justify-content: space-between;
 
     font-family:
-        "DM Mono",
-        monospace;
-
-    font-size: 8px;
+        "DM Mono", monospace;
 
     color: #555;
-
+    font-size: 8px;
 }
-
-
-.skill-card-number {
-
-    color: #444;
-
-}
-
 
 .skill-card-symbol {
-
-    font-size: 12px;
-
     color: #777;
-
 }
 
-
 .skill-card-main {
+    position: absolute;
+
+    left: 30px;
+    bottom: 95px;
 
     transform:
         rotate(-90deg);
@@ -1247,162 +834,95 @@ body::after {
     transform-origin:
         left top;
 
-    white-space:
-        nowrap;
+    white-space: nowrap;
 
-    position: absolute;
-
-    left: 35px;
-
-    bottom: 45px;
-
+    transition:
+        transform .7s var(--ease),
+        bottom .7s var(--ease);
 }
 
-
 .skill-card-main h3 {
-
     font-size: 27px;
-
     font-weight: 400;
 
     letter-spacing: -.05em;
-
 }
 
-
-.skill-card-bottom {
-
-    opacity: .5;
-
-    font-family:
-        "DM Mono",
-        monospace;
-
-    font-size: 7px;
-
-    line-height: 1.7;
-
-    color: #777;
-
+.skill-card.active .skill-card-main,
+.skill-card:hover .skill-card-main {
+    transform: rotate(0);
+    bottom: 125px;
 }
 
-
-/* =========================================================
-   ACTIVE SKILL
-========================================================= */
-
-.skill-card.active {
-
-    background:
-        rgba(255,255,255,.045);
-
-}
-
-
-.skill-card.active .skill-card-main {
-
-    transform:
-        rotate(0deg);
-
-    left: 30px;
-
-    bottom: 100px;
-
-    transition:
-        transform .7s var(--ease);
-
-}
-
-
-.skill-card.active .skill-card-main h3 {
-
+.skill-card.active .skill-card-main h3,
+.skill-card:hover .skill-card-main h3 {
     font-size:
-        clamp(30px,4vw,55px);
-
+        clamp(30px, 3.8vw, 52px);
 }
-
 
 .skill-detail {
-
     position: absolute;
 
     left: 30px;
-
-    right: 30px;
-
-    bottom: 32px;
+    right: 25px;
+    bottom: 40px;
 
     color: #777;
 
     font-family:
-        "DM Mono",
-        monospace;
+        "DM Mono", monospace;
 
     font-size: 8px;
-
     line-height: 1.7;
 
     opacity: 0;
 
     transform:
-        translateY(10px);
+        translateY(12px);
 
     transition:
-        opacity .5s ease,
-        transform .6s var(--ease);
-
+        opacity .4s ease,
+        transform .5s var(--ease);
 }
 
-
-.skill-card.active .skill-detail {
-
+.skill-card.active .skill-detail,
+.skill-card:hover .skill-detail {
     opacity: 1;
 
     transform:
         translateY(0);
-
 }
 
-
 .skill-meter {
-
     position: absolute;
 
     left: 30px;
-
-    right: 30px;
-
-    bottom: 16px;
+    right: 25px;
+    bottom: 17px;
 
     height: 1px;
 
     background:
         rgba(255,255,255,.08);
-
 }
 
-
 .skill-meter span {
-
     display: block;
 
     height: 100%;
 
     width: 0;
 
-    background: white;
+    background:
+        white;
 
     transition:
         width 1s var(--ease);
-
 }
 
-
-.skill-card.active .skill-meter span {
-
-    width:
-        var(--skill);
-
+.skill-card.active .skill-meter span,
+.skill-card:hover .skill-meter span {
+    width: var(--skill);
 }
 
 
@@ -1411,61 +931,47 @@ body::after {
 ========================================================= */
 
 .lab {
-
     padding:
         170px 5vw;
 
     border-bottom:
         1px solid var(--line);
-
 }
 
-
 .lab-grid {
-
     display: grid;
 
     grid-template-columns:
         1fr 1fr;
 
-    gap: 80px;
-
+    gap: 10vw;
 }
-
 
 .lab-heading {
-
     font-size:
-        clamp(55px,8vw,110px);
+        clamp(55px, 8vw, 110px);
 
     line-height: .85;
-
     letter-spacing: -.08em;
-
     font-weight: 400;
-
 }
 
-
 .lab-heading span {
-
     color: transparent;
 
     -webkit-text-stroke:
         1px rgba(255,255,255,.25);
-
 }
-
 
 .lab-list {
-
     border-top:
         1px solid var(--line);
-
 }
 
-
 .lab-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 
     padding:
         27px 0;
@@ -1473,46 +979,26 @@ body::after {
     border-bottom:
         1px solid var(--line);
 
-    display: flex;
-
-    justify-content:
-        space-between;
-
-    align-items:
-        center;
-
     transition:
         padding .5s var(--ease);
-
 }
-
 
 .lab-item:hover {
-
     padding-left: 20px;
-
 }
-
 
 .lab-item-title {
-
     font-size: 18px;
-
     font-weight: 400;
-
 }
 
-
 .lab-item-meta {
-
-    font-family:
-        "DM Mono",
-        monospace;
-
     color: #555;
 
-    font-size: 8px;
+    font-family:
+        "DM Mono", monospace;
 
+    font-size: 8px;
 }
 
 
@@ -1521,28 +1007,21 @@ body::after {
 ========================================================= */
 
 .journey {
-
     padding:
         170px 5vw;
 
     border-bottom:
         1px solid var(--line);
-
 }
 
-
 .timeline {
-
     max-width: 900px;
 
     margin:
         100px auto 0;
-
 }
 
-
 .timeline-item {
-
     display: grid;
 
     grid-template-columns:
@@ -1553,46 +1032,33 @@ body::after {
 
     border-top:
         1px solid var(--line);
-
 }
-
 
 .timeline-year {
-
-    font-family:
-        "DM Mono",
-        monospace;
-
     color: #555;
 
-    font-size: 9px;
+    font-family:
+        "DM Mono", monospace;
 
+    font-size: 9px;
 }
 
-
 .timeline-title {
-
     font-size: 26px;
-
     font-weight: 400;
 
     letter-spacing: -.03em;
-
 }
 
-
 .timeline-text {
+    max-width: 500px;
 
     margin-top: 10px;
 
     color: #666;
 
-    max-width: 500px;
-
     font-size: 12px;
-
     line-height: 1.8;
-
 }
 
 
@@ -1601,129 +1067,85 @@ body::after {
 ========================================================= */
 
 .contact {
-
-    min-height:
-        100svh;
+    min-height: 100svh;
 
     padding:
         170px 5vw
         90px;
 
     display: flex;
-
-    flex-direction:
-        column;
-
-    justify-content:
-        space-between;
+    flex-direction: column;
+    justify-content: space-between;
 
     border-bottom:
         1px solid var(--line);
-
-    overflow: hidden;
-
 }
-
 
 .contact-title {
-
     font-size:
-        clamp(80px,14vw,200px);
+        clamp(80px, 14vw, 200px);
 
     line-height: .75;
-
     letter-spacing: -.095em;
-
     font-weight: 600;
-
 }
 
-
 .contact-title span {
-
     color: transparent;
 
     -webkit-text-stroke:
         1px rgba(255,255,255,.25);
-
 }
-
 
 .contact-bottom {
-
     display: flex;
-
-    justify-content:
-        space-between;
-
-    align-items:
-        flex-end;
-
+    justify-content: space-between;
+    align-items: flex-end;
 }
 
-
 .contact-description {
-
     max-width: 300px;
 
     color: #666;
 
     font-family:
-        "DM Mono",
-        monospace;
+        "DM Mono", monospace;
 
     font-size: 9px;
-
     line-height: 1.8;
-
 }
 
-
 .contact-button {
-
-    display: inline-flex;
-
-    align-items:
-        center;
-
-    justify-content:
-        center;
-
     width: 150px;
     height: 150px;
 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
     border:
-        1px solid
-        rgba(255,255,255,.2);
+        1px solid rgba(255,255,255,.2);
 
     border-radius: 50%;
 
     font-family:
-        "DM Mono",
-        monospace;
+        "DM Mono", monospace;
 
     font-size: 9px;
-
     letter-spacing: .15em;
 
     transition:
         background .4s ease,
+        color .4s ease,
         transform .5s var(--ease);
-
 }
 
-
 .contact-button:hover {
-
-    background:
-        white;
-
-    color:
-        black;
+    background: white;
+    color: black;
 
     transform:
         scale(1.08);
-
 }
 
 
@@ -1732,52 +1154,34 @@ body::after {
 ========================================================= */
 
 footer {
-
     padding:
         32px 5vw;
 
     display: flex;
-
-    justify-content:
-        space-between;
-
-    align-items:
-        center;
+    justify-content: space-between;
+    align-items: center;
 
     color: #4b4b4b;
 
     font-family:
-        "DM Mono",
-        monospace;
+        "DM Mono", monospace;
 
     font-size: 8px;
-
     letter-spacing: .15em;
-
 }
-
 
 .socials {
-
     display: flex;
-
     gap: 25px;
-
 }
-
 
 .socials a {
-
     transition:
         color .3s ease;
-
 }
 
-
 .socials a:hover {
-
     color: white;
-
 }
 
 
@@ -1786,26 +1190,19 @@ footer {
 ========================================================= */
 
 .reveal {
-
     opacity: 0;
-
     transform:
         translateY(35px);
 
     transition:
-        opacity 1s ease,
+        opacity .9s ease,
         transform 1s var(--ease);
-
 }
 
-
 .reveal.visible {
-
     opacity: 1;
-
     transform:
         translateY(0);
-
 }
 
 
@@ -1813,340 +1210,224 @@ footer {
    MOBILE
 ========================================================= */
 
-@media(max-width:800px) {
-
-
-    body,
-    a,
-    button {
-
-        cursor: auto;
-
-    }
-
+@media(max-width: 800px) {
 
     .cursor,
     .cursor-ring {
-
         display: none;
-
     }
-
 
     .nav {
-
         height: 75px;
-
-        padding:
-            20px 22px;
-
+        padding: 20px 22px;
     }
-
-
-    .nav-status {
-
-        display: none;
-
-    }
-
 
     .nav-links {
-
         gap: 14px;
-
     }
-
 
     .nav-links a {
-
         font-size: 7px;
+    }
 
+    .nav-status {
+        display: none;
     }
 
 
+    /* HERO */
+
     .hero {
+        min-height: 100svh;
 
         padding:
             125px 22px
-            70px;
+            75px;
 
         align-items:
             flex-start;
-
     }
 
+    .mini-label {
+        font-size: 8px;
+    }
 
     .hero-title h1,
     .hero-outline {
-
-        font-size:
-            21vw;
-
+        font-size: 21vw;
     }
-
 
     .hero-info {
-
         margin-top:
             105px;
-
-        display:
-            block;
-
     }
 
+    .hero-role {
+        font-size: 8px;
+    }
 
     .hero-description {
-
-        max-width:
-            300px;
-
+        max-width: 300px;
     }
-
 
     .hero-description p {
-
-        font-size:
-            14px;
-
+        font-size: 14px;
     }
-
 
     .hero-object {
+        width: 190px;
 
-        width:
-            190px;
+        right: -35px;
 
-        right:
-            -35px;
+        top: 61%;
 
-        top:
-            61%;
-
-        opacity:
-            .6;
-
+        opacity: .55;
     }
-
 
     .scroll-marker {
-
-        display:
-            none;
-
+        display: none;
     }
 
 
-    .info-strip {
+    /* STRIP */
 
+    .info-strip {
         padding:
             18px 22px;
 
-        font-size:
-            6px;
-
+        font-size: 6px;
     }
-
 
     .info-strip span:nth-child(2) {
-
-        display:
-            none;
-
+        display: none;
     }
 
 
-    .section {
+    /* SECTIONS */
 
+    .section,
+    .skills,
+    .lab,
+    .journey {
         padding:
             110px 22px;
-
     }
 
-
     .section-label {
-
         margin-bottom:
             50px;
-
     }
 
 
     /* ABOUT */
 
     .about-grid {
-
         grid-template-columns:
             1fr;
 
-        gap:
-            55px;
-
+        gap: 55px;
     }
-
 
     .about-heading {
-
-        font-size:
-            51px;
-
+        font-size: 51px;
     }
-
 
     .about-copy {
-
-        font-size:
-            14px;
-
+        font-size: 14px;
     }
-
 
     .about-numbers {
-
-        gap:
-            35px;
-
+        gap: 30px;
     }
 
-
     .number strong {
-
-        font-size:
-            27px;
-
+        font-size: 27px;
     }
 
 
     /* WORK */
 
     .work {
-
         padding:
             110px 0;
-
     }
-
 
     .work-header {
-
         padding:
             0 22px;
-
     }
-
 
     .work-title {
-
         font-size:
             76px;
-
     }
-
 
     .projects {
-
         margin-top:
             75px;
-
     }
 
-
     .project {
-
         min-height:
-            150px;
+            145px;
 
         padding:
             28px 22px;
 
         grid-template-columns:
             42px 1fr;
-
     }
-
 
     .project:hover {
-
         padding-left:
             30px;
-
     }
-
 
     .project-name {
-
         font-size:
             29px;
-
     }
 
-
     .project-meta {
-
         grid-column:
             2;
 
         margin-top:
             8px;
-
     }
 
 
     /* SKILLS */
 
-    .skills {
-
-        padding:
-            110px 22px;
-
-    }
-
-
     .skills-intro {
-
-        display:
-            block;
+        display: block;
 
         margin-bottom:
             65px;
-
     }
-
 
     .skills-heading {
-
         font-size:
             62px;
-
     }
 
-
     .skills-copy {
+        width: 270px;
 
         margin-top:
             35px;
-
-        width:
-            270px;
-
     }
 
-
     .skill-deck {
-
-        display:
-            block;
+        display: block;
 
         min-height:
             auto;
-
     }
 
-
     .skill-card {
-
         min-height:
-            90px;
+            88px;
 
         border-right:
             none;
@@ -2156,223 +1437,136 @@ footer {
 
         padding:
             25px;
-
     }
-
 
     .skill-card:last-child {
-
         border-bottom:
             none;
-
     }
 
-
-    .skill-card-main {
-
+    .skill-card-main,
+    .skill-card.active .skill-card-main,
+    .skill-card:hover .skill-card-main {
         position:
             relative;
 
-        left:
-            auto;
+        left: auto;
+        bottom: auto;
 
-        bottom:
-            auto;
-
-        transform:
-            none;
+        transform: none;
 
         margin-top:
-            40px;
-
+            35px;
     }
 
-
-    .skill-card-main h3 {
-
+    .skill-card-main h3,
+    .skill-card.active .skill-card-main h3,
+    .skill-card:hover .skill-card-main h3 {
         font-size:
-            25px;
-
+            27px;
     }
-
 
     .skill-card.active {
-
         min-height:
-            240px;
-
+            235px;
     }
 
-
-    .skill-card.active
-    .skill-card-main {
-
-        left:
-            auto;
-
-        bottom:
-            auto;
-
-        transform:
-            none;
-
-    }
-
-
-    .skill-card.active
-    .skill-card-main h3 {
-
+    .skill-card.active .skill-card-main h3 {
         font-size:
             38px;
-
     }
 
-
     .skill-detail {
-
         position:
             relative;
 
-        left:
-            auto;
-
-        right:
-            auto;
-
-        bottom:
-            auto;
+        left: auto;
+        right: auto;
+        bottom: auto;
 
         margin-top:
-            25px;
-
+            22px;
     }
 
-
     .skill-meter {
-
-        left:
-            25px;
-
-        right:
-            25px;
-
-        bottom:
-            15px;
-
+        left: 25px;
+        right: 25px;
+        bottom: 14px;
     }
 
 
     /* LAB */
 
-    .lab {
-
-        padding:
-            110px 22px;
-
-    }
-
-
     .lab-grid {
-
         grid-template-columns:
             1fr;
 
-        gap:
-            60px;
-
+        gap: 60px;
     }
 
-
     .lab-heading {
-
         font-size:
             55px;
-
     }
 
 
     /* JOURNEY */
 
-    .journey {
-
-        padding:
-            110px 22px;
-
-    }
-
-
     .timeline {
-
         margin-top:
             60px;
-
     }
-
 
     .timeline-item {
-
         grid-template-columns:
             65px 1fr;
-
     }
 
-
     .timeline-title {
-
         font-size:
             21px;
-
     }
 
 
     /* CONTACT */
 
     .contact {
+        min-height:
+            85svh;
 
         padding:
             110px 22px
             60px;
-
     }
-
 
     .contact-title {
-
         font-size:
             22vw;
-
     }
 
-
     .contact-bottom {
+        flex-direction:
+            column;
 
         align-items:
             flex-start;
 
         gap:
-            40px;
-
-        flex-direction:
-            column;
-
+            45px;
     }
 
-
     .contact-button {
-
         width:
             110px;
 
         height:
             110px;
-
     }
 
 
     /* FOOTER */
 
     footer {
-
         padding:
             28px 22px;
 
@@ -2381,24 +1575,41 @@ footer {
 
         gap:
             20px;
-
     }
 
-
     .socials {
-
         width:
             100%;
 
         order:
             3;
+    }
 
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media(prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration:
+            .01ms !important;
+
+        transition-duration:
+            .01ms !important;
+
+        scroll-behavior:
+            auto !important;
     }
 
 }
 
 </style>
-
 </head>
 
 
@@ -2409,9 +1620,9 @@ footer {
      BACKGROUND
 ===================================================== -->
 
-<canvas id="space"></canvas>
+<canvas id="spaceCanvas"></canvas>
 
-<div class="space-glow"></div>
+<div class="background-glow"></div>
 
 
 <!-- =====================================================
@@ -2419,7 +1630,6 @@ footer {
 ===================================================== -->
 
 <div class="cursor"></div>
-
 <div class="cursor-ring"></div>
 
 
@@ -2429,38 +1639,18 @@ footer {
 
 <nav class="nav">
 
-
-    <a
-        href="#home"
-        class="brand"
-    >
-
-        NITHAN
-        <span>/01</span>
-
+    <a href="#home" class="brand">
+        NITHAN <span>/01</span>
     </a>
-
 
     <div class="nav-links">
 
-        <a href="#about">
-            ABOUT
-        </a>
-
-        <a href="#work">
-            WORK
-        </a>
-
-        <a href="#skills">
-            SKILLS
-        </a>
-
-        <a href="#contact">
-            CONTACT
-        </a>
+        <a href="#about">ABOUT</a>
+        <a href="#work">WORK</a>
+        <a href="#skills">SKILLS</a>
+        <a href="#contact">CONTACT</a>
 
     </div>
-
 
     <div class="nav-status">
 
@@ -2470,44 +1660,28 @@ footer {
 
     </div>
 
-
 </nav>
 
 
-
 <!-- =====================================================
-     HOME
+     HERO
 ===================================================== -->
 
-<section
-    class="hero"
-    id="home"
->
+<section class="hero" id="home">
 
-
-    <div
-        class="hero-content reveal"
-    >
-
+    <div class="hero-content reveal">
 
         <div class="mini-label">
-
             PORTFOLIO / 2026
-
         </div>
 
 
         <div class="hero-title">
 
-            <h1>
-                NITHAN
-            </h1>
-
+            <h1>NITHAN</h1>
 
             <div class="hero-outline">
-
                 V—01
-
             </div>
 
         </div>
@@ -2515,59 +1689,37 @@ footer {
 
         <div class="hero-info">
 
-
             <div class="hero-description">
 
-
                 <div class="hero-role">
-
-                    STUDENT /
-                    DEVELOPER /
-                    EXPLORER
-
+                    STUDENT / DEVELOPER / EXPLORER
                 </div>
 
-
                 <p>
-
                     I build
-                    <strong>
-                        digital experiences
-                    </strong>
-                    where technology,
-                    design and curiosity
+                    <strong>digital experiences</strong>
+                    where technology, design and curiosity
                     collide.
-
                 </p>
-
 
             </div>
 
-
         </div>
-
 
     </div>
 
 
+    <!-- OBJECT -->
 
-    <!-- FLOATING OBJECT -->
+    <div class="hero-object" id="heroObject">
 
-    <div
-        class="hero-object"
-        id="heroObject"
-    >
-
-        <div class="chrome"></div>
+        <div class="chrome-object"></div>
 
         <div class="object-label">
-
             OBJECT / 001
-
         </div>
 
     </div>
-
 
 
     <div class="scroll-marker">
@@ -2578,9 +1730,7 @@ footer {
 
     </div>
 
-
 </section>
-
 
 
 <!-- =====================================================
@@ -2604,30 +1754,21 @@ footer {
 </div>
 
 
-
 <!-- =====================================================
      ABOUT
 ===================================================== -->
 
-<section
-    class="section"
-    id="about"
->
-
+<section class="section" id="about">
 
     <div class="section-label reveal">
-
         01 / ABOUT
-
     </div>
 
 
     <div class="about-grid">
 
 
-        <div
-            class="about-heading reveal"
-        >
+        <div class="about-heading reveal">
 
             CURIOUS
             <br>
@@ -2639,50 +1780,37 @@ footer {
         </div>
 
 
-        <div
-            class="about-copy reveal"
-        >
+        <div class="about-copy reveal">
 
             <p>
-
-                I'm a student interested in
-                the space where
+                I'm a student interested in the space
+                where
                 <strong>
-                    technology, business
-                    and design
+                    technology, business and design
                 </strong>
                 overlap.
-
             </p>
 
 
             <p>
-
-                I like taking ideas from
-                rough thoughts to things
-                people can actually use.
-
+                I like taking ideas from rough thoughts
+                to things people can actually interact
+                with.
             </p>
 
 
             <p>
-
-                The goal isn't to know
-                everything. It's to keep
-                learning fast enough to
+                The goal isn't to know everything.
+                It's to keep learning fast enough to
                 build interesting things.
-
             </p>
 
 
             <div class="about-numbers">
 
-
                 <div class="number">
 
-                    <strong>
-                        01
-                    </strong>
+                    <strong>01</strong>
 
                     <span>
                         MINDSET
@@ -2693,9 +1821,7 @@ footer {
 
                 <div class="number">
 
-                    <strong>
-                        ∞
-                    </strong>
+                    <strong>∞</strong>
 
                     <span>
                         CURIOSITY
@@ -2706,9 +1832,7 @@ footer {
 
                 <div class="number">
 
-                    <strong>
-                        24/7
-                    </strong>
+                    <strong>24/7</strong>
 
                     <span>
                         LEARNING
@@ -2716,39 +1840,26 @@ footer {
 
                 </div>
 
-
             </div>
-
 
         </div>
 
-
     </div>
 
-
 </section>
-
 
 
 <!-- =====================================================
      WORK
 ===================================================== -->
 
-<section
-    class="work"
-    id="work"
->
-
+<section class="work" id="work">
 
     <div class="work-header">
 
-
         <div class="section-label reveal">
-
             02 / SELECTED WORK
-
         </div>
-
 
         <div class="work-title reveal">
 
@@ -2761,124 +1872,75 @@ footer {
 
         </div>
 
-
     </div>
-
 
 
     <div class="projects">
 
 
-        <a
-            href="#"
-            class="project reveal"
-        >
+        <a href="#" class="project reveal">
 
             <div class="project-index">
-
                 01
-
             </div>
 
-
             <div class="project-name">
-
                 ORBIT
-
             </div>
 
-
             <div class="project-meta">
-
                 WEB / EXPERIMENT
-
             </div>
 
         </a>
 
 
-
-        <a
-            href="#"
-            class="project reveal"
-        >
+        <a href="#" class="project reveal">
 
             <div class="project-index">
-
                 02
-
             </div>
 
-
             <div class="project-name">
-
                 DATA / V02
-
             </div>
 
-
             <div class="project-meta">
-
                 ANALYTICS
-
             </div>
 
         </a>
 
 
-
-        <a
-            href="#"
-            class="project reveal"
-        >
+        <a href="#" class="project reveal">
 
             <div class="project-index">
-
                 03
-
             </div>
-
 
             <div class="project-name">
-
                 UNKNOWN
-
             </div>
 
-
             <div class="project-meta">
-
                 EXPERIMENT
-
             </div>
 
         </a>
 
 
-
-        <a
-            href="#"
-            class="project reveal"
-        >
+        <a href="#" class="project reveal">
 
             <div class="project-index">
-
                 04
-
             </div>
-
 
             <div class="project-name">
-
                 NEXT
-
             </div>
 
-
             <div class="project-meta">
-
                 IN DEVELOPMENT
-
             </div>
 
         </a>
@@ -2886,32 +1948,21 @@ footer {
 
     </div>
 
-
 </section>
-
 
 
 <!-- =====================================================
      SKILLS
 ===================================================== -->
 
-<section
-    class="skills"
-    id="skills"
->
-
+<section class="skills" id="skills">
 
     <div class="section-label reveal">
-
         03 / CAPABILITIES
-
     </div>
 
 
-    <div
-        class="skills-intro reveal"
-    >
-
+    <div class="skills-intro reveal">
 
         <div class="skills-heading">
 
@@ -2928,24 +1979,18 @@ footer {
         <div class="skills-copy">
 
             Not a list of software icons.
-            A living toolkit that changes
-            every time I build something.
+            A growing toolkit shaped by
+            building, experimenting and
+            breaking things.
 
         </div>
-
 
     </div>
 
 
+    <!-- SKILL DECK -->
 
-    <!-- =================================================
-         SKILL DECK
-    ================================================= -->
-
-    <div
-        class="skill-deck reveal"
-        id="skillDeck"
-    >
+    <div class="skill-deck reveal">
 
 
         <!-- WEB -->
@@ -2957,7 +2002,7 @@ footer {
 
             <div class="skill-card-top">
 
-                <span class="skill-card-number">
+                <span>
                     01
                 </span>
 
@@ -2979,21 +2024,18 @@ footer {
 
             <div class="skill-detail">
 
-                Building responsive,
-                interactive interfaces
-                for the web.
+                Responsive interfaces,
+                modern layouts and
+                interactive experiences.
 
             </div>
 
 
             <div class="skill-meter">
-
                 <span></span>
-
             </div>
 
         </article>
-
 
 
         <!-- JAVASCRIPT -->
@@ -3005,7 +2047,7 @@ footer {
 
             <div class="skill-card-top">
 
-                <span class="skill-card-number">
+                <span>
                     02
                 </span>
 
@@ -3036,13 +2078,10 @@ footer {
 
 
             <div class="skill-meter">
-
                 <span></span>
-
             </div>
 
         </article>
-
 
 
         <!-- PYTHON -->
@@ -3054,7 +2093,7 @@ footer {
 
             <div class="skill-card-top">
 
-                <span class="skill-card-number">
+                <span>
                     03
                 </span>
 
@@ -3077,21 +2116,17 @@ footer {
             <div class="skill-detail">
 
                 Automation,
-                scripting,
-                data work and
-                experimentation.
+                scripting, data work
+                and experimentation.
 
             </div>
 
 
             <div class="skill-meter">
-
                 <span></span>
-
             </div>
 
         </article>
-
 
 
         <!-- DATA -->
@@ -3103,7 +2138,7 @@ footer {
 
             <div class="skill-card-top">
 
-                <span class="skill-card-number">
+                <span>
                     04
                 </span>
 
@@ -3127,23 +2162,19 @@ footer {
 
                 Finding patterns,
                 cleaning information
-                and extracting useful
-                insights.
+                and extracting insights.
 
             </div>
 
 
             <div class="skill-meter">
-
                 <span></span>
-
             </div>
 
         </article>
 
 
-
-        <!-- UI UX -->
+        <!-- UI -->
 
         <article
             class="skill-card"
@@ -3152,7 +2183,7 @@ footer {
 
             <div class="skill-card-top">
 
-                <span class="skill-card-number">
+                <span>
                     05
                 </span>
 
@@ -3176,19 +2207,16 @@ footer {
 
                 Visual hierarchy,
                 interaction design
-                and digital experiences.
+                and intentional interfaces.
 
             </div>
 
 
             <div class="skill-meter">
-
                 <span></span>
-
             </div>
 
         </article>
-
 
 
         <!-- CREATIVE -->
@@ -3200,7 +2228,7 @@ footer {
 
             <div class="skill-card-top">
 
-                <span class="skill-card-number">
+                <span>
                     06
                 </span>
 
@@ -3222,18 +2250,15 @@ footer {
 
             <div class="skill-detail">
 
-                Turning code into
-                visual systems,
-                experiments and
+                Code as a medium for
+                visual experiments and
                 unusual interfaces.
 
             </div>
 
 
             <div class="skill-meter">
-
                 <span></span>
-
             </div>
 
         </article>
@@ -3241,34 +2266,24 @@ footer {
 
     </div>
 
-
 </section>
-
 
 
 <!-- =====================================================
      LAB
 ===================================================== -->
 
-<section
-    class="lab"
-    id="lab"
->
-
+<section class="lab" id="lab">
 
     <div class="section-label reveal">
-
         04 / LAB
-
     </div>
 
 
     <div class="lab-grid">
 
 
-        <div
-            class="lab-heading reveal"
-        >
+        <div class="lab-heading reveal">
 
             CURRENTLY
             <br>
@@ -3280,9 +2295,7 @@ footer {
         </div>
 
 
-        <div
-            class="lab-list reveal"
-        >
+        <div class="lab-list reveal">
 
 
             <div class="lab-item">
@@ -3352,33 +2365,23 @@ footer {
 
         </div>
 
-
     </div>
 
-
 </section>
-
 
 
 <!-- =====================================================
      JOURNEY
 ===================================================== -->
 
-<section
-    class="journey"
->
-
+<section class="journey">
 
     <div class="section-label reveal">
-
         05 / JOURNEY
-
     </div>
 
 
-    <div
-        class="work-title reveal"
-    >
+    <div class="work-title reveal">
 
         STILL
         <br>
@@ -3393,9 +2396,7 @@ footer {
     <div class="timeline">
 
 
-        <div
-            class="timeline-item reveal"
-        >
+        <div class="timeline-item reveal">
 
             <div class="timeline-year">
                 2024
@@ -3419,10 +2420,7 @@ footer {
         </div>
 
 
-
-        <div
-            class="timeline-item reveal"
-        >
+        <div class="timeline-item reveal">
 
             <div class="timeline-year">
                 2025
@@ -3446,10 +2444,7 @@ footer {
         </div>
 
 
-
-        <div
-            class="timeline-item reveal"
-        >
+        <div class="timeline-item reveal">
 
             <div class="timeline-year">
                 2026
@@ -3464,7 +2459,7 @@ footer {
                 <div class="timeline-text">
 
                     Building more ambitious projects
-                    and developing a stronger technical
+                    and strengthening the technical
                     foundation.
 
                 </div>
@@ -3474,10 +2469,7 @@ footer {
         </div>
 
 
-
-        <div
-            class="timeline-item reveal"
-        >
+        <div class="timeline-item reveal">
 
             <div class="timeline-year">
                 NEXT
@@ -3491,8 +2483,8 @@ footer {
 
                 <div class="timeline-text">
 
-                    The interesting part is not
-                    knowing exactly where this goes.
+                    The interesting part is not knowing
+                    exactly where this goes.
 
                 </div>
 
@@ -3503,31 +2495,21 @@ footer {
 
     </div>
 
-
 </section>
-
 
 
 <!-- =====================================================
      CONTACT
 ===================================================== -->
 
-<section
-    class="contact"
-    id="contact"
->
-
+<section class="contact" id="contact">
 
     <div class="section-label reveal">
-
         06 / CONTACT
-
     </div>
 
 
-    <div
-        class="contact-title reveal"
-    >
+    <div class="contact-title reveal">
 
         LET'S
         <br>
@@ -3556,20 +2538,17 @@ footer {
 
         <a
             href="mailto:hello@nithan.in"
-            class="contact-button magnetic"
+            class="contact-button"
         >
 
-            GET IN TOUCH
-            ↗
+            GET IN TOUCH ↗
 
         </a>
 
 
     </div>
 
-
 </section>
-
 
 
 <!-- =====================================================
@@ -3578,11 +2557,8 @@ footer {
 
 <footer>
 
-
     <div>
-
         NITHAN.IN
-
     </div>
 
 
@@ -3604,1001 +2580,884 @@ footer {
 
 
     <div>
-
         V1.0 / 2026
-
     </div>
 
-
 </footer>
-
 
 
 <script>
 
 /* =========================================================
-   CURSOR
+   EVERYTHING BELOW IS PROGRESSIVE ENHANCEMENT
+   The actual website remains visible if JS fails.
 ========================================================= */
-
-const cursor =
-    document.querySelector(".cursor");
-
-const cursorRing =
-    document.querySelector(".cursor-ring");
-
-let mouseX = 0;
-let mouseY = 0;
-
-let ringX = 0;
-let ringY = 0;
-
-
-document.addEventListener(
-    "mousemove",
-    e => {
-
-        mouseX =
-            e.clientX;
-
-        mouseY =
-            e.clientY;
-
-
-        cursor.style.left =
-            mouseX + "px";
-
-        cursor.style.top =
-            mouseY + "px";
-
-
-    }
-);
-
-
-function cursorLoop() {
-
-    ringX +=
-        (mouseX - ringX) *
-        .12;
-
-    ringY +=
-        (mouseY - ringY) *
-        .12;
-
-
-    cursorRing.style.left =
-        ringX + "px";
-
-    cursorRing.style.top =
-        ringY + "px";
-
-
-    requestAnimationFrame(
-        cursorLoop
-    );
-
-}
-
-
-cursorLoop();
-
 
 
 /* =========================================================
-   CURSOR HOVER
+   CUSTOM CURSOR
 ========================================================= */
 
-document
-.querySelectorAll(
-    "a, button, .skill-card, .project"
-)
-.forEach(
-    element => {
+try {
+
+    const cursor =
+        document.querySelector(".cursor");
+
+    const ring =
+        document.querySelector(".cursor-ring");
+
+    let mouseX = 0;
+    let mouseY = 0;
+
+    let ringX = 0;
+    let ringY = 0;
 
 
-        element.addEventListener(
-            "mouseenter",
-            () => {
+    document.addEventListener(
+        "mousemove",
+        function(event) {
 
-                cursorRing.style.width =
-                    "55px";
+            mouseX =
+                event.clientX;
 
-                cursorRing.style.height =
-                    "55px";
-
-            }
-        );
+            mouseY =
+                event.clientY;
 
 
-        element.addEventListener(
-            "mouseleave",
-            () => {
+            cursor.style.left =
+                mouseX + "px";
 
-                cursorRing.style.width =
-                    "34px";
+            cursor.style.top =
+                mouseY + "px";
 
-                cursorRing.style.height =
-                    "34px";
-
-            }
-        );
-
-
-    }
-);
-
-
-
-/* =========================================================
-   HERO OBJECT PARALLAX
-========================================================= */
-
-const heroObject =
-    document.getElementById(
-        "heroObject"
+        }
     );
 
 
-document.addEventListener(
-    "mousemove",
-    e => {
+    function cursorLoop() {
+
+        ringX +=
+            (mouseX - ringX) * .12;
+
+        ringY +=
+            (mouseY - ringY) * .12;
 
 
-        if(
-            window.innerWidth <= 800
-        )
-            return;
+        ring.style.left =
+            ringX + "px";
+
+        ring.style.top =
+            ringY + "px";
 
 
-        const x =
-            (
-                e.clientX /
-                window.innerWidth -
-                .5
-            ) * 35;
-
-
-        const y =
-            (
-                e.clientY /
-                window.innerHeight -
-                .5
-            ) * 35;
-
-
-        heroObject.style.setProperty(
-            "--object-x",
-            x + "px"
+        requestAnimationFrame(
+            cursorLoop
         );
-
-
-        heroObject.style.setProperty(
-            "--object-y",
-            y + "px"
-        );
-
 
     }
-);
 
 
-
-/* =========================================================
-   MOUSE LIGHT
-========================================================= */
-
-const glow =
-    document.querySelector(
-        ".space-glow"
-    );
+    cursorLoop();
 
 
-document.addEventListener(
-    "mousemove",
-    e => {
+    document
+        .querySelectorAll("a, button, .skill-card")
+        .forEach(function(element) {
 
-        glow.style.left =
-            e.clientX + "px";
+            element.addEventListener(
+                "mouseenter",
+                function() {
 
-        glow.style.top =
-            e.clientY + "px";
+                    ring.style.width =
+                        "55px";
 
-    }
-);
-
-
-
-/* =========================================================
-   SKILL DECK
-========================================================= */
-
-const skillCards =
-    document.querySelectorAll(
-        ".skill-card"
-    );
-
-
-skillCards.forEach(
-    card => {
-
-
-        card.addEventListener(
-            "mouseenter",
-            () => {
-
-                skillCards.forEach(
-                    other => {
-
-                        other.classList.remove(
-                            "active"
-                        );
-
-                    }
-                );
-
-
-                card.classList.add(
-                    "active"
-                );
-
-            }
-        );
-
-
-        card.addEventListener(
-            "click",
-            () => {
-
-                skillCards.forEach(
-                    other => {
-
-                        other.classList.remove(
-                            "active"
-                        );
-
-                    }
-                );
-
-
-                card.classList.add(
-                    "active"
-                );
-
-            }
-        );
-
-
-    }
-);
-
-
-
-/* =========================================================
-   REVEAL ON SCROLL
-========================================================= */
-
-const revealObserver =
-    new IntersectionObserver(
-        entries => {
-
-            entries.forEach(
-                entry => {
-
-                    if(
-                        entry.isIntersecting
-                    ) {
-
-                        entry.target
-                            .classList
-                            .add(
-                                "visible"
-                            );
-
-                    }
+                    ring.style.height =
+                        "55px";
 
                 }
             );
 
-        },
-        {
-            threshold: .1
-        }
-    );
 
+            element.addEventListener(
+                "mouseleave",
+                function() {
 
-document
-.querySelectorAll(".reveal")
-.forEach(
-    element =>
-        revealObserver.observe(
-            element
-        )
-);
+                    ring.style.width =
+                        "34px";
 
+                    ring.style.height =
+                        "34px";
 
-
-/* =========================================================
-   SPACE
-========================================================= */
-
-const canvas =
-    document.getElementById(
-        "space"
-    );
-
-const ctx =
-    canvas.getContext("2d");
-
-
-let W = 0;
-let H = 0;
-
-let stars = [];
-let shootingStars = [];
-
-
-const isMobile =
-    window.innerWidth <= 800;
-
-
-const STAR_COUNT =
-    isMobile ? 130 : 280;
-
-
-
-/* =========================================================
-   RESIZE
-========================================================= */
-
-function resizeSpace() {
-
-    const ratio =
-        Math.min(
-            window.devicePixelRatio || 1,
-            2
-        );
-
-
-    W =
-        window.innerWidth;
-
-    H =
-        window.innerHeight;
-
-
-    canvas.width =
-        W * ratio;
-
-    canvas.height =
-        H * ratio;
-
-
-    canvas.style.width =
-        W + "px";
-
-    canvas.style.height =
-        H + "px";
-
-
-    ctx.setTransform(
-        ratio,
-        0,
-        0,
-        ratio,
-        0,
-        0
-    );
-
-}
-
-
-resizeSpace();
-
-
-window.addEventListener(
-    "resize",
-    resizeSpace
-);
-
-
-
-/* =========================================================
-   CREATE STARS
-========================================================= */
-
-function createStars() {
-
-    stars = [];
-
-
-    for(
-        let i = 0;
-        i < STAR_COUNT;
-        i++
-    ) {
-
-
-        stars.push({
-
-            x:
-                Math.random() * W,
-
-            y:
-                Math.random() * H,
-
-            size:
-                Math.random() < .94
-                ?
-                Math.random() * .65 + .2
-                :
-                Math.random() * 1.2 + .6,
-
-            opacity:
-                Math.random() *
-                .45 +
-                .08,
-
-            phase:
-                Math.random() *
-                Math.PI *
-                2,
-
-            speed:
-                Math.random() *
-                .015 +
-                .002
+                }
+            );
 
         });
 
+} catch(error) {
 
-    }
-
-}
-
-
-createStars();
-
-
-
-/* =========================================================
-   SHOOTING STAR
-========================================================= */
-
-function spawnShootingStar() {
-
-
-    const side =
-        Math.random() > .5;
-
-
-    const star = {
-
-        x:
-            side
-            ?
-            Math.random() *
-            W *
-            .65
-            :
-            W *
-            .35 +
-            Math.random() *
-            W *
-            .65,
-
-        y:
-            Math.random() *
-            H *
-            .55,
-
-        angle:
-            side
-            ?
-            Math.PI *
-            (.12 + Math.random()*.09)
-            :
-            Math.PI *
-            (.82 + Math.random()*.09),
-
-        speed:
-            Math.random() *
-            5 +
-            8,
-
-        length:
-            Math.random() *
-            90 +
-            70,
-
-        life:
-            0,
-
-        maxLife:
-            Math.random() *
-            30 +
-            35,
-
-        opacity:
-            Math.random() *
-            .35 +
-            .35
-
-    };
-
-
-    shootingStars.push(
-        star
+    console.warn(
+        "Cursor enhancement disabled."
     );
 
 }
 
 
 /* =========================================================
-   RANDOM SHOOTING STARS
+   HERO PARALLAX
 ========================================================= */
 
-function scheduleMeteor() {
+try {
+
+    const object =
+        document.getElementById(
+            "heroObject"
+        );
 
 
-    const delay =
-        Math.random() *
-        2200 +
-        1000;
+    const glow =
+        document.querySelector(
+            ".background-glow"
+        );
 
 
-    setTimeout(
-        () => {
-
+    document.addEventListener(
+        "mousemove",
+        function(event) {
 
             if(
-                shootingStars.length < 2
+                window.innerWidth <= 800
             ) {
-
-                spawnShootingStar();
-
+                return;
             }
 
 
-            scheduleMeteor();
+            const x =
+                (
+                    event.clientX /
+                    window.innerWidth -
+                    .5
+                ) * 30;
 
 
-        },
-        delay
-    );
-
-}
-
-
-scheduleMeteor();
+            const y =
+                (
+                    event.clientY /
+                    window.innerHeight -
+                    .5
+                ) * 30;
 
 
-
-/* =========================================================
-   DRAW SPACE
-========================================================= */
-
-function drawSpace() {
-
-
-    ctx.clearRect(
-        0,
-        0,
-        W,
-        H
-    );
-
-
-    /* -------------------------------------
-       STARS
-    ------------------------------------- */
-
-    stars.forEach(
-        star => {
-
-
-            star.phase +=
-                star.speed;
-
-
-            const pulse =
-                Math.sin(
-                    star.phase
-                );
-
-
-            const opacity =
-                Math.max(
-                    .04,
-                    star.opacity +
-                    pulse * .10
-                );
-
-
-            ctx.beginPath();
-
-
-            ctx.arc(
-                star.x,
-                star.y,
-                star.size,
-                0,
-                Math.PI * 2
+            object.style.setProperty(
+                "--object-x",
+                x + "px"
             );
 
 
-            ctx.fillStyle =
-                `rgba(
-                    255,
-                    255,
-                    255,
-                    ${opacity}
-                )`;
+            object.style.setProperty(
+                "--object-y",
+                y + "px"
+            );
 
 
-            ctx.fill();
+            glow.style.left =
+                event.clientX + "px";
 
+
+            glow.style.top =
+                event.clientY + "px";
 
         }
     );
 
+} catch(error) {
+
+    console.warn(
+        "Parallax disabled."
+    );
+
+}
 
 
-    /* -------------------------------------
-       SHOOTING STARS
-    ------------------------------------- */
+/* =========================================================
+   SKILL CARDS
+========================================================= */
 
-    shootingStars.forEach(
-        (meteor,index) => {
+try {
 
-
-            meteor.life++;
-
-
-            meteor.x +=
-                Math.cos(
-                    meteor.angle
-                ) *
-                meteor.speed;
+    const cards =
+        document.querySelectorAll(
+            ".skill-card"
+        );
 
 
-            meteor.y +=
-                Math.sin(
-                    meteor.angle
-                ) *
-                meteor.speed;
+    cards.forEach(
+        function(card) {
+
+            card.addEventListener(
+                "click",
+                function() {
+
+                    cards.forEach(
+                        function(other) {
+
+                            if(
+                                other !== card
+                            ) {
+
+                                other.classList.remove(
+                                    "active"
+                                );
+
+                            }
+
+                        }
+                    );
 
 
-            const progress =
-                meteor.life /
-                meteor.maxLife;
+                    card.classList.toggle(
+                        "active"
+                    );
+
+                }
+            );
+
+        }
+    );
+
+} catch(error) {
+
+    console.warn(
+        "Skill interaction disabled."
+    );
+
+}
 
 
-            let fade = 1;
+/* =========================================================
+   SCROLL REVEAL
+========================================================= */
+
+try {
+
+    const revealElements =
+        document.querySelectorAll(
+            ".reveal"
+        );
 
 
-            if(progress < .15) {
+    if(
+        "IntersectionObserver"
+        in window
+    ) {
 
-                fade =
-                    progress / .15;
+
+        const observer =
+            new IntersectionObserver(
+                function(entries) {
+
+                    entries.forEach(
+                        function(entry) {
+
+                            if(
+                                entry.isIntersecting
+                            ) {
+
+                                entry.target
+                                    .classList
+                                    .add(
+                                        "visible"
+                                    );
+
+                            }
+
+                        }
+                    );
+
+                },
+                {
+                    threshold: .08
+                }
+            );
+
+
+        revealElements.forEach(
+            function(element) {
+
+                observer.observe(
+                    element
+                );
 
             }
+        );
 
 
-            if(progress > .7) {
+    } else {
 
-                fade =
-                    (1 - progress) / .3;
+        revealElements.forEach(
+            function(element) {
+
+                element.classList.add(
+                    "visible"
+                );
 
             }
+        );
+
+    }
+
+} catch(error) {
+
+    document
+        .querySelectorAll(".reveal")
+        .forEach(
+            function(element) {
+
+                element.classList.add(
+                    "visible"
+                );
+
+            }
+        );
+
+}
 
 
-            const alpha =
-                meteor.opacity *
-                fade;
+/* =========================================================
+   SPACE ENGINE
+========================================================= */
+
+try {
+
+    const canvas =
+        document.getElementById(
+            "spaceCanvas"
+        );
+
+    const ctx =
+        canvas.getContext("2d");
 
 
-            const tailX =
-                meteor.x -
-                Math.cos(
-                    meteor.angle
-                ) *
-                meteor.length;
+    let width = 0;
+    let height = 0;
 
 
-            const tailY =
-                meteor.y -
-                Math.sin(
-                    meteor.angle
-                ) *
-                meteor.length;
+    let stars = [];
+    let meteors = [];
 
 
-            const gradient =
-                ctx.createLinearGradient(
+    const mobile =
+        window.innerWidth <= 800;
+
+
+    const starCount =
+        mobile ? 130 : 300;
+
+
+    /* ---------------------------------------------
+       RESIZE
+    --------------------------------------------- */
+
+    function resizeCanvas() {
+
+        const ratio =
+            Math.min(
+                window.devicePixelRatio || 1,
+                2
+            );
+
+
+        width =
+            window.innerWidth;
+
+        height =
+            window.innerHeight;
+
+
+        canvas.width =
+            width * ratio;
+
+        canvas.height =
+            height * ratio;
+
+
+        canvas.style.width =
+            width + "px";
+
+        canvas.style.height =
+            height + "px";
+
+
+        ctx.setTransform(
+            ratio,
+            0,
+            0,
+            ratio,
+            0,
+            0
+        );
+
+    }
+
+
+    resizeCanvas();
+
+
+    window.addEventListener(
+        "resize",
+        resizeCanvas
+    );
+
+
+    /* ---------------------------------------------
+       STARS
+    --------------------------------------------- */
+
+    function makeStars() {
+
+        stars = [];
+
+
+        for(
+            let i = 0;
+            i < starCount;
+            i++
+        ) {
+
+            stars.push({
+
+                x:
+                    Math.random() *
+                    width,
+
+                y:
+                    Math.random() *
+                    height,
+
+                radius:
+                    Math.random() < .94
+                    ?
+                    Math.random() * .65 + .15
+                    :
+                    Math.random() * 1.2 + .5,
+
+                alpha:
+                    Math.random() *
+                    .45 +
+                    .08,
+
+                phase:
+                    Math.random() *
+                    Math.PI *
+                    2,
+
+                speed:
+                    Math.random() *
+                    .018 +
+                    .003
+
+            });
+
+        }
+
+    }
+
+
+    makeStars();
+
+
+    /* ---------------------------------------------
+       SHOOTING STAR
+    --------------------------------------------- */
+
+    function createMeteor() {
+
+        const fromLeft =
+            Math.random() > .5;
+
+
+        const meteor = {
+
+            x:
+                fromLeft
+                ?
+                Math.random() *
+                width *
+                .65
+                :
+                width *
+                .35 +
+                Math.random() *
+                width *
+                .65,
+
+            y:
+                Math.random() *
+                height *
+                .55,
+
+            angle:
+                fromLeft
+                ?
+                Math.PI *
+                (.12 + Math.random()*.09)
+                :
+                Math.PI *
+                (.82 + Math.random()*.09),
+
+            speed:
+                Math.random() * 5 + 8,
+
+            length:
+                Math.random() * 100 + 70,
+
+            life: 0,
+
+            maxLife:
+                Math.random() * 30 + 35,
+
+            alpha:
+                Math.random() * .35 + .35
+
+        };
+
+
+        meteors.push(
+            meteor
+        );
+
+    }
+
+
+    /* ---------------------------------------------
+       METEOR TIMER
+    --------------------------------------------- */
+
+    function meteorTimer() {
+
+        const delay =
+            Math.random() *
+            2500 +
+            1000;
+
+
+        setTimeout(
+            function() {
+
+                if(
+                    meteors.length < 2
+                ) {
+
+                    createMeteor();
+
+                }
+
+
+                meteorTimer();
+
+            },
+            delay
+        );
+
+    }
+
+
+    meteorTimer();
+
+
+    /* ---------------------------------------------
+       DRAW
+    --------------------------------------------- */
+
+    function draw() {
+
+        ctx.clearRect(
+            0,
+            0,
+            width,
+            height
+        );
+
+
+        /* STARS */
+
+        stars.forEach(
+            function(star) {
+
+                star.phase +=
+                    star.speed;
+
+
+                const pulse =
+                    Math.sin(
+                        star.phase
+                    );
+
+
+                const alpha =
+                    Math.max(
+                        .025,
+                        star.alpha +
+                        pulse * .09
+                    );
+
+
+                ctx.beginPath();
+
+
+                ctx.arc(
+                    star.x,
+                    star.y,
+                    star.radius,
+                    0,
+                    Math.PI * 2
+                );
+
+
+                ctx.fillStyle =
+                    "rgba(255,255,255," +
+                    alpha +
+                    ")";
+
+
+                ctx.fill();
+
+            }
+        );
+
+
+        /* METEORS */
+
+        meteors.forEach(
+            function(meteor, index) {
+
+                meteor.life++;
+
+
+                meteor.x +=
+                    Math.cos(
+                        meteor.angle
+                    ) *
+                    meteor.speed;
+
+
+                meteor.y +=
+                    Math.sin(
+                        meteor.angle
+                    ) *
+                    meteor.speed;
+
+
+                const progress =
+                    meteor.life /
+                    meteor.maxLife;
+
+
+                let fade = 1;
+
+
+                if(
+                    progress < .15
+                ) {
+
+                    fade =
+                        progress / .15;
+
+                }
+
+
+                if(
+                    progress > .7
+                ) {
+
+                    fade =
+                        (1 - progress) / .3;
+
+                }
+
+
+                const alpha =
+                    meteor.alpha *
+                    fade;
+
+
+                const tailX =
+                    meteor.x -
+                    Math.cos(
+                        meteor.angle
+                    ) *
+                    meteor.length;
+
+
+                const tailY =
+                    meteor.y -
+                    Math.sin(
+                        meteor.angle
+                    ) *
+                    meteor.length;
+
+
+                const gradient =
+                    ctx.createLinearGradient(
+                        tailX,
+                        tailY,
+                        meteor.x,
+                        meteor.y
+                    );
+
+
+                gradient.addColorStop(
+                    0,
+                    "rgba(255,255,255,0)"
+                );
+
+
+                gradient.addColorStop(
+                    .65,
+                    "rgba(255,255,255," +
+                    alpha * .25 +
+                    ")"
+                );
+
+
+                gradient.addColorStop(
+                    1,
+                    "rgba(255,255,255," +
+                    alpha +
+                    ")"
+                );
+
+
+                ctx.beginPath();
+
+
+                ctx.moveTo(
                     tailX,
-                    tailY,
+                    tailY
+                );
+
+
+                ctx.lineTo(
                     meteor.x,
                     meteor.y
                 );
 
 
-            gradient.addColorStop(
-                0,
-                "rgba(255,255,255,0)"
-            );
+                ctx.strokeStyle =
+                    gradient;
 
 
-            gradient.addColorStop(
-                .7,
-                `rgba(
-                    255,
-                    255,
-                    255,
-                    ${alpha*.3}
-                )`
-            );
+                ctx.lineWidth =
+                    .8;
 
 
-            gradient.addColorStop(
-                1,
-                `rgba(
-                    255,
-                    255,
-                    255,
-                    ${alpha}
-                )`
-            );
+                ctx.stroke();
 
 
-            ctx.beginPath();
+                /* bright head */
+
+                ctx.beginPath();
 
 
-            ctx.moveTo(
-                tailX,
-                tailY
-            );
-
-
-            ctx.lineTo(
-                meteor.x,
-                meteor.y
-            );
-
-
-            ctx.strokeStyle =
-                gradient;
-
-
-            ctx.lineWidth = .8;
-
-
-            ctx.stroke();
-
-
-            /* HEAD */
-
-            ctx.beginPath();
-
-
-            ctx.arc(
-                meteor.x,
-                meteor.y,
-                1.25,
-                0,
-                Math.PI * 2
-            );
-
-
-            ctx.fillStyle =
-                `rgba(
-                    255,
-                    255,
-                    255,
-                    ${alpha}
-                )`;
-
-
-            ctx.shadowBlur = 15;
-
-            ctx.shadowColor =
-                "white";
-
-
-            ctx.fill();
-
-
-            ctx.shadowBlur = 0;
-
-
-            if(
-                meteor.life >
-                meteor.maxLife
-            ) {
-
-                shootingStars.splice(
-                    index,
-                    1
+                ctx.arc(
+                    meteor.x,
+                    meteor.y,
+                    1.25,
+                    0,
+                    Math.PI * 2
                 );
 
+
+                ctx.fillStyle =
+                    "rgba(255,255,255," +
+                    alpha +
+                    ")";
+
+
+                ctx.shadowBlur =
+                    14;
+
+                ctx.shadowColor =
+                    "white";
+
+
+                ctx.fill();
+
+
+                ctx.shadowBlur =
+                    0;
+
+
+                if(
+                    meteor.life >
+                    meteor.maxLife ||
+                    meteor.x < -200 ||
+                    meteor.x > width + 200 ||
+                    meteor.y < -200 ||
+                    meteor.y > height + 200
+                ) {
+
+                    meteors.splice(
+                        index,
+                        1
+                    );
+
+                }
+
             }
+        );
 
 
-        }
-    );
+        requestAnimationFrame(
+            draw
+        );
+
+    }
 
 
-    requestAnimationFrame(
-        drawSpace
+    draw();
+
+} catch(error) {
+
+    console.warn(
+        "Space animation disabled.",
+        error
     );
 
 }
 
 
-drawSpace();
-
-
-
 /* =========================================================
-   MAGNETIC BUTTON
-========================================================= */
-
-const magneticElements =
-    document.querySelectorAll(
-        ".magnetic"
-    );
-
-
-magneticElements.forEach(
-    element => {
-
-
-        element.addEventListener(
-            "mousemove",
-            e => {
-
-
-                if(
-                    window.innerWidth <= 800
-                )
-                    return;
-
-
-                const rect =
-                    element.getBoundingClientRect();
-
-
-                const x =
-                    e.clientX -
-                    rect.left -
-                    rect.width / 2;
-
-
-                const y =
-                    e.clientY -
-                    rect.top -
-                    rect.height / 2;
-
-
-                element.style.transform =
-                    `translate(
-                        ${x * .15}px,
-                        ${y * .15}px
-                    )`;
-
-            }
-        );
-
-
-        element.addEventListener(
-            "mouseleave",
-            () => {
-
-                element.style.transform =
-                    "";
-
-            }
-        );
-
-
-    }
-);
-
-
-
-/* =========================================================
-   ACTIVE NAV
-========================================================= */
-
-const sections =
-    document.querySelectorAll(
-        "section[id]"
-    );
-
-const navLinks =
-    document.querySelectorAll(
-        ".nav-links a"
-    );
-
-
-const navObserver =
-    new IntersectionObserver(
-        entries => {
-
-
-            entries.forEach(
-                entry => {
-
-
-                    if(
-                        entry.isIntersecting
-                    ) {
-
-
-                        navLinks.forEach(
-                            link => {
-
-                                link.style.color =
-                                    "#666";
-
-                            }
-                        );
-
-
-                        const active =
-                            document.querySelector(
-                                `.nav-links a[href="#${entry.target.id}"]`
-                            );
-
-
-                        if(active) {
-
-                            active.style.color =
-                                "white";
-
-                        }
-
-
-                    }
-
-
-                }
-            );
-
-
-        },
-        {
-            threshold: .45
-        }
-    );
-
-
-sections.forEach(
-    section =>
-        navObserver.observe(
-            section
-        );
-
-
-
-/* =========================================================
-   INITIAL LOAD
+   INITIAL STATE
 ========================================================= */
 
 window.addEventListener(
     "load",
-    () => {
+    function() {
 
-        document
-            .querySelector(".hero-content")
-            .classList
-            .add("visible");
+        /*
+         * If the browser doesn't trigger
+         * IntersectionObserver properly,
+         * make the hero visible.
+         */
+
+        const hero =
+            document.querySelector(
+                ".hero-content"
+            );
+
+
+        if(hero) {
+
+            hero.classList.add(
+                "visible"
+            );
+
+        }
 
     }
 );
 
-
 </script>
 
 </body>
-
 </html>
