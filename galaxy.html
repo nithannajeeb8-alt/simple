@@ -3,72 +3,53 @@
 
 <head>
 
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-    >
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+>
 
-    <meta
-        name="theme-color"
-        content="#080808"
-    >
+<meta name="theme-color" content="#050505">
 
-    <title>Nithan — Portfolio</title>
+<title>Nithan — Creative Developer</title>
 
-    <!-- Fonts -->
-    <link
-        rel="preconnect"
-        href="https://fonts.googleapis.com"
-    >
+<link rel="preconnect" href="https://fonts.googleapis.com">
 
-    <link
-        rel="preconnect"
-        href="https://fonts.gstatic.com"
-        crossorigin
-    >
+<link rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin>
 
-    <link
-        href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet"
-    >
+<link
+href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600;700;800&display=swap"
+rel="stylesheet">
 
 
 <style>
 
 /* =========================================================
-   ROOT
+   CORE
 ========================================================= */
 
 :root {
 
-    --bg: #080808;
-    --bg2: #0d0d0d;
-
-    --white: #f4f4f2;
-
+    --bg: #050505;
+    --white: #f5f5f3;
     --muted: #777;
-    --dim: #4c4c4c;
+    --dim: #414141;
 
-    --line: rgba(255,255,255,.11);
-    --soft-line: rgba(255,255,255,.06);
+    --line: rgba(255,255,255,.10);
+    --line-soft: rgba(255,255,255,.055);
 
-    --ease:
-        cubic-bezier(.16,1,.3,1);
+    --ease: cubic-bezier(.16,1,.3,1);
 
 }
 
-
-/* =========================================================
-   RESET
-========================================================= */
 
 * {
 
     margin: 0;
     padding: 0;
-
     box-sizing: border-box;
 
 }
@@ -120,7 +101,79 @@ button {
 
 
 /* =========================================================
-   CUSTOM CURSOR
+   SPACE BACKGROUND
+========================================================= */
+
+#space {
+
+    position: fixed;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    z-index: -20;
+
+    pointer-events: none;
+
+}
+
+
+.space-glow {
+
+    position: fixed;
+
+    width: 550px;
+    height: 550px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(255,255,255,.035),
+            transparent 70%
+        );
+
+    transform:
+        translate(-50%,-50%);
+
+    pointer-events: none;
+
+    z-index: -10;
+
+}
+
+
+/* =========================================================
+   GRAIN
+========================================================= */
+
+body::after {
+
+    content: "";
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 9990;
+
+    pointer-events: none;
+
+    opacity: .025;
+
+    background-image:
+        url(
+        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"
+        );
+
+}
+
+
+/* =========================================================
+   CURSOR
 ========================================================= */
 
 .cursor {
@@ -139,7 +192,7 @@ button {
     z-index: 10000;
 
     transform:
-        translate(-50%, -50%);
+        translate(-50%,-50%);
 
     mix-blend-mode: difference;
 
@@ -155,7 +208,7 @@ button {
 
     border:
         1px solid
-        rgba(255,255,255,.45);
+        rgba(255,255,255,.4);
 
     border-radius: 50%;
 
@@ -164,59 +217,12 @@ button {
     z-index: 9999;
 
     transform:
-        translate(-50%, -50%);
+        translate(-50%,-50%);
 
     transition:
-        width .35s var(--ease),
-        height .35s var(--ease),
-        border-color .35s ease;
-
-}
-
-
-/* =========================================================
-   GRAIN
-========================================================= */
-
-body::after {
-
-    content: "";
-
-    position: fixed;
-
-    inset: 0;
-
-    pointer-events: none;
-
-    z-index: 9997;
-
-    opacity: .025;
-
-    background-image:
-
-        url(
-        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E"
-        );
-
-}
-
-
-/* =========================================================
-   SPACE CANVAS
-========================================================= */
-
-#spaceCanvas {
-
-    position: fixed;
-
-    inset: 0;
-
-    width: 100%;
-    height: 100%;
-
-    pointer-events: none;
-
-    z-index: -10;
+        width .4s var(--ease),
+        height .4s var(--ease),
+        background .3s;
 
 }
 
@@ -225,7 +231,7 @@ body::after {
    NAVIGATION
 ========================================================= */
 
-nav {
+.nav {
 
     position: fixed;
 
@@ -241,16 +247,18 @@ nav {
 
     display: flex;
 
-    align-items: center;
+    justify-content:
+        space-between;
 
-    justify-content: space-between;
+    align-items:
+        center;
 
-    z-index: 100;
+    z-index: 500;
 
 }
 
 
-.logo {
+.brand {
 
     font-family:
         "DM Mono",
@@ -263,23 +271,23 @@ nav {
 }
 
 
-.logo span {
+.brand span {
 
     color: #555;
 
 }
 
 
-.nav {
+.nav-links {
 
     display: flex;
 
-    gap: 32px;
+    gap: 30px;
 
 }
 
 
-.nav a {
+.nav-links a {
 
     font-family:
         "DM Mono",
@@ -289,7 +297,7 @@ nav {
 
     letter-spacing: .18em;
 
-    color: #777;
+    color: #666;
 
     transition:
         color .3s ease;
@@ -297,9 +305,44 @@ nav {
 }
 
 
-.nav a:hover {
+.nav-links a:hover {
 
     color: white;
+
+}
+
+
+.nav-status {
+
+    display: flex;
+
+    align-items:
+        center;
+
+    gap: 9px;
+
+    font-family:
+        "DM Mono",
+        monospace;
+
+    font-size: 8px;
+
+    color: #555;
+
+}
+
+
+.status-dot {
+
+    width: 5px;
+    height: 5px;
+
+    border-radius: 50%;
+
+    background: white;
+
+    box-shadow:
+        0 0 12px white;
 
 }
 
@@ -310,56 +353,52 @@ nav {
 
 .hero {
 
+    min-height: 100svh;
+
     position: relative;
-
-    min-height: 100vh;
-
-    padding:
-        155px 5vw
-        90px;
 
     display: flex;
 
     align-items: center;
+
+    padding:
+        140px 5vw
+        90px;
 
     overflow: hidden;
 
 }
 
 
-.hero-inner {
-
-    width: 100%;
+.hero-content {
 
     position: relative;
 
-    z-index: 5;
+    z-index: 10;
+
+    width: 100%;
 
 }
 
 
-.kicker {
+.mini-label {
 
     font-family:
         "DM Mono",
         monospace;
 
-    font-size: 10px;
+    color: #555;
 
-    letter-spacing: .38em;
+    font-size: 9px;
 
-    color: #666;
-
-    margin-bottom: 35px;
+    letter-spacing: .3em;
 
 }
 
 
-/* =========================================================
-   HERO TITLE
-========================================================= */
-
 .hero-title {
+
+    margin-top: 32px;
 
     position: relative;
 
@@ -371,18 +410,18 @@ nav {
 .hero-title h1 {
 
     font-size:
-        clamp(80px, 15vw, 220px);
+        clamp(85px, 15vw, 220px);
 
-    line-height: .77;
+    line-height: .75;
+
+    letter-spacing: -.095em;
 
     font-weight: 700;
-
-    letter-spacing: -.09em;
 
 }
 
 
-.hero-title .ghost {
+.hero-outline {
 
     position: absolute;
 
@@ -391,71 +430,75 @@ nav {
     top: 74%;
 
     font-size:
-        clamp(80px, 15vw, 220px);
+        clamp(85px, 15vw, 220px);
 
-    line-height: .77;
+    line-height: .75;
+
+    letter-spacing: -.095em;
 
     font-weight: 700;
-
-    letter-spacing: -.09em;
 
     color: transparent;
 
     -webkit-text-stroke:
-        1px rgba(255,255,255,.24);
+        1px rgba(255,255,255,.22);
 
     z-index: -1;
 
 }
 
 
-/* =========================================================
-   HERO INTRO
-========================================================= */
-
-.hero-bottom {
+.hero-info {
 
     margin-top: 145px;
 
+    display: flex;
+
+    justify-content:
+        space-between;
+
+    align-items:
+        flex-end;
+
 }
 
 
-.intro {
+.hero-description {
 
-    max-width: 450px;
+    max-width: 430px;
 
 }
 
 
-.role {
+.hero-role {
 
     font-family:
         "DM Mono",
         monospace;
 
-    font-size: 10px;
-
-    letter-spacing: .26em;
-
     color: #666;
+
+    font-size: 9px;
+
+    letter-spacing: .22em;
 
     margin-bottom: 22px;
 
 }
 
 
-.intro p {
-
-    font-size: 18px;
-
-    line-height: 1.65;
+.hero-description p {
 
     color: #858585;
+
+    font-size: 17px;
+
+    line-height: 1.7;
 
 }
 
 
-.intro strong {
+.hero-description strong {
 
     color: white;
 
@@ -465,10 +508,10 @@ nav {
 
 
 /* =========================================================
-   HERO ORB
+   HERO OBJECT
 ========================================================= */
 
-.visual {
+.hero-object {
 
     position: absolute;
 
@@ -477,28 +520,24 @@ nav {
     top: 50%;
 
     width:
-        min(34vw, 430px);
+        min(31vw,420px);
 
     aspect-ratio: 1;
 
     transform:
         translateY(-50%)
         translate(
-            var(--mouse-x, 0px),
-            var(--mouse-y, 0px)
+            var(--object-x,0px),
+            var(--object-y,0px)
         );
 
     transition:
-        transform .7s var(--ease);
-
-    z-index: 2;
+        transform .8s var(--ease);
 
 }
 
 
-.orb {
-
-    position: relative;
+.chrome {
 
     width: 100%;
     height: 100%;
@@ -508,33 +547,32 @@ nav {
     background:
 
         radial-gradient(
-            circle at 29% 24%,
-            #ffffff 0%,
-            #bdbdbd 3%,
-            #575757 8%,
-            #222 20%,
-            #0c0c0c 52%,
-            #010101 75%
+            circle at 30% 24%,
+            #fff 0%,
+            #aaa 4%,
+            #505050 10%,
+            #181818 28%,
+            #080808 57%,
+            #000 76%
         );
 
     box-shadow:
 
-        -25px -20px 80px
-        rgba(255,255,255,.07),
+        inset -45px -55px 100px #000,
 
-        inset -55px -50px 110px
-        rgba(0,0,0,.95),
+        inset 25px 20px 50px
+        rgba(255,255,255,.15),
 
-        inset 25px 20px 55px
-        rgba(255,255,255,.13);
+        -20px -20px 80px
+        rgba(255,255,255,.07);
 
     animation:
-        orbFloat 7s ease-in-out infinite;
+        floatObject 8s ease-in-out infinite;
 
 }
 
 
-.orb::before {
+.chrome::before {
 
     content: "";
 
@@ -546,28 +584,22 @@ nav {
 
     border:
         1px solid
-        rgba(255,255,255,.22);
-
-    box-shadow:
-        0 0 60px
-        rgba(255,255,255,.04);
+        rgba(255,255,255,.25);
 
 }
 
 
-.orb::after {
+.chrome::after {
 
     content: "";
 
     position: absolute;
 
-    width: 135%;
+    width: 140%;
+    height: 16%;
 
-    height: 18%;
-
-    left: -17%;
-
-    top: 42%;
+    left: -20%;
+    top: 43%;
 
     border-radius: 50%;
 
@@ -575,19 +607,13 @@ nav {
         1px solid
         rgba(255,255,255,.55);
 
-    border-bottom:
-        1px solid
-        rgba(255,255,255,.04);
-
     transform:
-        rotate(-18deg);
-
-    filter: blur(.25px);
+        rotate(-19deg);
 
 }
 
 
-@keyframes orbFloat {
+@keyframes floatObject {
 
     0%,
     100% {
@@ -607,7 +633,7 @@ nav {
 }
 
 
-.orb-label {
+.object-label {
 
     position: absolute;
 
@@ -619,49 +645,50 @@ nav {
         "DM Mono",
         monospace;
 
+    color: #444;
+
     font-size: 8px;
 
-    letter-spacing: .2em;
-
-    color: #444;
+    letter-spacing: .18em;
 
 }
 
 
 /* =========================================================
-   SCROLL
+   SCROLL MARKER
 ========================================================= */
 
-.scroll {
+.scroll-marker {
 
     position: absolute;
 
-    left: 5vw;
-
     bottom: 35px;
+
+    left: 5vw;
 
     display: flex;
 
-    align-items: center;
+    align-items:
+        center;
 
-    gap: 15px;
+    gap: 14px;
 
     font-family:
         "DM Mono",
         monospace;
 
+    color: #555;
+
     font-size: 8px;
 
     letter-spacing: .2em;
 
-    color: #555;
-
 }
 
 
-.scroll-line {
+.scroll-marker span {
 
-    width: 50px;
+    width: 45px;
 
     height: 1px;
 
@@ -671,10 +698,10 @@ nav {
 
 
 /* =========================================================
-   INFO BAR
+   INFO STRIP
 ========================================================= */
 
-.intro-bar {
+.info-strip {
 
     border-top:
         1px solid var(--line);
@@ -682,23 +709,23 @@ nav {
     border-bottom:
         1px solid var(--line);
 
-    padding:
-        22px 5vw;
-
     display: flex;
 
     justify-content:
         space-between;
 
+    padding:
+        21px 5vw;
+
     font-family:
         "DM Mono",
         monospace;
 
+    color: #555;
+
     font-size: 8px;
 
-    letter-spacing: .18em;
-
-    color: #555;
+    letter-spacing: .15em;
 
 }
 
@@ -710,7 +737,7 @@ nav {
 .section {
 
     padding:
-        165px 5vw;
+        170px 5vw;
 
     border-bottom:
         1px solid var(--line);
@@ -726,11 +753,11 @@ nav {
 
     font-size: 9px;
 
-    letter-spacing: .28em;
+    letter-spacing: .25em;
 
-    color: #505050;
+    color: #4c4c4c;
 
-    margin-bottom: 75px;
+    margin-bottom: 80px;
 
 }
 
@@ -744,19 +771,19 @@ nav {
     display: grid;
 
     grid-template-columns:
-        1.2fr .8fr;
+        1.15fr .85fr;
 
     gap: 10vw;
 
 }
 
 
-.about-title {
+.about-heading {
 
     font-size:
         clamp(55px, 7vw, 105px);
 
-    line-height: .9;
+    line-height: .88;
 
     letter-spacing: -.07em;
 
@@ -765,15 +792,25 @@ nav {
 }
 
 
+.about-heading span {
+
+    color: transparent;
+
+    -webkit-text-stroke:
+        1px rgba(255,255,255,.28);
+
+}
+
+
 .about-copy {
 
-    max-width: 480px;
+    max-width: 500px;
 
     color: #777;
 
     font-size: 15px;
 
-    line-height: 1.95;
+    line-height: 2;
 
 }
 
@@ -794,14 +831,57 @@ nav {
 }
 
 
+.about-numbers {
+
+    display: flex;
+
+    gap: 60px;
+
+    margin-top: 60px;
+
+}
+
+
+.number strong {
+
+    display: block;
+
+    font-size: 35px;
+
+    font-weight: 400;
+
+    letter-spacing: -.05em;
+
+}
+
+
+.number span {
+
+    display: block;
+
+    margin-top: 8px;
+
+    font-family:
+        "DM Mono",
+        monospace;
+
+    font-size: 7px;
+
+    color: #555;
+
+    letter-spacing: .15em;
+
+}
+
+
 /* =========================================================
-   PROJECTS
+   WORK
 ========================================================= */
 
 .work {
 
     padding:
-        165px 5vw;
+        170px 0;
 
     border-bottom:
         1px solid var(--line);
@@ -809,18 +889,44 @@ nav {
 }
 
 
+.work-header {
+
+    padding:
+        0 5vw;
+
+}
+
+
 .work-title {
 
     font-size:
-        clamp(70px, 12vw, 170px);
+        clamp(75px, 13vw, 180px);
 
-    line-height: .78;
+    line-height: .75;
 
-    letter-spacing: -.09em;
+    letter-spacing: -.095em;
 
-    font-weight: 500;
+    font-weight: 600;
 
-    margin-bottom: 120px;
+}
+
+
+.work-title span {
+
+    color: transparent;
+
+    -webkit-text-stroke:
+        1px rgba(255,255,255,.25);
+
+}
+
+
+.projects {
+
+    margin-top: 120px;
+
+    border-top:
+        1px solid var(--line);
 
 }
 
@@ -829,30 +935,26 @@ nav {
 
     position: relative;
 
+    min-height: 190px;
+
+    padding:
+        35px 5vw;
+
     display: grid;
 
     grid-template-columns:
-        80px 1fr 170px;
+        80px 1fr 180px;
 
-    align-items: center;
+    align-items:
+        center;
 
-    padding: 35px 0;
-
-    border-top:
+    border-bottom:
         1px solid var(--line);
 
     overflow: hidden;
 
     transition:
-        padding .5s var(--ease);
-
-}
-
-
-.project:last-child {
-
-    border-bottom:
-        1px solid var(--line);
+        padding .6s var(--ease);
 
 }
 
@@ -863,30 +965,28 @@ nav {
 
     position: absolute;
 
-    left: 0;
-    right: 0;
-    bottom: 0;
-
-    height: 100%;
+    inset: 0;
 
     background:
-        rgba(255,255,255,.025);
+        linear-gradient(
+            90deg,
+            rgba(255,255,255,.035),
+            transparent
+        );
 
     transform:
-        translateY(100%);
+        translateX(-100%);
 
     transition:
-        transform .5s var(--ease);
-
-    z-index: -1;
+        transform .7s var(--ease);
 
 }
 
 
 .project:hover {
 
-    padding:
-        35px 25px;
+    padding-left:
+        6vw;
 
 }
 
@@ -894,12 +994,16 @@ nav {
 .project:hover::before {
 
     transform:
-        translateY(0);
+        translateX(0);
 
 }
 
 
-.project-number {
+.project-index {
+
+    position: relative;
+
+    z-index: 2;
 
     font-family:
         "DM Mono",
@@ -914,15 +1018,19 @@ nav {
 
 .project-name {
 
+    position: relative;
+
+    z-index: 2;
+
     font-size:
-        clamp(27px, 4vw, 55px);
+        clamp(30px, 5vw, 65px);
+
+    letter-spacing: -.055em;
 
     font-weight: 400;
 
-    letter-spacing: -.045em;
-
     transition:
-        transform .5s var(--ease);
+        transform .6s var(--ease);
 
 }
 
@@ -930,18 +1038,22 @@ nav {
 .project:hover .project-name {
 
     transform:
-        translateX(10px);
+        translateX(15px);
 
 }
 
 
-.project-type {
+.project-meta {
+
+    position: relative;
+
+    z-index: 2;
+
+    color: #555;
 
     font-family:
         "DM Mono",
         monospace;
-
-    color: #555;
 
     font-size: 8px;
 
@@ -957,7 +1069,7 @@ nav {
 .skills {
 
     padding:
-        165px 5vw;
+        170px 5vw;
 
     border-bottom:
         1px solid var(--line);
@@ -967,45 +1079,47 @@ nav {
 }
 
 
-.skills-heading {
+.skills-intro {
 
     display: flex;
 
     justify-content:
         space-between;
 
-    align-items: flex-end;
+    align-items:
+        flex-end;
 
-    margin-bottom: 100px;
+    margin-bottom:
+        100px;
 
 }
 
 
-.skills-title {
+.skills-heading {
 
     font-size:
         clamp(65px, 10vw, 150px);
 
-    line-height: .82;
+    line-height: .8;
 
-    letter-spacing: -.085em;
+    letter-spacing: -.09em;
 
     font-weight: 500;
 
 }
 
 
-.skills-title span {
+.skills-heading span {
 
     color: transparent;
 
     -webkit-text-stroke:
-        1px rgba(255,255,255,.3);
+        1px rgba(255,255,255,.25);
 
 }
 
 
-.skills-description {
+.skills-copy {
 
     width: 300px;
 
@@ -1023,519 +1137,373 @@ nav {
 
 
 /* =========================================================
-   SKILLS SYSTEM
+   SKILL DECK
 ========================================================= */
 
-.skills-system {
-
-    position: relative;
+.skill-deck {
 
     width: 100%;
 
-    max-width: 1100px;
+    display: grid;
 
-    height: 650px;
+    grid-template-columns:
+        repeat(6, 1fr);
 
-    margin: auto;
+    min-height: 530px;
 
     border-top:
-        1px solid
-        rgba(255,255,255,.08);
+        1px solid var(--line);
 
     border-bottom:
-        1px solid
-        rgba(255,255,255,.08);
+        1px solid var(--line);
+
+}
+
+
+.skill-card {
+
+    position: relative;
+
+    min-width: 0;
+
+    padding:
+        30px 20px;
+
+    border-right:
+        1px solid var(--line);
+
+    overflow: hidden;
+
+    display: flex;
+
+    flex-direction:
+        column;
+
+    justify-content:
+        space-between;
+
+    transition:
+        flex .7s var(--ease),
+        background .6s ease,
+        width .7s var(--ease);
+
+}
+
+
+.skill-card:last-child {
+
+    border-right: none;
+
+}
+
+
+.skill-card:hover {
 
     background:
-
-        radial-gradient(
-            circle at 50% 50%,
-            rgba(255,255,255,.035),
-            transparent 32%
-        );
+        rgba(255,255,255,.035);
 
 }
 
 
-/* =========================================================
-   ORBITS
-========================================================= */
-
-.skill-orbit {
-
-    position: absolute;
-
-    left: 50%;
-    top: 50%;
-
-    border:
-        1px solid
-        rgba(255,255,255,.065);
-
-    border-radius: 50%;
-
-    pointer-events: none;
-
-}
-
-
-.orbit-a {
-
-    width: 280px;
-    height: 280px;
-
-    transform:
-        translate(-50%,-50%);
-
-    animation:
-        orbitOne 25s linear infinite;
-
-}
-
-
-.orbit-b {
-
-    width: 460px;
-    height: 250px;
-
-    transform:
-        translate(-50%,-50%)
-        rotate(-22deg);
-
-    animation:
-        orbitTwo 32s linear infinite;
-
-}
-
-
-.orbit-c {
-
-    width: 700px;
-    height: 400px;
-
-    transform:
-        translate(-50%,-50%)
-        rotate(14deg);
-
-    animation:
-        orbitThree 45s linear infinite;
-
-}
-
-
-@keyframes orbitOne {
-
-    from {
-
-        transform:
-            translate(-50%,-50%)
-            rotate(0deg);
-
-    }
-
-    to {
-
-        transform:
-            translate(-50%,-50%)
-            rotate(360deg);
-
-    }
-
-}
-
-
-@keyframes orbitTwo {
-
-    from {
-
-        transform:
-            translate(-50%,-50%)
-            rotate(360deg);
-
-    }
-
-    to {
-
-        transform:
-            translate(-50%,-50%)
-            rotate(0deg);
-
-    }
-
-}
-
-
-@keyframes orbitThree {
-
-    from {
-
-        transform:
-            translate(-50%,-50%)
-            rotate(14deg);
-
-    }
-
-    to {
-
-        transform:
-            translate(-50%,-50%)
-            rotate(374deg);
-
-    }
-
-}
-
-
-/* =========================================================
-   SKILL CORE
-========================================================= */
-
-.skill-core {
-
-    position: absolute;
-
-    left: 50%;
-    top: 50%;
-
-    width: 135px;
-    height: 135px;
-
-    transform:
-        translate(-50%,-50%);
-
-    border-radius: 50%;
-
-    border:
-        1px solid
-        rgba(255,255,255,.17);
-
-    background:
-        rgba(5,5,5,.88);
-
-    backdrop-filter:
-        blur(15px);
+.skill-card-top {
 
     display: flex;
 
     justify-content:
-        center;
-
-    align-items:
-        center;
-
-    text-align: center;
-
-    z-index: 5;
-
-    transition:
-        transform .5s var(--ease);
-
-}
-
-
-.skill-core::before {
-
-    content: "";
-
-    position: absolute;
-
-    inset: -10px;
-
-    border-radius: 50%;
-
-    border:
-        1px solid
-        rgba(255,255,255,.045);
-
-}
-
-
-.skill-core::after {
-
-    content: "";
-
-    position: absolute;
-
-    inset: 18px;
-
-    border-radius: 50%;
-
-    border:
-        1px dashed
-        rgba(255,255,255,.08);
-
-    animation:
-        coreSpin 18s linear infinite;
-
-}
-
-
-@keyframes coreSpin {
-
-    to {
-
-        transform:
-            rotate(360deg);
-
-    }
-
-}
-
-
-.core-dot {
-
-    position: absolute;
-
-    top: 15px;
-
-    width: 6px;
-    height: 6px;
-
-    border-radius: 50%;
-
-    background: white;
-
-    box-shadow:
-        0 0 18px
-        rgba(255,255,255,.8);
-
-}
-
-
-.core-label {
+        space-between;
 
     font-family:
         "DM Mono",
         monospace;
 
-    color: #666;
+    font-size: 8px;
+
+    color: #555;
+
+}
+
+
+.skill-card-number {
+
+    color: #444;
+
+}
+
+
+.skill-card-symbol {
+
+    font-size: 12px;
+
+    color: #777;
+
+}
+
+
+.skill-card-main {
+
+    transform:
+        rotate(-90deg);
+
+    transform-origin:
+        left top;
+
+    white-space:
+        nowrap;
+
+    position: absolute;
+
+    left: 35px;
+
+    bottom: 45px;
+
+}
+
+
+.skill-card-main h3 {
+
+    font-size: 27px;
+
+    font-weight: 400;
+
+    letter-spacing: -.05em;
+
+}
+
+
+.skill-card-bottom {
+
+    opacity: .5;
+
+    font-family:
+        "DM Mono",
+        monospace;
 
     font-size: 7px;
 
     line-height: 1.7;
 
-    letter-spacing: .18em;
-
-}
-
-
-.core-number {
-
-    position: absolute;
-
-    bottom: 16px;
-
-    font-family:
-        "DM Mono",
-        monospace;
-
-    color: #444;
-
-    font-size: 8px;
-
-}
-
-
-/* =========================================================
-   SKILL NODES
-========================================================= */
-
-.skill-node {
-
-    position: absolute;
-
-    border: 0;
-
-    background: transparent;
-
-    color: white;
-
-    padding: 14px;
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 11px;
-
-    z-index: 10;
-
-    transition:
-        transform .5s var(--ease),
-        opacity .4s ease;
-
-}
-
-
-.skill-node:hover {
-
-    transform:
-        scale(1.08);
-
-}
-
-
-.node-dot {
-
-    width: 7px;
-    height: 7px;
-
-    border-radius: 50%;
-
-    background: #444;
-
-    transition:
-        background .3s ease,
-        box-shadow .3s ease,
-        transform .3s ease;
-
-}
-
-
-.skill-node:hover .node-dot {
-
-    background: white;
-
-    transform:
-        scale(1.6);
-
-    box-shadow:
-        0 0 12px white,
-        0 0 28px
-        rgba(255,255,255,.3);
-
-}
-
-
-.node-number {
-
-    color: #444;
-
-    font-size: 8px;
-
-}
-
-
-.node-name {
-
-    font-family:
-        "DM Mono",
-        monospace;
-
-    font-size: 9px;
-
-    letter-spacing: .16em;
-
     color: #777;
 
+}
+
+
+/* =========================================================
+   ACTIVE SKILL
+========================================================= */
+
+.skill-card.active {
+
+    background:
+        rgba(255,255,255,.045);
+
+}
+
+
+.skill-card.active .skill-card-main {
+
+    transform:
+        rotate(0deg);
+
+    left: 30px;
+
+    bottom: 100px;
+
     transition:
-        color .3s ease;
+        transform .7s var(--ease);
 
 }
 
 
-.skill-node:hover .node-name {
+.skill-card.active .skill-card-main h3 {
 
-    color: white;
-
-}
-
-
-/* =========================================================
-   NODE POSITIONS
-========================================================= */
-
-.node-1 {
-
-    left: 8%;
-    top: 25%;
+    font-size:
+        clamp(30px,4vw,55px);
 
 }
 
-
-.node-2 {
-
-    left: 23%;
-    top: 7%;
-
-}
-
-
-.node-3 {
-
-    right: 19%;
-    top: 10%;
-
-}
-
-
-.node-4 {
-
-    right: 6%;
-    top: 44%;
-
-}
-
-
-.node-5 {
-
-    right: 22%;
-    bottom: 9%;
-
-}
-
-
-.node-6 {
-
-    left: 17%;
-    bottom: 11%;
-
-}
-
-
-/* =========================================================
-   SKILL DETAIL
-========================================================= */
 
 .skill-detail {
 
     position: absolute;
 
-    left: 50%;
-    top: 50%;
+    left: 30px;
 
-    width: 285px;
+    right: 30px;
 
-    transform:
-        translate(-50%,-50%);
+    bottom: 32px;
 
-    text-align: center;
+    color: #777;
 
-    pointer-events: none;
+    font-family:
+        "DM Mono",
+        monospace;
+
+    font-size: 8px;
+
+    line-height: 1.7;
 
     opacity: 0;
 
-    z-index: 20;
+    transform:
+        translateY(10px);
 
     transition:
-        opacity .3s ease,
-        transform .5s var(--ease);
+        opacity .5s ease,
+        transform .6s var(--ease);
 
 }
 
 
-.skill-detail.active {
+.skill-card.active .skill-detail {
 
     opacity: 1;
 
     transform:
-        translate(-50%,-50%)
-        scale(1.02);
+        translateY(0);
 
 }
 
 
-.detail-index {
+.skill-meter {
+
+    position: absolute;
+
+    left: 30px;
+
+    right: 30px;
+
+    bottom: 16px;
+
+    height: 1px;
+
+    background:
+        rgba(255,255,255,.08);
+
+}
+
+
+.skill-meter span {
+
+    display: block;
+
+    height: 100%;
+
+    width: 0;
+
+    background: white;
+
+    transition:
+        width 1s var(--ease);
+
+}
+
+
+.skill-card.active .skill-meter span {
+
+    width:
+        var(--skill);
+
+}
+
+
+/* =========================================================
+   LAB
+========================================================= */
+
+.lab {
+
+    padding:
+        170px 5vw;
+
+    border-bottom:
+        1px solid var(--line);
+
+}
+
+
+.lab-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 80px;
+
+}
+
+
+.lab-heading {
+
+    font-size:
+        clamp(55px,8vw,110px);
+
+    line-height: .85;
+
+    letter-spacing: -.08em;
+
+    font-weight: 400;
+
+}
+
+
+.lab-heading span {
+
+    color: transparent;
+
+    -webkit-text-stroke:
+        1px rgba(255,255,255,.25);
+
+}
+
+
+.lab-list {
+
+    border-top:
+        1px solid var(--line);
+
+}
+
+
+.lab-item {
+
+    padding:
+        27px 0;
+
+    border-bottom:
+        1px solid var(--line);
+
+    display: flex;
+
+    justify-content:
+        space-between;
+
+    align-items:
+        center;
+
+    transition:
+        padding .5s var(--ease);
+
+}
+
+
+.lab-item:hover {
+
+    padding-left: 20px;
+
+}
+
+
+.lab-item-title {
+
+    font-size: 18px;
+
+    font-weight: 400;
+
+}
+
+
+.lab-item-meta {
 
     font-family:
         "DM Mono",
@@ -1545,56 +1513,85 @@ nav {
 
     font-size: 8px;
 
-    letter-spacing: .2em;
+}
+
+
+/* =========================================================
+   JOURNEY
+========================================================= */
+
+.journey {
+
+    padding:
+        170px 5vw;
+
+    border-bottom:
+        1px solid var(--line);
 
 }
 
 
-.detail-title {
+.timeline {
 
-    margin-top: 12px;
+    max-width: 900px;
 
-    font-size: 28px;
-
-    letter-spacing: -.04em;
-
-}
-
-
-.detail-text {
-
-    margin-top: 14px;
-
-    color: #777;
-
-    font-size: 10px;
-
-    line-height: 1.7;
+    margin:
+        100px auto 0;
 
 }
 
 
-.detail-level {
+.timeline-item {
 
-    display: inline-block;
+    display: grid;
 
-    margin-top: 18px;
+    grid-template-columns:
+        120px 1fr;
 
-    padding: 7px 11px;
+    padding:
+        35px 0;
 
-    border:
-        1px solid
-        rgba(255,255,255,.12);
+    border-top:
+        1px solid var(--line);
 
-    color: #666;
+}
+
+
+.timeline-year {
 
     font-family:
         "DM Mono",
         monospace;
 
-    font-size: 7px;
+    color: #555;
 
-    letter-spacing: .18em;
+    font-size: 9px;
+
+}
+
+
+.timeline-title {
+
+    font-size: 26px;
+
+    font-weight: 400;
+
+    letter-spacing: -.03em;
+
+}
+
+
+.timeline-text {
+
+    margin-top: 10px;
+
+    color: #666;
+
+    max-width: 500px;
+
+    font-size: 12px;
+
+    line-height: 1.8;
 
 }
 
@@ -1605,14 +1602,17 @@ nav {
 
 .contact {
 
-    min-height: 85vh;
+    min-height:
+        100svh;
 
     padding:
-        165px 5vw;
+        170px 5vw
+        90px;
 
     display: flex;
 
-    flex-direction: column;
+    flex-direction:
+        column;
 
     justify-content:
         space-between;
@@ -1620,17 +1620,19 @@ nav {
     border-bottom:
         1px solid var(--line);
 
+    overflow: hidden;
+
 }
 
 
 .contact-title {
 
     font-size:
-        clamp(70px, 13vw, 190px);
+        clamp(80px,14vw,200px);
 
-    line-height: .78;
+    line-height: .75;
 
-    letter-spacing: -.09em;
+    letter-spacing: -.095em;
 
     font-weight: 600;
 
@@ -1642,41 +1644,85 @@ nav {
     color: transparent;
 
     -webkit-text-stroke:
-        1px rgba(255,255,255,.3);
+        1px rgba(255,255,255,.25);
 
 }
 
 
-.email {
+.contact-bottom {
 
-    display: inline-block;
+    display: flex;
 
-    width: max-content;
+    justify-content:
+        space-between;
 
-    margin-top: 100px;
+    align-items:
+        flex-end;
 
-    padding-bottom: 12px;
+}
 
-    border-bottom:
-        1px solid #555;
+
+.contact-description {
+
+    max-width: 300px;
+
+    color: #666;
 
     font-family:
         "DM Mono",
         monospace;
 
-    font-size: 12px;
+    font-size: 9px;
 
-    letter-spacing: .12em;
-
-    transition:
-        border-color .3s ease;
+    line-height: 1.8;
 
 }
 
 
-.email:hover {
+.contact-button {
 
-    border-color: white;
+    display: inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    width: 150px;
+    height: 150px;
+
+    border:
+        1px solid
+        rgba(255,255,255,.2);
+
+    border-radius: 50%;
+
+    font-family:
+        "DM Mono",
+        monospace;
+
+    font-size: 9px;
+
+    letter-spacing: .15em;
+
+    transition:
+        background .4s ease,
+        transform .5s var(--ease);
+
+}
+
+
+.contact-button:hover {
+
+    background:
+        white;
+
+    color:
+        black;
+
+    transform:
+        scale(1.08);
 
 }
 
@@ -1688,14 +1734,17 @@ nav {
 footer {
 
     padding:
-        35px 5vw;
+        32px 5vw;
 
     display: flex;
 
     justify-content:
         space-between;
 
-    align-items: center;
+    align-items:
+        center;
+
+    color: #4b4b4b;
 
     font-family:
         "DM Mono",
@@ -1704,8 +1753,6 @@ footer {
     font-size: 8px;
 
     letter-spacing: .15em;
-
-    color: #555;
 
 }
 
@@ -1735,7 +1782,7 @@ footer {
 
 
 /* =========================================================
-   REVEAL ANIMATION
+   REVEAL
 ========================================================= */
 
 .reveal {
@@ -1752,7 +1799,7 @@ footer {
 }
 
 
-.reveal.show {
+.reveal.visible {
 
     opacity: 1;
 
@@ -1769,16 +1816,6 @@ footer {
 @media(max-width:800px) {
 
 
-    /* Cursor */
-
-    .cursor,
-    .cursor-ring {
-
-        display: none;
-
-    }
-
-
     body,
     a,
     button {
@@ -1788,40 +1825,50 @@ footer {
     }
 
 
-    /* Nav */
+    .cursor,
+    .cursor-ring {
 
-    nav {
-
-        padding:
-            22px;
+        display: none;
 
     }
 
 
     .nav {
 
-        gap: 15px;
+        height: 75px;
+
+        padding:
+            20px 22px;
 
     }
 
 
-    .nav a {
+    .nav-status {
+
+        display: none;
+
+    }
+
+
+    .nav-links {
+
+        gap: 14px;
+
+    }
+
+
+    .nav-links a {
 
         font-size: 7px;
 
     }
 
 
-    /* Hero */
-
     .hero {
 
-        min-height:
-            100svh;
-
         padding:
-            135px 22px
-            80px;
+            125px 22px
+            70px;
 
         align-items:
             flex-start;
@@ -1829,15 +1876,8 @@ footer {
     }
 
 
-    .kicker {
-
-        font-size: 8px;
-
-    }
-
-
     .hero-title h1,
-    .hero-title .ghost {
+    .hero-outline {
 
         font-size:
             21vw;
@@ -1845,93 +1885,78 @@ footer {
     }
 
 
-    .hero-bottom {
+    .hero-info {
 
         margin-top:
-            100px;
+            105px;
+
+        display:
+            block;
 
     }
 
 
-    .role {
-
-        font-size: 8px;
-
-        letter-spacing:
-            .2em;
-
-    }
-
-
-    .intro {
+    .hero-description {
 
         max-width:
-            310px;
+            300px;
 
     }
 
 
-    .intro p {
+    .hero-description p {
 
-        font-size: 15px;
-
-    }
-
-
-    /* Orb */
-
-    .visual {
-
-        width: 185px;
-
-        right: -25px;
-
-        top: 60%;
-
-        opacity: .62;
+        font-size:
+            14px;
 
     }
 
 
-    .orb-label {
+    .hero-object {
 
-        display: none;
+        width:
+            190px;
+
+        right:
+            -35px;
+
+        top:
+            61%;
+
+        opacity:
+            .6;
 
     }
 
 
-    .scroll {
+    .scroll-marker {
 
-        display: none;
+        display:
+            none;
 
     }
 
 
-    /* Info */
-
-    .intro-bar {
+    .info-strip {
 
         padding:
             18px 22px;
 
-        font-size: 7px;
+        font-size:
+            6px;
 
     }
 
 
-    .intro-bar span:nth-child(2) {
+    .info-strip span:nth-child(2) {
 
-        display: none;
+        display:
+            none;
 
     }
 
 
-    /* Sections */
-
-    .section,
-    .work,
-    .skills,
-    .contact {
+    .section {
 
         padding:
             110px 22px;
@@ -1947,19 +1972,20 @@ footer {
     }
 
 
-    /* About */
+    /* ABOUT */
 
     .about-grid {
 
         grid-template-columns:
             1fr;
 
-        gap: 50px;
+        gap:
+            55px;
 
     }
 
 
-    .about-title {
+    .about-heading {
 
         font-size:
             51px;
@@ -1975,50 +2001,15 @@ footer {
     }
 
 
-    /* Projects */
+    .about-numbers {
 
-    .work-title {
-
-        font-size:
-            76px;
-
-        margin-bottom:
-            75px;
+        gap:
+            35px;
 
     }
 
 
-    .project {
-
-        grid-template-columns:
-            42px 1fr;
-
-        padding:
-            28px 0;
-
-    }
-
-
-    .project:hover {
-
-        padding:
-            28px 10px;
-
-    }
-
-
-    .project-type {
-
-        grid-column:
-            2;
-
-        margin-top:
-            9px;
-
-    }
-
-
-    .project-name {
+    .number strong {
 
         font-size:
             27px;
@@ -2026,19 +2017,103 @@ footer {
     }
 
 
-    /* Skills */
+    /* WORK */
 
-    .skills-heading {
+    .work {
 
-        display: block;
-
-        margin-bottom:
-            60px;
+        padding:
+            110px 0;
 
     }
 
 
-    .skills-title {
+    .work-header {
+
+        padding:
+            0 22px;
+
+    }
+
+
+    .work-title {
+
+        font-size:
+            76px;
+
+    }
+
+
+    .projects {
+
+        margin-top:
+            75px;
+
+    }
+
+
+    .project {
+
+        min-height:
+            150px;
+
+        padding:
+            28px 22px;
+
+        grid-template-columns:
+            42px 1fr;
+
+    }
+
+
+    .project:hover {
+
+        padding-left:
+            30px;
+
+    }
+
+
+    .project-name {
+
+        font-size:
+            29px;
+
+    }
+
+
+    .project-meta {
+
+        grid-column:
+            2;
+
+        margin-top:
+            8px;
+
+    }
+
+
+    /* SKILLS */
+
+    .skills {
+
+        padding:
+            110px 22px;
+
+    }
+
+
+    .skills-intro {
+
+        display:
+            block;
+
+        margin-bottom:
+            65px;
+
+    }
+
+
+    .skills-heading {
 
         font-size:
             62px;
@@ -2046,160 +2121,203 @@ footer {
     }
 
 
-    .skills-description {
-
-        width:
-            270px;
+    .skills-copy {
 
         margin-top:
             35px;
 
-    }
-
-
-    .skills-system {
-
-        height:
-            560px;
-
-    }
-
-
-    .orbit-a {
-
         width:
-            190px;
-
-        height:
-            190px;
+            270px;
 
     }
 
 
-    .orbit-b {
-
-        width:
-            320px;
-
-        height:
-            180px;
-
-    }
-
-
-    .orbit-c {
-
-        width:
-            500px;
-
-        height:
-            280px;
-
-    }
-
-
-    .skill-core {
-
-        width:
-            105px;
-
-        height:
-            105px;
-
-    }
-
-
-    .node-name {
-
-        font-size:
-            8px;
-
-    }
-
-
-    .node-number {
+    .skill-deck {
 
         display:
+            block;
+
+        min-height:
+            auto;
+
+    }
+
+
+    .skill-card {
+
+        min-height:
+            90px;
+
+        border-right:
+            none;
+
+        border-bottom:
+            1px solid var(--line);
+
+        padding:
+            25px;
+
+    }
+
+
+    .skill-card:last-child {
+
+        border-bottom:
             none;
 
     }
 
 
-    .node-1 {
+    .skill-card-main {
+
+        position:
+            relative;
 
         left:
-            1%;
-
-        top:
-            23%;
-
-    }
-
-
-    .node-2 {
-
-        left:
-            18%;
-
-        top:
-            4%;
-
-    }
-
-
-    .node-3 {
-
-        right:
-            3%;
-
-        top:
-            15%;
-
-    }
-
-
-    .node-4 {
-
-        right:
-            0;
-
-        top:
-            48%;
-
-    }
-
-
-    .node-5 {
-
-        right:
-            13%;
+            auto;
 
         bottom:
-            7%;
+            auto;
+
+        transform:
+            none;
+
+        margin-top:
+            40px;
 
     }
 
 
-    .node-6 {
+    .skill-card-main h3 {
+
+        font-size:
+            25px;
+
+    }
+
+
+    .skill-card.active {
+
+        min-height:
+            240px;
+
+    }
+
+
+    .skill-card.active
+    .skill-card-main {
 
         left:
-            3%;
+            auto;
 
         bottom:
-            10%;
+            auto;
+
+        transform:
+            none;
+
+    }
+
+
+    .skill-card.active
+    .skill-card-main h3 {
+
+        font-size:
+            38px;
 
     }
 
 
     .skill-detail {
 
-        width:
-            185px;
+        position:
+            relative;
+
+        left:
+            auto;
+
+        right:
+            auto;
+
+        bottom:
+            auto;
+
+        margin-top:
+            25px;
 
     }
 
 
-    .detail-title {
+    .skill-meter {
+
+        left:
+            25px;
+
+        right:
+            25px;
+
+        bottom:
+            15px;
+
+    }
+
+
+    /* LAB */
+
+    .lab {
+
+        padding:
+            110px 22px;
+
+    }
+
+
+    .lab-grid {
+
+        grid-template-columns:
+            1fr;
+
+        gap:
+            60px;
+
+    }
+
+
+    .lab-heading {
+
+        font-size:
+            55px;
+
+    }
+
+
+    /* JOURNEY */
+
+    .journey {
+
+        padding:
+            110px 22px;
+
+    }
+
+
+    .timeline {
+
+        margin-top:
+            60px;
+
+    }
+
+
+    .timeline-item {
+
+        grid-template-columns:
+            65px 1fr;
+
+    }
+
+
+    .timeline-title {
 
         font-size:
             21px;
@@ -2207,20 +2325,13 @@ footer {
     }
 
 
-    .detail-text {
-
-        font-size:
-            9px;
-
-    }
-
-
-    /* Contact */
+    /* CONTACT */
 
     .contact {
 
-        min-height:
-            75svh;
+        padding:
+            110px 22px
+            60px;
 
     }
 
@@ -2233,29 +2344,43 @@ footer {
     }
 
 
-    .email {
+    .contact-bottom {
 
-        margin-top:
-            70px;
+        align-items:
+            flex-start;
 
-        font-size:
-            10px;
+        gap:
+            40px;
+
+        flex-direction:
+            column;
 
     }
 
 
-    /* Footer */
+    .contact-button {
+
+        width:
+            110px;
+
+        height:
+            110px;
+
+    }
+
+
+    /* FOOTER */
 
     footer {
 
         padding:
-            30px 22px;
+            28px 22px;
 
         flex-wrap:
             wrap;
 
         gap:
-            25px;
+            20px;
 
     }
 
@@ -2272,33 +2397,6 @@ footer {
 
 }
 
-
-/* =========================================================
-   REDUCED MOTION
-========================================================= */
-
-@media(prefers-reduced-motion: reduce) {
-
-    *,
-    *::before,
-    *::after {
-
-        animation-duration:
-            .01ms !important;
-
-        animation-iteration-count:
-            1 !important;
-
-        scroll-behavior:
-            auto !important;
-
-        transition-duration:
-            .01ms !important;
-
-    }
-
-}
-
 </style>
 
 </head>
@@ -2307,40 +2405,43 @@ footer {
 <body>
 
 
-<!-- =======================================================
-     SPACE BACKGROUND
-======================================================= -->
+<!-- =====================================================
+     BACKGROUND
+===================================================== -->
 
-<canvas id="spaceCanvas"></canvas>
+<canvas id="space"></canvas>
+
+<div class="space-glow"></div>
 
 
-<!-- =======================================================
+<!-- =====================================================
      CURSOR
-======================================================= -->
+===================================================== -->
 
 <div class="cursor"></div>
 
 <div class="cursor-ring"></div>
 
 
-<!-- =======================================================
+<!-- =====================================================
      NAVIGATION
-======================================================= -->
+===================================================== -->
 
-<nav>
+<nav class="nav">
+
 
     <a
         href="#home"
-        class="logo"
+        class="brand"
     >
 
         NITHAN
-        <span>/ 01</span>
+        <span>/01</span>
 
     </a>
 
 
-    <div class="nav">
+    <div class="nav-links">
 
         <a href="#about">
             ABOUT
@@ -2360,13 +2461,23 @@ footer {
 
     </div>
 
+
+    <div class="nav-status">
+
+        <span class="status-dot"></span>
+
+        ONLINE
+
+    </div>
+
+
 </nav>
 
 
 
-<!-- =======================================================
-     HERO
-======================================================= -->
+<!-- =====================================================
+     HOME
+===================================================== -->
 
 <section
     class="hero"
@@ -2375,11 +2486,11 @@ footer {
 
 
     <div
-        class="hero-inner reveal"
+        class="hero-content reveal"
     >
 
 
-        <div class="kicker">
+        <div class="mini-label">
 
             PORTFOLIO / 2026
 
@@ -2393,7 +2504,7 @@ footer {
             </h1>
 
 
-            <div class="ghost">
+            <div class="hero-outline">
 
                 V—01
 
@@ -2402,13 +2513,13 @@ footer {
         </div>
 
 
-        <div class="hero-bottom">
+        <div class="hero-info">
 
 
-            <div class="intro">
+            <div class="hero-description">
 
 
-                <div class="role">
+                <div class="hero-role">
 
                     STUDENT /
                     DEVELOPER /
@@ -2423,8 +2534,9 @@ footer {
                     <strong>
                         digital experiences
                     </strong>
-                    somewhere between technology,
-                    design and curiosity.
+                    where technology,
+                    design and curiosity
+                    collide.
 
                 </p>
 
@@ -2442,13 +2554,13 @@ footer {
     <!-- FLOATING OBJECT -->
 
     <div
-        class="visual"
-        id="heroVisual"
+        class="hero-object"
+        id="heroObject"
     >
 
-        <div class="orb"></div>
+        <div class="chrome"></div>
 
-        <div class="orb-label">
+        <div class="object-label">
 
             OBJECT / 001
 
@@ -2458,11 +2570,11 @@ footer {
 
 
 
-    <div class="scroll">
+    <div class="scroll-marker">
 
-        <span class="scroll-line"></span>
+        <span></span>
 
-        SCROLL
+        SCROLL TO EXPLORE
 
     </div>
 
@@ -2471,11 +2583,11 @@ footer {
 
 
 
-<!-- =======================================================
-     INFO BAR
-======================================================= -->
+<!-- =====================================================
+     INFO
+===================================================== -->
 
-<div class="intro-bar">
+<div class="info-strip">
 
     <span>
         AVAILABLE FOR SELECTED PROJECTS
@@ -2493,9 +2605,9 @@ footer {
 
 
 
-<!-- =======================================================
+<!-- =====================================================
      ABOUT
-======================================================= -->
+===================================================== -->
 
 <section
     class="section"
@@ -2514,12 +2626,15 @@ footer {
 
 
         <div
-            class="about-title reveal"
+            class="about-heading reveal"
         >
 
             CURIOUS
             <br>
-            BY DEFAULT.
+
+            <span>
+                BY DEFAULT.
+            </span>
 
         </div>
 
@@ -2530,10 +2645,11 @@ footer {
 
             <p>
 
-                I'm a student interested in the
-                space where
+                I'm a student interested in
+                the space where
                 <strong>
-                    technology, business and design
+                    technology, business
+                    and design
                 </strong>
                 overlap.
 
@@ -2542,20 +2658,66 @@ footer {
 
             <p>
 
-                I like taking an idea from a rough
-                thought to something people can
-                actually interact with.
+                I like taking ideas from
+                rough thoughts to things
+                people can actually use.
 
             </p>
 
 
             <p>
 
-                Currently learning, experimenting
-                and building things that probably
-                didn't need to exist.
+                The goal isn't to know
+                everything. It's to keep
+                learning fast enough to
+                build interesting things.
 
             </p>
+
+
+            <div class="about-numbers">
+
+
+                <div class="number">
+
+                    <strong>
+                        01
+                    </strong>
+
+                    <span>
+                        MINDSET
+                    </span>
+
+                </div>
+
+
+                <div class="number">
+
+                    <strong>
+                        ∞
+                    </strong>
+
+                    <span>
+                        CURIOSITY
+                    </span>
+
+                </div>
+
+
+                <div class="number">
+
+                    <strong>
+                        24/7
+                    </strong>
+
+                    <span>
+                        LEARNING
+                    </span>
+
+                </div>
+
+
+            </div>
 
 
         </div>
@@ -2568,9 +2730,9 @@ footer {
 
 
 
-<!-- =======================================================
-     PROJECTS
-======================================================= -->
+<!-- =====================================================
+     WORK
+===================================================== -->
 
 <section
     class="work"
@@ -2578,113 +2740,160 @@ footer {
 >
 
 
-    <div class="section-label reveal">
+    <div class="work-header">
 
-        02 / SELECTED WORK
+
+        <div class="section-label reveal">
+
+            02 / SELECTED WORK
+
+        </div>
+
+
+        <div class="work-title reveal">
+
+            THINGS
+            <br>
+
+            <span>
+                I'VE BUILT.
+            </span>
+
+        </div>
+
 
     </div>
 
 
-    <div class="work-title reveal">
 
-        PROJECTS
+    <div class="projects">
+
+
+        <a
+            href="#"
+            class="project reveal"
+        >
+
+            <div class="project-index">
+
+                01
+
+            </div>
+
+
+            <div class="project-name">
+
+                ORBIT
+
+            </div>
+
+
+            <div class="project-meta">
+
+                WEB / EXPERIMENT
+
+            </div>
+
+        </a>
+
+
+
+        <a
+            href="#"
+            class="project reveal"
+        >
+
+            <div class="project-index">
+
+                02
+
+            </div>
+
+
+            <div class="project-name">
+
+                DATA / V02
+
+            </div>
+
+
+            <div class="project-meta">
+
+                ANALYTICS
+
+            </div>
+
+        </a>
+
+
+
+        <a
+            href="#"
+            class="project reveal"
+        >
+
+            <div class="project-index">
+
+                03
+
+            </div>
+
+
+            <div class="project-name">
+
+                UNKNOWN
+
+            </div>
+
+
+            <div class="project-meta">
+
+                EXPERIMENT
+
+            </div>
+
+        </a>
+
+
+
+        <a
+            href="#"
+            class="project reveal"
+        >
+
+            <div class="project-index">
+
+                04
+
+            </div>
+
+
+            <div class="project-name">
+
+                NEXT
+
+            </div>
+
+
+            <div class="project-meta">
+
+                IN DEVELOPMENT
+
+            </div>
+
+        </a>
+
 
     </div>
-
-
-    <a
-        href="#"
-        class="project reveal"
-    >
-
-        <div class="project-number">
-
-            01
-
-        </div>
-
-
-        <div class="project-name">
-
-            ORBIT
-
-        </div>
-
-
-        <div class="project-type">
-
-            WEB / EXPERIMENT
-
-        </div>
-
-    </a>
-
-
-
-    <a
-        href="#"
-        class="project reveal"
-    >
-
-        <div class="project-number">
-
-            02
-
-        </div>
-
-
-        <div class="project-name">
-
-            DATA / V02
-
-        </div>
-
-
-        <div class="project-type">
-
-            ANALYTICS
-
-        </div>
-
-    </a>
-
-
-
-    <a
-        href="#"
-        class="project reveal"
-    >
-
-        <div class="project-number">
-
-            03
-
-        </div>
-
-
-        <div class="project-name">
-
-            NEXT
-
-        </div>
-
-
-        <div class="project-type">
-
-            CURRENTLY BUILDING
-
-        </div>
-
-    </a>
 
 
 </section>
 
 
 
-<!-- =======================================================
+<!-- =====================================================
      SKILLS
-======================================================= -->
+===================================================== -->
 
 <section
     class="skills"
@@ -2699,10 +2908,12 @@ footer {
     </div>
 
 
-    <div class="skills-heading reveal">
+    <div
+        class="skills-intro reveal"
+    >
 
 
-        <div class="skills-title">
+        <div class="skills-heading">
 
             WHAT I
             <br>
@@ -2714,11 +2925,11 @@ footer {
         </div>
 
 
-        <div class="skills-description">
+        <div class="skills-copy">
 
-            A growing toolkit shaped by curiosity,
-            experimentation and actual things
-            I've tried to build.
+            Not a list of software icons.
+            A living toolkit that changes
+            every time I build something.
 
         </div>
 
@@ -2727,53 +2938,481 @@ footer {
 
 
 
-    <!-- SKILL CONSTELLATION -->
+    <!-- =================================================
+         SKILL DECK
+    ================================================= -->
 
     <div
-        class="skills-system reveal"
-        id="skillsSystem"
+        class="skill-deck reveal"
+        id="skillDeck"
     >
 
 
-        <!-- ORBITS -->
+        <!-- WEB -->
 
-        <div
-            class="skill-orbit orbit-a"
-        ></div>
+        <article
+            class="skill-card active"
+            style="--skill:88%"
+        >
 
-        <div
-            class="skill-orbit orbit-b"
-        ></div>
+            <div class="skill-card-top">
 
-        <div
-            class="skill-orbit orbit-c"
-        ></div>
+                <span class="skill-card-number">
+                    01
+                </span>
 
-
-
-        <!-- CENTER -->
-
-        <div class="skill-core">
-
-            <div class="core-dot"></div>
-
-            <div
-                class="core-label"
-                id="coreLabel"
-            >
-
-                CURRENT
-                <br>
-                STACK
+                <span class="skill-card-symbol">
+                    /
+                </span>
 
             </div>
 
-            <div
-                class="core-number"
-                id="coreNumber"
-            >
 
-                06
+            <div class="skill-card-main">
+
+                <h3>
+                    WEB
+                </h3>
+
+            </div>
+
+
+            <div class="skill-detail">
+
+                Building responsive,
+                interactive interfaces
+                for the web.
+
+            </div>
+
+
+            <div class="skill-meter">
+
+                <span></span>
+
+            </div>
+
+        </article>
+
+
+
+        <!-- JAVASCRIPT -->
+
+        <article
+            class="skill-card"
+            style="--skill:72%"
+        >
+
+            <div class="skill-card-top">
+
+                <span class="skill-card-number">
+                    02
+                </span>
+
+                <span class="skill-card-symbol">
+                    /
+                </span>
+
+            </div>
+
+
+            <div class="skill-card-main">
+
+                <h3>
+                    JAVASCRIPT
+                </h3>
+
+            </div>
+
+
+            <div class="skill-detail">
+
+                Interaction,
+                animation,
+                DOM systems and
+                creative experiments.
+
+            </div>
+
+
+            <div class="skill-meter">
+
+                <span></span>
+
+            </div>
+
+        </article>
+
+
+
+        <!-- PYTHON -->
+
+        <article
+            class="skill-card"
+            style="--skill:68%"
+        >
+
+            <div class="skill-card-top">
+
+                <span class="skill-card-number">
+                    03
+                </span>
+
+                <span class="skill-card-symbol">
+                    /
+                </span>
+
+            </div>
+
+
+            <div class="skill-card-main">
+
+                <h3>
+                    PYTHON
+                </h3>
+
+            </div>
+
+
+            <div class="skill-detail">
+
+                Automation,
+                scripting,
+                data work and
+                experimentation.
+
+            </div>
+
+
+            <div class="skill-meter">
+
+                <span></span>
+
+            </div>
+
+        </article>
+
+
+
+        <!-- DATA -->
+
+        <article
+            class="skill-card"
+            style="--skill:64%"
+        >
+
+            <div class="skill-card-top">
+
+                <span class="skill-card-number">
+                    04
+                </span>
+
+                <span class="skill-card-symbol">
+                    /
+                </span>
+
+            </div>
+
+
+            <div class="skill-card-main">
+
+                <h3>
+                    DATA
+                </h3>
+
+            </div>
+
+
+            <div class="skill-detail">
+
+                Finding patterns,
+                cleaning information
+                and extracting useful
+                insights.
+
+            </div>
+
+
+            <div class="skill-meter">
+
+                <span></span>
+
+            </div>
+
+        </article>
+
+
+
+        <!-- UI UX -->
+
+        <article
+            class="skill-card"
+            style="--skill:79%"
+        >
+
+            <div class="skill-card-top">
+
+                <span class="skill-card-number">
+                    05
+                </span>
+
+                <span class="skill-card-symbol">
+                    /
+                </span>
+
+            </div>
+
+
+            <div class="skill-card-main">
+
+                <h3>
+                    UI / UX
+                </h3>
+
+            </div>
+
+
+            <div class="skill-detail">
+
+                Visual hierarchy,
+                interaction design
+                and digital experiences.
+
+            </div>
+
+
+            <div class="skill-meter">
+
+                <span></span>
+
+            </div>
+
+        </article>
+
+
+
+        <!-- CREATIVE -->
+
+        <article
+            class="skill-card"
+            style="--skill:74%"
+        >
+
+            <div class="skill-card-top">
+
+                <span class="skill-card-number">
+                    06
+                </span>
+
+                <span class="skill-card-symbol">
+                    /
+                </span>
+
+            </div>
+
+
+            <div class="skill-card-main">
+
+                <h3>
+                    CREATIVE TECH
+                </h3>
+
+            </div>
+
+
+            <div class="skill-detail">
+
+                Turning code into
+                visual systems,
+                experiments and
+                unusual interfaces.
+
+            </div>
+
+
+            <div class="skill-meter">
+
+                <span></span>
+
+            </div>
+
+        </article>
+
+
+    </div>
+
+
+</section>
+
+
+
+<!-- =====================================================
+     LAB
+===================================================== -->
+
+<section
+    class="lab"
+    id="lab"
+>
+
+
+    <div class="section-label reveal">
+
+        04 / LAB
+
+    </div>
+
+
+    <div class="lab-grid">
+
+
+        <div
+            class="lab-heading reveal"
+        >
+
+            CURRENTLY
+            <br>
+
+            <span>
+                EXPLORING.
+            </span>
+
+        </div>
+
+
+        <div
+            class="lab-list reveal"
+        >
+
+
+            <div class="lab-item">
+
+                <div class="lab-item-title">
+                    Creative Web
+                </div>
+
+                <div class="lab-item-meta">
+                    ACTIVE
+                </div>
+
+            </div>
+
+
+            <div class="lab-item">
+
+                <div class="lab-item-title">
+                    Data Analytics
+                </div>
+
+                <div class="lab-item-meta">
+                    LEARNING
+                </div>
+
+            </div>
+
+
+            <div class="lab-item">
+
+                <div class="lab-item-title">
+                    AI Interfaces
+                </div>
+
+                <div class="lab-item-meta">
+                    EXPLORING
+                </div>
+
+            </div>
+
+
+            <div class="lab-item">
+
+                <div class="lab-item-title">
+                    3D Web
+                </div>
+
+                <div class="lab-item-meta">
+                    EXPERIMENTAL
+                </div>
+
+            </div>
+
+
+            <div class="lab-item">
+
+                <div class="lab-item-title">
+                    Automation
+                </div>
+
+                <div class="lab-item-meta">
+                    NEXT
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+</section>
+
+
+
+<!-- =====================================================
+     JOURNEY
+===================================================== -->
+
+<section
+    class="journey"
+>
+
+
+    <div class="section-label reveal">
+
+        05 / JOURNEY
+
+    </div>
+
+
+    <div
+        class="work-title reveal"
+    >
+
+        STILL
+        <br>
+
+        <span>
+            BECOMING.
+        </span>
+
+    </div>
+
+
+    <div class="timeline">
+
+
+        <div
+            class="timeline-item reveal"
+        >
+
+            <div class="timeline-year">
+                2024
+            </div>
+
+            <div>
+
+                <div class="timeline-title">
+                    START
+                </div>
+
+                <div class="timeline-text">
+
+                    Started exploring technology,
+                    coding and the web.
+
+                </div>
 
             </div>
 
@@ -2781,193 +3420,81 @@ footer {
 
 
 
-        <!-- NODE 1 -->
-
-        <button
-            class="skill-node node-1"
-            data-title="WEB"
-            data-info="Responsive interfaces, modern layouts and interactive web experiences."
-            data-level="ADVANCED"
-            data-number="01"
+        <div
+            class="timeline-item reveal"
         >
 
-            <span class="node-dot"></span>
+            <div class="timeline-year">
+                2025
+            </div>
 
-            <span class="node-number">
-                01
-            </span>
+            <div>
 
-            <span class="node-name">
-                WEB
-            </span>
+                <div class="timeline-title">
+                    EXPERIMENT
+                </div>
 
-        </button>
+                <div class="timeline-text">
 
+                    Began combining development,
+                    design and business thinking.
 
+                </div>
 
-        <!-- NODE 2 -->
+            </div>
 
-        <button
-            class="skill-node node-2"
-            data-title="JAVASCRIPT"
-            data-info="Interactive interfaces, motion, DOM systems and creative web experiments."
-            data-level="BUILDING"
-            data-number="02"
-        >
-
-            <span class="node-dot"></span>
-
-            <span class="node-number">
-                02
-            </span>
-
-            <span class="node-name">
-                JAVASCRIPT
-            </span>
-
-        </button>
+        </div>
 
 
-
-        <!-- NODE 3 -->
-
-        <button
-            class="skill-node node-3"
-            data-title="PYTHON"
-            data-info="Automation, scripting, data work and experimentation."
-            data-level="BUILDING"
-            data-number="03"
-        >
-
-            <span class="node-dot"></span>
-
-            <span class="node-number">
-                03
-            </span>
-
-            <span class="node-name">
-                PYTHON
-            </span>
-
-        </button>
-
-
-
-        <!-- NODE 4 -->
-
-        <button
-            class="skill-node node-4"
-            data-title="DATA"
-            data-info="Finding patterns, cleaning information and turning numbers into useful decisions."
-            data-level="EXPLORING"
-            data-number="04"
-        >
-
-            <span class="node-dot"></span>
-
-            <span class="node-number">
-                04
-            </span>
-
-            <span class="node-name">
-                DATA
-            </span>
-
-        </button>
-
-
-
-        <!-- NODE 5 -->
-
-        <button
-            class="skill-node node-5"
-            data-title="UI / UX"
-            data-info="Visual hierarchy, interaction design and interfaces that feel intentional."
-            data-level="BUILDING"
-            data-number="05"
-        >
-
-            <span class="node-dot"></span>
-
-            <span class="node-number">
-                05
-            </span>
-
-            <span class="node-name">
-                UI / UX
-            </span>
-
-        </button>
-
-
-
-        <!-- NODE 6 -->
-
-        <button
-            class="skill-node node-6"
-            data-title="CREATIVE TECH"
-            data-info="Using code as a medium for visual experiments and unusual interfaces."
-            data-level="EXPLORING"
-            data-number="06"
-        >
-
-            <span class="node-dot"></span>
-
-            <span class="node-number">
-                06
-            </span>
-
-            <span class="node-name">
-                CREATIVE TECH
-            </span>
-
-        </button>
-
-
-
-        <!-- DETAIL -->
 
         <div
-            class="skill-detail"
-            id="skillDetail"
+            class="timeline-item reveal"
         >
 
-            <div
-                class="detail-index"
-                id="detailIndex"
-            >
+            <div class="timeline-year">
+                2026
+            </div>
 
-                00 / SELECT A NODE
+            <div>
+
+                <div class="timeline-title">
+                    BUILD
+                </div>
+
+                <div class="timeline-text">
+
+                    Building more ambitious projects
+                    and developing a stronger technical
+                    foundation.
+
+                </div>
 
             </div>
 
+        </div>
 
-            <div
-                class="detail-title"
-                id="detailTitle"
-            >
 
-                EXPLORE
 
+        <div
+            class="timeline-item reveal"
+        >
+
+            <div class="timeline-year">
+                NEXT
             </div>
 
+            <div>
 
-            <p
-                class="detail-text"
-                id="detailText"
-            >
+                <div class="timeline-title">
+                    UNKNOWN
+                </div>
 
-                Hover over a skill to inspect it.
+                <div class="timeline-text">
 
-            </p>
+                    The interesting part is not
+                    knowing exactly where this goes.
 
-
-            <div
-                class="detail-level"
-                id="detailLevel"
-            >
-
-                SYSTEM READY
+                </div>
 
             </div>
 
@@ -2981,9 +3508,9 @@ footer {
 
 
 
-<!-- =======================================================
+<!-- =====================================================
      CONTACT
-======================================================= -->
+===================================================== -->
 
 <section
     class="contact"
@@ -2993,46 +3520,61 @@ footer {
 
     <div class="section-label reveal">
 
-        04 / CONTACT
+        06 / CONTACT
 
     </div>
 
 
-    <div class="reveal">
+    <div
+        class="contact-title reveal"
+    >
+
+        LET'S
+        <br>
+
+        <span>
+            BUILD.
+        </span>
+
+    </div>
 
 
-        <div class="contact-title">
+    <div class="contact-bottom">
 
-            LET'S
-            <br>
 
-            <span>
-                BUILD.
-            </span>
+        <div class="contact-description">
+
+            HAVE AN IDEA?
+
+            <br><br>
+
+            Let's turn it into something
+            people can actually interact with.
 
         </div>
 
 
+        <a
+            href="mailto:hello@nithan.in"
+            class="contact-button magnetic"
+        >
+
+            GET IN TOUCH
+            ↗
+
+        </a>
+
+
     </div>
-
-
-    <a
-        href="mailto:hello@nithan.in"
-        class="email"
-    >
-
-        HELLO@NITHAN.IN ↗
-
-    </a>
 
 
 </section>
 
 
 
-<!-- =======================================================
+<!-- =====================================================
      FOOTER
-======================================================= -->
+===================================================== -->
 
 <footer>
 
@@ -3075,7 +3617,7 @@ footer {
 <script>
 
 /* =========================================================
-   CUSTOM CURSOR
+   CURSOR
 ========================================================= */
 
 const cursor =
@@ -3083,7 +3625,6 @@ const cursor =
 
 const cursorRing =
     document.querySelector(".cursor-ring");
-
 
 let mouseX = 0;
 let mouseY = 0;
@@ -3094,13 +3635,13 @@ let ringY = 0;
 
 document.addEventListener(
     "mousemove",
-    event => {
+    e => {
 
         mouseX =
-            event.clientX;
+            e.clientX;
 
         mouseY =
-            event.clientY;
+            e.clientY;
 
 
         cursor.style.left =
@@ -3109,11 +3650,12 @@ document.addEventListener(
         cursor.style.top =
             mouseY + "px";
 
+
     }
 );
 
 
-function cursorAnimation() {
+function cursorLoop() {
 
     ringX +=
         (mouseX - ringX) *
@@ -3132,13 +3674,13 @@ function cursorAnimation() {
 
 
     requestAnimationFrame(
-        cursorAnimation
+        cursorLoop
     );
 
 }
 
 
-cursorAnimation();
+cursorLoop();
 
 
 
@@ -3147,237 +3689,184 @@ cursorAnimation();
 ========================================================= */
 
 document
-.querySelectorAll("a, button")
-.forEach(element => {
+.querySelectorAll(
+    "a, button, .skill-card, .project"
+)
+.forEach(
+    element => {
 
 
-    element.addEventListener(
-        "mouseenter",
-        () => {
+        element.addEventListener(
+            "mouseenter",
+            () => {
 
-            cursorRing.style.width =
-                "55px";
+                cursorRing.style.width =
+                    "55px";
 
-            cursorRing.style.height =
-                "55px";
+                cursorRing.style.height =
+                    "55px";
 
-            cursorRing.style.borderColor =
-                "rgba(255,255,255,.8)";
-
-        }
-    );
+            }
+        );
 
 
-    element.addEventListener(
-        "mouseleave",
-        () => {
+        element.addEventListener(
+            "mouseleave",
+            () => {
 
-            cursorRing.style.width =
-                "34px";
+                cursorRing.style.width =
+                    "34px";
 
-            cursorRing.style.height =
-                "34px";
+                cursorRing.style.height =
+                    "34px";
 
-            cursorRing.style.borderColor =
-                "rgba(255,255,255,.45)";
-
-        }
-    );
+            }
+        );
 
 
-});
+    }
+);
 
 
 
 /* =========================================================
-   HERO ORB PARALLAX
+   HERO OBJECT PARALLAX
 ========================================================= */
 
-const heroVisual =
+const heroObject =
     document.getElementById(
-        "heroVisual"
+        "heroObject"
     );
 
 
 document.addEventListener(
     "mousemove",
-    event => {
+    e => {
 
-        if(window.innerWidth <= 800)
+
+        if(
+            window.innerWidth <= 800
+        )
             return;
 
 
         const x =
-            (event.clientX /
-            window.innerWidth -
-            .5) * 30;
+            (
+                e.clientX /
+                window.innerWidth -
+                .5
+            ) * 35;
 
 
         const y =
-            (event.clientY /
-            window.innerHeight -
-            .5) * 30;
+            (
+                e.clientY /
+                window.innerHeight -
+                .5
+            ) * 35;
 
 
-        heroVisual.style.setProperty(
-            "--mouse-x",
+        heroObject.style.setProperty(
+            "--object-x",
             x + "px"
         );
 
 
-        heroVisual.style.setProperty(
-            "--mouse-y",
+        heroObject.style.setProperty(
+            "--object-y",
             y + "px"
         );
 
+
     }
 );
 
 
 
 /* =========================================================
-   SKILLS INTERACTION
+   MOUSE LIGHT
 ========================================================= */
 
-const skillNodes =
+const glow =
+    document.querySelector(
+        ".space-glow"
+    );
+
+
+document.addEventListener(
+    "mousemove",
+    e => {
+
+        glow.style.left =
+            e.clientX + "px";
+
+        glow.style.top =
+            e.clientY + "px";
+
+    }
+);
+
+
+
+/* =========================================================
+   SKILL DECK
+========================================================= */
+
+const skillCards =
     document.querySelectorAll(
-        ".skill-node"
+        ".skill-card"
     );
 
 
-const skillDetail =
-    document.getElementById(
-        "skillDetail"
-    );
+skillCards.forEach(
+    card => {
 
 
-const detailIndex =
-    document.getElementById(
-        "detailIndex"
-    );
+        card.addEventListener(
+            "mouseenter",
+            () => {
 
+                skillCards.forEach(
+                    other => {
 
-const detailTitle =
-    document.getElementById(
-        "detailTitle"
-    );
+                        other.classList.remove(
+                            "active"
+                        );
 
-
-const detailText =
-    document.getElementById(
-        "detailText"
-    );
-
-
-const detailLevel =
-    document.getElementById(
-        "detailLevel"
-    );
-
-
-const coreLabel =
-    document.getElementById(
-        "coreLabel"
-    );
-
-
-const coreNumber =
-    document.getElementById(
-        "coreNumber"
-    );
-
-
-skillNodes.forEach(
-    node => {
-
-
-        function activateSkill() {
-
-            const title =
-                node.dataset.title;
-
-            const info =
-                node.dataset.info;
-
-            const level =
-                node.dataset.level;
-
-            const number =
-                node.dataset.number;
-
-
-            detailIndex.textContent =
-                number +
-                " / CAPABILITY";
-
-
-            detailTitle.textContent =
-                title;
-
-
-            detailText.textContent =
-                info;
-
-
-            detailLevel.textContent =
-                level;
-
-
-            coreLabel.innerHTML =
-                title.replace(
-                    " / ",
-                    "<br>"
+                    }
                 );
 
 
-            coreNumber.textContent =
-                number;
+                card.classList.add(
+                    "active"
+                );
 
-
-            skillDetail.classList.add(
-                "active"
-            );
-
-        }
-
-
-        node.addEventListener(
-            "mouseenter",
-            activateSkill
+            }
         );
 
 
-        node.addEventListener(
+        card.addEventListener(
             "click",
-            activateSkill
+            () => {
+
+                skillCards.forEach(
+                    other => {
+
+                        other.classList.remove(
+                            "active"
+                        );
+
+                    }
+                );
+
+
+                card.classList.add(
+                    "active"
+                );
+
+            }
         );
 
-
-    }
-);
-
-
-/* reset skill panel */
-
-document
-.getElementById("skillsSystem")
-.addEventListener(
-    "mouseleave",
-    () => {
-
-        if(window.innerWidth > 800) {
-
-            skillDetail.classList.remove(
-                "active"
-            );
-
-            coreLabel.innerHTML =
-                "CURRENT<br>STACK";
-
-            coreNumber.textContent =
-                "06";
-
-        }
 
     }
 );
@@ -3385,7 +3874,7 @@ document
 
 
 /* =========================================================
-   SCROLL REVEAL
+   REVEAL ON SCROLL
 ========================================================= */
 
 const revealObserver =
@@ -3401,7 +3890,9 @@ const revealObserver =
 
                         entry.target
                             .classList
-                            .add("show");
+                            .add(
+                                "visible"
+                            );
 
                     }
 
@@ -3410,7 +3901,7 @@ const revealObserver =
 
         },
         {
-            threshold: .12
+            threshold: .1
         }
     );
 
@@ -3427,40 +3918,39 @@ document
 
 
 /* =========================================================
-   SPACE CANVAS
+   SPACE
 ========================================================= */
 
 const canvas =
     document.getElementById(
-        "spaceCanvas"
+        "space"
     );
-
 
 const ctx =
     canvas.getContext("2d");
 
 
-let width = 0;
-let height = 0;
+let W = 0;
+let H = 0;
 
 let stars = [];
-let meteors = [];
+let shootingStars = [];
 
 
-const mobile =
+const isMobile =
     window.innerWidth <= 800;
 
 
 const STAR_COUNT =
-    mobile ? 150 : 320;
+    isMobile ? 130 : 280;
 
 
 
 /* =========================================================
-   CANVAS RESIZE
+   RESIZE
 ========================================================= */
 
-function resizeCanvas() {
+function resizeSpace() {
 
     const ratio =
         Math.min(
@@ -3469,27 +3959,25 @@ function resizeCanvas() {
         );
 
 
-    width =
+    W =
         window.innerWidth;
 
-    height =
+    H =
         window.innerHeight;
 
 
     canvas.width =
-        width * ratio;
-
+        W * ratio;
 
     canvas.height =
-        height * ratio;
+        H * ratio;
 
 
     canvas.style.width =
-        width + "px";
-
+        W + "px";
 
     canvas.style.height =
-        height + "px";
+        H + "px";
 
 
     ctx.setTransform(
@@ -3504,16 +3992,12 @@ function resizeCanvas() {
 }
 
 
-resizeCanvas();
+resizeSpace();
 
 
 window.addEventListener(
     "resize",
-    () => {
-
-        resizeCanvas();
-
-    }
+    resizeSpace
 );
 
 
@@ -3537,34 +4021,32 @@ function createStars() {
         stars.push({
 
             x:
-                Math.random() *
-                width,
+                Math.random() * W,
 
             y:
-                Math.random() *
-                height,
+                Math.random() * H,
 
-            radius:
-                Math.random() < .93
+            size:
+                Math.random() < .94
                 ?
                 Math.random() * .65 + .2
                 :
-                Math.random() * 1.3 + .6,
+                Math.random() * 1.2 + .6,
 
             opacity:
-                Math.random() * .55 + .12,
+                Math.random() *
+                .45 +
+                .08,
 
             phase:
                 Math.random() *
-                Math.PI * 2,
+                Math.PI *
+                2,
 
             speed:
                 Math.random() *
-                .015 + .003,
-
-            drift:
-                Math.random() *
-                .05 + .01
+                .015 +
+                .002
 
         });
 
@@ -3579,69 +4061,44 @@ createStars();
 
 
 /* =========================================================
-   CREATE SHOOTING STAR
+   SHOOTING STAR
 ========================================================= */
 
-function createMeteor() {
+function spawnShootingStar() {
 
 
-    const fromLeft =
+    const side =
         Math.random() > .5;
 
 
-    let startX;
-    let startY;
-
-
-    if(fromLeft) {
-
-        startX =
-            Math.random() *
-            width *
-            .75;
-
-        startY =
-            Math.random() *
-            height *
-            .6;
-
-    } else {
-
-        startX =
-            width *
-            .25 +
-            Math.random() *
-            width *
-            .75;
-
-        startY =
-            Math.random() *
-            height *
-            .45;
-
-    }
-
-
-    const angle =
-        fromLeft
-        ?
-        Math.PI *
-        (.12 + Math.random() * .10)
-        :
-        Math.PI *
-        (.83 + Math.random() * .10);
-
-
-    meteors.push({
+    const star = {
 
         x:
-            startX,
+            side
+            ?
+            Math.random() *
+            W *
+            .65
+            :
+            W *
+            .35 +
+            Math.random() *
+            W *
+            .65,
 
         y:
-            startY,
+            Math.random() *
+            H *
+            .55,
 
         angle:
-            angle,
+            side
+            ?
+            Math.PI *
+            (.12 + Math.random()*.09)
+            :
+            Math.PI *
+            (.82 + Math.random()*.09),
 
         speed:
             Math.random() *
@@ -3650,65 +4107,59 @@ function createMeteor() {
 
         length:
             Math.random() *
-            100 +
-            80,
+            90 +
+            70,
 
-        width:
-            Math.random() *
-            .7 +
-            .5,
-
-        life: 0,
+        life:
+            0,
 
         maxLife:
             Math.random() *
-            35 +
+            30 +
             35,
 
         opacity:
             Math.random() *
             .35 +
-            .4
+            .35
 
-    });
+    };
+
+
+    shootingStars.push(
+        star
+    );
 
 }
 
 
-
 /* =========================================================
-   METEOR SPAWNER
+   RANDOM SHOOTING STARS
 ========================================================= */
 
-function meteorSpawner() {
+function scheduleMeteor() {
 
 
     const delay =
         Math.random() *
-        1800 +
-        900;
+        2200 +
+        1000;
 
 
     setTimeout(
         () => {
 
 
-            /*
-             * Only occasionally create one.
-             * The background should breathe,
-             * not look like Armageddon.
-             */
-
             if(
-                meteors.length < 2
+                shootingStars.length < 2
             ) {
 
-                createMeteor();
+                spawnShootingStar();
 
             }
 
 
-            meteorSpawner();
+            scheduleMeteor();
 
 
         },
@@ -3718,12 +4169,12 @@ function meteorSpawner() {
 }
 
 
-meteorSpawner();
+scheduleMeteor();
 
 
 
 /* =========================================================
-   DRAW STAR FIELD
+   DRAW SPACE
 ========================================================= */
 
 function drawSpace() {
@@ -3732,15 +4183,14 @@ function drawSpace() {
     ctx.clearRect(
         0,
         0,
-        width,
-        height
+        W,
+        H
     );
 
 
-
-    /* =====================================================
+    /* -------------------------------------
        STARS
-    ===================================================== */
+    ------------------------------------- */
 
     stars.forEach(
         star => {
@@ -3756,32 +4206,12 @@ function drawSpace() {
                 );
 
 
-            const alpha =
+            const opacity =
                 Math.max(
                     .04,
                     star.opacity +
-                    pulse * .12
+                    pulse * .10
                 );
-
-
-            /*
-             * Tiny vertical movement.
-             * Almost invisible.
-             */
-
-            star.y +=
-                star.drift *
-                .01;
-
-
-            if(
-                star.y >
-                height
-            ) {
-
-                star.y = 0;
-
-            }
 
 
             ctx.beginPath();
@@ -3790,7 +4220,7 @@ function drawSpace() {
             ctx.arc(
                 star.x,
                 star.y,
-                star.radius,
+                star.size,
                 0,
                 Math.PI * 2
             );
@@ -3801,7 +4231,7 @@ function drawSpace() {
                     255,
                     255,
                     255,
-                    ${alpha}
+                    ${opacity}
                 )`;
 
 
@@ -3813,11 +4243,11 @@ function drawSpace() {
 
 
 
-    /* =====================================================
+    /* -------------------------------------
        SHOOTING STARS
-    ===================================================== */
+    ------------------------------------- */
 
-    meteors.forEach(
+    shootingStars.forEach(
         (meteor,index) => {
 
 
@@ -3838,11 +4268,6 @@ function drawSpace() {
                 meteor.speed;
 
 
-
-            /*
-             * Fade in and out.
-             */
-
             const progress =
                 meteor.life /
                 meteor.maxLife;
@@ -3862,8 +4287,7 @@ function drawSpace() {
             if(progress > .7) {
 
                 fade =
-                    (1 - progress) /
-                    .3;
+                    (1 - progress) / .3;
 
             }
 
@@ -3872,11 +4296,6 @@ function drawSpace() {
                 meteor.opacity *
                 fade;
 
-
-
-            /*
-             * Tail.
-             */
 
             const tailX =
                 meteor.x -
@@ -3892,7 +4311,6 @@ function drawSpace() {
                     meteor.angle
                 ) *
                 meteor.length;
-
 
 
             const gradient =
@@ -3911,12 +4329,12 @@ function drawSpace() {
 
 
             gradient.addColorStop(
-                .65,
+                .7,
                 `rgba(
                     255,
                     255,
                     255,
-                    ${alpha * .25}
+                    ${alpha*.3}
                 )`
             );
 
@@ -3930,7 +4348,6 @@ function drawSpace() {
                     ${alpha}
                 )`
             );
-
 
 
             ctx.beginPath();
@@ -3952,17 +4369,13 @@ function drawSpace() {
                 gradient;
 
 
-            ctx.lineWidth =
-                meteor.width;
+            ctx.lineWidth = .8;
 
 
             ctx.stroke();
 
 
-
-            /*
-             * Bright head.
-             */
+            /* HEAD */
 
             ctx.beginPath();
 
@@ -3970,7 +4383,7 @@ function drawSpace() {
             ctx.arc(
                 meteor.x,
                 meteor.y,
-                1.2,
+                1.25,
                 0,
                 Math.PI * 2
             );
@@ -3985,12 +4398,10 @@ function drawSpace() {
                 )`;
 
 
-            ctx.shadowBlur =
-                14;
-
+            ctx.shadowBlur = 15;
 
             ctx.shadowColor =
-                "rgba(255,255,255,.9)";
+                "white";
 
 
             ctx.fill();
@@ -3999,30 +4410,21 @@ function drawSpace() {
             ctx.shadowBlur = 0;
 
 
-
-            /*
-             * Remove finished meteor.
-             */
-
             if(
                 meteor.life >
-                meteor.maxLife ||
-                meteor.x < -200 ||
-                meteor.x > width + 200 ||
-                meteor.y < -200 ||
-                meteor.y > height + 200
+                meteor.maxLife
             ) {
 
-                meteors.splice(
+                shootingStars.splice(
                     index,
                     1
                 );
 
             }
 
+
         }
     );
-
 
 
     requestAnimationFrame(
@@ -4037,97 +4439,66 @@ drawSpace();
 
 
 /* =========================================================
-   SCROLL PARALLAX
+   MAGNETIC BUTTON
 ========================================================= */
 
-let previousScroll =
-    window.scrollY;
-
-let scrollVelocity = 0;
-
-
-window.addEventListener(
-    "scroll",
-    () => {
+const magneticElements =
+    document.querySelectorAll(
+        ".magnetic"
+    );
 
 
-        const current =
-            window.scrollY;
+magneticElements.forEach(
+    element => {
 
 
-        scrollVelocity =
-            current -
-            previousScroll;
+        element.addEventListener(
+            "mousemove",
+            e => {
 
 
-        previousScroll =
-            current;
+                if(
+                    window.innerWidth <= 800
+                )
+                    return;
 
 
-    },
-    {
-        passive: true
-    }
-);
+                const rect =
+                    element.getBoundingClientRect();
 
 
-/*
- * Give stars a microscopic
- * amount of motion while scrolling.
- */
-
-function scrollStars() {
+                const x =
+                    e.clientX -
+                    rect.left -
+                    rect.width / 2;
 
 
-    if(
-        Math.abs(scrollVelocity) >
-        .01
-    ) {
+                const y =
+                    e.clientY -
+                    rect.top -
+                    rect.height / 2;
 
 
-        stars.forEach(
-            star => {
-
-                star.y +=
-                    scrollVelocity *
-                    .012;
+                element.style.transform =
+                    `translate(
+                        ${x * .15}px,
+                        ${y * .15}px
+                    )`;
 
             }
         );
 
 
-        scrollVelocity *=
-            .92;
+        element.addEventListener(
+            "mouseleave",
+            () => {
 
-    }
+                element.style.transform =
+                    "";
 
+            }
+        );
 
-    requestAnimationFrame(
-        scrollStars
-    );
-
-}
-
-
-scrollStars();
-
-
-
-/* =========================================================
-   KEYBOARD ACCESSIBILITY
-========================================================= */
-
-document.addEventListener(
-    "keydown",
-    event => {
-
-        if(event.key === "Escape") {
-
-            skillDetail.classList.remove(
-                "active"
-            );
-
-        }
 
     }
 );
@@ -4135,7 +4506,82 @@ document.addEventListener(
 
 
 /* =========================================================
-   INITIAL PAGE LOAD
+   ACTIVE NAV
+========================================================= */
+
+const sections =
+    document.querySelectorAll(
+        "section[id]"
+    );
+
+const navLinks =
+    document.querySelectorAll(
+        ".nav-links a"
+    );
+
+
+const navObserver =
+    new IntersectionObserver(
+        entries => {
+
+
+            entries.forEach(
+                entry => {
+
+
+                    if(
+                        entry.isIntersecting
+                    ) {
+
+
+                        navLinks.forEach(
+                            link => {
+
+                                link.style.color =
+                                    "#666";
+
+                            }
+                        );
+
+
+                        const active =
+                            document.querySelector(
+                                `.nav-links a[href="#${entry.target.id}"]`
+                            );
+
+
+                        if(active) {
+
+                            active.style.color =
+                                "white";
+
+                        }
+
+
+                    }
+
+
+                }
+            );
+
+
+        },
+        {
+            threshold: .45
+        }
+    );
+
+
+sections.forEach(
+    section =>
+        navObserver.observe(
+            section
+        );
+
+
+
+/* =========================================================
+   INITIAL LOAD
 ========================================================= */
 
 window.addEventListener(
@@ -4143,15 +4589,15 @@ window.addEventListener(
     () => {
 
         document
-            .querySelector(".hero-inner")
+            .querySelector(".hero-content")
             .classList
-            .add("show");
+            .add("visible");
 
     }
 );
 
-</script>
 
+</script>
 
 </body>
 
