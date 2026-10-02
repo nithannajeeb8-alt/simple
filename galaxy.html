@@ -2,17 +2,19 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Nithan Najeeb — Portfolio</title>
+<title>Nithan Najeeb</title>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+/* =========================================================
+   RESET
+========================================================= */
 
 * {
     margin: 0;
@@ -27,623 +29,921 @@ html {
 body {
     background: #050505;
     color: white;
-    font-family: Inter, sans-serif;
+    font-family: "Inter", sans-serif;
     overflow-x: hidden;
 }
 
+
 /* =========================================================
-   WEBGL BACKGROUND
+   MAIN BACKGROUND
 ========================================================= */
 
-#liquidCanvas {
+body::before {
+    content: "";
+
     position: fixed;
     inset: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -5;
+
+    pointer-events: none;
+
+    background:
+        radial-gradient(
+            circle at 50% 15%,
+            rgba(255,255,255,.045),
+            transparent 35%
+        );
+
+    z-index: -10;
 }
+
 
 /* =========================================================
    INTRO
 ========================================================= */
 
-#intro {
-    position: fixed;
-    inset: 0;
-    z-index: 50;
+.intro {
+    height: 100vh;
+    height: 100svh;
+
+    position: relative;
 
     display: flex;
     justify-content: center;
     align-items: center;
+
+    overflow: hidden;
 
     background:
         radial-gradient(
-            circle at center,
-            #151515 0%,
-            #050505 60%,
-            #000 100%
+            ellipse at center,
+            #111 0%,
+            #070707 50%,
+            #020202 100%
         );
-
-    overflow: hidden;
 }
 
-.intro-content {
-    position: relative;
-    width: min(90vw, 650px);
-    height: 300px;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
 
 /* =========================================================
-   GLASS NAME
+   STAR / DUST PARTICLES
 ========================================================= */
 
-.glass-name {
+.particles {
+    position: absolute;
+    inset: 0;
 
-    position: relative;
+    pointer-events: none;
 
-    font-size: clamp(3rem, 9vw, 8rem);
-    font-weight: 700;
-
-    letter-spacing: -0.07em;
-
-    color: rgba(255,255,255,.15);
-
-    text-align: center;
-
-    padding: 45px 55px;
-
-    border-radius: 42px;
-
-    border: 1px solid rgba(255,255,255,.55);
-
-    background:
-        linear-gradient(
-            135deg,
-            rgba(255,255,255,.14),
-            rgba(255,255,255,.025)
-        );
-
-    backdrop-filter: blur(20px) saturate(180%);
-
-    box-shadow:
-        inset 0 1px 2px rgba(255,255,255,.7),
-        inset 0 -20px 50px rgba(255,255,255,.025),
-        0 30px 100px rgba(0,0,0,.6);
-
-    overflow: hidden;
-
-    transform: perspective(1000px) rotateX(8deg);
+    opacity: .45;
 }
 
-/* rainbow liquid */
-
-.liquid {
-
+.particle {
     position: absolute;
 
-    left: -10%;
-    bottom: -10%;
+    width: 2px;
+    height: 2px;
 
-    width: 120%;
-    height: 0%;
+    border-radius: 50%;
 
-    border-radius: 50% 50% 0 0;
+    background: white;
 
-    background:
-        linear-gradient(
-            90deg,
-            #ff0055,
-            #ff8a00,
-            #ffe600,
-            #00ff8a,
-            #00b7ff,
-            #7657ff,
-            #ff00e5
-        );
-
-    background-size: 400% 100%;
-
-    filter:
-        blur(2px)
-        saturate(150%);
+    opacity: .25;
 
     animation:
-        rainbowMove 5s linear infinite;
-
-    opacity: .9;
-
-    z-index: 1;
+        floatParticle
+        var(--duration)
+        ease-in-out
+        infinite alternate;
 }
 
-@keyframes rainbowMove {
+@keyframes floatParticle {
 
-    0% {
-        background-position: 0% 50%;
+    from {
+        transform: translateY(0);
+        opacity: .15;
     }
 
-    100% {
-        background-position: 400% 50%;
+    to {
+        transform: translateY(-25px);
+        opacity: .5;
     }
-
 }
 
-/* liquid highlight */
 
-.liquid::before {
+/* =========================================================
+   NAME STAGE
+========================================================= */
 
-    content: "";
+.name-stage {
 
-    position: absolute;
-
-    width: 100%;
-    height: 25px;
-
-    top: -12px;
-
-    background:
-        radial-gradient(
-            ellipse,
-            rgba(255,255,255,.9),
-            transparent 70%
-        );
-
-    filter: blur(8px);
-}
-
-/* name sits above liquid */
-
-.name-text {
+    width: min(94vw, 1250px);
 
     position: relative;
 
     z-index: 5;
 
-    mix-blend-mode: screen;
-
-    color: rgba(255,255,255,.9);
-
-    text-shadow:
-        0 0 30px rgba(255,255,255,.4);
+    display: flex;
+    justify-content: center;
 }
 
-/* glass shine */
 
-.glass-shine {
+/*
+   The SVG itself contains every individual letter.
+*/
+
+.name-svg {
+
+    width: 100%;
+    height: auto;
+
+    overflow: visible;
+
+    filter:
+        drop-shadow(
+            0 0 18px
+            rgba(255,255,255,.08)
+        );
+}
+
+
+/* =========================================================
+   GLASS LETTERS
+========================================================= */
+
+/*
+   Empty glass outline.
+*/
+
+.glass-letter {
+
+    fill:
+        rgba(255,255,255,.015);
+
+    stroke:
+        rgba(255,255,255,.82);
+
+    stroke-width: 1.3;
+
+    paint-order: stroke fill;
+
+    filter:
+        drop-shadow(
+            0 0 7px
+            rgba(255,255,255,.10)
+        );
+}
+
+
+/*
+   Inner glass highlight.
+*/
+
+.glass-highlight {
+
+    fill: none;
+
+    stroke:
+        rgba(255,255,255,.22);
+
+    stroke-width: .7;
+
+    opacity: .8;
+}
+
+
+/* =========================================================
+   LIQUID
+========================================================= */
+
+.liquid-letter {
+
+    /*
+       Individual liquid is clipped
+       to its corresponding letter.
+    */
+
+    transform:
+        translateY(100%);
+
+    transform-box: fill-box;
+
+    opacity: .92;
+}
+
+
+/*
+   Animated liquid surface.
+*/
+
+.liquid-surface {
+
+    fill: none;
+
+    stroke:
+        rgba(255,255,255,.75);
+
+    stroke-width: 1.2;
+
+    opacity: .65;
+}
+
+
+/* =========================================================
+   LIQUID STREAMS
+========================================================= */
+
+.stream {
+    fill: none;
+
+    stroke-linecap: round;
+
+    opacity: 0;
+
+    filter:
+        url(#liquidGlow);
+}
+
+
+/* =========================================================
+   LIQUID POOL
+========================================================= */
+
+.liquid-world {
 
     position: absolute;
 
-    inset: 0;
+    left: -10%;
+    right: -10%;
 
-    z-index: 6;
+    bottom: -12vh;
+
+    height: 30vh;
 
     pointer-events: none;
 
+    opacity: 0;
+
+    z-index: 1;
+
+    overflow: hidden;
+}
+
+
+/*
+   Main liquid surface.
+*/
+
+.liquid-pool {
+
+    position: absolute;
+
+    left: -10%;
+
+    width: 120%;
+
+    top: 30%;
+
+    height: 120%;
+
+    border-radius:
+        50% 50% 0 0;
+
     background:
+
+        radial-gradient(
+            ellipse at 30% 20%,
+            rgba(110,225,255,.30),
+            transparent 25%
+        ),
+
+        radial-gradient(
+            ellipse at 65% 25%,
+            rgba(180,100,255,.25),
+            transparent 30%
+        ),
+
+        radial-gradient(
+            ellipse at 48% 15%,
+            rgba(255,255,255,.15),
+            transparent 25%
+        ),
+
         linear-gradient(
-            120deg,
-            transparent 20%,
-            rgba(255,255,255,.35) 48%,
-            transparent 55%
+            90deg,
+            rgba(40,180,255,.18),
+            rgba(170,90,255,.18),
+            rgba(255,70,180,.14),
+            rgba(90,220,255,.18)
         );
 
-    transform:
-        translateX(-120%);
+    filter:
+        blur(12px);
 
+    animation:
+        poolMove
+        8s
+        ease-in-out
+        infinite
+        alternate;
 }
+
+
+@keyframes poolMove {
+
+    from {
+        transform:
+            translateX(-2%)
+            scaleY(1);
+    }
+
+    to {
+        transform:
+            translateX(2%)
+            scaleY(1.08);
+    }
+}
+
+
+/*
+   Sharp reflective edge.
+*/
+
+.pool-edge {
+
+    position: absolute;
+
+    left: -10%;
+
+    width: 120%;
+
+    top: 29%;
+
+    height: 2px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(150,230,255,.55),
+            rgba(255,255,255,.65),
+            rgba(180,120,255,.5),
+            transparent
+        );
+
+    filter: blur(2px);
+}
+
 
 /* =========================================================
-   GLASS SHARDS
+   SCROLL INDICATOR
 ========================================================= */
 
-.shard {
+.scroll-hint {
 
-    position: fixed;
+    position: absolute;
 
-    width: 20px;
-    height: 20px;
+    bottom: 35px;
+
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    z-index: 10;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 10px;
+
+    color:
+        rgba(255,255,255,.4);
+
+    font-size: .68rem;
+
+    letter-spacing: .18em;
+
+    text-transform: uppercase;
+
+    transition: opacity .5s;
+}
+
+
+.scroll-line {
+
+    width: 1px;
+    height: 45px;
 
     background:
         linear-gradient(
-            135deg,
-            rgba(255,255,255,.8),
-            rgba(255,255,255,.05)
+            white,
+            transparent
         );
 
-    border:
-        1px solid rgba(255,255,255,.8);
-
-    backdrop-filter: blur(4px);
-
-    pointer-events: none;
-
-    z-index: 100;
+    animation:
+        scrollLine
+        2s
+        ease-in-out
+        infinite;
 }
+
+
+@keyframes scrollLine {
+
+    0%,100% {
+        transform:
+            scaleY(.4);
+        transform-origin: top;
+    }
+
+    50% {
+        transform:
+            scaleY(1);
+    }
+}
+
 
 /* =========================================================
    PORTFOLIO
 ========================================================= */
 
-#portfolio {
+.portfolio {
 
     position: relative;
 
-    opacity: 0;
+    margin-top: -2px;
 
-    visibility: hidden;
+    background: transparent;
+
+    z-index: 5;
 }
 
+
 /* =========================================================
-   NAV
+   NAVIGATION
 ========================================================= */
 
-nav {
+.nav {
 
     position: fixed;
 
-    top: 25px;
+    top: 24px;
     left: 50%;
 
-    transform: translateX(-50%);
+    transform:
+        translateX(-50%)
+        translateY(-120px);
 
-    width: min(92%, 900px);
-
-    padding: 14px 20px;
+    width: min(90%, 900px);
 
     display: flex;
-    justify-content: space-between;
+
     align-items: center;
 
+    justify-content: space-between;
+
+    padding: 12px 18px;
+
     border:
-        1px solid rgba(255,255,255,.15);
-
-    background:
-        rgba(255,255,255,.045);
-
-    backdrop-filter:
-        blur(25px);
+        1px solid
+        rgba(255,255,255,.10);
 
     border-radius: 999px;
 
-    z-index: 20;
+    background:
+        rgba(10,10,10,.35);
+
+    backdrop-filter:
+        blur(24px)
+        saturate(140%);
+
+    -webkit-backdrop-filter:
+        blur(24px)
+        saturate(140%);
+
+    z-index: 100;
+
+    opacity: 0;
+
+    transition:
+        transform .8s cubic-bezier(.16,1,.3,1),
+        opacity .8s;
 }
+
+
+.nav.visible {
+
+    transform:
+        translateX(-50%)
+        translateY(0);
+
+    opacity: 1;
+}
+
 
 .logo {
 
+    font-size: .85rem;
+
     font-weight: 700;
+
     letter-spacing: -.04em;
 }
 
-nav a {
 
-    color: rgba(255,255,255,.65);
+.nav-links {
+
+    display: flex;
+
+    gap: 25px;
+}
+
+
+.nav-links a {
+
+    color:
+        rgba(255,255,255,.55);
 
     text-decoration: none;
 
-    font-size: .85rem;
+    font-size: .72rem;
 
-    margin-left: 22px;
-
-    transition: .3s;
+    transition: color .3s;
 }
 
-nav a:hover {
+
+.nav-links a:hover {
     color: white;
 }
 
-/* =========================================================
-   HERO
-========================================================= */
-
-.hero {
-
-    min-height: 100vh;
-
-    display: flex;
-    flex-direction: column;
-
-    justify-content: center;
-
-    max-width: 1200px;
-
-    margin: auto;
-
-    padding:
-        120px 30px
-        80px;
-}
-
-.eyebrow {
-
-    font-size: .8rem;
-
-    text-transform: uppercase;
-
-    letter-spacing: .2em;
-
-    color:
-        rgba(255,255,255,.5);
-
-    margin-bottom: 20px;
-}
-
-.hero h1 {
-
-    font-size:
-        clamp(4rem, 11vw, 10rem);
-
-    line-height: .85;
-
-    letter-spacing: -.08em;
-
-    max-width: 1000px;
-}
-
-.gradient-text {
-
-    background:
-
-        linear-gradient(
-            90deg,
-            #ff3d81,
-            #ffb000,
-            #65ffbc,
-            #48caff,
-            #a46cff,
-            #ff4fd8
-        );
-
-    background-size: 300%;
-
-    -webkit-background-clip: text;
-
-    color: transparent;
-
-    animation:
-        rainbowText 8s linear infinite;
-}
-
-@keyframes rainbowText {
-
-    to {
-        background-position: 300%;
-    }
-
-}
-
-.hero-description {
-
-    max-width: 550px;
-
-    margin-top: 35px;
-
-    font-size: 1.1rem;
-
-    line-height: 1.8;
-
-    color:
-        rgba(255,255,255,.6);
-}
 
 /* =========================================================
    SECTIONS
 ========================================================= */
 
-section {
+.section {
 
-    max-width: 1200px;
+    min-height: 100vh;
+
+    padding:
+        150px 7vw;
+
+    max-width: 1400px;
 
     margin: auto;
 
-    padding:
-        120px 30px;
+    position: relative;
 }
+
+
+.section-label {
+
+    color:
+        rgba(255,255,255,.38);
+
+    font-size: .7rem;
+
+    text-transform: uppercase;
+
+    letter-spacing: .22em;
+
+    margin-bottom: 25px;
+}
+
 
 .section-title {
 
     font-size:
-        clamp(2.5rem, 6vw, 5rem);
+        clamp(3rem, 8vw, 8rem);
 
-    letter-spacing: -.06em;
+    line-height: .9;
 
-    margin-bottom: 50px;
+    letter-spacing: -.08em;
+
+    font-weight: 600;
+
+    margin-bottom: 60px;
 }
 
+
 /* =========================================================
-   GLASS CARDS
+   ABOUT
 ========================================================= */
 
-.glass-grid {
+.about-grid {
 
     display: grid;
 
     grid-template-columns:
-        repeat(
-            auto-fit,
-            minmax(250px, 1fr)
-        );
+        1.2fr .8fr;
 
-    gap: 20px;
+    gap: 60px;
+
+    align-items: start;
 }
 
-.card {
 
-    position: relative;
+.about-text {
 
-    padding: 35px;
+    font-size:
+        clamp(1.4rem, 2.8vw, 2.5rem);
 
-    min-height: 250px;
+    line-height: 1.35;
 
-    border-radius: 30px;
-
-    border:
-        1px solid rgba(255,255,255,.12);
-
-    background:
-        linear-gradient(
-            135deg,
-            rgba(255,255,255,.08),
-            rgba(255,255,255,.025)
-        );
-
-    backdrop-filter:
-        blur(25px);
-
-    overflow: hidden;
-
-    transition:
-        transform .5s,
-        border .5s;
-}
-
-.card::before {
-
-    content: "";
-
-    position: absolute;
-
-    width: 250px;
-    height: 250px;
-
-    border-radius: 50%;
-
-    background:
-        radial-gradient(
-            circle,
-            rgba(100,200,255,.15),
-            transparent 70%
-        );
-
-    top: -100px;
-    right: -100px;
-
-    transition: .5s;
-}
-
-.card:hover {
-
-    transform:
-        translateY(-8px)
-        scale(1.01);
-
-    border-color:
-        rgba(255,255,255,.35);
-}
-
-.card:hover::before {
-    transform: scale(2);
-}
-
-.card h3 {
-
-    font-size: 1.4rem;
-
-    margin-bottom: 15px;
-}
-
-.card p {
+    letter-spacing: -.04em;
 
     color:
-        rgba(255,255,255,.55);
-
-    line-height: 1.7;
+        rgba(255,255,255,.72);
 }
+
+
+.about-text span {
+
+    color: white;
+}
+
+
+.about-side {
+
+    padding-top: 10px;
+}
+
+
+.info-line {
+
+    padding: 18px 0;
+
+    border-top:
+        1px solid
+        rgba(255,255,255,.1);
+
+    display: flex;
+
+    justify-content: space-between;
+
+    color:
+        rgba(255,255,255,.5);
+
+    font-size: .85rem;
+}
+
+
+.info-line strong {
+
+    color:
+        rgba(255,255,255,.9);
+
+    font-weight: 400;
+}
+
 
 /* =========================================================
    SKILLS
 ========================================================= */
 
-.skill {
+.skills-grid {
 
-    margin-bottom: 25px;
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 14px;
 }
 
-.skill-top {
 
-    display: flex;
+.skill-card {
 
-    justify-content:
-        space-between;
+    min-height: 250px;
 
-    margin-bottom: 8px;
-}
+    padding: 28px;
 
-.skill-name {
-
-    color:
-        rgba(255,255,255,.8);
-}
-
-.skill-bar {
-
-    height: 5px;
+    border:
+        1px solid
+        rgba(255,255,255,.09);
 
     background:
-        rgba(255,255,255,.1);
+        rgba(255,255,255,.025);
 
-    border-radius: 10px;
+    backdrop-filter:
+        blur(18px);
+
+    transition:
+        transform .5s,
+        background .5s,
+        border .5s;
+
+    position: relative;
 
     overflow: hidden;
 }
 
-.skill-progress {
 
-    height: 100%;
+.skill-card::after {
 
-    width: 0;
+    content: "";
 
-    border-radius: 10px;
+    position: absolute;
+
+    width: 150px;
+    height: 150px;
+
+    border-radius: 50%;
+
+    right: -60px;
+    bottom: -70px;
 
     background:
-        linear-gradient(
-            90deg,
-            #ff3d81,
-            #ffb000,
-            #5effbd,
-            #4ac8ff
+        radial-gradient(
+            circle,
+            rgba(100,190,255,.16),
+            transparent 70%
         );
+
+    filter: blur(15px);
+
+    transition: .5s;
 }
+
+
+.skill-card:hover {
+
+    transform:
+        translateY(-8px);
+
+    border-color:
+        rgba(255,255,255,.2);
+
+    background:
+        rgba(255,255,255,.045);
+}
+
+
+.skill-number {
+
+    color:
+        rgba(255,255,255,.25);
+
+    font-size: .7rem;
+
+    margin-bottom: 70px;
+}
+
+
+.skill-card h3 {
+
+    font-size: 1.5rem;
+
+    font-weight: 500;
+
+    letter-spacing: -.05em;
+
+    margin-bottom: 10px;
+}
+
+
+.skill-card p {
+
+    color:
+        rgba(255,255,255,.45);
+
+    line-height: 1.6;
+
+    font-size: .85rem;
+}
+
 
 /* =========================================================
    PROJECTS
 ========================================================= */
 
+.projects {
+
+    display: flex;
+
+    flex-direction: column;
+}
+
+
 .project {
 
-    min-height: 350px;
+    display: grid;
+
+    grid-template-columns:
+        100px 1fr auto;
+
+    align-items: center;
+
+    gap: 30px;
+
+    padding:
+        30px 0;
+
+    border-top:
+        1px solid
+        rgba(255,255,255,.1);
+
+    transition:
+        padding .5s;
+}
+
+
+.project:last-child {
+
+    border-bottom:
+        1px solid
+        rgba(255,255,255,.1);
+}
+
+
+.project:hover {
+    padding-left: 15px;
+}
+
+
+.project-number {
+
+    color:
+        rgba(255,255,255,.3);
+
+    font-size: .7rem;
+}
+
+
+.project h3 {
+
+    font-size:
+        clamp(1.5rem, 3vw, 2.8rem);
+
+    font-weight: 500;
+
+    letter-spacing: -.06em;
+}
+
+
+.project-type {
+
+    color:
+        rgba(255,255,255,.4);
+
+    font-size: .7rem;
+}
+
+
+/* =========================================================
+   CONTACT
+========================================================= */
+
+.contact {
+
+    min-height: 80vh;
 
     display: flex;
 
     flex-direction: column;
 
-    justify-content:
-        flex-end;
+    justify-content: center;
 }
 
-.project-number {
 
-    font-size: .75rem;
+.contact h2 {
+
+    font-size:
+        clamp(4rem, 11vw, 11rem);
+
+    line-height: .8;
+
+    letter-spacing: -.1em;
+}
+
+
+.contact h2 span {
 
     color:
-        rgba(255,255,255,.4);
-
-    margin-bottom: auto;
+        rgba(255,255,255,.3);
 }
 
-.project h3 {
 
-    font-size: 2rem;
+.contact-link {
 
-    letter-spacing: -.04em;
+    margin-top: 70px;
+
+    color: white;
+
+    text-decoration: none;
+
+    font-size: 1rem;
+
+    border-bottom:
+        1px solid
+        rgba(255,255,255,.3);
+
+    width: max-content;
+
+    padding-bottom: 8px;
 }
 
-.project p {
-
-    margin-top: 10px;
-}
 
 /* =========================================================
    FOOTER
@@ -651,268 +951,843 @@ section {
 
 footer {
 
-    text-align: center;
-
     padding:
-        100px 20px;
+        40px 7vw;
+
+    border-top:
+        1px solid
+        rgba(255,255,255,.08);
+
+    display: flex;
+
+    justify-content: space-between;
 
     color:
-        rgba(255,255,255,.4);
+        rgba(255,255,255,.3);
+
+    font-size: .7rem;
 }
+
+
+/* =========================================================
+   REVEAL ANIMATIONS
+========================================================= */
+
+.reveal {
+
+    opacity: 0;
+
+    transform:
+        translateY(70px);
+
+    transition:
+        opacity 1s cubic-bezier(.16,1,.3,1),
+        transform 1s cubic-bezier(.16,1,.3,1);
+}
+
+
+.reveal.show {
+
+    opacity: 1;
+
+    transform:
+        translateY(0);
+}
+
 
 /* =========================================================
    MOBILE
 ========================================================= */
 
-@media(max-width:700px) {
+@media(max-width:800px) {
 
-    .glass-name {
-
-        padding:
-            30px 25px;
-
-        border-radius: 28px;
-
-        font-size:
-            clamp(2.3rem, 11vw, 4rem);
+    .name-stage {
+        width: 96vw;
     }
 
-    nav {
-
-        padding: 12px 16px;
+    .about-grid {
+        grid-template-columns: 1fr;
+        gap: 50px;
     }
 
-    nav a {
+    .skills-grid {
+        grid-template-columns: 1fr;
+    }
 
+    .project {
+        grid-template-columns:
+            50px 1fr;
+    }
+
+    .project-type {
         display: none;
     }
 
-    .hero h1 {
-
-        font-size:
-            clamp(4rem, 20vw, 7rem);
+    .nav-links {
+        display: none;
     }
 
+    .section {
+        padding:
+            120px 7vw;
+    }
+
+    footer {
+        flex-direction: column;
+        gap: 10px;
+    }
 }
 
 </style>
 </head>
 
+
 <body>
 
-<canvas id="liquidCanvas"></canvas>
 
 <!-- =====================================================
      INTRO
 ===================================================== -->
 
-<div id="intro">
+<section class="intro" id="intro">
 
-    <div class="intro-content">
+    <div class="particles" id="particles"></div>
 
-        <div class="glass-name">
 
-            <div class="liquid"
-                 id="liquid">
-            </div>
+    <!--
+        SVG DEFINITIONS
 
-            <div class="glass-shine"
-                 id="shine">
-            </div>
+        Each letter is individually clipped.
+        The liquid therefore exists INSIDE the letter,
+        rather than inside a box.
+    -->
 
-            <div class="name-text">
-                Nithan Najeeb
-            </div>
+    <svg
+        class="name-svg"
+        viewBox="0 0 1200 260"
+        preserveAspectRatio="xMidYMid meet"
+        aria-label="Nithan Najeeb">
 
-        </div>
+        <defs>
+
+            <!-- =================================================
+                 IRIDESCENT LIQUID GRADIENT
+            ================================================== -->
+
+            <linearGradient
+                id="liquidGradient"
+                x1="0%"
+                y1="0%"
+                x2="100%"
+                y2="0%">
+
+                <stop
+                    offset="0%"
+                    stop-color="#7DE7FF"/>
+
+                <stop
+                    offset="22%"
+                    stop-color="#8D9BFF"/>
+
+                <stop
+                    offset="45%"
+                    stop-color="#C98AFF"/>
+
+                <stop
+                    offset="65%"
+                    stop-color="#FF8EDB"/>
+
+                <stop
+                    offset="82%"
+                    stop-color="#FFD59A"/>
+
+                <stop
+                    offset="100%"
+                    stop-color="#7DE7FF"/>
+
+                <animate
+                    attributeName="x1"
+                    values="0%;-100%;0%"
+                    dur="7s"
+                    repeatCount="indefinite"/>
+
+                <animate
+                    attributeName="x2"
+                    values="100%;0%;100%"
+                    dur="7s"
+                    repeatCount="indefinite"/>
+
+            </linearGradient>
+
+
+            <!-- =================================================
+                 SOFT LIQUID GLOW
+            ================================================== -->
+
+            <filter
+                id="liquidGlow"
+                x="-50%"
+                y="-50%"
+                width="200%"
+                height="200%">
+
+                <feGaussianBlur
+                    stdDeviation="3"
+                    result="blur"/>
+
+                <feMerge>
+
+                    <feMergeNode
+                        in="blur"/>
+
+                    <feMergeNode
+                        in="SourceGraphic"/>
+
+                </feMerge>
+
+            </filter>
+
+
+            <!-- =================================================
+                 EACH LETTER CLIP
+            ================================================== -->
+
+            <clipPath id="clipN1">
+                <text
+                    x="50"
+                    y="175"
+                    class="svg-letter">
+                    N
+                </text>
+            </clipPath>
+
+            <clipPath id="clipI">
+                <text
+                    x="185"
+                    y="175"
+                    class="svg-letter">
+                    i
+                </text>
+            </clipPath>
+
+            <clipPath id="clipT">
+                <text
+                    x="245"
+                    y="175"
+                    class="svg-letter">
+                    t
+                </text>
+            </clipPath>
+
+            <clipPath id="clipH">
+                <text
+                    x="320"
+                    y="175"
+                    class="svg-letter">
+                    h
+                </text>
+            </clipPath>
+
+            <clipPath id="clipA">
+                <text
+                    x="445"
+                    y="175"
+                    class="svg-letter">
+                    a
+                </text>
+            </clipPath>
+
+            <clipPath id="clipN2">
+                <text
+                    x="565"
+                    y="175"
+                    class="svg-letter">
+                    n
+                </text>
+            </clipPath>
+
+            <clipPath id="clipN3">
+                <text
+                    x="710"
+                    y="175"
+                    class="svg-letter">
+                    N
+                </text>
+            </clipPath>
+
+            <clipPath id="clipA2">
+                <text
+                    x="845"
+                    y="175"
+                    class="svg-letter">
+                    a
+                </text>
+            </clipPath>
+
+            <clipPath id="clipJ">
+                <text
+                    x="960"
+                    y="175"
+                    class="svg-letter">
+                    j
+                </text>
+            </clipPath>
+
+            <clipPath id="clipE1">
+                <text
+                    x="1020"
+                    y="175"
+                    class="svg-letter">
+                    e
+                </text>
+            </clipPath>
+
+            <clipPath id="clipE2">
+                <text
+                    x="1090"
+                    y="175"
+                    class="svg-letter">
+                    e
+                </text>
+            </clipPath>
+
+
+            <!-- common text style -->
+
+            <style>
+
+                .svg-letter {
+                    font-family:
+                        Inter,
+                        sans-serif;
+
+                    font-weight: 700;
+
+                    font-size: 150px;
+
+                    letter-spacing: -8px;
+                }
+
+            </style>
+
+        </defs>
+
+
+        <!-- =================================================
+             GLASS LETTERS
+        ================================================== -->
+
+        <g class="glass-letters">
+
+            <text
+                x="50"
+                y="175"
+                class="svg-letter glass-letter">
+                N
+            </text>
+
+            <text
+                x="185"
+                y="175"
+                class="svg-letter glass-letter">
+                i
+            </text>
+
+            <text
+                x="245"
+                y="175"
+                class="svg-letter glass-letter">
+                t
+            </text>
+
+            <text
+                x="320"
+                y="175"
+                class="svg-letter glass-letter">
+                h
+            </text>
+
+            <text
+                x="445"
+                y="175"
+                class="svg-letter glass-letter">
+                a
+            </text>
+
+            <text
+                x="565"
+                y="175"
+                class="svg-letter glass-letter">
+                n
+            </text>
+
+            <text
+                x="710"
+                y="175"
+                class="svg-letter glass-letter">
+                N
+            </text>
+
+            <text
+                x="845"
+                y="175"
+                class="svg-letter glass-letter">
+                a
+            </text>
+
+            <text
+                x="960"
+                y="175"
+                class="svg-letter glass-letter">
+                j
+            </text>
+
+            <text
+                x="1020"
+                y="175"
+                class="svg-letter glass-letter">
+                e
+            </text>
+
+            <text
+                x="1090"
+                y="175"
+                class="svg-letter glass-letter">
+                e
+            </text>
+
+        </g>
+
+
+        <!-- =================================================
+             LIQUID INSIDE EACH LETTER
+        ================================================== -->
+
+        <g id="liquidLetters">
+
+            <g clip-path="url(#clipN1)">
+                <rect
+                    class="liquid-letter"
+                    data-letter="N1"
+                    x="0"
+                    y="20"
+                    width="180"
+                    height="180"
+                    fill="url(#liquidGradient)"/>
+            </g>
+
+            <g clip-path="url(#clipI)">
+                <rect
+                    class="liquid-letter"
+                    data-letter="I"
+                    x="150"
+                    y="20"
+                    width="100"
+                    height="180"
+                    fill="url(#liquidGradient)"/>
+            </g>
+
+            <g clip-path="url(#clipT)">
+                <rect
+                    class="liquid-letter"
+                    data-letter="T"
+                    x="210"
+                    y="20"
+                    width="120"
+                    height="180"
+                    fill="url(#liquidGradient)"/>
+            </g>
+
+            <g clip-path="url(#clipH)">
+                <rect
+                    class="liquid-letter"
+                    data-letter="H"
+                    x="290"
+                    y="20"
+                    width="150"
+                    height="180"
+                    fill="url(#liquidGradient)"/>
+            </g>
+
+            <g clip-path="url(#clipA)">
+                <rect
+                    class="liquid-letter"
+                    data-letter="A"
+                    x="415"
+                    y="20"
+                    width="150"
+                    height="180"
+                    fill="url(#liquidGradient)"/>
+            </g>
+
+            <g clip-path="url(#clipN2)">
+                <rect
+                    class="liquid-letter"
+                    data-letter="N2"
+                    x="535"
+                    y="20"
+                    width="150"
+                    height="180"
+                    fill="url(#liquidGradient)"/>
+            </g>
+
+            <g clip-path="url(#clipN3)">
+                <rect
+                    class="liquid-letter"
+                    data-letter="N3"
+                    x="665"
+                    y="20"
+                    width="180"
+                    height="180"
+                    fill="url(#liquidGradient)"/>
+            </g>
+
+            <g clip-path="url(#clipA2)">
+                <rect
+                    class="liquid-letter"
+                    data-letter="A2"
+                    x="810"
+                    y="20"
+                    width="150"
+                    height="180"
+                    fill="url(#liquidGradient)"/>
+            </g>
+
+            <g clip-path="url(#clipJ)">
+                <rect
+                    class="liquid-letter"
+                    data-letter="J"
+                    x="930"
+                    y="20"
+                    width="100"
+                    height="180"
+                    fill="url(#liquidGradient)"/>
+            </g>
+
+            <g clip-path="url(#clipE1)">
+                <rect
+                    class="liquid-letter"
+                    data-letter="E1"
+                    x="990"
+                    y="20"
+                    width="100"
+                    height="180"
+                    fill="url(#liquidGradient)"/>
+            </g>
+
+            <g clip-path="url(#clipE2)">
+                <rect
+                    class="liquid-letter"
+                    data-letter="E2"
+                    x="1060"
+                    y="20"
+                    width="100"
+                    height="180"
+                    fill="url(#liquidGradient)"/>
+            </g>
+
+        </g>
+
+
+        <!-- =================================================
+             GLASS HIGHLIGHTS
+        ================================================== -->
+
+        <g
+            class="glass-highlights"
+            opacity=".7">
+
+            <text
+                x="50"
+                y="175"
+                class="svg-letter glass-highlight">
+                N
+            </text>
+
+            <text
+                x="185"
+                y="175"
+                class="svg-letter glass-highlight">
+                i
+            </text>
+
+            <text
+                x="245"
+                y="175"
+                class="svg-letter glass-highlight">
+                t
+            </text>
+
+            <text
+                x="320"
+                y="175"
+                class="svg-letter glass-highlight">
+                h
+            </text>
+
+            <text
+                x="445"
+                y="175"
+                class="svg-letter glass-highlight">
+                a
+            </text>
+
+            <text
+                x="565"
+                y="175"
+                class="svg-letter glass-highlight">
+                n
+            </text>
+
+            <text
+                x="710"
+                y="175"
+                class="svg-letter glass-highlight">
+                N
+            </text>
+
+            <text
+                x="845"
+                y="175"
+                class="svg-letter glass-highlight">
+                a
+            </text>
+
+            <text
+                x="960"
+                y="175"
+                class="svg-letter glass-highlight">
+                j
+            </text>
+
+            <text
+                x="1020"
+                y="175"
+                class="svg-letter glass-highlight">
+                e
+            </text>
+
+            <text
+                x="1090"
+                y="175"
+                class="svg-letter glass-highlight">
+                e
+            </text>
+
+        </g>
+
+
+        <!-- =================================================
+             LIQUID STREAMS
+        ================================================== -->
+
+        <g id="streams">
+
+            <path
+                class="stream"
+                data-stream="1"
+                stroke="url(#liquidGradient)"
+                stroke-width="8"
+                d="M125 180 C120 230 135 280 120 350"/>
+
+            <path
+                class="stream"
+                data-stream="2"
+                stroke="url(#liquidGradient)"
+                stroke-width="6"
+                d="M380 180 C390 235 375 290 400 355"/>
+
+            <path
+                class="stream"
+                data-stream="3"
+                stroke="url(#liquidGradient)"
+                stroke-width="9"
+                d="M505 180 C500 235 525 300 510 365"/>
+
+            <path
+                class="stream"
+                data-stream="4"
+                stroke="url(#liquidGradient)"
+                stroke-width="7"
+                d="M625 180 C620 240 645 300 630 360"/>
+
+            <path
+                class="stream"
+                data-stream="5"
+                stroke="url(#liquidGradient)"
+                stroke-width="8"
+                d="M790 180 C805 245 780 295 800 365"/>
+
+            <path
+                class="stream"
+                data-stream="6"
+                stroke="url(#liquidGradient)"
+                stroke-width="7"
+                d="M920 180 C905 240 930 300 910 360"/>
+
+        </g>
+
+    </svg>
+
+
+    <!-- =================================================
+         LIQUID POOL
+    ================================================== -->
+
+    <div
+        class="liquid-world"
+        id="liquidWorld">
+
+        <div class="liquid-pool"></div>
+
+        <div class="pool-edge"></div>
 
     </div>
 
-</div>
+
+    <!-- =================================================
+         SCROLL HINT
+    ================================================== -->
+
+    <div
+        class="scroll-hint"
+        id="scrollHint">
+
+        <span>Scroll</span>
+
+        <div class="scroll-line"></div>
+
+    </div>
+
+</section>
+
 
 
 <!-- =====================================================
      PORTFOLIO
 ===================================================== -->
 
-<div id="portfolio">
+<main class="portfolio">
 
-<nav>
+
+<!-- NAV -->
+
+<nav
+    class="nav"
+    id="nav">
 
     <div class="logo">
         NN.
     </div>
 
-    <div>
-        <a href="#about">About</a>
-        <a href="#skills">Skills</a>
-        <a href="#projects">Projects</a>
-        <a href="#contact">Contact</a>
+    <div class="nav-links">
+
+        <a href="#about">
+            About
+        </a>
+
+        <a href="#skills">
+            Skills
+        </a>
+
+        <a href="#projects">
+            Projects
+        </a>
+
+        <a href="#contact">
+            Contact
+        </a>
+
     </div>
 
 </nav>
 
 
-<!-- HERO -->
+<!-- =====================================================
+     ABOUT
+===================================================== -->
 
-<header class="hero">
+<section
+    class="section"
+    id="about">
 
-    <div class="eyebrow">
-        Portfolio · 2026
+    <div class="section-label reveal">
+        01 / About
     </div>
 
-    <h1>
-        Nithan<br>
-        <span class="gradient-text">
-            Najeeb
-        </span>
-    </h1>
-
-    <p class="hero-description">
-
-        Student, creator and technology enthusiast
-        exploring design, web development, creative
-        technology and interactive experiences.
-
-    </p>
-
-</header>
+    <h2 class="section-title reveal">
+        Who is<br>
+        Nithan?
+    </h2>
 
 
-<!-- ABOUT -->
+    <div class="about-grid">
 
-<section id="about">
+        <p class="about-text reveal">
 
-    <div class="section-title reveal">
-        About me
-    </div>
+            I'm <span>Nithan Najeeb</span>, a
+            B.Com student interested in technology,
+            business, design and creative digital
+            experiences.
 
-    <div class="glass-grid">
+            <br><br>
 
-        <div class="card reveal">
+            I like taking ideas that exist only in
+            someone's head and turning them into
+            something people can actually interact
+            with.
 
-            <h3>
-                Who is Nithan?
-            </h3>
-
-            <p>
-
-                I'm Nithan Najeeb, a B.Com student
-                interested in technology, business,
-                design and creative digital experiences.
-
-                I enjoy turning ideas into things that
-                actually exist, preferably without making
-                the browser cry.
-
-            </p>
-
-        </div>
+        </p>
 
 
-        <div class="card reveal">
+        <div class="about-side reveal">
 
-            <h3>
-                What I do
-            </h3>
+            <div class="info-line">
 
-            <p>
-
-                Web design, creative coding,
-                interactive interfaces, digital
-                experiments and business-oriented
-                technology projects.
-
-            </p>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- SKILLS -->
-
-<section id="skills">
-
-    <div class="section-title reveal">
-        Skills
-    </div>
-
-    <div class="card reveal">
-
-        <div class="skill">
-
-            <div class="skill-top">
-                <span class="skill-name">
-                    HTML / CSS
+                <span>
+                    Based
                 </span>
 
-                <span>90%</span>
+                <strong>
+                    Kerala, India
+                </strong>
+
             </div>
 
-            <div class="skill-bar">
-                <div class="skill-progress"
-                     data-width="90%">
-                </div>
-            </div>
+            <div class="info-line">
 
-        </div>
-
-
-        <div class="skill">
-
-            <div class="skill-top">
-                <span class="skill-name">
-                    JavaScript
+                <span>
+                    Education
                 </span>
 
-                <span>80%</span>
+                <strong>
+                    B.Com
+                </strong>
+
             </div>
 
-            <div class="skill-bar">
-                <div class="skill-progress"
-                     data-width="80%">
-                </div>
-            </div>
+            <div class="info-line">
 
-        </div>
-
-
-        <div class="skill">
-
-            <div class="skill-top">
-                <span class="skill-name">
-                    UI / UX
+                <span>
+                    Interests
                 </span>
 
-                <span>85%</span>
+                <strong>
+                    Technology
+                </strong>
+
             </div>
 
-            <div class="skill-bar">
-                <div class="skill-progress"
-                     data-width="85%">
-                </div>
-            </div>
+            <div class="info-line">
 
-        </div>
-
-
-        <div class="skill">
-
-            <div class="skill-top">
-                <span class="skill-name">
-                    Creative Technology
+                <span>
+                    Focus
                 </span>
 
-                <span>85%</span>
-            </div>
+                <strong>
+                    Creative Development
+                </strong>
 
-            <div class="skill-bar">
-                <div class="skill-progress"
-                     data-width="85%">
-                </div>
             </div>
 
         </div>
@@ -922,586 +1797,671 @@ footer {
 </section>
 
 
-<!-- PROJECTS -->
 
-<section id="projects">
+<!-- =====================================================
+     SKILLS
+===================================================== -->
 
-    <div class="section-title reveal">
-        Projects
+<section
+    class="section"
+    id="skills">
+
+    <div class="section-label reveal">
+        02 / Skills
     </div>
 
-    <div class="glass-grid">
+    <h2 class="section-title reveal">
+        Things I<br>
+        build with.
+    </h2>
 
-        <div class="card project reveal">
 
-            <div class="project-number">
+    <div class="skills-grid">
+
+
+        <article class="skill-card reveal">
+
+            <div class="skill-number">
                 01
             </div>
 
             <h3>
-                Interactive VN Engine
+                Web Development
             </h3>
 
             <p>
-                A custom visual-novel engine with
-                animated characters, memory systems,
-                menus and cinematic presentation.
+                Interactive websites,
+                responsive interfaces and
+                experimental web experiences.
             </p>
 
-        </div>
+        </article>
 
 
-        <div class="card project reveal">
+        <article class="skill-card reveal">
 
-            <div class="project-number">
+            <div class="skill-number">
                 02
             </div>
 
             <h3>
-                Creative Web Experiences
+                UI / UX
             </h3>
 
             <p>
-                Experimental interfaces combining
-                animation, WebGL, glassmorphism and
-                interactive visual effects.
+                Clean interfaces, visual
+                hierarchy, motion and
+                interactive experiences.
             </p>
 
-        </div>
+        </article>
 
 
-        <div class="card project reveal">
+        <article class="skill-card reveal">
 
-            <div class="project-number">
+            <div class="skill-number">
                 03
             </div>
 
             <h3>
-                Business Projects
+                Creative Coding
             </h3>
 
             <p>
-                Academic and practical projects
-                combining business, information
-                systems and technology.
+                WebGL, animation, shaders,
+                procedural effects and
+                experimental interfaces.
             </p>
 
-        </div>
+        </article>
+
+
+        <article class="skill-card reveal">
+
+            <div class="skill-number">
+                04
+            </div>
+
+            <h3>
+                JavaScript
+            </h3>
+
+            <p>
+                Interactive behaviour,
+                animation systems and
+                dynamic web applications.
+            </p>
+
+        </article>
+
+
+        <article class="skill-card reveal">
+
+            <div class="skill-number">
+                05
+            </div>
+
+            <h3>
+                Creative Technology
+            </h3>
+
+            <p>
+                Combining design and
+                technology to create unusual
+                digital experiences.
+            </p>
+
+        </article>
+
+
+        <article class="skill-card reveal">
+
+            <div class="skill-number">
+                06
+            </div>
+
+            <h3>
+                Problem Solving
+            </h3>
+
+            <p>
+                Turning vague ideas into
+                practical systems and
+                working prototypes.
+            </p>
+
+        </article>
+
 
     </div>
 
 </section>
 
 
-<!-- CONTACT -->
 
-<section id="contact">
+<!-- =====================================================
+     PROJECTS
+===================================================== -->
 
-    <div class="section-title reveal">
-        Let's create.
+<section
+    class="section"
+    id="projects">
+
+    <div class="section-label reveal">
+        03 / Projects
     </div>
 
-    <div class="card reveal">
+    <h2 class="section-title reveal">
+        Selected<br>
+        work.
+    </h2>
 
-        <p>
-            Interested in technology, design,
-            creative development or building
-            something ridiculous that somehow works?
-        </p>
 
-        <br>
+    <div class="projects">
 
-        <h3>
-            Nithan Najeeb
-        </h3>
+
+        <article class="project reveal">
+
+            <span class="project-number">
+                01
+            </span>
+
+            <h3>
+                Visual Novel Engine
+            </h3>
+
+            <span class="project-type">
+                Creative Technology
+            </span>
+
+        </article>
+
+
+        <article class="project reveal">
+
+            <span class="project-number">
+                02
+            </span>
+
+            <h3>
+                Interactive Web
+            </h3>
+
+            <span class="project-type">
+                Web Development
+            </span>
+
+        </article>
+
+
+        <article class="project reveal">
+
+            <span class="project-number">
+                03
+            </span>
+
+            <h3>
+                Business Technology
+            </h3>
+
+            <span class="project-type">
+                Business / ICT
+            </span>
+
+        </article>
+
 
     </div>
 
 </section>
+
+
+
+<!-- =====================================================
+     CONTACT
+===================================================== -->
+
+<section
+    class="section contact"
+    id="contact">
+
+    <div class="section-label reveal">
+        04 / Contact
+    </div>
+
+
+    <h2 class="reveal">
+
+        Let's<br>
+
+        <span>
+            create.
+        </span>
+
+    </h2>
+
+
+    <a
+        href="mailto:your@email.com"
+        class="contact-link reveal">
+
+        Get in touch →
+
+    </a>
+
+</section>
+
 
 
 <footer>
 
-    © 2026 Nithan Najeeb
+    <span>
+        © 2026 Nithan Najeeb
+    </span>
+
+    <span>
+        Designed & built with curiosity
+    </span>
 
 </footer>
 
-</div>
+
+</main>
+
 
 
 <script>
 
 /* =========================================================
-   THREE.JS LIQUID BACKGROUND
+   PARTICLES
 ========================================================= */
 
-const canvas =
-    document.getElementById("liquidCanvas");
-
-const renderer =
-    new THREE.WebGLRenderer({
-        canvas,
-        antialias: true,
-        alpha: true
-    });
-
-renderer.setPixelRatio(
-    Math.min(window.devicePixelRatio, 2)
-);
-
-renderer.setSize(
-    window.innerWidth,
-    window.innerHeight
-);
+const particleContainer =
+    document.getElementById("particles");
 
 
-const scene =
-    new THREE.Scene();
+for (
+    let i = 0;
+    i < 90;
+    i++
+) {
+
+    const particle =
+        document.createElement("div");
+
+    particle.className =
+        "particle";
+
+    particle.style.left =
+        Math.random() * 100 + "%";
+
+    particle.style.top =
+        Math.random() * 100 + "%";
+
+    particle.style.setProperty(
+        "--duration",
+        (2 + Math.random() * 5) + "s"
+    );
+
+    particle.style.opacity =
+        .1 + Math.random() * .4;
+
+    particleContainer.appendChild(
+        particle
+    );
+}
 
 
-const camera =
-    new THREE.OrthographicCamera(
-        -1, 1,
-        1, -1,
-        0,
-        1
+/* =========================================================
+   INTRO ELEMENTS
+========================================================= */
+
+const liquidLetters =
+    document.querySelectorAll(
+        ".liquid-letter"
+    );
+
+const streams =
+    document.querySelectorAll(
+        ".stream"
+    );
+
+const liquidWorld =
+    document.getElementById(
+        "liquidWorld"
+    );
+
+const scrollHint =
+    document.getElementById(
+        "scrollHint"
+    );
+
+const nav =
+    document.getElementById(
+        "nav"
     );
 
 
-const geometry =
-    new THREE.PlaneGeometry(2, 2);
+/* =========================================================
+   LIQUID FILL
+========================================================= */
+
+/*
+   The letters all fill together.
+
+   Because the liquid rectangles are clipped
+   individually to each letter, the result is
+   literally liquid INSIDE each character.
+*/
+
+let startTime =
+    performance.now();
+
+let filling =
+    false;
+
+let draining =
+    false;
+
+let introProgress =
+    0;
 
 
-/* custom shader */
+function animateIntro(time) {
 
-const material =
-    new THREE.ShaderMaterial({
+    const elapsed =
+        (time - startTime) / 1000;
 
-        uniforms: {
 
-            uTime: {
-                value: 0
-            },
+    /*
+       Phase 1:
+       Glass appears.
+    */
 
-            uIntensity: {
-                value: 0
-            }
+    if (elapsed < 1.5) {
 
-        },
-
-        fragmentShader: `
-
-        uniform float uTime;
-        uniform float uIntensity;
-
-        vec3 rainbow(float t){
-
-            return vec3(
-                0.5 + 0.5*cos(6.2831*(t+0.0)),
-                0.5 + 0.5*cos(6.2831*(t+0.33)),
-                0.5 + 0.5*cos(6.2831*(t+0.66))
+        const progress =
+            Math.min(
+                elapsed / 1.5,
+                1
             );
 
-        }
+        document
+        .querySelector(".name-svg")
+        .style.opacity =
+            progress;
 
-        void main(){
+        document
+        .querySelector(".name-svg")
+        .style.transform =
+            `scale(${.94 + progress * .06})`;
 
-            vec2 uv =
-                gl_FragCoord.xy /
-                vec2(
-                    ${window.innerWidth.toFixed(1)},
-                    ${window.innerHeight.toFixed(1)}
-                );
-
-            float t =
-                uTime * 0.08;
-
-            float wave =
-                sin(
-                    uv.x * 5.0 +
-                    sin(uv.y * 4.0 + t) * 2.0 +
-                    t
-                );
-
-            wave +=
-                sin(
-                    uv.y * 7.0 +
-                    t * 1.3
-                );
-
-            wave *= .5;
-
-            float mask =
-                smoothstep(
-                    .15,
-                    .9,
-                    uv.y
-                );
-
-            vec3 color =
-                rainbow(
-                    uv.x +
-                    wave * .08 +
-                    t
-                );
-
-            color *=
-                uIntensity *
-                mask *
-                .12;
-
-            gl_FragColor =
-                vec4(color, 1.0);
-
-        }
-
-        `
-
-    });
+    }
 
 
-const plane =
-    new THREE.Mesh(
-        geometry,
-        material
-    );
+    /*
+       Phase 2:
+       Liquid fills letters.
+    */
 
-scene.add(plane);
+    if (
+        elapsed >= 1.3 &&
+        elapsed < 5.2
+    ) {
+
+        filling = true;
+
+        const progress =
+            Math.min(
+                (elapsed - 1.3) / 3.9,
+                1
+            );
+
+        introProgress =
+            progress;
 
 
-/* render */
+        /*
+           Cubic easing.
+        */
 
-function animate(time){
+        const eased =
+            1 -
+            Math.pow(
+                1 - progress,
+                3
+            );
 
-    material.uniforms.uTime.value =
-        time * .001;
 
-    renderer.render(
-        scene,
-        camera
-    );
+        liquidLetters.forEach(
+            letter => {
+
+                const amount =
+                    100 - eased * 100;
+
+                letter.style.transform =
+                    `translateY(${amount}%)`;
+
+                letter.style.opacity =
+                    .35 + eased * .65;
+
+            }
+        );
+
+    }
+
+
+    /*
+       Phase 3:
+       Liquid pours from letters.
+    */
+
+    if (
+        elapsed >= 5.0 &&
+        elapsed < 7.5
+    ) {
+
+        draining = true;
+
+        const progress =
+            Math.min(
+                (elapsed - 5.0) / 2.5,
+                1
+            );
+
+
+        streams.forEach(
+            (stream, index) => {
+
+                const delay =
+                    index * .06;
+
+                const local =
+                    Math.max(
+                        0,
+                        Math.min(
+                            1,
+                            (progress - delay) /
+                            (1 - delay)
+                        )
+                    );
+
+
+                stream.style.opacity =
+                    local;
+
+
+                /*
+                   Draw the stream progressively.
+                */
+
+                const length =
+                    stream.getTotalLength();
+
+                stream.style.strokeDasharray =
+                    length;
+
+                stream.style.strokeDashoffset =
+                    length *
+                    (1 - local);
+
+            }
+        );
+
+
+        /*
+           Pool slowly appears.
+        */
+
+        liquidWorld.style.opacity =
+            Math.min(
+                progress * 1.5,
+                1
+            );
+
+    }
+
+
+    /*
+       Phase 4:
+       Everything settles.
+    */
+
+    if (elapsed >= 7.5) {
+
+        liquidWorld.style.opacity = 1;
+
+        streams.forEach(
+            stream => {
+                stream.style.opacity = 0;
+            }
+        );
+
+    }
+
 
     requestAnimationFrame(
-        animate
+        animateIntro
     );
-
 }
+
 
 requestAnimationFrame(
-    animate
+    animateIntro
 );
 
 
 /* =========================================================
-   INTRO ANIMATION
+   SCROLL BEHAVIOUR
 ========================================================= */
 
-const liquid =
-    document.getElementById("liquid");
-
-const shine =
-    document.getElementById("shine");
-
-const intro =
-    document.getElementById("intro");
-
-const portfolio =
-    document.getElementById("portfolio");
+let lastScroll =
+    window.scrollY;
 
 
-const timeline =
-    gsap.timeline();
+window.addEventListener(
+    "scroll",
+    () => {
+
+        const scroll =
+            window.scrollY;
+
+        const viewport =
+            window.innerHeight;
 
 
-/* initial state */
+        /*
+           The scroll hint disappears.
+        */
 
-gsap.set(
-    liquid,
-    {
-        height: "0%"
-    }
-);
-
-gsap.set(
-    shine,
-    {
-        x: "-120%"
-    }
-);
-
-
-/* glass entrance */
-
-timeline.from(
-    ".glass-name",
-    {
-        scale: .4,
-        opacity: 0,
-        rotateX: 40,
-        duration: 1.5,
-        ease: "back.out(1.7)"
-    }
-);
-
-
-/* glass shine */
-
-timeline.to(
-    shine,
-    {
-        x: "120%",
-        duration: 1.5,
-        ease: "power2.inOut"
-    },
-    "-=.8"
-);
-
-
-/* liquid filling */
-
-timeline.to(
-    liquid,
-    {
-        height: "115%",
-        duration: 4,
-        ease: "power2.inOut"
-    }
-);
-
-
-/* make background wake up */
-
-timeline.to(
-    material.uniforms.uIntensity,
-    {
-        value: 1,
-        duration: 2
-    },
-    "-=2"
-);
-
-
-/* =========================================================
-   GLASS SHATTER
-========================================================= */
-
-timeline.call(
-    createShards
-);
-
-
-/* glass disappears */
-
-timeline.to(
-    ".glass-name",
-    {
-        scale: 1.15,
-        opacity: 0,
-        duration: .35,
-        ease: "power3.in"
-    }
-);
-
-
-/* intro fades */
-
-timeline.to(
-    intro,
-    {
-        opacity: 0,
-        duration: 1,
-        pointerEvents: "none"
-    }
-);
-
-
-/* portfolio appears */
-
-timeline.set(
-    portfolio,
-    {
-        visibility: "visible"
-    }
-);
-
-timeline.to(
-    portfolio,
-    {
-        opacity: 1,
-        duration: 1.5
-    }
-);
-
-
-/* animate hero */
-
-timeline.from(
-    ".hero > *",
-    {
-        y: 80,
-        opacity: 0,
-        stagger: .15,
-        duration: 1,
-        ease: "power4.out"
-    }
-);
-
-
-/* =========================================================
-   GLASS SHARDS
-========================================================= */
-
-function createShards(){
-
-    const rect =
-        document
-        .querySelector(".glass-name")
-        .getBoundingClientRect();
-
-
-    for(
-        let i = 0;
-        i < 90;
-        i++
-    ){
-
-        const shard =
-            document.createElement(
-                "div"
+        scrollHint.style.opacity =
+            Math.max(
+                0,
+                1 -
+                scroll / 150
             );
 
-        shard.className =
-            "shard";
 
-        shard.style.left =
-            (
-                rect.left +
-                Math.random() *
-                rect.width
-            ) + "px";
+        /*
+           Navigation appears.
+        */
 
-        shard.style.top =
-            (
-                rect.top +
-                Math.random() *
-                rect.height
-            ) + "px";
+        if (
+            scroll >
+            viewport * .65
+        ) {
 
+            nav.classList.add(
+                "visible"
+            );
 
-        const size =
-            5 +
-            Math.random() * 25;
+        } else {
 
-        shard.style.width =
-            size + "px";
+            nav.classList.remove(
+                "visible"
+            );
 
-        shard.style.height =
-            size * (
-                .5 +
-                Math.random()
-            ) + "px";
+        }
 
 
-        document.body.appendChild(
-            shard
-        );
+        /*
+           Liquid stays visually alive
+           as the user moves through the page.
+        */
+
+        const pool =
+            document.querySelector(
+                ".liquid-pool"
+            );
+
+        const movement =
+            Math.sin(
+                scroll * .003
+            ) * 2;
+
+        pool.style.transform =
+            `translateX(${movement}%)`;
 
 
-        const direction =
-            Math.random() < .5
-            ? -1
-            : 1;
+        lastScroll =
+            scroll;
 
-
-        gsap.fromTo(
-            shard,
-
-            {
-                scale: .2,
-                opacity: 1,
-                rotation: 0
-            },
-
-            {
-                x:
-                    direction *
-                    (
-                        100 +
-                        Math.random() *
-                        500
-                    ),
-
-                y:
-                    300 +
-                    Math.random() *
-                    700,
-
-                rotation:
-                    Math.random() *
-                    1000,
-
-                scale:
-                    .3 +
-                    Math.random() *
-                    1.5,
-
-                opacity: 0,
-
-                duration:
-                    1.5 +
-                    Math.random() * 2,
-
-                ease: "power2.in",
-
-                onComplete(){
-                    shard.remove();
-                }
-
-            }
-        );
-
+    },
+    {
+        passive: true
     }
-
-}
+);
 
 
 /* =========================================================
-   SCROLL REVEALS
+   REVEAL SECTIONS
 ========================================================= */
 
-const observer =
+const revealElements =
+    document.querySelectorAll(
+        ".reveal"
+    );
+
+
+const revealObserver =
     new IntersectionObserver(
         entries => {
 
             entries.forEach(
                 entry => {
 
-                    if(
+                    if (
                         entry.isIntersecting
-                    ){
+                    ) {
 
-                        gsap.fromTo(
-                            entry.target,
+                        entry.target
+                            .classList
+                            .add("show");
 
-                            {
-                                y: 70,
-                                opacity: 0,
-                                scale: .96
-                            },
-
-                            {
-                                y: 0,
-                                opacity: 1,
-                                scale: 1,
-                                duration: 1,
-                                ease: "power3.out"
-                            }
-                        );
-
-
-                        observer.unobserve(
-                            entry.target
-                        );
+                        revealObserver
+                            .unobserve(
+                                entry.target
+                            );
 
                     }
 
@@ -1509,117 +2469,72 @@ const observer =
             );
 
         },
-
         {
             threshold: .15
         }
-
     );
 
 
-document
-.querySelectorAll(".reveal")
-.forEach(
-    element =>
-        observer.observe(element)
+revealElements.forEach(
+    element => {
+
+        revealObserver.observe(
+            element
+        );
+
+    }
 );
 
 
 /* =========================================================
-   SKILL BARS
+   MOUSE MOVEMENT
 ========================================================= */
 
-const skillObserver =
-    new IntersectionObserver(
-        entries => {
-
-            entries.forEach(
-                entry => {
-
-                    if(
-                        entry.isIntersecting
-                    ){
-
-                        const bar =
-                            entry.target;
-
-                        gsap.to(
-                            bar,
-                            {
-                                width:
-                                    bar.dataset.width,
-
-                                duration: 1.5,
-
-                                ease:
-                                    "power3.out"
-                            }
-                        );
-
-                        skillObserver.unobserve(
-                            bar
-                        );
-
-                    }
-
-                }
-            );
-
-        },
-
-        {
-            threshold: .5
-        }
+const nameSvg =
+    document.querySelector(
+        ".name-svg"
     );
 
 
-document
-.querySelectorAll(
-    ".skill-progress"
-)
-.forEach(
-    bar =>
-        skillObserver.observe(bar)
-);
-
-
-/* =========================================================
-   MOUSE GLASS PARALLAX
-========================================================= */
-
-document.addEventListener(
+window.addEventListener(
     "mousemove",
-    e => {
+    event => {
+
+        /*
+           Only a tiny movement.
+
+           The glass should feel physical,
+           not like the website is having a seizure.
+        */
 
         const x =
             (
-                e.clientX /
-                window.innerWidth
-                - .5
+                event.clientX /
+                window.innerWidth -
+                .5
             ) * 2;
 
         const y =
             (
-                e.clientY /
-                window.innerHeight
-                - .5
+                event.clientY /
+                window.innerHeight -
+                .5
             ) * 2;
 
 
-        gsap.to(
-            ".card",
-            {
-                rotateY:
-                    x * 2,
+        if (
+            window.scrollY <
+            window.innerHeight
+        ) {
 
-                rotateX:
-                    -y * 2,
+            nameSvg.style.transform =
+                `
+                perspective(1000px)
+                rotateX(${y * -1.5}deg)
+                rotateY(${x * 1.5}deg)
+                `;
 
-                duration: 1,
-
-                overwrite: true
-            }
-        );
+        }
 
     }
 );
@@ -1633,10 +2548,11 @@ window.addEventListener(
     "resize",
     () => {
 
-        renderer.setSize(
-            window.innerWidth,
-            window.innerHeight
-        );
+        /*
+           SVG handles resizing automatically.
+           This exists so the animation remains
+           responsive if the viewport changes.
+        */
 
     }
 );
