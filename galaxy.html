@@ -2,17 +2,17 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#050505">
-<meta name="description" content="Nithan — B.Com student, developer and explorer.">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
 
-<title>NITHAN / 01</title>
+<title>Nithan Najeeb — Portfolio</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 
 <style>
 
-/* =========================================================
-   RESET
-========================================================= */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 * {
     margin: 0;
@@ -26,397 +26,313 @@ html {
 
 body {
     background: #050505;
-    color: #ededed;
-    font-family: Arial, Helvetica, sans-serif;
+    color: white;
+    font-family: Inter, sans-serif;
     overflow-x: hidden;
 }
 
-a {
-    color: inherit;
-    text-decoration: none;
-}
-
-button {
-    font: inherit;
-}
-
-
 /* =========================================================
-   VARIABLES
+   WEBGL BACKGROUND
 ========================================================= */
 
-:root {
-
-    --background: #050505;
-
-    --white: #eeeeee;
-
-    --grey-1: #999999;
-    --grey-2: #666666;
-    --grey-3: #444444;
-    --grey-4: #222222;
-
-    --line: rgba(255,255,255,.085);
-
-    --green: #62f5a0;
-
-    --max-width: 1320px;
-
-}
-
-
-/* =========================================================
-   BACKGROUND WORLD
-========================================================= */
-
-.space-bg {
-
+#liquidCanvas {
     position: fixed;
-
     inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -5;
+}
 
-    z-index: 0;
+/* =========================================================
+   INTRO
+========================================================= */
 
-    pointer-events: none;
+#intro {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background:
+        radial-gradient(
+            circle at center,
+            #151515 0%,
+            #050505 60%,
+            #000 100%
+        );
+
+    overflow: hidden;
+}
+
+.intro-content {
+    position: relative;
+    width: min(90vw, 650px);
+    height: 300px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* =========================================================
+   GLASS NAME
+========================================================= */
+
+.glass-name {
+
+    position: relative;
+
+    font-size: clamp(3rem, 9vw, 8rem);
+    font-weight: 700;
+
+    letter-spacing: -0.07em;
+
+    color: rgba(255,255,255,.15);
+
+    text-align: center;
+
+    padding: 45px 55px;
+
+    border-radius: 42px;
+
+    border: 1px solid rgba(255,255,255,.55);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,255,255,.14),
+            rgba(255,255,255,.025)
+        );
+
+    backdrop-filter: blur(20px) saturate(180%);
+
+    box-shadow:
+        inset 0 1px 2px rgba(255,255,255,.7),
+        inset 0 -20px 50px rgba(255,255,255,.025),
+        0 30px 100px rgba(0,0,0,.6);
 
     overflow: hidden;
 
+    transform: perspective(1000px) rotateX(8deg);
+}
+
+/* rainbow liquid */
+
+.liquid {
+
+    position: absolute;
+
+    left: -10%;
+    bottom: -10%;
+
+    width: 120%;
+    height: 0%;
+
+    border-radius: 50% 50% 0 0;
+
     background:
-
-        radial-gradient(
-            circle at 75% 38%,
-            rgba(255,255,255,.045),
-            transparent 22%
-        ),
-
-        radial-gradient(
-            circle at 15% 85%,
-            rgba(80,120,255,.025),
-            transparent 30%
-        ),
-
-        #050505;
-
-}
-
-
-/* =========================================================
-   CANVAS
-========================================================= */
-
-#calculationCanvas {
-
-    position: absolute;
-
-    inset: -15px;
-
-    width: calc(100% + 30px);
-
-    height: calc(100% + 30px);
-
-    transition:
-        transform .25s ease-out;
-
-}
-
-
-/* =========================================================
-   BACKGROUND GRID
-========================================================= */
-
-.ambient-grid {
-
-    position: absolute;
-
-    inset: -15%;
-
-    opacity: .17;
-
-    background-image:
-
-        linear-gradient(
-            rgba(255,255,255,.035) 1px,
-            transparent 1px
-        ),
-
         linear-gradient(
             90deg,
-            rgba(255,255,255,.035) 1px,
-            transparent 1px
+            #ff0055,
+            #ff8a00,
+            #ffe600,
+            #00ff8a,
+            #00b7ff,
+            #7657ff,
+            #ff00e5
         );
 
-    background-size:
-        85px 85px;
+    background-size: 400% 100%;
 
-    transform:
-        perspective(900px)
-        rotateX(55deg)
-        scale(1.55);
-
-    transform-origin:
-        center;
+    filter:
+        blur(2px)
+        saturate(150%);
 
     animation:
-        gridMove
-        28s
-        linear
-        infinite;
+        rainbowMove 5s linear infinite;
 
+    opacity: .9;
+
+    z-index: 1;
 }
 
+@keyframes rainbowMove {
 
-@keyframes gridMove {
-
-    from {
-        background-position:
-            0 0;
+    0% {
+        background-position: 0% 50%;
     }
 
-    to {
-        background-position:
-            85px 85px;
+    100% {
+        background-position: 400% 50%;
     }
 
 }
 
+/* liquid highlight */
 
-/* =========================================================
-   DEPTH GLOWS
-========================================================= */
+.liquid::before {
 
-.depth-glow {
+    content: "";
 
     position: absolute;
 
-    border-radius: 50%;
+    width: 100%;
+    height: 25px;
 
-    filter:
-        blur(90px);
-
-    opacity: .15;
-
-}
-
-
-.glow-one {
-
-    width: 500px;
-
-    height: 500px;
-
-    right: -240px;
-
-    top: 20%;
+    top: -12px;
 
     background:
         radial-gradient(
-            circle,
-            rgba(255,255,255,.12),
+            ellipse,
+            rgba(255,255,255,.9),
             transparent 70%
         );
 
-    animation:
-        glowOne
-        14s
-        ease-in-out
-        infinite;
-
+    filter: blur(8px);
 }
 
+/* name sits above liquid */
 
-.glow-two {
-
-    width: 360px;
-
-    height: 360px;
-
-    left: -180px;
-
-    bottom: 8%;
-
-    background:
-        radial-gradient(
-            circle,
-            rgba(100,140,255,.07),
-            transparent 70%
-        );
-
-    animation:
-        glowTwo
-        17s
-        ease-in-out
-        infinite;
-
-}
-
-
-@keyframes glowOne {
-
-    0%,
-    100% {
-
-        transform:
-            translate3d(
-                0,
-                0,
-                0
-            )
-            scale(1);
-
-    }
-
-    50% {
-
-        transform:
-            translate3d(
-                -80px,
-                50px,
-                0
-            )
-            scale(1.2);
-
-    }
-
-}
-
-
-@keyframes glowTwo {
-
-    0%,
-    100% {
-
-        transform:
-            translate3d(
-                0,
-                0,
-                0
-            )
-            scale(1);
-
-    }
-
-    50% {
-
-        transform:
-            translate3d(
-                90px,
-                -60px,
-                0
-            )
-            scale(1.25);
-
-    }
-
-}
-
-
-/* =========================================================
-   PAGE CONTENT
-========================================================= */
-
-header,
-main,
-footer {
+.name-text {
 
     position: relative;
 
     z-index: 5;
 
+    mix-blend-mode: screen;
+
+    color: rgba(255,255,255,.9);
+
+    text-shadow:
+        0 0 30px rgba(255,255,255,.4);
 }
 
+/* glass shine */
+
+.glass-shine {
+
+    position: absolute;
+
+    inset: 0;
+
+    z-index: 6;
+
+    pointer-events: none;
+
+    background:
+        linear-gradient(
+            120deg,
+            transparent 20%,
+            rgba(255,255,255,.35) 48%,
+            transparent 55%
+        );
+
+    transform:
+        translateX(-120%);
+
+}
 
 /* =========================================================
-   HEADER
+   GLASS SHARDS
 ========================================================= */
 
-header {
+.shard {
 
-    max-width:
-        var(--max-width);
+    position: fixed;
 
-    margin:
-        auto;
+    width: 20px;
+    height: 20px;
 
-    padding:
-        34px 42px;
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,255,255,.8),
+            rgba(255,255,255,.05)
+        );
 
-    display:
-        flex;
+    border:
+        1px solid rgba(255,255,255,.8);
 
-    justify-content:
-        space-between;
+    backdrop-filter: blur(4px);
 
-    align-items:
-        center;
+    pointer-events: none;
 
-    border-bottom:
-        1px solid var(--line);
-
+    z-index: 100;
 }
 
+/* =========================================================
+   PORTFOLIO
+========================================================= */
 
-.logo {
+#portfolio {
 
-    font-family:
-        "Courier New",
-        monospace;
+    position: relative;
 
-    font-size:
-        15px;
+    opacity: 0;
 
-    letter-spacing:
-        .28em;
-
+    visibility: hidden;
 }
 
-
-.logo span {
-
-    color:
-        #444;
-
-}
-
+/* =========================================================
+   NAV
+========================================================= */
 
 nav {
 
-    display:
-        flex;
+    position: fixed;
 
-    gap:
-        32px;
+    top: 25px;
+    left: 50%;
 
+    transform: translateX(-50%);
+
+    width: min(92%, 900px);
+
+    padding: 14px 20px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    border:
+        1px solid rgba(255,255,255,.15);
+
+    background:
+        rgba(255,255,255,.045);
+
+    backdrop-filter:
+        blur(25px);
+
+    border-radius: 999px;
+
+    z-index: 20;
 }
 
+.logo {
+
+    font-weight: 700;
+    letter-spacing: -.04em;
+}
 
 nav a {
 
-    font-family:
-        monospace;
+    color: rgba(255,255,255,.65);
 
-    font-size:
-        10px;
+    text-decoration: none;
 
-    letter-spacing:
-        .22em;
+    font-size: .85rem;
 
-    color:
-        #5b5b5b;
+    margin-left: 22px;
 
-    transition:
-        color .3s ease;
-
+    transition: .3s;
 }
 
-
-nav a:hover,
-nav a.active {
-
-    color:
-        #eeeeee;
-
+nav a:hover {
+    color: white;
 }
-
 
 /* =========================================================
    HERO
@@ -424,1126 +340,310 @@ nav a.active {
 
 .hero {
 
-    max-width:
-        var(--max-width);
+    min-height: 100vh;
 
-    margin:
-        auto;
+    display: flex;
+    flex-direction: column;
 
-    min-height:
-        900px;
+    justify-content: center;
+
+    max-width: 1200px;
+
+    margin: auto;
 
     padding:
-        70px 42px 100px;
-
-    position:
-        relative;
-
+        120px 30px
+        80px;
 }
-
 
 .eyebrow {
 
-    font-family:
-        monospace;
+    font-size: .8rem;
 
-    font-size:
-        11px;
+    text-transform: uppercase;
 
-    letter-spacing:
-        .36em;
+    letter-spacing: .2em;
 
     color:
-        #666;
+        rgba(255,255,255,.5);
 
+    margin-bottom: 20px;
 }
 
-
-.hero-title {
-
-    position:
-        relative;
-
-    margin-top:
-        55px;
-
-}
-
-
-.hero-title h1 {
-
-    position:
-        relative;
-
-    z-index:
-        2;
+.hero h1 {
 
     font-size:
-        clamp(
-            85px,
-            15vw,
-            210px
+        clamp(4rem, 11vw, 10rem);
+
+    line-height: .85;
+
+    letter-spacing: -.08em;
+
+    max-width: 1000px;
+}
+
+.gradient-text {
+
+    background:
+
+        linear-gradient(
+            90deg,
+            #ff3d81,
+            #ffb000,
+            #65ffbc,
+            #48caff,
+            #a46cff,
+            #ff4fd8
         );
 
-    line-height:
-        .78;
+    background-size: 300%;
 
-    letter-spacing:
-        -.075em;
+    -webkit-background-clip: text;
 
-    font-weight:
-        800;
+    color: transparent;
 
+    animation:
+        rainbowText 8s linear infinite;
 }
 
+@keyframes rainbowText {
 
-.hero-outline {
-
-    position:
-        absolute;
-
-    left:
-        8px;
-
-    top:
-        35px;
-
-    z-index:
-        1;
-
-    font-size:
-        clamp(
-            90px,
-            15vw,
-            210px
-        );
-
-    line-height:
-        .8;
-
-    letter-spacing:
-        -.07em;
-
-    color:
-        transparent;
-
-    -webkit-text-stroke:
-        1px rgba(255,255,255,.14);
+    to {
+        background-position: 300%;
+    }
 
 }
-
-
-.hero-copy {
-
-    margin-top:
-        115px;
-
-    max-width:
-        720px;
-
-}
-
-
-.hero-role {
-
-    font-family:
-        monospace;
-
-    font-size:
-        11px;
-
-    letter-spacing:
-        .31em;
-
-    color:
-        #666;
-
-    margin-bottom:
-        32px;
-
-}
-
 
 .hero-description {
 
-    font-size:
-        clamp(
-            22px,
-            3vw,
-            36px
-        );
+    max-width: 550px;
 
-    line-height:
-        1.38;
+    margin-top: 35px;
+
+    font-size: 1.1rem;
+
+    line-height: 1.8;
 
     color:
-        #777;
-
+        rgba(255,255,255,.6);
 }
-
-
-.hero-description strong {
-
-    color:
-        #ededed;
-
-    font-weight:
-        400;
-
-}
-
-
-/* =========================================================
-   BUSINESS PANEL
-========================================================= */
-
-.business-panel {
-
-    position:
-        absolute;
-
-    right:
-        0;
-
-    bottom:
-        75px;
-
-    width:
-        650px;
-
-    max-width:
-        58%;
-
-    padding:
-        28px;
-
-    border:
-        1px solid var(--line);
-
-    background:
-        rgba(8,8,8,.78);
-
-    backdrop-filter:
-        blur(18px);
-
-    box-shadow:
-        0 30px 100px
-        rgba(0,0,0,.4);
-
-}
-
-
-.panel-header {
-
-    display:
-        flex;
-
-    justify-content:
-        space-between;
-
-    align-items:
-        center;
-
-    padding-bottom:
-        18px;
-
-    margin-bottom:
-        24px;
-
-    border-bottom:
-        1px solid var(--line);
-
-}
-
-
-.panel-name {
-
-    font-family:
-        monospace;
-
-    font-size:
-        10px;
-
-    letter-spacing:
-        .25em;
-
-    color:
-        #555;
-
-}
-
-
-.live {
-
-    color:
-        var(--green);
-
-}
-
-
-.live::before {
-
-    content:
-        "";
-
-    width:
-        6px;
-
-    height:
-        6px;
-
-    display:
-        inline-block;
-
-    border-radius:
-        50%;
-
-    background:
-        var(--green);
-
-    box-shadow:
-        0 0 14px
-        var(--green);
-
-    margin-right:
-        7px;
-
-}
-
-
-/* =========================================================
-   METRICS
-========================================================= */
-
-.metrics {
-
-    display:
-        grid;
-
-    grid-template-columns:
-        repeat(3,1fr);
-
-    border-bottom:
-        1px solid var(--line);
-
-    padding-bottom:
-        23px;
-
-}
-
-
-.metric small {
-
-    display:
-        block;
-
-    font-family:
-        monospace;
-
-    font-size:
-        8px;
-
-    letter-spacing:
-        .18em;
-
-    color:
-        #505050;
-
-    margin-bottom:
-        9px;
-
-}
-
-
-.metric strong {
-
-    font-family:
-        monospace;
-
-    font-size:
-        24px;
-
-    font-weight:
-        400;
-
-}
-
-
-.metric:first-child strong {
-
-    color:
-        var(--green);
-
-}
-
-
-/* =========================================================
-   CHART
-========================================================= */
-
-.chart-container {
-
-    padding-top:
-        25px;
-
-}
-
-
-.chart {
-
-    width:
-        100%;
-
-    height:
-        150px;
-
-}
-
-
-.chart svg {
-
-    width:
-        100%;
-
-    height:
-        100%;
-
-    overflow:
-        visible;
-
-}
-
-
-.chart-area {
-
-    fill:
-        rgba(255,255,255,.025);
-
-}
-
-
-.chart-line {
-
-    fill:
-        none;
-
-    stroke:
-        #a9a9a9;
-
-    stroke-width:
-        1.5;
-
-    stroke-linecap:
-        round;
-
-    stroke-linejoin:
-        round;
-
-}
-
-
-.chart-glow {
-
-    fill:
-        none;
-
-    stroke:
-        rgba(255,255,255,.1);
-
-    stroke-width:
-        8;
-
-    filter:
-        blur(4px);
-
-}
-
-
-.chart-caption {
-
-    margin-top:
-        10px;
-
-    font-family:
-        monospace;
-
-    font-size:
-        8px;
-
-    letter-spacing:
-        .18em;
-
-    color:
-        #444;
-
-}
-
 
 /* =========================================================
    SECTIONS
 ========================================================= */
 
-.section {
+section {
 
-    max-width:
-        var(--max-width);
+    max-width: 1200px;
 
-    margin:
-        auto;
+    margin: auto;
 
     padding:
-        150px 42px;
-
-    border-top:
-        1px solid var(--line);
-
+        120px 30px;
 }
-
-
-.section-header {
-
-    display:
-        flex;
-
-    justify-content:
-        space-between;
-
-    align-items:
-        flex-end;
-
-    margin-bottom:
-        75px;
-
-}
-
-
-.section-number {
-
-    font-family:
-        monospace;
-
-    font-size:
-        10px;
-
-    letter-spacing:
-        .25em;
-
-    color:
-        #4d4d4d;
-
-}
-
 
 .section-title {
 
     font-size:
-        clamp(
-            55px,
-            8vw,
-            105px
-        );
+        clamp(2.5rem, 6vw, 5rem);
 
-    line-height:
-        .85;
+    letter-spacing: -.06em;
 
-    letter-spacing:
-        -.065em;
-
-    font-weight:
-        700;
-
+    margin-bottom: 50px;
 }
-
 
 /* =========================================================
-   ABOUT
+   GLASS CARDS
 ========================================================= */
 
-.about-grid {
+.glass-grid {
 
-    display:
-        grid;
+    display: grid;
 
     grid-template-columns:
-        1fr 1fr;
+        repeat(
+            auto-fit,
+            minmax(250px, 1fr)
+        );
 
-    gap:
-        110px;
-
+    gap: 20px;
 }
 
+.card {
 
-.about-text {
+    position: relative;
 
-    font-size:
-        25px;
+    padding: 35px;
 
-    line-height:
-        1.55;
+    min-height: 250px;
+
+    border-radius: 30px;
+
+    border:
+        1px solid rgba(255,255,255,.12);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,255,255,.08),
+            rgba(255,255,255,.025)
+        );
+
+    backdrop-filter:
+        blur(25px);
+
+    overflow: hidden;
+
+    transition:
+        transform .5s,
+        border .5s;
+}
+
+.card::before {
+
+    content: "";
+
+    position: absolute;
+
+    width: 250px;
+    height: 250px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(100,200,255,.15),
+            transparent 70%
+        );
+
+    top: -100px;
+    right: -100px;
+
+    transition: .5s;
+}
+
+.card:hover {
+
+    transform:
+        translateY(-8px)
+        scale(1.01);
+
+    border-color:
+        rgba(255,255,255,.35);
+}
+
+.card:hover::before {
+    transform: scale(2);
+}
+
+.card h3 {
+
+    font-size: 1.4rem;
+
+    margin-bottom: 15px;
+}
+
+.card p {
 
     color:
-        #777;
+        rgba(255,255,255,.55);
 
+    line-height: 1.7;
 }
-
-
-.about-text strong {
-
-    color:
-        #ededed;
-
-    font-weight:
-        400;
-
-}
-
-
-.about-facts {
-
-    border-top:
-        1px solid var(--line);
-
-}
-
-
-.fact {
-
-    display:
-        flex;
-
-    justify-content:
-        space-between;
-
-    padding:
-        18px 0;
-
-    border-bottom:
-        1px solid var(--line);
-
-    font-family:
-        monospace;
-
-    font-size:
-        10px;
-
-    letter-spacing:
-        .1em;
-
-}
-
-
-.fact span:first-child {
-
-    color:
-        #4d4d4d;
-
-}
-
 
 /* =========================================================
    SKILLS
 ========================================================= */
 
-.skills-grid {
-
-    display:
-        grid;
-
-    grid-template-columns:
-        .85fr 1.15fr;
-
-    gap:
-        110px;
-
-}
-
-
-.skills-intro {
-
-    font-size:
-        21px;
-
-    line-height:
-        1.6;
-
-    color:
-        #707070;
-
-}
-
-
-.skills-list {
-
-    border-top:
-        1px solid var(--line);
-
-}
-
-
 .skill {
 
-    padding:
-        24px 0;
-
-    border-bottom:
-        1px solid var(--line);
-
+    margin-bottom: 25px;
 }
-
 
 .skill-top {
 
-    display:
-        flex;
+    display: flex;
 
     justify-content:
         space-between;
 
-    margin-bottom:
-        12px;
-
+    margin-bottom: 8px;
 }
 
-
-.skill-name,
-.skill-value {
-
-    font-family:
-        monospace;
-
-    font-size:
-        10px;
-
-    letter-spacing:
-        .12em;
-
-}
-
-
-.skill-value {
+.skill-name {
 
     color:
-        #555;
-
+        rgba(255,255,255,.8);
 }
 
+.skill-bar {
 
-.skill-track {
-
-    height:
-        2px;
+    height: 5px;
 
     background:
-        rgba(255,255,255,.07);
+        rgba(255,255,255,.1);
 
-    overflow:
-        hidden;
+    border-radius: 10px;
 
+    overflow: hidden;
 }
 
+.skill-progress {
 
-.skill-fill {
+    height: 100%;
 
-    height:
-        100%;
+    width: 0;
 
-    width:
-        0;
+    border-radius: 10px;
 
     background:
-        #dcdcdc;
-
-    transition:
-        width 1.4s
-        cubic-bezier(.2,.8,.2,1);
-
+        linear-gradient(
+            90deg,
+            #ff3d81,
+            #ffb000,
+            #5effbd,
+            #4ac8ff
+        );
 }
-
 
 /* =========================================================
    PROJECTS
 ========================================================= */
 
-.projects {
-
-    display:
-        grid;
-
-    grid-template-columns:
-        repeat(2,1fr);
-
-    gap:
-        1px;
-
-    background:
-        var(--line);
-
-    border:
-        1px solid var(--line);
-
-}
-
-
 .project {
 
-    position:
-        relative;
+    min-height: 350px;
 
-    min-height:
-        360px;
+    display: flex;
 
-    padding:
-        30px;
+    flex-direction: column;
 
-    background:
-        #070707;
-
-    overflow:
-        hidden;
-
-    transition:
-        background .4s ease;
-
+    justify-content:
+        flex-end;
 }
-
-
-.project:hover {
-
-    background:
-        #0d0d0d;
-
-}
-
 
 .project-number {
 
-    font-family:
-        monospace;
-
-    font-size:
-        9px;
+    font-size: .75rem;
 
     color:
-        #444;
+        rgba(255,255,255,.4);
 
+    margin-bottom: auto;
 }
-
-
-.project-symbol {
-
-    position:
-        absolute;
-
-    right:
-        30px;
-
-    top:
-        30px;
-
-    font-family:
-        monospace;
-
-    font-size:
-        90px;
-
-    line-height:
-        1;
-
-    color:
-        #151515;
-
-    transition:
-        transform .7s
-        cubic-bezier(.2,.8,.2,1);
-
-}
-
-
-.project:hover
-.project-symbol {
-
-    transform:
-        rotate(15deg)
-        scale(1.12);
-
-}
-
 
 .project h3 {
 
-    position:
-        absolute;
+    font-size: 2rem;
 
-    left:
-        30px;
-
-    bottom:
-        70px;
-
-    font-size:
-        40px;
-
-    letter-spacing:
-        -.04em;
-
-    font-weight:
-        400;
-
+    letter-spacing: -.04em;
 }
-
 
 .project p {
 
-    position:
-        absolute;
-
-    left:
-        30px;
-
-    bottom:
-        30px;
-
-    font-family:
-        monospace;
-
-    font-size:
-        9px;
-
-    letter-spacing:
-        .15em;
-
-    color:
-        #555;
-
+    margin-top: 10px;
 }
-
-
-/* =========================================================
-   EDUCATION
-========================================================= */
-
-.timeline {
-
-    border-left:
-        1px solid var(--line);
-
-}
-
-
-.timeline-item {
-
-    position:
-        relative;
-
-    padding:
-        0 0 70px 45px;
-
-}
-
-
-.timeline-item:last-child {
-
-    padding-bottom:
-        0;
-
-}
-
-
-.timeline-item::before {
-
-    content:
-        "";
-
-    position:
-        absolute;
-
-    left:
-        -4px;
-
-    top:
-        3px;
-
-    width:
-        7px;
-
-    height:
-        7px;
-
-    border-radius:
-        50%;
-
-    background:
-        #d8d8d8;
-
-}
-
-
-.timeline-date {
-
-    font-family:
-        monospace;
-
-    font-size:
-        9px;
-
-    letter-spacing:
-        .2em;
-
-    color:
-        #505050;
-
-    margin-bottom:
-        13px;
-
-}
-
-
-.timeline-item h3 {
-
-    font-size:
-        30px;
-
-    font-weight:
-        400;
-
-    margin-bottom:
-        10px;
-
-}
-
-
-.timeline-item p {
-
-    max-width:
-        600px;
-
-    color:
-        #666;
-
-    line-height:
-        1.6;
-
-}
-
-
-/* =========================================================
-   CONTACT
-========================================================= */
-
-.contact {
-
-    min-height:
-        650px;
-
-}
-
-
-.contact-label {
-
-    font-family:
-        monospace;
-
-    font-size:
-        10px;
-
-    color:
-        #555;
-
-    letter-spacing:
-        .25em;
-
-}
-
-
-.contact-title {
-
-    margin-top:
-        50px;
-
-    font-size:
-        clamp(
-            75px,
-            13vw,
-            175px
-        );
-
-    line-height:
-        .8;
-
-    letter-spacing:
-        -.075em;
-
-}
-
-
-.contact-copy {
-
-    max-width:
-        600px;
-
-    margin-top:
-        55px;
-
-    font-size:
-        21px;
-
-    line-height:
-        1.55;
-
-    color:
-        #6d6d6d;
-
-}
-
-
-.contact-links {
-
-    display:
-        flex;
-
-    gap:
-        35px;
-
-    margin-top:
-        50px;
-
-}
-
-
-.contact-links a {
-
-    font-family:
-        monospace;
-
-    font-size:
-        10px;
-
-    letter-spacing:
-        .2em;
-
-    padding-bottom:
-        8px;
-
-    border-bottom:
-        1px solid #444;
-
-    transition:
-        color .3s,
-        border-color .3s;
-
-}
-
-
-.contact-links a:hover {
-
-    color:
-        white;
-
-    border-color:
-        white;
-
-}
-
 
 /* =========================================================
    FOOTER
@@ -1551,348 +651,46 @@ nav a.active {
 
 footer {
 
-    max-width:
-        var(--max-width);
-
-    margin:
-        auto;
+    text-align: center;
 
     padding:
-        25px 42px;
-
-    display:
-        flex;
-
-    justify-content:
-        space-between;
-
-    border-top:
-        1px solid var(--line);
-
-    font-family:
-        monospace;
-
-    font-size:
-        8px;
-
-    letter-spacing:
-        .18em;
+        100px 20px;
 
     color:
-        #3f3f3f;
-
+        rgba(255,255,255,.4);
 }
-
-
-/* =========================================================
-   SCROLL REVEAL
-========================================================= */
-
-.reveal {
-
-    opacity:
-        0;
-
-    transform:
-        translateY(40px);
-
-    transition:
-        opacity .9s ease,
-        transform .9s
-        cubic-bezier(.2,.7,.2,1);
-
-}
-
-
-.reveal.visible {
-
-    opacity:
-        1;
-
-    transform:
-        translateY(0);
-
-}
-
 
 /* =========================================================
    MOBILE
 ========================================================= */
 
-@media(max-width:800px) {
+@media(max-width:700px) {
 
-
-    header {
+    .glass-name {
 
         padding:
-            28px 22px;
+            30px 25px;
 
+        border-radius: 28px;
+
+        font-size:
+            clamp(2.3rem, 11vw, 4rem);
     }
-
 
     nav {
 
-        gap:
-            16px;
-
+        padding: 12px 16px;
     }
-
 
     nav a {
 
-        font-size:
-            8px;
-
-        letter-spacing:
-            .12em;
-
+        display: none;
     }
 
-
-    .hero {
-
-        min-height:
-            900px;
-
-        padding:
-            55px 22px 70px;
-
-    }
-
-
-    .eyebrow {
+    .hero h1 {
 
         font-size:
-            9px;
-
-        letter-spacing:
-            .25em;
-
-    }
-
-
-    .hero-title {
-
-        margin-top:
-            55px;
-
-    }
-
-
-    .hero-title h1 {
-
-        font-size:
-            clamp(
-                65px,
-                19vw,
-                110px
-            );
-
-    }
-
-
-    .hero-outline {
-
-        top:
-            27px;
-
-        font-size:
-            clamp(
-                70px,
-                19vw,
-                110px
-            );
-
-    }
-
-
-    .hero-copy {
-
-        margin-top:
-            105px;
-
-    }
-
-
-    .hero-description {
-
-        font-size:
-            21px;
-
-    }
-
-
-    .business-panel {
-
-        left:
-            22px;
-
-        right:
-            22px;
-
-        bottom:
-            40px;
-
-        width:
-            auto;
-
-        max-width:
-            none;
-
-        padding:
-            20px;
-
-    }
-
-
-    .metric strong {
-
-        font-size:
-            18px;
-
-    }
-
-
-    .chart {
-
-        height:
-            125px;
-
-    }
-
-
-    .section {
-
-        padding:
-            105px 22px;
-
-    }
-
-
-    .section-header {
-
-        margin-bottom:
-            50px;
-
-    }
-
-
-    .section-title {
-
-        font-size:
-            58px;
-
-    }
-
-
-    .about-grid,
-    .skills-grid {
-
-        grid-template-columns:
-            1fr;
-
-        gap:
-            60px;
-
-    }
-
-
-    .about-text {
-
-        font-size:
-            21px;
-
-    }
-
-
-    .projects {
-
-        grid-template-columns:
-            1fr;
-
-    }
-
-
-    .project {
-
-        min-height:
-            290px;
-
-    }
-
-
-    .project h3 {
-
-        font-size:
-            34px;
-
-    }
-
-
-    .contact-title {
-
-        font-size:
-            70px;
-
-    }
-
-
-    .contact-links {
-
-        flex-wrap:
-            wrap;
-
-        gap:
-            22px;
-
-    }
-
-
-    footer {
-
-        padding:
-            25px 22px;
-
-        gap:
-            15px;
-
-    }
-
-
-    footer span:nth-child(2) {
-
-        display:
-            none;
-
-    }
-
-}
-
-
-/* =========================================================
-   REDUCED MOTION
-========================================================= */
-
-@media(prefers-reduced-motion:reduce) {
-
-    html {
-        scroll-behavior:
-            auto;
-    }
-
-    *,
-    *::before,
-    *::after {
-
-        animation-duration:
-            .01ms !important;
-
-        animation-iteration-count:
-            1 !important;
-
-        transition-duration:
-            .01ms !important;
-
+            clamp(4rem, 20vw, 7rem);
     }
 
 }
@@ -1900,1677 +698,488 @@ footer {
 </style>
 </head>
 
-
 <body>
 
+<canvas id="liquidCanvas"></canvas>
 
-<!-- =======================================================
-     BACKGROUND
-======================================================= -->
+<!-- =====================================================
+     INTRO
+===================================================== -->
 
-<div class="space-bg">
+<div id="intro">
 
-    <canvas
-        id="calculationCanvas">
-    </canvas>
+    <div class="intro-content">
 
-    <div
-        class="ambient-grid">
-    </div>
+        <div class="glass-name">
 
-    <div
-        class="depth-glow glow-one">
-    </div>
+            <div class="liquid"
+                 id="liquid">
+            </div>
 
-    <div
-        class="depth-glow glow-two">
+            <div class="glass-shine"
+                 id="shine">
+            </div>
+
+            <div class="name-text">
+                Nithan Najeeb
+            </div>
+
+        </div>
+
     </div>
 
 </div>
 
 
-<!-- =======================================================
-     HEADER
-======================================================= -->
+<!-- =====================================================
+     PORTFOLIO
+===================================================== -->
 
-<header>
+<div id="portfolio">
 
-    <a
-        href="#home"
-        class="logo">
+<nav>
 
-        NITHAN <span>/01</span>
+    <div class="logo">
+        NN.
+    </div>
 
-    </a>
+    <div>
+        <a href="#about">About</a>
+        <a href="#skills">Skills</a>
+        <a href="#projects">Projects</a>
+        <a href="#contact">Contact</a>
+    </div>
+
+</nav>
 
 
-    <nav>
+<!-- HERO -->
 
-        <a
-            href="#about">
-            ABOUT
-        </a>
+<header class="hero">
 
-        <a
-            href="#work">
-            WORK
-        </a>
+    <div class="eyebrow">
+        Portfolio · 2026
+    </div>
 
-        <a
-            href="#skills">
-            SKILLS
-        </a>
+    <h1>
+        Nithan<br>
+        <span class="gradient-text">
+            Najeeb
+        </span>
+    </h1>
 
-        <a
-            href="#contact">
-            CONTACT
-        </a>
+    <p class="hero-description">
 
-    </nav>
+        Student, creator and technology enthusiast
+        exploring design, web development, creative
+        technology and interactive experiences.
+
+    </p>
 
 </header>
 
 
+<!-- ABOUT -->
 
-<main>
+<section id="about">
 
-
-<!-- =======================================================
-     HERO
-======================================================= -->
-
-<section
-    class="hero"
-    id="home">
-
-
-    <div class="eyebrow">
-
-        COMMERCE × TECHNOLOGY / 2026
-
+    <div class="section-title reveal">
+        About me
     </div>
 
+    <div class="glass-grid">
 
-    <div class="hero-title">
+        <div class="card reveal">
 
-        <div class="hero-outline">
+            <h3>
+                Who is Nithan?
+            </h3>
 
-            B-01
+            <p>
+
+                I'm Nithan Najeeb, a B.Com student
+                interested in technology, business,
+                design and creative digital experiences.
+
+                I enjoy turning ideas into things that
+                actually exist, preferably without making
+                the browser cry.
+
+            </p>
 
         </div>
 
 
-        <h1>
+        <div class="card reveal">
 
-            NITHAN
+            <h3>
+                What I do
+            </h3>
 
-        </h1>
+            <p>
+
+                Web design, creative coding,
+                interactive interfaces, digital
+                experiments and business-oriented
+                technology projects.
+
+            </p>
+
+        </div>
 
     </div>
 
+</section>
 
-    <div class="hero-copy">
 
-        <div class="hero-role">
+<!-- SKILLS -->
 
-            B.COM STUDENT / DEVELOPER / EXPLORER
+<section id="skills">
+
+    <div class="section-title reveal">
+        Skills
+    </div>
+
+    <div class="card reveal">
+
+        <div class="skill">
+
+            <div class="skill-top">
+                <span class="skill-name">
+                    HTML / CSS
+                </span>
+
+                <span>90%</span>
+            </div>
+
+            <div class="skill-bar">
+                <div class="skill-progress"
+                     data-width="90%">
+                </div>
+            </div>
 
         </div>
 
 
-        <p class="hero-description">
+        <div class="skill">
 
-            Exploring the intersection of
-            <strong>business, data and technology</strong>
-            and turning ideas into useful digital experiences.
+            <div class="skill-top">
+                <span class="skill-name">
+                    JavaScript
+                </span>
 
+                <span>80%</span>
+            </div>
+
+            <div class="skill-bar">
+                <div class="skill-progress"
+                     data-width="80%">
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="skill">
+
+            <div class="skill-top">
+                <span class="skill-name">
+                    UI / UX
+                </span>
+
+                <span>85%</span>
+            </div>
+
+            <div class="skill-bar">
+                <div class="skill-progress"
+                     data-width="85%">
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="skill">
+
+            <div class="skill-top">
+                <span class="skill-name">
+                    Creative Technology
+                </span>
+
+                <span>85%</span>
+            </div>
+
+            <div class="skill-bar">
+                <div class="skill-progress"
+                     data-width="85%">
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- PROJECTS -->
+
+<section id="projects">
+
+    <div class="section-title reveal">
+        Projects
+    </div>
+
+    <div class="glass-grid">
+
+        <div class="card project reveal">
+
+            <div class="project-number">
+                01
+            </div>
+
+            <h3>
+                Interactive VN Engine
+            </h3>
+
+            <p>
+                A custom visual-novel engine with
+                animated characters, memory systems,
+                menus and cinematic presentation.
+            </p>
+
+        </div>
+
+
+        <div class="card project reveal">
+
+            <div class="project-number">
+                02
+            </div>
+
+            <h3>
+                Creative Web Experiences
+            </h3>
+
+            <p>
+                Experimental interfaces combining
+                animation, WebGL, glassmorphism and
+                interactive visual effects.
+            </p>
+
+        </div>
+
+
+        <div class="card project reveal">
+
+            <div class="project-number">
+                03
+            </div>
+
+            <h3>
+                Business Projects
+            </h3>
+
+            <p>
+                Academic and practical projects
+                combining business, information
+                systems and technology.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- CONTACT -->
+
+<section id="contact">
+
+    <div class="section-title reveal">
+        Let's create.
+    </div>
+
+    <div class="card reveal">
+
+        <p>
+            Interested in technology, design,
+            creative development or building
+            something ridiculous that somehow works?
         </p>
 
-    </div>
+        <br>
 
-
-
-    <!-- ===================================================
-         BUSINESS OVERVIEW
-    =================================================== -->
-
-    <div class="business-panel">
-
-
-        <div class="panel-header">
-
-            <span class="panel-name">
-
-                BUSINESS / OVERVIEW
-
-            </span>
-
-
-            <span class="panel-name live">
-
-                LIVE
-
-            </span>
-
-        </div>
-
-
-
-        <div class="metrics">
-
-
-            <div class="metric">
-
-                <small>
-                    GROWTH
-                </small>
-
-                <strong id="growth">
-                    +18.6%
-                </strong>
-
-            </div>
-
-
-            <div class="metric">
-
-                <small>
-                    ROI
-                </small>
-
-                <strong id="roi">
-                    14.2%
-                </strong>
-
-            </div>
-
-
-            <div class="metric">
-
-                <small>
-                    MARGIN
-                </small>
-
-                <strong id="margin">
-                    32%
-                </strong>
-
-            </div>
-
-
-        </div>
-
-
-
-        <div class="chart-container">
-
-
-            <div class="chart">
-
-                <svg
-                    viewBox="0 0 600 150"
-                    preserveAspectRatio="none">
-
-
-                    <polygon
-                        class="chart-area"
-                        id="chartArea"
-                        points="">
-                    </polygon>
-
-
-                    <polyline
-                        class="chart-glow"
-                        id="chartGlow"
-                        points="">
-                    </polyline>
-
-
-                    <polyline
-                        class="chart-line"
-                        id="chartLine"
-                        points="">
-                    </polyline>
-
-
-                </svg>
-
-            </div>
-
-
-            <div class="chart-caption">
-
-                INDEX / PERFORMANCE / TREND
-
-            </div>
-
-        </div>
-
+        <h3>
+            Nithan Najeeb
+        </h3>
 
     </div>
 
 </section>
 
-
-
-<!-- =======================================================
-     ABOUT
-======================================================= -->
-
-<section
-    class="section reveal"
-    id="about">
-
-
-    <div class="section-header">
-
-        <div class="section-number">
-
-            01 / ABOUT
-
-        </div>
-
-
-        <h2 class="section-title">
-
-            ABOUT
-
-        </h2>
-
-    </div>
-
-
-
-    <div class="about-grid">
-
-
-        <p class="about-text">
-
-            I'm a B.Com student interested in what happens when
-            <strong>commerce meets technology</strong>.
-
-            I enjoy understanding businesses, working with data,
-            experimenting with digital products and building
-            things that are actually useful.
-
-        </p>
-
-
-
-        <div class="about-facts">
-
-
-            <div class="fact">
-
-                <span>
-                    FIELD
-                </span>
-
-                <span>
-                    COMMERCE
-                </span>
-
-            </div>
-
-
-            <div class="fact">
-
-                <span>
-                    FOCUS
-                </span>
-
-                <span>
-                    DATA + TECHNOLOGY
-                </span>
-
-            </div>
-
-
-            <div class="fact">
-
-                <span>
-                    APPROACH
-                </span>
-
-                <span>
-                    CURIOUS / PRACTICAL
-                </span>
-
-            </div>
-
-
-            <div class="fact">
-
-                <span>
-                    CURRENT STATE
-                </span>
-
-                <span>
-                    LEARNING
-                </span>
-
-            </div>
-
-
-        </div>
-
-    </div>
-
-</section>
-
-
-
-<!-- =======================================================
-     WORK
-======================================================= -->
-
-<section
-    class="section reveal"
-    id="work">
-
-
-    <div class="section-header">
-
-        <div class="section-number">
-
-            02 / SELECTED WORK
-
-        </div>
-
-
-        <h2 class="section-title">
-
-            WORK
-
-        </h2>
-
-    </div>
-
-
-
-    <div class="projects">
-
-
-        <article class="project">
-
-            <div class="project-number">
-                PROJECT / 01
-            </div>
-
-            <div class="project-symbol">
-                ₹
-            </div>
-
-            <h3>
-                Finance
-            </h3>
-
-            <p>
-                FINANCIAL THINKING / ANALYSIS
-            </p>
-
-        </article>
-
-
-
-        <article class="project">
-
-            <div class="project-number">
-                PROJECT / 02
-            </div>
-
-            <div class="project-symbol">
-                Σ
-            </div>
-
-            <h3>
-                Analytics
-            </h3>
-
-            <p>
-                DATA / PATTERNS / DECISIONS
-            </p>
-
-        </article>
-
-
-
-        <article class="project">
-
-            <div class="project-number">
-                PROJECT / 03
-            </div>
-
-            <div class="project-symbol">
-                ×
-            </div>
-
-            <h3>
-                Digital
-            </h3>
-
-            <p>
-                WEB / DESIGN / DEVELOPMENT
-            </p>
-
-        </article>
-
-
-
-        <article class="project">
-
-            <div class="project-number">
-                PROJECT / 04
-            </div>
-
-            <div class="project-symbol">
-                %
-            </div>
-
-            <h3>
-                Business
-            </h3>
-
-            <p>
-                STRATEGY / COMMERCE / GROWTH
-            </p>
-
-        </article>
-
-
-    </div>
-
-</section>
-
-
-
-<!-- =======================================================
-     SKILLS
-======================================================= -->
-
-<section
-    class="section reveal"
-    id="skills">
-
-
-    <div class="section-header">
-
-        <div class="section-number">
-
-            03 / CAPABILITIES
-
-        </div>
-
-
-        <h2 class="section-title">
-
-            SKILLS
-
-        </h2>
-
-    </div>
-
-
-
-    <div class="skills-grid">
-
-
-        <p class="skills-intro">
-
-            Commerce fundamentals combined with analytical
-            thinking and technology.
-
-            The percentages below represent the current
-            direction of development rather than some
-            suspiciously precise measurement of human ability.
-
-        </p>
-
-
-
-        <div class="skills-list">
-
-
-            <div
-                class="skill"
-                data-level="82">
-
-
-                <div class="skill-top">
-
-                    <span class="skill-name">
-                        BUSINESS ANALYSIS
-                    </span>
-
-                    <span class="skill-value">
-                        82%
-                    </span>
-
-                </div>
-
-
-                <div class="skill-track">
-
-                    <div class="skill-fill">
-                    </div>
-
-                </div>
-
-            </div>
-
-
-
-            <div
-                class="skill"
-                data-level="76">
-
-
-                <div class="skill-top">
-
-                    <span class="skill-name">
-                        ACCOUNTING
-                    </span>
-
-                    <span class="skill-value">
-                        76%
-                    </span>
-
-                </div>
-
-
-                <div class="skill-track">
-
-                    <div class="skill-fill">
-                    </div>
-
-                </div>
-
-            </div>
-
-
-
-            <div
-                class="skill"
-                data-level="79">
-
-
-                <div class="skill-top">
-
-                    <span class="skill-name">
-                        DATA ANALYTICS
-                    </span>
-
-                    <span class="skill-value">
-                        79%
-                    </span>
-
-                </div>
-
-
-                <div class="skill-track">
-
-                    <div class="skill-fill">
-                    </div>
-
-                </div>
-
-            </div>
-
-
-
-            <div
-                class="skill"
-                data-level="72">
-
-
-                <div class="skill-top">
-
-                    <span class="skill-name">
-                        WEB DEVELOPMENT
-                    </span>
-
-                    <span class="skill-value">
-                        72%
-                    </span>
-
-                </div>
-
-
-                <div class="skill-track">
-
-                    <div class="skill-fill">
-                    </div>
-
-                </div>
-
-            </div>
-
-
-
-            <div
-                class="skill"
-                data-level="68">
-
-
-                <div class="skill-top">
-
-                    <span class="skill-name">
-                        UI / UX
-                    </span>
-
-                    <span class="skill-value">
-                        68%
-                    </span>
-
-                </div>
-
-
-                <div class="skill-track">
-
-                    <div class="skill-fill">
-                    </div>
-
-                </div>
-
-            </div>
-
-
-        </div>
-
-    </div>
-
-</section>
-
-
-
-<!-- =======================================================
-     EDUCATION
-======================================================= -->
-
-<section
-    class="section reveal"
-    id="education">
-
-
-    <div class="section-header">
-
-        <div class="section-number">
-
-            04 / EDUCATION
-
-        </div>
-
-
-        <h2 class="section-title">
-
-            PATH
-
-        </h2>
-
-    </div>
-
-
-
-    <div class="timeline">
-
-
-        <div class="timeline-item">
-
-
-            <div class="timeline-date">
-
-                2023 — PRESENT
-
-            </div>
-
-
-            <h3>
-
-                B.Com
-
-            </h3>
-
-
-            <p>
-
-                Commerce, accounting, economics,
-                business fundamentals and technology.
-
-            </p>
-
-        </div>
-
-
-
-        <div class="timeline-item">
-
-
-            <div class="timeline-date">
-
-                CURRENT
-
-            </div>
-
-
-            <h3>
-
-                Independent Learning
-
-            </h3>
-
-
-            <p>
-
-                Exploring data analytics, web development,
-                digital products and modern technology.
-
-            </p>
-
-        </div>
-
-
-
-        <div class="timeline-item">
-
-
-            <div class="timeline-date">
-
-                NEXT
-
-            </div>
-
-
-            <h3>
-
-                Build / Learn / Repeat
-
-            </h3>
-
-
-            <p>
-
-                Turning academic knowledge into practical
-                projects and real-world experience.
-
-            </p>
-
-        </div>
-
-
-    </div>
-
-</section>
-
-
-
-<!-- =======================================================
-     CONTACT
-======================================================= -->
-
-<section
-    class="section contact reveal"
-    id="contact">
-
-
-    <div class="contact-label">
-
-        05 / CONTACT
-
-    </div>
-
-
-    <h2 class="contact-title">
-
-        LET'S<br>
-        BUILD.
-
-    </h2>
-
-
-    <p class="contact-copy">
-
-        Interested in business, technology, data
-        or interesting ideas?
-
-        That's generally where things get interesting.
-
-    </p>
-
-
-    <div class="contact-links">
-
-        <!-- Replace these with your actual accounts -->
-
-        <a
-            href="mailto:hello@example.com">
-
-            EMAIL
-
-        </a>
-
-
-        <a
-            href="#">
-
-            LINKEDIN
-
-        </a>
-
-
-        <a
-            href="#">
-
-            GITHUB
-
-        </a>
-
-    </div>
-
-</section>
-
-
-</main>
-
-
-
-<!-- =======================================================
-     FOOTER
-======================================================= -->
 
 <footer>
 
-    <span>
-        NITHAN / 01
-    </span>
-
-
-    <span>
-        COMMERCE × TECHNOLOGY
-    </span>
-
-
-    <span>
-        2026
-    </span>
+    © 2026 Nithan Najeeb
 
 </footer>
 
+</div>
 
 
 <script>
 
 /* =========================================================
-   DEEP CALCULATION SPACE
+   THREE.JS LIQUID BACKGROUND
 ========================================================= */
 
 const canvas =
-    document.getElementById(
-        "calculationCanvas"
-    );
+    document.getElementById("liquidCanvas");
 
+const renderer =
+    new THREE.WebGLRenderer({
+        canvas,
+        antialias: true,
+        alpha: true
+    });
 
-const ctx =
-    canvas.getContext(
-        "2d"
-    );
+renderer.setPixelRatio(
+    Math.min(window.devicePixelRatio, 2)
+);
 
-
-let width =
-    window.innerWidth;
-
-
-let height =
-    window.innerHeight;
-
-
-let dpr =
-    Math.min(
-        window.devicePixelRatio || 1,
-        2
-    );
-
-
-/* =========================================================
-   RESIZE
-========================================================= */
-
-function resizeCanvas() {
-
-    width =
-        window.innerWidth;
-
-    height =
-        window.innerHeight;
-
-    dpr =
-        Math.min(
-            window.devicePixelRatio || 1,
-            2
-        );
-
-
-    canvas.width =
-        width * dpr;
-
-
-    canvas.height =
-        height * dpr;
-
-
-    ctx.setTransform(
-        dpr,
-        0,
-        0,
-        dpr,
-        0,
-        0
-    );
-
-}
-
-
-resizeCanvas();
-
-
-window.addEventListener(
-    "resize",
-    resizeCanvas
+renderer.setSize(
+    window.innerWidth,
+    window.innerHeight
 );
 
 
-/* =========================================================
-   SYMBOLS
-========================================================= */
+const scene =
+    new THREE.Scene();
 
-const calculationSymbols = [
 
-    "%",
-    "×",
-    "−",
-    "+",
-    "÷",
-    "₹",
-    "=",
-    "Σ",
-    "∑",
-    "ROI",
-    "CAGR",
-    "01",
-    "10%",
-    "32%",
-    "₹+",
-    "EBITDA"
-
-];
-
-
-/* =========================================================
-   PARTICLES
-========================================================= */
-
-let particles = [];
-
-
-const isMobile =
-    window.innerWidth <= 800;
-
-
-const particleCount =
-    isMobile
-        ? 28
-        : 60;
-
-
-/* =========================================================
-   RANDOM
-========================================================= */
-
-function random(
-    min,
-    max
-) {
-
-    return (
-        Math.random() *
-        (max - min) +
-        min
-    );
-
-}
-
-
-function choose(
-    array
-) {
-
-    return array[
-        Math.floor(
-            Math.random() *
-            array.length
-        )
-    ];
-
-}
-
-
-/* =========================================================
-   CREATE CURVED PARTICLE
-========================================================= */
-
-function createParticle(
-    initial = false
-) {
-
-
-    /*
-     * Start around the viewport.
-     */
-
-    const startX =
-        random(
-            -width * .15,
-            width * 1.1
-        );
-
-
-    const startY =
-        random(
-            -height * .15,
-            height * 1.1
-        );
-
-
-    /*
-     * End somewhere else.
-     */
-
-    const endX =
-        startX +
-        random(
-            -width * .45,
-            width * .55
-        );
-
-
-    const endY =
-        startY +
-        random(
-            -height * .25,
-            height * .55
-        );
-
-
-    /*
-     * TWO control points create
-     * the curved trajectory.
-     */
-
-    const control1X =
-        startX +
-        random(
-            -300,
-            300
-        );
-
-
-    const control1Y =
-        startY +
-        random(
-            -300,
-            300
-        );
-
-
-    const control2X =
-        endX +
-        random(
-            -300,
-            300
-        );
-
-
-    const control2Y =
-        endY +
-        random(
-            -300,
-            300
-        );
-
-
-    /*
-     * DEPTH
-     *
-     * 0 = far
-     * 1 = close
-     */
-
-    const depth =
-        Math.random();
-
-
-    /*
-     * Perspective.
-     */
-
-    const scale =
-        .35 +
-        depth * 1.3;
-
-
-    const speed =
-        .00055 +
-        depth * .0028;
-
-
-    const opacity =
-        .025 +
-        depth * .15;
-
-
-    const particle = {
-
-        symbol:
-            choose(
-                calculationSymbols
-            ),
-
-
-        startX,
-
-        startY,
-
-
-        control1X,
-
-        control1Y,
-
-
-        control2X,
-
-        control2Y,
-
-
-        endX,
-
-        endY,
-
-
-        depth,
-
-
-        scale,
-
-
-        speed,
-
-
-        opacity,
-
-
-        size:
-            random(
-                7,
-                15
-            ),
-
-
-        progress:
-            initial
-                ? Math.random()
-                : -.15,
-
-
-        rotation:
-            random(
-                -1,
-                1
-            ),
-
-
-        rotationSpeed:
-            random(
-                -.002,
-                .002
-            ),
-
-
-        wobble:
-            random(
-                0,
-                Math.PI * 2
-            ),
-
-
-        wobbleSpeed:
-            random(
-                .005,
-                .016
-            )
-
-    };
-
-
-    particles.push(
-        particle
-    );
-
-}
-
-
-/* =========================================================
-   INITIALIZE
-========================================================= */
-
-for (
-    let i = 0;
-    i < particleCount;
-    i++
-) {
-
-    createParticle(
-        true
-    );
-
-}
-
-
-/* =========================================================
-   BEZIER CURVE
-========================================================= */
-
-function bezier(
-    p0,
-    p1,
-    p2,
-    p3,
-    t
-) {
-
-    const inverse =
-        1 - t;
-
-
-    return (
-
-        inverse *
-        inverse *
-        inverse *
-        p0
-
-        +
-
-        3 *
-        inverse *
-        inverse *
-        t *
-        p1
-
-        +
-
-        3 *
-        inverse *
-        t *
-        t *
-        p2
-
-        +
-
-        t *
-        t *
-        t *
-        p3
-
-    );
-
-}
-
-
-/* =========================================================
-   DRAW PARTICLE
-========================================================= */
-
-function drawParticle(
-    particle
-) {
-
-    const t =
-        particle.progress;
-
-
-    let x =
-        bezier(
-            particle.startX,
-            particle.control1X,
-            particle.control2X,
-            particle.endX,
-            t
-        );
-
-
-    let y =
-        bezier(
-            particle.startY,
-            particle.control1Y,
-            particle.control2Y,
-            particle.endY,
-            t
-        );
-
-
-    /*
-     * Extra organic movement.
-     */
-
-    x +=
-        Math.sin(
-            particle.wobble
-        ) *
-        particle.depth *
-        9;
-
-
-    y +=
-        Math.cos(
-            particle.wobble * .8
-        ) *
-        particle.depth *
-        7;
-
-
-    /*
-     * Fade.
-     */
-
-    let fade =
-        1;
-
-
-    if (
-        t < .1
-    ) {
-
-        fade =
-            t / .1;
-
-    }
-
-
-    if (
-        t > .84
-    ) {
-
-        fade =
-            (1 - t) / .16;
-
-    }
-
-
-    /*
-     * Trail position.
-     */
-
-    const trailT =
-        Math.max(
-            0,
-            t - .045
-        );
-
-
-    const trailX =
-        bezier(
-            particle.startX,
-            particle.control1X,
-            particle.control2X,
-            particle.endX,
-            trailT
-        );
-
-
-    const trailY =
-        bezier(
-            particle.startY,
-            particle.control1Y,
-            particle.control2Y,
-            particle.endY,
-            trailT
-        );
-
-
-    const localTrailX =
-        trailX - x;
-
-
-    const localTrailY =
-        trailY - y;
-
-
-    ctx.save();
-
-
-    ctx.translate(
-        x,
-        y
-    );
-
-
-    ctx.rotate(
-        particle.rotation
-    );
-
-
-    /*
-     * Trail.
-     */
-
-    const gradient =
-        ctx.createLinearGradient(
-            localTrailX,
-            localTrailY,
-            0,
-            0
-        );
-
-
-    gradient.addColorStop(
+const camera =
+    new THREE.OrthographicCamera(
+        -1, 1,
+        1, -1,
         0,
-        "rgba(255,255,255,0)"
+        1
     );
 
 
-    gradient.addColorStop(
-        .65,
-        `rgba(
-            255,
-            255,
-            255,
-            ${particle.opacity * .25 * fade}
-        )`
-    );
+const geometry =
+    new THREE.PlaneGeometry(2, 2);
 
 
-    gradient.addColorStop(
-        1,
-        `rgba(
-            255,
-            255,
-            255,
-            ${particle.opacity * fade}
-        )`
-    );
+/* custom shader */
 
+const material =
+    new THREE.ShaderMaterial({
 
-    ctx.beginPath();
+        uniforms: {
 
+            uTime: {
+                value: 0
+            },
 
-    ctx.moveTo(
-        localTrailX,
-        localTrailY
-    );
+            uIntensity: {
+                value: 0
+            }
 
+        },
 
-    ctx.lineTo(
-        0,
-        0
-    );
+        fragmentShader: `
 
+        uniform float uTime;
+        uniform float uIntensity;
 
-    ctx.strokeStyle =
-        gradient;
+        vec3 rainbow(float t){
 
-
-    ctx.lineWidth =
-        .5 +
-        particle.depth;
-
-
-    ctx.stroke();
-
-
-    /*
-     * Nearby symbols glow slightly.
-     */
-
-    if (
-        particle.depth > .68
-    ) {
-
-        ctx.shadowBlur =
-            14 *
-            particle.depth;
-
-
-        ctx.shadowColor =
-            `rgba(
-                255,
-                255,
-                255,
-                ${particle.opacity * fade}
-            )`;
-
-    }
-
-
-    /*
-     * Draw symbol.
-     */
-
-    const fontSize =
-        particle.size *
-        particle.scale;
-
-
-    ctx.font =
-        `${fontSize}px "Courier New", monospace`;
-
-
-    ctx.textAlign =
-        "center";
-
-
-    ctx.textBaseline =
-        "middle";
-
-
-    ctx.fillStyle =
-        `rgba(
-            235,
-            235,
-            235,
-            ${particle.opacity * fade}
-        )`;
-
-
-    ctx.fillText(
-        particle.symbol,
-        0,
-        0
-    );
-
-
-    ctx.restore();
-
-}
-
-
-/* =========================================================
-   ANIMATION LOOP
-========================================================= */
-
-let previousTime =
-    performance.now();
-
-
-function animate(
-    currentTime
-) {
-
-    const delta =
-        currentTime -
-        previousTime;
-
-
-    previousTime =
-        currentTime;
-
-
-    ctx.clearRect(
-        0,
-        0,
-        width,
-        height
-    );
-
-
-    particles.forEach(
-        particle => {
-
-            particle.progress +=
-                particle.speed *
-                delta;
-
-
-            particle.rotation +=
-                particle.rotationSpeed *
-                delta;
-
-
-            particle.wobble +=
-                particle.wobbleSpeed *
-                delta;
-
-
-            drawParticle(
-                particle
+            return vec3(
+                0.5 + 0.5*cos(6.2831*(t+0.0)),
+                0.5 + 0.5*cos(6.2831*(t+0.33)),
+                0.5 + 0.5*cos(6.2831*(t+0.66))
             );
 
         }
+
+        void main(){
+
+            vec2 uv =
+                gl_FragCoord.xy /
+                vec2(
+                    ${window.innerWidth.toFixed(1)},
+                    ${window.innerHeight.toFixed(1)}
+                );
+
+            float t =
+                uTime * 0.08;
+
+            float wave =
+                sin(
+                    uv.x * 5.0 +
+                    sin(uv.y * 4.0 + t) * 2.0 +
+                    t
+                );
+
+            wave +=
+                sin(
+                    uv.y * 7.0 +
+                    t * 1.3
+                );
+
+            wave *= .5;
+
+            float mask =
+                smoothstep(
+                    .15,
+                    .9,
+                    uv.y
+                );
+
+            vec3 color =
+                rainbow(
+                    uv.x +
+                    wave * .08 +
+                    t
+                );
+
+            color *=
+                uIntensity *
+                mask *
+                .12;
+
+            gl_FragColor =
+                vec4(color, 1.0);
+
+        }
+
+        `
+
+    });
+
+
+const plane =
+    new THREE.Mesh(
+        geometry,
+        material
     );
 
-
-    /*
-     * Remove finished particles.
-     */
-
-    particles =
-        particles.filter(
-            particle =>
-                particle.progress < 1
-        );
+scene.add(plane);
 
 
-    /*
-     * Replace them.
-     */
+/* render */
 
-    while (
-        particles.length <
-        particleCount
-    ) {
+function animate(time){
 
-        createParticle();
+    material.uniforms.uTime.value =
+        time * .001;
 
-    }
-
+    renderer.render(
+        scene,
+        camera
+    );
 
     requestAnimationFrame(
         animate
@@ -3578,508 +1187,438 @@ function animate(
 
 }
 
-
 requestAnimationFrame(
     animate
 );
 
 
 /* =========================================================
-   CURSOR PARALLAX
+   INTRO ANIMATION
 ========================================================= */
 
-if (
-    window.matchMedia(
-        "(pointer:fine)"
-    ).matches
-) {
+const liquid =
+    document.getElementById("liquid");
+
+const shine =
+    document.getElementById("shine");
+
+const intro =
+    document.getElementById("intro");
+
+const portfolio =
+    document.getElementById("portfolio");
 
 
-    window.addEventListener(
-        "mousemove",
-        event => {
+const timeline =
+    gsap.timeline();
 
 
-            const x =
-                (
-                    event.clientX /
-                    width -
-                    .5
-                );
+/* initial state */
+
+gsap.set(
+    liquid,
+    {
+        height: "0%"
+    }
+);
+
+gsap.set(
+    shine,
+    {
+        x: "-120%"
+    }
+);
 
 
-            const y =
-                (
-                    event.clientY /
-                    height -
-                    .5
-                );
+/* glass entrance */
+
+timeline.from(
+    ".glass-name",
+    {
+        scale: .4,
+        opacity: 0,
+        rotateX: 40,
+        duration: 1.5,
+        ease: "back.out(1.7)"
+    }
+);
 
 
-            canvas.style.transform =
-                `translate(
-                    ${x * -12}px,
-                    ${y * -12}px
-                )`;
+/* glass shine */
 
-        }
-    );
-
-}
-
-
-/* =========================================================
-   BUSINESS NUMBERS
-========================================================= */
-
-let growth =
-    18.6;
+timeline.to(
+    shine,
+    {
+        x: "120%",
+        duration: 1.5,
+        ease: "power2.inOut"
+    },
+    "-=.8"
+);
 
 
-let roi =
-    14.2;
+/* liquid filling */
+
+timeline.to(
+    liquid,
+    {
+        height: "115%",
+        duration: 4,
+        ease: "power2.inOut"
+    }
+);
 
 
-let margin =
-    32;
+/* make background wake up */
 
-
-function updateMetrics() {
-
-
-    growth +=
-        random(
-            -.18,
-            .18
-        );
-
-
-    roi +=
-        random(
-            -.12,
-            .12
-        );
-
-
-    margin +=
-        random(
-            -.3,
-            .3
-        );
-
-
-    growth =
-        Math.max(
-            12,
-            Math.min(
-                25,
-                growth
-            )
-        );
-
-
-    roi =
-        Math.max(
-            9,
-            Math.min(
-                20,
-                roi
-            )
-        );
-
-
-    margin =
-        Math.max(
-            25,
-            Math.min(
-                40,
-                margin
-            )
-        );
-
-
-    document
-        .getElementById(
-            "growth"
-        )
-        .textContent =
-            "+" +
-            growth.toFixed(1) +
-            "%";
-
-
-    document
-        .getElementById(
-            "roi"
-        )
-        .textContent =
-            roi.toFixed(1) +
-            "%";
-
-
-    document
-        .getElementById(
-            "margin"
-        )
-        .textContent =
-            Math.round(
-                margin
-            ) +
-            "%";
-
-}
-
-
-setInterval(
-    updateMetrics,
-    1800
+timeline.to(
+    material.uniforms.uIntensity,
+    {
+        value: 1,
+        duration: 2
+    },
+    "-=2"
 );
 
 
 /* =========================================================
-   CHART
+   GLASS SHATTER
 ========================================================= */
 
-const chartLine =
-    document.getElementById(
-        "chartLine"
-    );
+timeline.call(
+    createShards
+);
 
 
-const chartGlow =
-    document.getElementById(
-        "chartGlow"
-    );
+/* glass disappears */
+
+timeline.to(
+    ".glass-name",
+    {
+        scale: 1.15,
+        opacity: 0,
+        duration: .35,
+        ease: "power3.in"
+    }
+);
 
 
-const chartArea =
-    document.getElementById(
-        "chartArea"
-    );
+/* intro fades */
+
+timeline.to(
+    intro,
+    {
+        opacity: 0,
+        duration: 1,
+        pointerEvents: "none"
+    }
+);
 
 
-let chartValues = [
+/* portfolio appears */
 
-    66,
-    72,
-    69,
-    82,
-    78,
-    89,
-    84,
-    97,
-    91,
-    105,
-    99,
-    113,
-    108,
-    122
+timeline.set(
+    portfolio,
+    {
+        visibility: "visible"
+    }
+);
 
-];
+timeline.to(
+    portfolio,
+    {
+        opacity: 1,
+        duration: 1.5
+    }
+);
 
 
-function drawChart() {
+/* animate hero */
+
+timeline.from(
+    ".hero > *",
+    {
+        y: 80,
+        opacity: 0,
+        stagger: .15,
+        duration: 1,
+        ease: "power4.out"
+    }
+);
 
 
-    const width =
-        600;
+/* =========================================================
+   GLASS SHARDS
+========================================================= */
+
+function createShards(){
+
+    const rect =
+        document
+        .querySelector(".glass-name")
+        .getBoundingClientRect();
 
 
-    const height =
-        150;
+    for(
+        let i = 0;
+        i < 90;
+        i++
+    ){
 
-
-    const step =
-        width /
-        (
-            chartValues.length -
-            1
-        );
-
-
-    const points =
-        chartValues
-            .map(
-                (
-                    value,
-                    index
-                ) => {
-
-
-                    const x =
-                        index *
-                        step;
-
-
-                    const y =
-                        height -
-                        value;
-
-
-                    return (
-                        x +
-                        "," +
-                        y
-                    );
-
-                }
-            )
-            .join(
-                " "
+        const shard =
+            document.createElement(
+                "div"
             );
 
+        shard.className =
+            "shard";
 
-    chartLine.setAttribute(
-        "points",
-        points
-    );
+        shard.style.left =
+            (
+                rect.left +
+                Math.random() *
+                rect.width
+            ) + "px";
 
-
-    chartGlow.setAttribute(
-        "points",
-        points
-    );
-
-
-    chartArea.setAttribute(
-        "points",
-        "0,150 " +
-        points +
-        " 600,150"
-    );
-
-}
+        shard.style.top =
+            (
+                rect.top +
+                Math.random() *
+                rect.height
+            ) + "px";
 
 
-drawChart();
+        const size =
+            5 +
+            Math.random() * 25;
+
+        shard.style.width =
+            size + "px";
+
+        shard.style.height =
+            size * (
+                .5 +
+                Math.random()
+            ) + "px";
 
 
-function updateChart() {
-
-
-    const previous =
-        chartValues[
-            chartValues.length - 1
-        ];
-
-
-    const next =
-        previous +
-        random(
-            -8,
-            15
+        document.body.appendChild(
+            shard
         );
 
 
-    chartValues.shift();
+        const direction =
+            Math.random() < .5
+            ? -1
+            : 1;
 
 
-    chartValues.push(
-        Math.max(
-            35,
-            Math.min(
-                135,
-                next
-            )
-        )
-    );
+        gsap.fromTo(
+            shard,
 
+            {
+                scale: .2,
+                opacity: 1,
+                rotation: 0
+            },
 
-    drawChart();
+            {
+                x:
+                    direction *
+                    (
+                        100 +
+                        Math.random() *
+                        500
+                    ),
+
+                y:
+                    300 +
+                    Math.random() *
+                    700,
+
+                rotation:
+                    Math.random() *
+                    1000,
+
+                scale:
+                    .3 +
+                    Math.random() *
+                    1.5,
+
+                opacity: 0,
+
+                duration:
+                    1.5 +
+                    Math.random() * 2,
+
+                ease: "power2.in",
+
+                onComplete(){
+                    shard.remove();
+                }
+
+            }
+        );
+
+    }
 
 }
 
 
-setInterval(
-    updateChart,
-    1300
-);
-
-
 /* =========================================================
-   SCROLL REVEAL
+   SCROLL REVEALS
 ========================================================= */
 
-const revealElements =
-    document.querySelectorAll(
-        ".reveal"
-    );
-
-
-const revealObserver =
+const observer =
     new IntersectionObserver(
         entries => {
-
 
             entries.forEach(
                 entry => {
 
+                    if(
+                        entry.isIntersecting
+                    ){
 
-                    if (
-                        !entry.isIntersecting
-                    ) {
+                        gsap.fromTo(
+                            entry.target,
 
-                        return;
+                            {
+                                y: 70,
+                                opacity: 0,
+                                scale: .96
+                            },
 
-                    }
-
-
-                    entry.target
-                        .classList
-                        .add(
-                            "visible"
+                            {
+                                y: 0,
+                                opacity: 1,
+                                scale: 1,
+                                duration: 1,
+                                ease: "power3.out"
+                            }
                         );
 
 
-                    /*
-                     * Skills animate once visible.
-                     */
+                        observer.unobserve(
+                            entry.target
+                        );
 
-                    const skills =
-                        entry.target
-                            .querySelectorAll(
-                                ".skill"
-                            );
-
-
-                    skills.forEach(
-                        (
-                            skill,
-                            index
-                        ) => {
-
-
-                            const level =
-                                skill.dataset.level;
-
-
-                            const fill =
-                                skill.querySelector(
-                                    ".skill-fill"
-                                );
-
-
-                            if (
-                                fill
-                            ) {
-
-
-                                setTimeout(
-                                    () => {
-
-                                        fill.style.width =
-                                            level +
-                                            "%";
-
-                                    },
-                                    index *
-                                    120
-
-                                );
-
-                            }
-
-                        }
-                    );
-
+                    }
 
                 }
             );
 
         },
+
         {
-            threshold:
-                .16
+            threshold: .15
         }
+
     );
 
 
-revealElements.forEach(
-    element => {
-
-        revealObserver.observe(
-            element
-        );
-
-    }
+document
+.querySelectorAll(".reveal")
+.forEach(
+    element =>
+        observer.observe(element)
 );
 
 
 /* =========================================================
-   ACTIVE NAV
+   SKILL BARS
 ========================================================= */
 
-const sections =
-    document.querySelectorAll(
-        "section[id]"
-    );
-
-
-const links =
-    document.querySelectorAll(
-        "nav a"
-    );
-
-
-const sectionObserver =
+const skillObserver =
     new IntersectionObserver(
         entries => {
-
 
             entries.forEach(
                 entry => {
 
+                    if(
+                        entry.isIntersecting
+                    ){
 
-                    if (
-                        !entry.isIntersecting
-                    ) {
+                        const bar =
+                            entry.target;
 
-                        return;
+                        gsap.to(
+                            bar,
+                            {
+                                width:
+                                    bar.dataset.width,
+
+                                duration: 1.5,
+
+                                ease:
+                                    "power3.out"
+                            }
+                        );
+
+                        skillObserver.unobserve(
+                            bar
+                        );
 
                     }
-
-
-                    links.forEach(
-                        link => {
-
-                            link.classList.remove(
-                                "active"
-                            );
-
-
-                            if (
-                                link.getAttribute(
-                                    "href"
-                                ) ===
-                                "#" +
-                                entry.target.id
-                            ) {
-
-                                link.classList.add(
-                                    "active"
-                                );
-
-                            }
-
-                        }
-                    );
 
                 }
             );
 
         },
+
         {
-            rootMargin:
-                "-35% 0px -55% 0px"
+            threshold: .5
         }
     );
 
 
-sections.forEach(
-    section => {
+document
+.querySelectorAll(
+    ".skill-progress"
+)
+.forEach(
+    bar =>
+        skillObserver.observe(bar)
+);
 
-        sectionObserver.observe(
-            section
+
+/* =========================================================
+   MOUSE GLASS PARALLAX
+========================================================= */
+
+document.addEventListener(
+    "mousemove",
+    e => {
+
+        const x =
+            (
+                e.clientX /
+                window.innerWidth
+                - .5
+            ) * 2;
+
+        const y =
+            (
+                e.clientY /
+                window.innerHeight
+                - .5
+            ) * 2;
+
+
+        gsap.to(
+            ".card",
+            {
+                rotateY:
+                    x * 2,
+
+                rotateX:
+                    -y * 2,
+
+                duration: 1,
+
+                overwrite: true
+            }
         );
 
     }
@@ -4087,21 +1626,22 @@ sections.forEach(
 
 
 /* =========================================================
-   INITIAL ACTIVE NAV
+   RESIZE
 ========================================================= */
 
-if (
-    links.length
-) {
+window.addEventListener(
+    "resize",
+    () => {
 
-    links[0].classList.add(
-        "active"
-    );
+        renderer.setSize(
+            window.innerWidth,
+            window.innerHeight
+        );
 
-}
+    }
+);
 
 </script>
-
 
 </body>
 </html>
