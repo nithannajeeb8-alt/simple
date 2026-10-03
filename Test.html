@@ -2,7 +2,6 @@
 <html lang="en">
 
 <head>
-
 <meta charset="UTF-8">
 
 <meta
@@ -10,1543 +9,1440 @@
   content="width=device-width, initial-scale=1.0, viewport-fit=cover"
 >
 
-<meta
-  name="theme-color"
-  content="#050505"
->
+<meta name="theme-color" content="#000000">
 
 <title>Nithan Najeeb</title>
-
-
-<!-- =====================================================
-     FONTS
-===================================================== -->
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 
 <link
-  href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500;600&family=Inter:wght@300;400;500&display=swap"
+  href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Noto+Serif+JP:wght@300;400;500&family=Inter:wght@300;400;500&display=swap"
   rel="stylesheet"
 >
 
 
 <style>
 
-/* =====================================================
+/* =========================================================
    RESET
-===================================================== */
+========================================================= */
 
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 html {
-  scroll-behavior: smooth;
+    scroll-behavior: smooth;
 }
 
 body {
-
-  margin: 0;
-
-  background: #f7f6f2;
-
-  color: #151515;
-
-  font-family: "Inter", sans-serif;
-
-  overflow-x: hidden;
-
+    margin: 0;
+    background: #f7f6f1;
+    color: #111;
+    overflow-x: hidden;
 }
 
 
-/* =====================================================
+/* =========================================================
    HERO
-===================================================== */
+========================================================= */
 
 .hero {
+    position: relative;
+    width: 100%;
+    height: 100svh;
+    min-height: 700px;
 
-  position: relative;
+    overflow: hidden;
 
-  width: 100%;
+    background: #000;
 
-  height: 100svh;
-
-  min-height: 650px;
-
-  overflow: hidden;
-
-  background: #050505;
-
-  display: flex;
-
-  justify-content: center;
-
-  align-items: flex-start;
-
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 
-/* =====================================================
-   VIDEO BACKGROUND
+/* =========================================================
+   BACKGROUND VIDEO
 
-   The source video remains 16:9.
-
-   object-fit: cover means it keeps its proportions
-   while filling the entire hero.
-
-   It will crop slightly on a tall phone instead
-   of stretching.
-===================================================== */
+   leafs.MP4
+========================================================= */
 
 .hero-video {
+    position: absolute;
 
-  position: absolute;
+    inset: 0;
 
-  top: 50%;
+    width: 100%;
+    height: 100%;
 
-  left: 50%;
+    display: block;
 
-  width: 100%;
+    object-fit: cover;
+    object-position: center center;
 
-  height: 100%;
+    z-index: 0;
 
-  transform: translate(-50%, -50%);
+    background: #000;
 
-  object-fit: cover;
+    border: none;
 
-  object-position: center center;
+    /*
+       IMPORTANT:
+       Keep the video visible.
+       Do NOT add opacity: 0.
+    */
 
-  background: #050505;
+    filter:
+        grayscale(100%)
+        brightness(0.48)
+        contrast(1.08);
 
-  z-index: 0;
-
-  display: block;
-
-  filter:
-    grayscale(1)
-    brightness(.42)
-    contrast(1.12);
-
+    pointer-events: none;
 }
 
 
-/* =====================================================
-   VIDEO OVERLAY
-===================================================== */
+/* Dark cinematic overlay */
 
-.video-overlay {
+.hero::after {
+    content: "";
 
-  position: absolute;
+    position: absolute;
 
-  inset: 0;
+    inset: 0;
 
-  z-index: 1;
+    z-index: 1;
 
-  pointer-events: none;
+    pointer-events: none;
 
-  background:
-
-    linear-gradient(
-      to bottom,
-      rgba(0,0,0,.18) 0%,
-      rgba(0,0,0,.16) 40%,
-      rgba(0,0,0,.68) 100%
-    );
-
+    background:
+        linear-gradient(
+            to bottom,
+            rgba(0,0,0,0.22),
+            rgba(0,0,0,0.12) 45%,
+            rgba(0,0,0,0.62) 100%
+        );
 }
 
 
-/* =====================================================
+/* =========================================================
    HERO CONTENT
-===================================================== */
+========================================================= */
 
 .hero-content {
+    position: relative;
 
-  position: relative;
+    z-index: 5;
 
-  z-index: 5;
+    width: 100%;
+    height: 100%;
 
-  width: 92%;
+    display: flex;
+    flex-direction: column;
 
-  max-width: 1500px;
+    align-items: center;
 
-  text-align: center;
+    text-align: center;
 
-  padding-top: 9vh;
-
+    padding-top: 13vh;
 }
 
 
-/* =====================================================
+/* =========================================================
    TOP LABEL
-===================================================== */
+========================================================= */
 
 .hero-label {
+    color: rgba(255,255,255,0.72);
 
-  margin-bottom: 28px;
+    font-family: "Inter", sans-serif;
 
-  color:
-    rgba(255,255,255,.65);
+    font-size: 0.62rem;
 
-  font-size: .6rem;
+    font-weight: 300;
 
-  letter-spacing: .45em;
+    letter-spacing: 0.48em;
 
-  text-transform: uppercase;
+    margin-bottom: 35px;
 
+    text-transform: uppercase;
 }
 
 
-/* =====================================================
+/* =========================================================
    NAME
-===================================================== */
+
+   MUCH BIGGER THAN THE SWORD
+========================================================= */
 
 #name {
+    position: relative;
 
-  font-family:
-    "Noto Serif JP",
-    serif;
+    z-index: 10;
 
-  font-weight: 400;
+    color: #f4f3ef;
 
-  color: #f5f5f2;
+    font-family:
+        "Cormorant Garamond",
+        "Noto Serif JP",
+        serif;
 
-  font-size:
-    clamp(
-      3rem,
-      8vw,
-      8rem
-    );
+    font-size:
+        clamp(
+            4.2rem,
+            11vw,
+            10rem
+        );
 
-  line-height: 1;
+    font-weight: 500;
 
-  letter-spacing: .01em;
+    line-height: 0.92;
 
-  /*
-     Prevent the name from breaking.
-  */
+    letter-spacing: -0.025em;
 
-  white-space: nowrap;
+    white-space: nowrap;
 
-  text-shadow:
-    0 5px 35px rgba(0,0,0,.75);
-
+    text-shadow:
+        0 4px 30px rgba(0,0,0,0.8);
 }
 
 
 /* Individual letters */
 
 #name span {
+    display: inline-block;
 
-  display: inline-block;
-
-  opacity: 0;
-
-  transform:
-    translateY(25px);
-
-  animation:
-    nameAppear
-    .65s
-    cubic-bezier(.2,.8,.2,1)
-    forwards;
-
-}
-
-
-@keyframes nameAppear {
-
-  to {
-
-    opacity: 1;
+    opacity: 0;
 
     transform:
-      translateY(0);
+        translateY(30px);
 
-  }
+    animation:
+        nameIn
+        0.7s
+        cubic-bezier(.16,.8,.2,1)
+        forwards;
+}
+
+
+@keyframes nameIn {
+
+    to {
+        opacity: 1;
+
+        transform:
+            translateY(0);
+    }
 
 }
 
 
-/* =====================================================
-   SWORD CONTAINER
-===================================================== */
+/* =========================================================
+   SWORD AREA
+
+   Sword is BELOW the name.
+========================================================= */
 
 .sword-area {
 
-  position: relative;
+    position: relative;
 
-  width: 100%;
+    width: 100%;
 
-  height: 180px;
+    height: 145px;
 
-  margin-top: 20px;
+    margin-top: 30px;
 
-  overflow: visible;
+    overflow: visible;
 
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
 }
 
 
-/* =====================================================
-   SWORD IMAGE
+/* =========================================================
+   SWORD
 
-   Sword enters from the RIGHT.
-===================================================== */
+   Sword is deliberately smaller than name.
+========================================================= */
 
 #sword {
 
-  position: absolute;
+    position: absolute;
 
-  width:
-    min(
-      1250px,
-      105vw
-    );
+    top: 50%;
+    left: 50%;
 
-  height: auto;
+    width:
+        min(
+            850px,
+            82vw
+        );
 
-  max-width: none;
+    height: auto;
 
-  left: 50%;
+    max-width: none;
 
-  top: 50%;
+    opacity: 0;
 
-  opacity: 0;
+    transform:
+        translate(115vw, -50%);
 
-  transform:
-    translate(120vw, -50%)
-    rotate(-1deg);
+    filter:
+        contrast(1.15)
+        brightness(0.92)
+        drop-shadow(
+            0 10px 20px
+            rgba(0,0,0,0.55)
+        );
 
-  filter:
-    contrast(1.18)
-    brightness(.92)
-    drop-shadow(
-      0 12px 25px
-      rgba(0,0,0,.55)
-    );
+    z-index: 6;
 
+    pointer-events: none;
 }
 
 
-/* Sword animation */
+/* Sword enters from right */
 
 #sword.slice {
 
-  animation:
-    swordSlice
-    1.25s
-    cubic-bezier(.12,.8,.2,1)
-    forwards;
-
+    animation:
+        swordSlice
+        1.2s
+        cubic-bezier(.12,.82,.18,1)
+        forwards;
 }
 
 
 @keyframes swordSlice {
 
-  0% {
+    0% {
 
-    opacity: 0;
+        opacity: 0;
 
-    transform:
-      translate(120vw, -50%)
-      rotate(-1deg);
+        transform:
+            translate(115vw, -50%);
+    }
 
-  }
+    8% {
 
-  10% {
+        opacity: 1;
+    }
 
-    opacity: 1;
+    100% {
 
-  }
+        opacity: 1;
 
-  100% {
-
-    opacity: 1;
-
-    transform:
-      translate(-50%, -50%)
-      rotate(-1deg);
-
-  }
-
+        transform:
+            translate(-50%, -50%);
+    }
 }
 
 
-/* =====================================================
+/* =========================================================
    SUBTITLE
-===================================================== */
+========================================================= */
 
 .hero-subtitle {
 
-  margin-top: 5px;
+    position: relative;
 
-  color:
-    rgba(255,255,255,.68);
+    z-index: 8;
 
-  font-size: .6rem;
+    margin-top: 8px;
 
-  letter-spacing: .4em;
+    color:
+        rgba(255,255,255,0.72);
 
-  text-transform: uppercase;
+    font-family:
+        "Inter",
+        sans-serif;
 
+    font-size:
+        0.62rem;
+
+    font-weight: 300;
+
+    letter-spacing:
+        0.42em;
+
+    text-transform:
+        uppercase;
 }
 
 
-/* =====================================================
-   JAPANESE DECORATION
-===================================================== */
+/* =========================================================
+   JAPANESE SIDE MARK
+========================================================= */
 
 .japanese-mark {
 
-  position: absolute;
+    position: absolute;
 
-  right: 4vw;
+    right: 4vw;
 
-  top: 45%;
+    top: 50%;
 
-  z-index: 4;
+    transform:
+        translateY(-50%);
 
-  writing-mode: vertical-rl;
+    z-index: 5;
 
-  color:
-    rgba(255,255,255,.3);
+    color:
+        rgba(255,255,255,0.28);
 
-  font-family:
-    "Noto Serif JP",
-    serif;
+    font-family:
+        "Noto Serif JP",
+        serif;
 
-  font-size: 1rem;
+    font-size:
+        0.9rem;
 
-  letter-spacing: .5em;
+    writing-mode:
+        vertical-rl;
 
+    letter-spacing:
+        0.55em;
 }
 
 
-/* =====================================================
-   SCROLL INDICATOR
-===================================================== */
+/* =========================================================
+   SCROLL
+========================================================= */
 
 .scroll {
 
-  position: absolute;
+    position: absolute;
 
-  left: 50%;
+    z-index: 10;
 
-  bottom: 28px;
+    left: 50%;
 
-  z-index: 10;
+    bottom: 27px;
 
-  transform:
-    translateX(-50%);
+    transform:
+        translateX(-50%);
 
-  color:
-    rgba(255,255,255,.7);
+    display: flex;
 
-  text-decoration: none;
+    flex-direction: column;
 
-  font-size: .55rem;
+    align-items: center;
 
-  letter-spacing: .35em;
+    gap: 13px;
 
-  display: flex;
+    color:
+        rgba(255,255,255,0.72);
 
-  flex-direction: column;
+    text-decoration: none;
 
-  align-items: center;
+    font-family:
+        "Inter",
+        sans-serif;
 
-  gap: 12px;
+    font-size:
+        0.56rem;
 
+    font-weight: 300;
+
+    letter-spacing:
+        0.42em;
 }
 
 
 .scroll-line {
 
-  width: 1px;
+    width: 1px;
 
-  height: 55px;
+    height: 52px;
 
-  background:
-    rgba(255,255,255,.65);
+    background:
+        rgba(255,255,255,0.65);
 
-  animation:
-    scrollLine 2s
-    ease-in-out
-    infinite;
-
+    animation:
+        scrollPulse
+        2s
+        ease-in-out
+        infinite;
 }
 
 
-@keyframes scrollLine {
+@keyframes scrollPulse {
 
-  0%,
-  100% {
+    0%,
+    100% {
+        height: 38px;
+        opacity: 0.35;
+    }
 
-    height: 40px;
-
-    opacity: .4;
-
-  }
-
-  50% {
-
-    height: 65px;
-
-    opacity: 1;
-
-  }
-
+    50% {
+        height: 62px;
+        opacity: 1;
+    }
 }
 
 
-/* =====================================================
-   WHITE PAGE
-===================================================== */
+/* =========================================================
+   WHITE JAPANESE-INSPIRED CONTENT
+========================================================= */
 
 .page {
-
-  background:
-    #f7f6f2;
-
+    background: #f7f6f1;
 }
 
-
-/* =====================================================
-   GENERAL SECTION
-===================================================== */
 
 .section {
 
-  position: relative;
+    position: relative;
 
-  min-height: 90vh;
+    min-height: 90vh;
 
-  padding:
-    14vw 8vw;
+    padding:
+        14vw 8vw;
 
-  background:
-    #f7f6f2;
+    background:
+        #f7f6f1;
 
-  border-bottom:
-    1px solid #deddd7;
-
+    border-bottom:
+        1px solid #deddd6;
 }
 
 
 .section-inner {
 
-  width:
-    min(1150px, 100%);
+    width:
+        min(1150px, 100%);
 
-  margin:
-    auto;
-
+    margin:
+        auto;
 }
 
 
 .section-number {
 
-  position: absolute;
+    position: absolute;
 
-  left: 8vw;
+    left: 8vw;
 
-  top: 35px;
+    top: 35px;
 
-  font-family:
-    "Noto Serif JP",
-    serif;
+    color: #888;
 
-  font-size: .65rem;
+    font-family:
+        "Noto Serif JP",
+        serif;
 
-  color: #888;
+    font-size:
+        0.62rem;
 
-  letter-spacing: .25em;
-
+    letter-spacing:
+        0.25em;
 }
 
 
 .eyebrow {
 
-  font-family:
-    "Noto Serif JP",
-    serif;
+    color: #777;
 
-  font-size: .65rem;
+    font-family:
+        "Noto Serif JP",
+        serif;
 
-  letter-spacing: .35em;
+    font-size:
+        0.65rem;
 
-  color: #777;
+    letter-spacing:
+        0.35em;
 
-  margin-bottom: 25px;
-
+    margin-bottom:
+        25px;
 }
 
 
-/* =====================================================
-   SECTION HEADINGS
-===================================================== */
-
 .section h2 {
 
-  font-family:
-    "Noto Serif JP",
-    serif;
+    color: #161616;
 
-  font-weight: 400;
+    font-family:
+        "Cormorant Garamond",
+        "Noto Serif JP",
+        serif;
 
-  font-size:
-    clamp(
-      3.2rem,
-      7vw,
-      7rem
-    );
+    font-size:
+        clamp(
+            4rem,
+            8vw,
+            8rem
+        );
 
-  line-height: 1.05;
+    font-weight:
+        400;
 
-  letter-spacing: -.025em;
+    line-height:
+        0.95;
 
-  margin-bottom: 70px;
+    letter-spacing:
+        -0.03em;
 
+    margin-bottom:
+        70px;
 }
 
 
 .section h2 em {
 
-  color: #777;
+    color:
+        #777;
 
-  font-style: italic;
-
+    font-style:
+        italic;
 }
 
 
-/* =====================================================
+/* =========================================================
    ABOUT
-===================================================== */
+========================================================= */
 
 .about-layout {
 
-  display: grid;
+    display:
+        grid;
 
-  grid-template-columns:
-    1fr 1fr;
+    grid-template-columns:
+        1fr 1fr;
 
-  gap: 10vw;
-
+    gap:
+        10vw;
 }
 
 
 .about-intro {
 
-  font-family:
-    "Noto Serif JP",
-    serif;
+    font-family:
+        "Noto Serif JP",
+        serif;
 
-  font-size: 1.7rem;
+    font-size:
+        1.6rem;
 
-  line-height: 1.6;
-
+    line-height:
+        1.65;
 }
 
 
 .about-text {
 
-  max-width: 500px;
+    max-width:
+        520px;
 
-  color: #666;
+    color:
+        #666;
 
-  font-size: .95rem;
+    font-family:
+        "Inter",
+        sans-serif;
 
-  line-height: 2;
+    font-size:
+        0.95rem;
 
+    line-height:
+        2;
 }
 
 
-/* =====================================================
+/* =========================================================
    WORK
-===================================================== */
+========================================================= */
 
 .work-list {
 
-  border-top:
-    1px solid #d5d4cf;
-
+    border-top:
+        1px solid #d5d4ce;
 }
 
 
 .work-item {
 
-  min-height: 170px;
+    min-height:
+        170px;
 
-  display: grid;
+    display:
+        grid;
 
-  grid-template-columns:
-    80px 1fr 40px;
+    grid-template-columns:
+        80px 1fr 40px;
 
-  align-items: center;
+    align-items:
+        center;
 
-  gap: 30px;
+    gap:
+        30px;
 
-  border-bottom:
-    1px solid #d5d4cf;
+    border-bottom:
+        1px solid #d5d4ce;
 
-  transition:
-    background .35s,
-    padding .35s;
-
+    transition:
+        background .3s,
+        padding .3s;
 }
 
 
 .work-item:hover {
 
-  background:
-    #eeede8;
+    background:
+        #ecebe6;
 
-  padding-left:
-    20px;
-
+    padding-left:
+        20px;
 }
 
 
 .work-number {
 
-  color: #999;
+    color:
+        #999;
 
-  font-size: .7rem;
-
+    font-size:
+        0.7rem;
 }
 
 
 .work-item h3 {
 
-  font-family:
-    "Noto Serif JP",
-    serif;
+    font-family:
+        "Noto Serif JP",
+        serif;
 
-  font-size: 2rem;
+    font-size:
+        2rem;
 
-  font-weight: 400;
-
+    font-weight:
+        400;
 }
 
 
 .work-item p {
 
-  color: #777;
+    color:
+        #777;
 
-  font-size: .8rem;
+    font-size:
+        0.8rem;
 
-  margin-top: 8px;
-
+    margin-top:
+        8px;
 }
 
 
 .work-arrow {
 
-  font-size: 1.5rem;
+    font-size:
+        1.5rem;
 
-  color: #555;
-
+    color:
+        #555;
 }
 
 
-/* =====================================================
+/* =========================================================
    PHILOSOPHY
-===================================================== */
+========================================================= */
 
 .philosophy {
 
-  background:
-    #eeede8;
-
+    background:
+        #eeede8;
 }
 
 
 .philosophy-layout {
 
-  display: grid;
+    display:
+        grid;
 
-  grid-template-columns:
-    1fr 1fr;
+    grid-template-columns:
+        1fr 1fr;
 
-  gap: 12vw;
+    gap:
+        12vw;
 
-  align-items: center;
-
+    align-items:
+        center;
 }
 
 
 .philosophy-text {
 
-  font-family:
-    "Noto Serif JP",
-    serif;
+    color:
+        #555;
 
-  font-size: 1.1rem;
+    font-family:
+        "Noto Serif JP",
+        serif;
 
-  line-height: 2;
+    font-size:
+        1.1rem;
 
-  color: #555;
-
+    line-height:
+        2;
 }
 
 
-/* =====================================================
+/* =========================================================
    CONTACT
-===================================================== */
+========================================================= */
 
 .contact-link {
 
-  display: inline-block;
+    display:
+        inline-block;
 
-  font-family:
-    "Noto Serif JP",
-    serif;
+    color:
+        #222;
 
-  font-size: 1.2rem;
+    font-family:
+        "Noto Serif JP",
+        serif;
 
-  color: #222;
+    font-size:
+        1.2rem;
 
-  text-decoration: none;
+    text-decoration:
+        none;
 
-  border-bottom:
-    1px solid #555;
+    border-bottom:
+        1px solid #555;
 
-  padding-bottom: 10px;
-
+    padding-bottom:
+        10px;
 }
 
 
-/* =====================================================
+/* =========================================================
    FOOTER
-===================================================== */
+========================================================= */
 
 footer {
 
-  padding:
-    25px 8vw;
+    display:
+        flex;
 
-  background:
-    #f7f6f2;
+    justify-content:
+        space-between;
 
-  border-top:
-    1px solid #d5d4cf;
+    padding:
+        25px 8vw;
 
-  display:
-    flex;
+    background:
+        #f7f6f1;
 
-  justify-content:
-    space-between;
+    border-top:
+        1px solid #d5d4ce;
 
-  color: #888;
+    color:
+        #888;
 
-  font-size: .55rem;
+    font-size:
+        0.55rem;
 
-  letter-spacing: .3em;
-
+    letter-spacing:
+        0.3em;
 }
 
 
-/* =====================================================
+/* =========================================================
    MOBILE
-===================================================== */
+========================================================= */
 
 @media (max-width: 700px) {
 
+    .hero {
+        min-height: 700px;
+    }
 
-  .hero {
 
-    min-height:
-      100svh;
+    /*
+       On phones the video remains a real
+       background video and fills the entire hero.
+    */
 
-  }
+    .hero-video {
+        width: 100%;
+        height: 100%;
 
+        object-fit: cover;
 
-  .hero-content {
+        object-position:
+            center center;
+    }
 
-    padding-top:
-      10vh;
 
-  }
+    .hero-content {
 
+        padding-top:
+            12vh;
+    }
 
-  /* Prevent name wrapping */
 
-  #name {
+    .hero-label {
 
-    font-size:
-      clamp(
-        2.2rem,
-        10vw,
-        4rem
-      );
+        font-size:
+            0.5rem;
 
-    white-space:
-      nowrap;
+        letter-spacing:
+            0.34em;
 
-    letter-spacing:
-      -.025em;
+        margin-bottom:
+            27px;
+    }
 
-  }
 
+    /*
+       BIG NAME
+    */
 
-  .hero-label {
+    #name {
 
-    font-size:
-      .5rem;
+        font-size:
+            clamp(
+                3.15rem,
+                13vw,
+                5rem
+            );
 
-    letter-spacing:
-      .32em;
+        line-height:
+            0.95;
 
-  }
+        letter-spacing:
+            -0.035em;
+    }
 
 
-  /* Sword */
+    /*
+       Smaller sword.
+       Clearly below the name.
+    */
 
-  .sword-area {
+    .sword-area {
 
-    height:
-      110px;
+        height:
+            105px;
 
-    margin-top:
-      12px;
+        margin-top:
+            25px;
+    }
 
-  }
 
+    #sword {
 
-  #sword {
+        width:
+            720px;
 
-    width:
-      850px;
+        max-width:
+            none;
+    }
 
-  }
 
+    .hero-subtitle {
 
-  .hero-subtitle {
+        margin-top:
+            8px;
 
-    font-size:
-      .5rem;
+        font-size:
+            0.49rem;
 
-    letter-spacing:
-      .22em;
+        letter-spacing:
+            0.25em;
+    }
 
-  }
 
+    .japanese-mark {
+        display:
+            none;
+    }
 
-  .japanese-mark {
 
-    display:
-      none;
+    .scroll {
 
-  }
+        bottom:
+            24px;
+    }
 
 
-  /* White sections */
+    .section {
 
-  .section {
+        padding:
+            30vw 8vw;
+    }
 
-    padding:
-      30vw 8vw;
 
-  }
+    .section h2 {
 
+        font-size:
+            clamp(
+                3.8rem,
+                15vw,
+                6rem
+            );
+    }
 
-  .section h2 {
 
-    font-size:
-      clamp(
-        3rem,
-        14vw,
-        5rem
-      );
+    .about-layout,
+    .philosophy-layout {
 
-  }
+        grid-template-columns:
+            1fr;
 
+        gap:
+            50px;
+    }
 
-  .about-layout,
-  .philosophy-layout {
 
-    grid-template-columns:
-      1fr;
+    .work-item {
 
-    gap:
-      50px;
+        grid-template-columns:
+            45px 1fr;
 
-  }
+        padding:
+            30px 0;
+    }
 
 
-  .work-item {
+    .work-arrow {
+        display:
+            none;
+    }
 
-    grid-template-columns:
-      45px 1fr;
 
-    padding:
-      30px 0;
+    .work-item h3 {
 
-  }
-
-
-  .work-arrow {
-
-    display:
-      none;
-
-  }
-
-
-  .work-item h3 {
-
-    font-size:
-      1.5rem;
-
-  }
-
-
-  footer {
-
-    padding:
-      22px 8vw;
-
-  }
+        font-size:
+            1.5rem;
+    }
 
 }
 
 
-/* =====================================================
+/* =========================================================
    VERY SMALL PHONES
-===================================================== */
+========================================================= */
 
 @media (max-width: 390px) {
 
-  #name {
+    #name {
 
-    font-size:
-      2.05rem;
-
-  }
+        font-size:
+            2.9rem;
+    }
 
 }
 
 </style>
-
 </head>
-
 
 
 <body>
 
 
-<!-- =====================================================
+<!-- =======================================================
      HERO
-===================================================== -->
+======================================================= -->
 
 <section
-  class="hero"
-  id="home"
+    class="hero"
+    id="home"
 >
 
 
-  <!-- ================================================
-       LEAF VIDEO
+    <!-- ===================================================
+         BACKGROUND VIDEO
 
-       FILE:
-       leafs.MP4
+         GitHub files:
 
-       Must be in the same folder as test.html.
-  ================================================= -->
-
-  <video
-    id="heroVideo"
-    class="hero-video"
-
-    autoplay
-
-    muted
-
-    loop
-
-    playsinline
-
-    webkit-playsinline
-
-    preload="auto"
-
-    disablepictureinpicture
-
-    disableremoteplayback
-  >
-
-    <source
-      src="./leafs.MP4"
-      type="video/mp4"
-    >
-
-  </video>
-
-
-  <div
-    class="video-overlay"
-  ></div>
-
-
-
-  <!-- ================================================
-       HERO CONTENT
-  ================================================= -->
-
-  <div
-    class="hero-content"
-  >
-
-
-    <p
-      class="hero-label"
-    >
-      NITHAN · 2026
-    </p>
-
-
-
-    <!-- NAME -->
-
-    <h1
-      id="name"
-    ></h1>
-
-
-
-    <!-- ============================================
-         SWORD
-
-         FILE:
+         test.html
+         leafs.MP4
          Sword.PNG
-    ============================================= -->
+    ==================================================== -->
 
-    <div
-      class="sword-area"
+    <video
+        id="heroVideo"
+
+        class="hero-video"
+
+        autoplay
+        muted
+        loop
+        playsinline
+        webkit-playsinline
+
+        preload="auto"
+
+        aria-hidden="true"
     >
 
-      <img
-        id="sword"
-        src="./Sword.PNG"
-        alt="Sword"
-      >
+        <source
+            src="./leafs.MP4"
+            type="video/mp4"
+        >
+
+    </video>
+
+
+    <!-- HERO CONTENT -->
+
+    <div class="hero-content">
+
+
+        <div class="hero-label">
+            NITHAN · 2026
+        </div>
+
+
+        <!-- NAME -->
+
+        <h1 id="name"></h1>
+
+
+        <!-- SWORD -->
+
+        <div class="sword-area">
+
+            <img
+                id="sword"
+                src="./Sword.PNG"
+                alt=""
+            >
+
+        </div>
+
+
+        <div class="hero-subtitle">
+            STUDENT · CREATOR · BUILDER
+        </div>
+
 
     </div>
 
 
+    <!-- Japanese decoration -->
 
-    <p
-      class="hero-subtitle"
+    <div class="japanese-mark">
+        静 · 創 · 夢
+    </div>
+
+
+    <!-- Scroll -->
+
+    <a
+        href="#about"
+        class="scroll"
     >
-      STUDENT · CREATOR · BUILDER
-    </p>
 
+        <span>
+            SCROLL
+        </span>
 
-  </div>
+        <span class="scroll-line"></span>
 
-
-
-  <!-- Japanese decoration -->
-
-  <div
-    class="japanese-mark"
-  >
-    静 · 創 · 夢
-  </div>
-
-
-
-  <!-- Scroll -->
-
-  <a
-    href="#about"
-    class="scroll"
-  >
-
-    <span>
-      SCROLL
-    </span>
-
-    <span
-      class="scroll-line"
-    ></span>
-
-  </a>
-
+    </a>
 
 </section>
 
 
 
-<!-- =====================================================
-     WHITE PAGE
-===================================================== -->
+<!-- =======================================================
+     WHITE CONTENT
+======================================================= -->
 
-<main
-  class="page"
->
+<main class="page">
 
 
-  <!-- =================================================
-       ABOUT
-  ================================================= -->
+    <!-- ABOUT -->
 
-  <section
-    class="section"
-    id="about"
-  >
-
-    <span
-      class="section-number"
-    >
-      一 / ABOUT
-    </span>
-
-
-    <div
-      class="section-inner"
+    <section
+        class="section"
+        id="about"
     >
 
-
-      <p
-        class="eyebrow"
-      >
-        WHO I AM · 私について
-      </p>
+        <span class="section-number">
+            一 / ABOUT
+        </span>
 
 
-      <h2>
-        Who is<br>
-        <em>Nithan?</em>
-      </h2>
+        <div class="section-inner">
+
+            <div class="eyebrow">
+                WHO I AM · 私について
+            </div>
 
 
-      <div
-        class="about-layout"
-      >
+            <h2>
+                Who is<br>
+                <em>Nithan?</em>
+            </h2>
 
 
-        <p
-          class="about-intro"
-        >
+            <div class="about-layout">
 
-          I am Nithan Najeeb,
-          a student and creator
-          fascinated by technology,
-          design and stories.
+                <div class="about-intro">
 
-        </p>
+                    I am Nithan Najeeb,
+                    a student and creator
+                    fascinated by technology,
+                    design and stories.
+
+                </div>
 
 
-        <div
-          class="about-text"
-        >
+                <div class="about-text">
 
-          <p>
-            I enjoy building digital experiences
-            that combine technology with
-            visual storytelling.
-          </p>
+                    <p>
+                        I enjoy building digital
+                        experiences that combine
+                        technology with visual
+                        storytelling.
+                    </p>
 
-          <br>
+                    <br>
 
-          <p>
-            My interests move between web design,
-            creative development, artificial
-            intelligence and experimental projects.
-          </p>
+                    <p>
+                        My interests move between
+                        web design, creative
+                        development, artificial
+                        intelligence and experimental
+                        projects.
+                    </p>
+
+                </div>
+
+            </div>
 
         </div>
 
-
-      </div>
-
-
-    </div>
-
-  </section>
+    </section>
 
 
 
-  <!-- =================================================
-       WORK
-  ================================================= -->
+    <!-- WORK -->
 
-  <section
-    class="section"
-    id="work"
-  >
-
-    <span
-      class="section-number"
-    >
-      二 / WORK
-    </span>
-
-
-    <div
-      class="section-inner"
+    <section
+        class="section"
+        id="work"
     >
 
-
-      <p
-        class="eyebrow"
-      >
-        SELECTED WORK · 制作
-      </p>
+        <span class="section-number">
+            二 / WORK
+        </span>
 
 
-      <h2>
-        Things I<br>
-        <em>create.</em>
-      </h2>
+        <div class="section-inner">
+
+            <div class="eyebrow">
+                SELECTED WORK · 制作
+            </div>
 
 
-      <div
-        class="work-list"
-      >
+            <h2>
+                Things I<br>
+                <em>create.</em>
+            </h2>
 
 
-        <article
-          class="work-item"
+            <div class="work-list">
+
+
+                <article class="work-item">
+
+                    <span class="work-number">
+                        01
+                    </span>
+
+                    <div>
+
+                        <h3>
+                            Web Design
+                        </h3>
+
+                        <p>
+                            Cinematic and minimal
+                            digital experiences.
+                        </p>
+
+                    </div>
+
+                    <span class="work-arrow">
+                        ↗
+                    </span>
+
+                </article>
+
+
+                <article class="work-item">
+
+                    <span class="work-number">
+                        02
+                    </span>
+
+                    <div>
+
+                        <h3>
+                            Creative Projects
+                        </h3>
+
+                        <p>
+                            Visual concepts,
+                            stories and interactive ideas.
+                        </p>
+
+                    </div>
+
+                    <span class="work-arrow">
+                        ↗
+                    </span>
+
+                </article>
+
+
+                <article class="work-item">
+
+                    <span class="work-number">
+                        03
+                    </span>
+
+                    <div>
+
+                        <h3>
+                            Technology
+                        </h3>
+
+                        <p>
+                            Programming, AI and
+                            experimental projects.
+                        </p>
+
+                    </div>
+
+                    <span class="work-arrow">
+                        ↗
+                    </span>
+
+                </article>
+
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- PHILOSOPHY -->
+
+    <section
+        class="section philosophy"
+    >
+
+        <span class="section-number">
+            三 / PHILOSOPHY
+        </span>
+
+
+        <div
+            class="section-inner philosophy-layout"
         >
 
-          <span
-            class="work-number"
-          >
-            01
-          </span>
+            <div>
+
+                <div class="eyebrow">
+                    思想
+                </div>
+
+                <h2>
+                    Less noise.<br>
+                    <em>More meaning.</em>
+                </h2>
+
+            </div>
 
 
-          <div>
+            <div class="philosophy-text">
 
-            <h3>
-              Web Design
-            </h3>
+                Good design doesn't need to scream.
 
-            <p>
-              Cinematic and minimal
-              digital experiences.
-            </p>
+                <br><br>
 
-          </div>
+                It can be quiet.
+                It can breathe.
 
+                <br><br>
 
-          <span
-            class="work-arrow"
-          >
-            ↗
-          </span>
+                The goal isn't to fill every pixel.
+                It's to make every element matter.
 
-        </article>
+            </div>
 
+        </div>
 
-
-        <article
-          class="work-item"
-        >
-
-          <span
-            class="work-number"
-          >
-            02
-          </span>
-
-
-          <div>
-
-            <h3>
-              Creative Projects
-            </h3>
-
-            <p>
-              Visual concepts,
-              stories and interactive ideas.
-            </p>
-
-          </div>
-
-
-          <span
-            class="work-arrow"
-          >
-            ↗
-          </span>
-
-        </article>
+    </section>
 
 
 
-        <article
-          class="work-item"
-        >
+    <!-- CONTACT -->
 
-          <span
-            class="work-number"
-          >
-            03
-          </span>
-
-
-          <div>
-
-            <h3>
-              Technology
-            </h3>
-
-            <p>
-              Programming, AI and
-              experimental projects.
-            </p>
-
-          </div>
-
-
-          <span
-            class="work-arrow"
-          >
-            ↗
-          </span>
-
-        </article>
-
-
-      </div>
-
-
-    </div>
-
-  </section>
-
-
-
-  <!-- =================================================
-       PHILOSOPHY
-  ================================================= -->
-
-  <section
-    class="section philosophy"
-  >
-
-    <span
-      class="section-number"
-    >
-      三 / PHILOSOPHY
-    </span>
-
-
-    <div
-      class="section-inner philosophy-layout"
+    <section
+        class="section"
+        id="contact"
     >
 
-
-      <div>
-
-        <p
-          class="eyebrow"
-        >
-          思想
-        </p>
+        <span class="section-number">
+            四 / CONTACT
+        </span>
 
 
-        <h2>
-          Less noise.<br>
-          <em>More meaning.</em>
-        </h2>
+        <div class="section-inner">
 
-      </div>
-
-
-      <p
-        class="philosophy-text"
-      >
-
-        Good design doesn't need to scream.
-
-        <br><br>
-
-        It can be quiet.
-        It can breathe.
-
-        <br><br>
-
-        The goal isn't to fill every pixel.
-        It's to make every element matter.
-
-      </p>
+            <div class="eyebrow">
+                CONTACT · 連絡
+            </div>
 
 
-    </div>
-
-  </section>
-
-
-
-  <!-- =================================================
-       CONTACT
-  ================================================= -->
-
-  <section
-    class="section"
-    id="contact"
-  >
-
-    <span
-      class="section-number"
-    >
-      四 / CONTACT
-    </span>
+            <h2>
+                Let's create<br>
+                <em>something.</em>
+            </h2>
 
 
-    <div
-      class="section-inner"
-    >
+            <a
+                href="mailto:your@email.com"
+                class="contact-link"
+            >
+                your@email.com ↗
+            </a>
 
+        </div>
 
-      <p
-        class="eyebrow"
-      >
-        CONTACT · 連絡
-      </p>
-
-
-      <h2>
-        Let's create<br>
-        <em>something.</em>
-      </h2>
-
-
-      <a
-        href="mailto:your@email.com"
-        class="contact-link"
-      >
-        your@email.com ↗
-      </a>
-
-
-    </div>
-
-  </section>
-
+    </section>
 
 </main>
 
 
 
-<!-- =====================================================
-     FOOTER
-===================================================== -->
-
 <footer>
 
-  <span>
-    NITHAN NAJEEB
-  </span>
+    <span>
+        NITHAN NAJEEB
+    </span>
 
-  <span>
-    © 2026
-  </span>
+    <span>
+        © 2026
+    </span>
 
 </footer>
 
@@ -1554,258 +1450,245 @@ footer {
 
 <script>
 
-/* =====================================================
+/* =========================================================
    NAME ANIMATION
-===================================================== */
+========================================================= */
 
-const nameText =
-  "Nithan Najeeb";
+const nameText = "Nithan Najeeb";
 
 const nameElement =
-  document.getElementById("name");
+    document.getElementById("name");
 
-
-/*
-Create one span for every letter.
-*/
 
 [...nameText].forEach(
-  (character, index) => {
+    (character, index) => {
 
-    const letter =
-      document.createElement("span");
+        const letter =
+            document.createElement("span");
 
-    letter.textContent =
-      character === " "
-        ? "\u00A0"
-        : character;
+        letter.textContent =
+            character === " "
+                ? "\u00A0"
+                : character;
 
-    letter.style.animationDelay =
-      `${index * 80}ms`;
+        letter.style.animationDelay =
+            `${index * 65}ms`;
 
-    nameElement.appendChild(letter);
+        nameElement.appendChild(letter);
 
-  }
+    }
 );
 
 
-/* =====================================================
-   VIDEO
-===================================================== */
+/* =========================================================
+   VIDEO AUTOPLAY
+========================================================= */
 
 const video =
-  document.getElementById("heroVideo");
+    document.getElementById("heroVideo");
 
 
 /*
-Force the attributes required by
-Safari/iOS for muted inline playback.
+   Explicitly force the settings required
+   for iPhone/Safari autoplay.
 */
 
 video.muted = true;
 
 video.defaultMuted = true;
 
+video.autoplay = true;
+
+video.loop = true;
+
+video.playsInline = true;
+
 video.setAttribute(
-  "muted",
-  ""
+    "muted",
+    ""
 );
 
 video.setAttribute(
-  "playsinline",
-  ""
+    "autoplay",
+    ""
 );
 
 video.setAttribute(
-  "webkit-playsinline",
-  ""
+    "playsinline",
+    ""
+);
+
+video.setAttribute(
+    "webkit-playsinline",
+    ""
 );
 
 
 /*
-Attempt autoplay.
+   Try to start immediately.
 */
 
-function startVideo() {
+function playBackgroundVideo() {
 
-  video.muted = true;
+    video.muted = true;
 
-  const playPromise =
-    video.play();
+    const promise =
+        video.play();
 
+    if (promise !== undefined) {
 
-  if (
-    playPromise !== undefined
-  ) {
+        promise.catch(() => {
 
-    playPromise
-      .catch(() => {
+            /*
+               Safari may wait for the first
+               interaction if the MP4 codec is
+               unsupported or autoplay is blocked.
+            */
 
-        console.log(
-          "Browser blocked autoplay."
-        );
+            console.log(
+                "Video autoplay was blocked."
+            );
 
-      });
+        });
 
-  }
-
+    }
 }
 
 
 /*
-Start when page loads.
+   Try at several stages because Safari
+   occasionally behaves like it has never
+   encountered a video before.
 */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    playBackgroundVideo
+);
 
 window.addEventListener(
-  "load",
-  startVideo
+    "load",
+    playBackgroundVideo
+);
+
+video.addEventListener(
+    "loadeddata",
+    playBackgroundVideo
+);
+
+video.addEventListener(
+    "canplay",
+    playBackgroundVideo
 );
 
 
 /*
-Safari sometimes waits until
-the first user interaction.
+   If Safari allows playback after interaction,
+   immediately resume it.
 */
 
-[
-  "touchstart",
-  "touchend",
-  "click",
-  "scroll"
-].forEach(
-  eventName => {
-
-    document.addEventListener(
-      eventName,
-      () => {
+document.addEventListener(
+    "touchstart",
+    () => {
 
         if (video.paused) {
-
-          video.play()
-            .catch(() => {});
-
+            video.play().catch(() => {});
         }
 
-      },
-      {
-        once: true,
+    },
+    {
         passive: true
-      }
-    );
-
-  }
+    }
 );
 
 
-/* =====================================================
-   SWORD ANIMATION
-===================================================== */
+/* =========================================================
+   SWORD TIMING
+========================================================= */
 
 const sword =
-  document.getElementById("sword");
+    document.getElementById("sword");
 
 
 /*
-Nithan Najeeb = 13 characters
-including the space.
-
-Each character takes 80ms.
-The actual letter animation takes 650ms.
+   Wait until the name has completely appeared.
 */
 
-const nameAnimationTime =
-  (nameText.length - 1) * 80
-  + 650;
+const nameAnimationDuration =
+    ((nameText.length - 1) * 65) + 700;
 
 
 /*
-Wait until the entire name is visible,
-then bring the sword from the right.
+   Then sword enters from the RIGHT.
 */
 
 setTimeout(
-  () => {
+    () => {
 
-    sword.classList.add(
-      "slice"
-    );
+        sword.classList.add(
+            "slice"
+        );
 
-  },
-  nameAnimationTime + 350
+    },
+    nameAnimationDuration + 250
 );
 
 
-/* =====================================================
-   SCROLL
-===================================================== */
-
-const scrollButton =
-  document.querySelector(".scroll");
-
-
-scrollButton.addEventListener(
-  "click",
-  event => {
-
-    event.preventDefault();
-
-    document
-      .getElementById("about")
-      .scrollIntoView({
-        behavior: "smooth"
-      });
-
-  }
-);
-
-
-/* =====================================================
-   ERROR CHECKING
-===================================================== */
-
-video.addEventListener(
-  "error",
-  () => {
-
-    console.error(
-      "ERROR: leafs.MP4 could not be loaded."
-    );
-
-  }
-);
-
+/* =========================================================
+   IMAGE ERROR
+========================================================= */
 
 sword.addEventListener(
-  "error",
-  () => {
+    "error",
+    () => {
 
-    console.error(
-      "ERROR: Sword.PNG could not be loaded."
+        console.error(
+            "Sword.PNG could not be loaded."
+        );
+
+    }
+);
+
+
+/* =========================================================
+   VIDEO ERROR
+========================================================= */
+
+video.addEventListener(
+    "error",
+    () => {
+
+        console.error(
+            "leafs.MP4 could not be loaded."
+        );
+
+    }
+);
+
+
+/* =========================================================
+   SCROLL
+========================================================= */
+
+document
+    .querySelector(".scroll")
+    .addEventListener(
+        "click",
+        function(event) {
+
+            event.preventDefault();
+
+            document
+                .getElementById("about")
+                .scrollIntoView({
+                    behavior: "smooth"
+                });
+
+        }
     );
-
-  }
-);
-
-
-/* =====================================================
-   DEBUG INFORMATION
-===================================================== */
-
-console.log(
-  "Portfolio loaded."
-);
-
-console.log(
-  "Video: ./leafs.MP4"
-);
-
-console.log(
-  "Sword: ./Sword.PNG"
-);
 
 </script>
 
 
 </body>
-
 </html>
