@@ -6,12 +6,14 @@
 <meta name="theme-color" content="#000000">
 <title>Nithan Najeeb | Portfolio</title>
 
+<!-- Upgraded Fonts: Cinzel for cinematic English, Shippori Mincho for elegant Japanese -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Noto+Serif+JP:wght@300;400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Inter:wght@300;400&family=Shippori+Mincho:wght@400;500;600&display=swap" rel="stylesheet">
 
 <style>
 /* =====================================================
-   RESET & BASE (Fixes white gaps above/below)
+   RESET & BASE (Fixes the white background bleed)
 ===================================================== */
 * {
     margin: 0;
@@ -19,15 +21,17 @@
     box-sizing: border-box;
 }
 
+/* Core backgrounds must be black to prevent iOS bounce showing white */
+html, body {
+    background-color: #000; 
+}
+
 html {
     scroll-behavior: smooth;
-    background: #000; /* Prevents white bleed at top/bottom bounce */
 }
 
 body {
-    margin: 0;
     overflow-x: hidden;
-    background: #000;
     color: #111;
     -webkit-font-smoothing: antialiased;
 }
@@ -68,7 +72,7 @@ body {
     height: 100%;
     object-fit: cover;
     object-position: center;
-    filter: grayscale(1) brightness(0.4) contrast(1.2);
+    filter: grayscale(1) brightness(0.35) contrast(1.2);
     pointer-events: none;
     -webkit-user-select: none;
     user-select: none;
@@ -81,9 +85,8 @@ video::-webkit-media-controls-panel {
     display: none !important;
 }
 
-/* Fallback for Low Power Mode */
 .video-canvas.fallback {
-    background-image: url('./Leafs-fallback.jpg'); /* Replace with a real screenshot */
+    background-image: url('./Leafs-fallback.jpg');
     background-size: cover;
     background-position: center;
 }
@@ -96,7 +99,7 @@ video::-webkit-media-controls-panel {
     position: absolute;
     inset: 0;
     z-index: -2;
-    background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.7) 100%);
+    background: linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.1) 40%, #000000 100%);
     pointer-events: none;
 }
 
@@ -104,14 +107,14 @@ video::-webkit-media-controls-panel {
     position: absolute;
     inset: 0;
     z-index: -1;
-    opacity: 0.1;
+    opacity: 0.12;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.45'/%3E%3C/svg%3E");
     mix-blend-mode: screen;
     pointer-events: none;
 }
 
 /* =====================================================
-   HERO CONTENT (Perfectly Centered)
+   HERO CONTENT
 ===================================================== */
 .hero-content {
     position: relative;
@@ -120,87 +123,102 @@ video::-webkit-media-controls-panel {
     flex-direction: column;
     align-items: center;
     text-align: center;
-    gap: 15px; /* Spacing between label, name, subtitle */
+    width: 100%;
 }
 
 .hero-label {
-    color: rgba(255,255,255,0.7);
+    color: rgba(255,255,255,0.6);
     font-family: "Inter", sans-serif;
     font-size: 0.65rem;
     font-weight: 300;
-    letter-spacing: 0.5em;
+    letter-spacing: 0.6em;
     text-transform: uppercase;
+    margin-bottom: 3vh;
     opacity: 0;
     animation: fadeIn 1s ease forwards 0.2s;
 }
 
 /* =====================================================
-   TITLE & SWORD STAGE
-   Ensures the sword overlays the name correctly without
-   breaking the layout and causing scroll gaps.
+   MASSIVE TYPOGRAPHY
 ===================================================== */
 .title-wrapper {
     position: relative;
+    width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 20px 0; /* Breathing room for the sword slice */
 }
 
 .name {
     position: relative;
     z-index: 10;
-    color: #f5f4ef;
-    font-family: "Cormorant Garamond", "Noto Serif JP", serif;
+    color: #fff;
+    font-family: "Cinzel", serif;
     font-weight: 500;
-    font-size: clamp(3.5rem, 11vw, 10rem);
-    line-height: 0.85;
-    letter-spacing: -0.035em;
-    white-space: nowrap;
-    text-shadow: 0 10px 40px rgba(0,0,0,0.9);
+    font-size: clamp(4rem, 9vw, 9rem);
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    text-shadow: 0 15px 40px rgba(0,0,0,1);
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    column-gap: 2.5vw;
 }
 
-.name span {
+.word {
+    display: inline-block;
+    white-space: nowrap;
+}
+
+.char {
     display: inline-block;
     opacity: 0;
-    transform: translateY(30px);
-    animation: letterIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    transform: translateY(40px);
+    animation: letterIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* SWORD OVERLAY */
+/* =====================================================
+   SWORD SLICE ANIMATION (Right to Center)
+===================================================== */
 .sword {
     position: absolute;
     top: 50%;
-    left: 50%;
-    /* Sword is explicitly smaller than the typography */
-    width: min(100%, 750px);
-    height: auto;
-    z-index: 20; /* Places sword exactly over the text */
+    
+    /* Pulls the grip off the right edge of the screen */
+    right: -4vw; 
+    
+    /* Make the sword wide enough to cross the text */
+    width: 65vw; 
+    max-width: 1000px;
+    
+    z-index: 20;
     pointer-events: none;
     opacity: 0;
-    transform: translate(100vw, -50%) rotate(-2deg);
-    filter: drop-shadow(0 15px 25px rgba(0,0,0,0.8)) brightness(0.95);
+    transform: translateY(-50%) rotate(-2deg);
+    filter: drop-shadow(0 15px 25px rgba(0,0,0,0.9)) brightness(0.9);
 }
 
 .sword.active {
-    animation: swordSlice 1.2s cubic-bezier(0.15, 0.85, 0.2, 1) forwards;
+    /* Fast, sharp cubic-bezier for a cutting motion */
+    animation: katanaStrike 1s cubic-bezier(0.05, 0.9, 0.1, 1) forwards;
 }
 
 .hero-subtitle {
     position: relative;
     z-index: 15;
-    color: rgba(255,255,255,0.7);
+    color: rgba(255,255,255,0.6);
     font-family: "Inter", sans-serif;
     font-size: 0.6rem;
     font-weight: 300;
-    letter-spacing: 0.45em;
+    letter-spacing: 0.5em;
     text-transform: uppercase;
+    margin-top: 4vh;
     opacity: 0;
     animation: fadeIn 1s ease forwards 1.8s;
 }
 
 /* =====================================================
-   JAPANESE MARKS & UI
+   JAPANESE UI
 ===================================================== */
 .jp-mark {
     position: absolute;
@@ -209,10 +227,10 @@ video::-webkit-media-controls-panel {
     transform: translateY(-50%);
     z-index: 5;
     color: rgba(255,255,255,0.25);
-    font-family: "Noto Serif JP", serif;
+    font-family: "Shippori Mincho", serif;
     writing-mode: vertical-rl;
     font-size: 0.85rem;
-    letter-spacing: 0.5em;
+    letter-spacing: 0.6em;
 }
 
 .scroll {
@@ -225,23 +243,28 @@ video::-webkit-media-controls-panel {
     flex-direction: column;
     align-items: center;
     gap: 12px;
-    color: rgba(255,255,255,0.7);
+    color: rgba(255,255,255,0.6);
     text-decoration: none;
     font-family: "Inter", sans-serif;
     font-size: 0.55rem;
     font-weight: 300;
     letter-spacing: 0.45em;
+    transition: opacity 0.3s;
+}
+
+.scroll:hover {
+    opacity: 1;
 }
 
 .scroll-line {
     width: 1px;
     height: 40px;
-    background: rgba(255,255,255,0.7);
+    background: rgba(255,255,255,0.6);
     animation: scrollPulse 2s ease-in-out infinite;
 }
 
 /* =====================================================
-   JAPANESE MINIMALIST CONTENT PAGE
+   MINIMALIST CONTENT PAGE
 ===================================================== */
 .page {
     position: relative;
@@ -266,14 +289,14 @@ video::-webkit-media-controls-panel {
     top: 40px;
     left: 8vw;
     color: #8b8983;
-    font-family: "Noto Serif JP", serif;
+    font-family: "Shippori Mincho", serif;
     font-size: 0.65rem;
     letter-spacing: 0.25em;
 }
 
 .eyebrow {
     color: #77746e;
-    font-family: "Noto Serif JP", serif;
+    font-family: "Shippori Mincho", serif;
     font-size: 0.65rem;
     letter-spacing: 0.35em;
     margin-bottom: 30px;
@@ -281,15 +304,16 @@ video::-webkit-media-controls-panel {
 
 .section h2 {
     color: #171717;
-    font-family: "Cormorant Garamond", "Noto Serif JP", serif;
-    font-size: clamp(3.5rem, 8vw, 7.5rem);
+    font-family: "Cinzel", serif;
+    font-size: clamp(3rem, 7vw, 6.5rem);
     font-weight: 400;
-    line-height: 0.9;
-    letter-spacing: -0.03em;
+    line-height: 1;
+    letter-spacing: -0.02em;
     margin-bottom: 80px;
 }
 
 .section h2 em {
+    font-family: "Shippori Mincho", serif;
     color: #777;
     font-style: italic;
 }
@@ -302,7 +326,7 @@ video::-webkit-media-controls-panel {
 }
 
 .about-lead {
-    font-family: "Noto Serif JP", serif;
+    font-family: "Shippori Mincho", serif;
     font-size: clamp(1.4rem, 2.5vw, 1.8rem);
     line-height: 1.6;
 }
@@ -342,7 +366,7 @@ video::-webkit-media-controls-panel {
 }
 
 .work h3 {
-    font-family: "Noto Serif JP", serif;
+    font-family: "Shippori Mincho", serif;
     font-size: clamp(1.5rem, 3vw, 2.2rem);
     font-weight: 400;
 }
@@ -368,7 +392,7 @@ video::-webkit-media-controls-panel {
 
 .philosophy-copy {
     color: #444;
-    font-family: "Noto Serif JP", serif;
+    font-family: "Shippori Mincho", serif;
     font-size: clamp(1rem, 2vw, 1.2rem);
     line-height: 2.2;
 }
@@ -377,7 +401,7 @@ video::-webkit-media-controls-panel {
 .contact {
     display: inline-block;
     color: #111;
-    font-family: "Noto Serif JP", serif;
+    font-family: "Shippori Mincho", serif;
     font-size: 1.2rem;
     text-decoration: none;
     border-bottom: 1px solid #333;
@@ -412,15 +436,22 @@ footer {
     to { opacity: 1; }
 }
 
-@keyframes swordSlice {
+/* The aggressive right-to-center strike animation */
+@keyframes katanaStrike {
     0% {
         opacity: 0;
-        transform: translate(100vw, -50%) rotate(-2deg);
+        /* Starts high, rotated, and far to the right */
+        transform: translateY(-150%) translateX(40vw) rotate(30deg);
+        filter: blur(8px) drop-shadow(0 0px 0px rgba(0,0,0,0));
     }
-    15% { opacity: 1; }
+    30% {
+        opacity: 1;
+        filter: blur(0px) drop-shadow(0 20px 35px rgba(0,0,0,0.9));
+    }
     100% {
         opacity: 1;
-        transform: translate(-50%, -50%) rotate(-2deg);
+        /* Settles exactly in the center vertically, rotated slightly */
+        transform: translateY(-50%) translateX(0) rotate(-2deg);
     }
 }
 
@@ -430,7 +461,7 @@ footer {
 }
 
 /* =====================================================
-   RESPONSIVE DESIGN
+   MOBILE RESPONSIVENESS
 ===================================================== */
 @media (max-width: 768px) {
     .video-canvas {
@@ -438,18 +469,29 @@ footer {
         height: max(56.25vw, 100vh);
     }
     .hero-content {
-        gap: 10px;
+        gap: 0;
     }
+    
+    /* Stack the name to allow for massive typography */
     .name {
-        font-size: clamp(3.2rem, 12vw, 5rem);
+        flex-direction: column;
+        font-size: clamp(5rem, 18vw, 8rem);
+        row-gap: 5px;
     }
+    .space {
+        display: none; /* Hide the space element when stacked */
+    }
+
+    /* Adjust sword so grip is hidden on the right side of mobile screen */
     .sword {
-        width: 110%; /* Makes sword extend past text slightly on mobile */
-        max-width: none;
+        right: -15vw; 
+        width: 125vw; /* Long enough to cut completely across */
     }
+
     .jp-mark {
         display: none;
     }
+    
     .about-grid, .philosophy-grid {
         grid-template-columns: 1fr;
         gap: 40px;
@@ -483,6 +525,7 @@ footer {
         <div class="hero-label">NITHAN · 2026</div>
         
         <div class="title-wrapper">
+            <!-- JS populates the name -->
             <h1 class="name" id="name"></h1>
             <img class="sword" id="sword" src="./Sword.PNG" alt="">
         </div>
@@ -498,7 +541,7 @@ footer {
     </a>
 </section>
 
-<!-- CONTENT (Japanese Minimalist Style) -->
+<!-- CONTENT -->
 <main class="page">
     
     <!-- ABOUT -->
@@ -589,27 +632,50 @@ footer {
 <!-- SCRIPTS -->
 <script>
 /* =====================================================
-   TYPOGRAPHY ANIMATION
+   TYPOGRAPHY INJECTION (Allows stacking on mobile)
 ===================================================== */
 const nameText = "Nithan Najeeb";
 const nameElement = document.getElementById("name");
 
-[...nameText].forEach((character, index) => {
-    const span = document.createElement("span");
-    span.textContent = character === " " ? "\u00A0" : character;
-    span.style.animationDelay = `${index * 50}ms`;
-    nameElement.appendChild(span);
+const words = nameText.split(" ");
+let totalLetterCount = 0;
+
+words.forEach((word, wordIndex) => {
+    const wordSpan = document.createElement("span");
+    wordSpan.className = "word";
+    
+    [...word].forEach((character) => {
+        const charSpan = document.createElement("span");
+        charSpan.className = "char";
+        charSpan.textContent = character;
+        
+        // Stagger the animation across all letters
+        charSpan.style.animationDelay = `${totalLetterCount * 60}ms`;
+        wordSpan.appendChild(charSpan);
+        totalLetterCount++;
+    });
+    
+    nameElement.appendChild(wordSpan);
+    
+    // Add space element between words (hidden on mobile via CSS)
+    if (wordIndex < words.length - 1) {
+        const space = document.createElement("span");
+        space.className = "space";
+        space.textContent = " ";
+        nameElement.appendChild(space);
+    }
 });
 
 /* =====================================================
    SWORD ANIMATION SYNC
 ===================================================== */
 const sword = document.getElementById("sword");
-const nameDuration = ((nameText.length - 1) * 50) + 800;
+// Wait for all letters to animate before striking
+const nameDuration = (totalLetterCount * 60) + 700;
 
 setTimeout(() => {
     sword.classList.add("active");
-}, nameDuration + 200);
+}, nameDuration + 150);
 
 /* =====================================================
    VIDEO & LOW POWER MODE FALLBACK
@@ -619,7 +685,7 @@ const video = document.getElementById("backgroundVideo");
 function startVideo() {
     video.muted = true;
     video.play().then(() => {
-        console.log("Background video playing.");
+        // Video playing successfully
     }).catch(() => {
         console.warn("Autoplay blocked (likely iOS Low Power Mode). Displaying fallback.");
         document.querySelector('.video-canvas').classList.add('fallback');
