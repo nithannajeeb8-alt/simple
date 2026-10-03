@@ -5,774 +5,341 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#000000">
 <title>Nithan Najeeb | Portfolio</title>
-
+<meta name="description" content="Portfolio of Nithan Najeeb: Mind Atlas, Forenexa, Ollama Uplink and creative web experiments.">
+<meta property="og:title" content="Nithan Najeeb | Portfolio">
+<meta property="og:url" content="https://nithan.in/">
+<link rel="icon" type="image/png" href="/favicon.PNG">
+<link rel="apple-touch-icon" href="/favicon.PNG">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Inter:wght@300;400&family=Shippori+Mincho:wght@400;500;600&display=swap" rel="stylesheet">
-
 <style>
-/* =====================================================
-   RESET & BASE
-===================================================== */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--red:#b3282d;--ink:#161616;--branch-half:calc(min(95vw,650px)*.15)}
+html,body{background:#000}
+html{scroll-behavior:smooth}
+body{overflow-x:hidden;color:#111;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--red);outline-offset:4px}
 
-html, body {
-    background-color: #000;
-}
+/* NAV */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:calc(env(safe-area-inset-top,0px) + 22px) 5vw 22px;color:#fff;mix-blend-mode:difference;font-family:"Inter",sans-serif;font-size:.62rem;letter-spacing:.4em}
+.brand{font-family:"Cinzel",serif;font-size:.95rem;letter-spacing:.3em;text-decoration:none}
+.nav-links{display:flex;gap:2.6rem}
+.nav-links a,.m-link{text-decoration:none;position:relative;text-transform:uppercase}
+.nav-links a::after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:1px;background:currentColor;transform:scaleX(0);transform-origin:right;transition:transform .5s cubic-bezier(.77,0,.18,1)}
+.nav-links a:hover::after{transform:scaleX(1);transform-origin:left}
+.menu-btn{display:none;background:none;border:0;color:inherit;width:34px;height:20px;position:relative;cursor:pointer}
+.menu-btn i{position:absolute;left:0;right:0;height:1px;background:currentColor;transition:transform .5s,top .5s}
+.menu-btn i:nth-child(1){top:4px}.menu-btn i:nth-child(2){top:14px}
+.menu-open .menu-btn i:nth-child(1){top:9px;transform:rotate(45deg)}
+.menu-open .menu-btn i:nth-child(2){top:9px;transform:rotate(-45deg)}
+.m-menu{position:fixed;inset:0;z-index:90;background:#050505;display:flex;flex-direction:column;justify-content:center;gap:2rem;padding:0 10vw;clip-path:circle(0 at 92% 6%);transition:clip-path .9s cubic-bezier(.77,0,.18,1);pointer-events:none}
+.menu-open .m-menu{clip-path:circle(150% at 92% 6%);pointer-events:auto}
+.m-link{color:#fff;font-family:"Cinzel",serif;font-size:2.2rem;letter-spacing:.1em}
+.m-link small{display:block;color:rgba(255,255,255,.35);font-family:"Shippori Mincho",serif;font-size:.8rem;letter-spacing:.4em;margin-bottom:4px}
 
-:root {
-    /* half the height of the branch divider (image is ~0.3x its width) */
-    --branch-half: calc(min(95vw, 650px) * 0.15);
-}
+/* PROGRESS + PETALS */
+.progress{position:fixed;right:0;top:0;width:2px;height:100%;background:var(--red);transform-origin:top;transform:scaleY(0);z-index:110;opacity:.8}
+#petals{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:60}
 
-html {
-    scroll-behavior: smooth;
-}
+/* HERO */
+.hero{position:relative;width:100%;height:100dvh;min-height:600px;background:#000;overflow:hidden;display:flex;align-items:center;justify-content:center;isolation:isolate}
+.video-canvas{position:absolute;left:50%;top:50%;width:max(100vw,177.7778vh);height:max(56.25vw,100dvh);transform:translate(-50%,-50%);z-index:-3;background:#000}
+.hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:grayscale(1) brightness(.35) contrast(1.2);pointer-events:none}
+video::-webkit-media-controls{display:none!important}
+.video-darkness{position:absolute;inset:0;z-index:-2;background:linear-gradient(to bottom,rgba(0,0,0,.4),rgba(0,0,0,.1) 40%,#000);pointer-events:none}
+.video-grain{position:absolute;inset:0;z-index:-1;opacity:.12;mix-blend-mode:screen;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.45'/%3E%3C/svg%3E")}
+.hero-content{position:relative;z-index:5;display:flex;flex-direction:column;align-items:center;text-align:center;width:100%}
+.hero-label,.hero-subtitle{color:rgba(255,255,255,.6);font-family:"Inter",sans-serif;font-weight:300;text-transform:uppercase;opacity:0;animation:fadeIn 1s ease forwards .2s}
+.hero-label{font-size:.65rem;letter-spacing:.6em;margin-bottom:3vh}
+.hero-subtitle{position:relative;z-index:15;font-size:.6rem;letter-spacing:.5em;margin-top:4vh;animation-delay:1.8s}
+.title-wrapper{position:relative;width:100%;display:flex;justify-content:center;align-items:center}
+.name{position:relative;z-index:10;color:#fff;font-family:"Cinzel",serif;font-weight:500;font-size:clamp(4rem,9vw,9rem);line-height:.9;letter-spacing:-.02em;text-shadow:0 10px 30px rgba(0,0,0,.55);display:flex;justify-content:center;flex-wrap:wrap;column-gap:2.5vw}
+.word{display:inline-block;white-space:nowrap}
+.char{display:inline-block;opacity:0;transform:translateY(40px);animation:letterIn .9s cubic-bezier(.16,1,.3,1) forwards}
+.sword{position:absolute;top:50%;left:50%;width:90vw;max-width:950px;z-index:5;pointer-events:none;opacity:0;transform:translate(-50%,-50%) rotate(-2deg);filter:drop-shadow(0 15px 25px rgba(0,0,0,.9)) brightness(.9)}
+.sword.active{animation:katanaStrike 1s cubic-bezier(.05,.9,.1,1) forwards}
+/* slash flash after the strike */
+.slash{position:absolute;left:0;right:0;top:50%;height:1px;z-index:6;background:linear-gradient(90deg,transparent,#fff,transparent);transform:scaleX(0) rotate(-2deg);opacity:0}
+.slash.go{animation:slash .9s ease-out forwards}
+.jp-mark{position:absolute;right:4vw;top:50%;transform:translateY(-50%);z-index:5;color:rgba(255,255,255,.25);font-family:"Shippori Mincho",serif;writing-mode:vertical-rl;font-size:.85rem;letter-spacing:.6em}
+.scroll{position:absolute;left:50%;bottom:30px;transform:translateX(-50%);z-index:30;display:flex;flex-direction:column;align-items:center;gap:12px;color:rgba(255,255,255,.6);text-decoration:none;font-family:"Inter",sans-serif;font-size:.55rem;font-weight:300;letter-spacing:.45em}
+.scroll-line{width:1px;height:40px;background:rgba(255,255,255,.6);animation:scrollPulse 2s ease-in-out infinite}
 
-body {
-    overflow-x: hidden;
-    color: #111;
-    -webkit-font-smoothing: antialiased;
-}
+/* PAGE */
+.page{position:relative;z-index:10;background:#f5f4ef;color:#161616}
+.section{position:relative;padding:10vw 8vw;overflow:hidden}
+.about-section{background:#f5f4ef}.work-section{background:#ecebe5}.philosophy-section{background:#e3e2db}.contact-section{background:#ecebe5}
+.about-section,.work-section,.philosophy-section{padding-bottom:calc(var(--branch-half) + 36px)}
+.work-section,.philosophy-section,.contact-section{padding-top:calc(var(--branch-half) + 72px)}
+.section-inner{width:min(1180px,100%);margin:auto;position:relative}
+.section-number{position:absolute;top:calc(var(--branch-half) + 28px);left:8vw;color:#8b8983;font-family:"Shippori Mincho",serif;font-size:.65rem;letter-spacing:.25em}
+.about-section .section-number{top:40px}
+.eyebrow{color:#77746e;font-family:"Shippori Mincho",serif;font-size:.65rem;letter-spacing:.35em;margin-bottom:30px}
+.section h2{color:#171717;font-family:"Cinzel",serif;font-size:clamp(3rem,7vw,6.5rem);font-weight:400;line-height:1;letter-spacing:-.02em;margin-bottom:80px}
+.section h2 em{font-family:"Shippori Mincho",serif;color:#777;font-style:italic}
+/* giant vertical kanji watermark, drifts with scroll */
+.mark{position:absolute;right:4vw;top:8vw;font-family:"Shippori Mincho",serif;font-size:clamp(9rem,26vw,24rem);line-height:1;color:rgba(0,0,0,.04);writing-mode:vertical-rl;pointer-events:none;transform:translateY(var(--py,0px))}
 
-/* =====================================================
-   HERO SECTION
-===================================================== */
-.hero {
-    position: relative;
-    width: 100%;
-    height: 100dvh;
-    min-height: 600px;
-    background: #000;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    isolation: isolate;
-}
-
-/* 16:9 VIDEO CANVAS */
-.video-canvas {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: max(100vw, 177.7778vh);
-    height: max(56.25vw, 100dvh);
-    transform: translate(-50%, -50%);
-    aspect-ratio: 16 / 9;
-    z-index: -3;
-    background: #000;
-}
-
-.hero-video {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-    filter: grayscale(1) brightness(0.35) contrast(1.2);
-    pointer-events: none;
-    -webkit-user-select: none;
-    user-select: none;
-}
-
-video::-webkit-media-controls {
-    display: none !important;
-}
-
-/* CINEMATIC OVERLAYS */
-.video-darkness {
-    position: absolute;
-    inset: 0;
-    z-index: -2;
-    background: linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.1) 40%, #000000 100%);
-    pointer-events: none;
-}
-
-.video-grain {
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    opacity: 0.12;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.45'/%3E%3C/svg%3E");
-    mix-blend-mode: screen;
-    pointer-events: none;
-}
-
-/* =====================================================
-   HERO CONTENT
-===================================================== */
-.hero-content {
-    position: relative;
-    z-index: 5;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    width: 100%;
-}
-
-.hero-label {
-    color: rgba(255,255,255,0.6);
-    font-family: "Inter", sans-serif;
-    font-size: 0.65rem;
-    font-weight: 300;
-    letter-spacing: 0.6em;
-    text-transform: uppercase;
-    margin-bottom: 3vh;
-    opacity: 0;
-    animation: fadeIn 1s ease forwards 0.2s;
-}
-
-/* =====================================================
-   MASSIVE TYPOGRAPHY
-===================================================== */
-.title-wrapper {
-    position: relative;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.name {
-    position: relative;
-    z-index: 10; /* text always sits ABOVE the sword */
-    color: #fff;
-    font-family: "Cinzel", serif;
-    font-weight: 500;
-    font-size: clamp(4rem, 9vw, 9rem);
-    line-height: 0.9;
-    letter-spacing: -0.02em;
-    text-shadow: 0 10px 30px rgba(0,0,0,0.55);
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    column-gap: 2.5vw;
-}
-
-.word {
-    display: inline-block;
-    white-space: nowrap;
-}
-
-.char {
-    display: inline-block;
-    opacity: 0;
-    transform: translateY(40px);
-    animation: letterIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-/* =====================================================
-   SWORD SLICE ANIMATION
-   FIX: sword is now layered BEHIND the name (z-index 5 < 10)
-   so the wrapped hilt can never cover the letters.
-===================================================== */
-.sword {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 90vw;
-    max-width: 950px;
-    z-index: 5;
-    pointer-events: none;
-    opacity: 0;
-    transform: translate(-50%, -50%) rotate(-2deg);
-    filter: drop-shadow(0 15px 25px rgba(0,0,0,0.9)) brightness(0.9);
-}
-
-.sword.active {
-    animation: katanaStrike 1s cubic-bezier(0.05, 0.9, 0.1, 1) forwards;
-}
-
-.hero-subtitle {
-    position: relative;
-    z-index: 15;
-    color: rgba(255,255,255,0.6);
-    font-family: "Inter", sans-serif;
-    font-size: 0.6rem;
-    font-weight: 300;
-    letter-spacing: 0.5em;
-    text-transform: uppercase;
-    margin-top: 4vh;
-    opacity: 0;
-    animation: fadeIn 1s ease forwards 1.8s;
-}
-
-/* =====================================================
-   JAPANESE UI
-===================================================== */
-.jp-mark {
-    position: absolute;
-    right: 4vw;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 5;
-    color: rgba(255,255,255,0.25);
-    font-family: "Shippori Mincho", serif;
-    writing-mode: vertical-rl;
-    font-size: 0.85rem;
-    letter-spacing: 0.6em;
-}
-
-.scroll {
-    position: absolute;
-    left: 50%;
-    bottom: 30px;
-    transform: translateX(-50%);
-    z-index: 30;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    color: rgba(255,255,255,0.6);
-    text-decoration: none;
-    font-family: "Inter", sans-serif;
-    font-size: 0.55rem;
-    font-weight: 300;
-    letter-spacing: 0.45em;
-    transition: opacity 0.3s;
-}
-
-.scroll:hover {
-    opacity: 1;
-}
-
-.scroll-line {
-    width: 1px;
-    height: 40px;
-    background: rgba(255,255,255,0.6);
-    animation: scrollPulse 2s ease-in-out infinite;
-}
-
-/* =====================================================
-   MINIMALIST CONTENT PAGE
-   .page is a stacking context (z-index 10), so the
-   branch dividers blend against the sections inside it.
-===================================================== */
-.page {
-    position: relative;
-    z-index: 10;
-    background: #f5f4ef;
-    color: #161616;
-}
-
-.section {
-    position: relative;
-    padding: 10vw 8vw;
-}
-
-.about-section      { background: #f5f4ef; }
-.work-section       { background: #ecebe5; }
-.philosophy-section { background: #e3e2db; }
-.contact-section    { background: #ecebe5; }
-
-/* Spacing around the branch dividers:
-   above = just enough to clear the branch's upper half,
-   below = clears the lower half before any label/heading starts */
-.about-section,
-.work-section,
-.philosophy-section {
-    padding-bottom: calc(var(--branch-half) + 36px);
-}
-.work-section,
-.philosophy-section,
-.contact-section {
-    padding-top: calc(var(--branch-half) + 72px);
-}
-
-.section-inner {
-    width: min(1180px, 100%);
-    margin: auto;
-}
-
-/* FIX: pushed lower so the branch's bottom half never touches it */
-.section-number {
-    position: absolute;
-    top: calc(var(--branch-half) + 28px);
-    left: 8vw;
-    color: #8b8983;
-    font-family: "Shippori Mincho", serif;
-    font-size: 0.65rem;
-    letter-spacing: 0.25em;
-}
-
-.eyebrow {
-    color: #77746e;
-    font-family: "Shippori Mincho", serif;
-    font-size: 0.65rem;
-    letter-spacing: 0.35em;
-    margin-bottom: 30px;
-}
-
-.section h2 {
-    color: #171717;
-    font-family: "Cinzel", serif;
-    font-size: clamp(3rem, 7vw, 6.5rem);
-    font-weight: 400;
-    line-height: 1;
-    letter-spacing: -0.02em;
-    margin-bottom: 80px;
-}
-
-.section h2 em {
-    font-family: "Shippori Mincho", serif;
-    color: #777;
-    font-style: italic;
-}
-
-/* =====================================================
-   BOUNDARY BRANCH DIVIDER (FIXED)
-   - No z-index / stacking context on the wrapper, so
-     mix-blend-mode: multiply actually blends with the
-     section colors behind it (no visible image box).
-   - Absolutely centered on the exact color boundary:
-     half over the section above, half over the one below.
-===================================================== */
-.color-boundary {
-    position: relative;
-    width: 100%;
-    height: 0;
-}
-
-.color-boundary img {
-    position: absolute;
-    left: 50%;
-    top: 0;
-    z-index: 20;
-    width: 90vw;
-    max-width: 650px;
-    height: auto;
-    transform: translate(-50%, -50%);
-    mix-blend-mode: multiply;
-    opacity: 0.85;
-    pointer-events: none;
-}
+/* BRANCH DIVIDER */
+.color-boundary{position:relative;width:100%;height:0}
+.color-boundary img{position:absolute;left:50%;top:0;z-index:20;width:min(95vw,650px);height:auto;transform:translate(-50%,-50%);mix-blend-mode:multiply;opacity:.85;pointer-events:none}
 
 /* ABOUT */
-.about-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8vw;
-}
-
-.about-lead {
-    font-family: "Shippori Mincho", serif;
-    font-size: clamp(1.4rem, 2.5vw, 1.8rem);
-    line-height: 1.6;
-}
-
-.about-copy {
-    color: #555;
-    font-family: "Inter", sans-serif;
-    font-size: 0.95rem;
-    line-height: 2;
-}
+.about-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:8vw}
+.about-lead{font-family:"Shippori Mincho",serif;font-size:clamp(1.4rem,2.5vw,1.8rem);line-height:1.6}
+.about-copy{color:#555;font-family:"Inter",sans-serif;font-size:.95rem;line-height:2;margin-top:2rem;max-width:62ch}
+.about-copy p+p{margin-top:1.4rem}
+.profile{position:relative;border-top:1px solid rgba(0,0,0,.15)}
+.profile div{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;padding:16px 0;border-bottom:1px solid rgba(0,0,0,.08);font-family:"Inter",sans-serif;font-size:.85rem;color:#444}
+.profile span{font-family:"Shippori Mincho",serif;color:#8b8983;font-size:.8rem;letter-spacing:.2em}
+.hanko{position:absolute;right:-6px;top:-62px;width:58px;height:58px;display:grid;place-items:center;background:var(--red);color:#f5f4ef;font-family:"Shippori Mincho",serif;font-size:1.7rem;border-radius:4px;transform:rotate(6deg);opacity:0;box-shadow:inset 0 0 0 2px rgba(255,255,255,.25)}
+.hanko.in{animation:stamp .7s cubic-bezier(.3,1.6,.5,1) .5s forwards}
+.tech{display:flex;flex-wrap:wrap;gap:12px 28px;margin-top:2.5rem;font-family:"Inter",sans-serif;font-size:.7rem;letter-spacing:.2em;color:#666}
+.tech b{font-family:"Shippori Mincho",serif;font-weight:500;color:#161616;margin-right:8px;letter-spacing:.1em}
 
 /* WORK */
-.work-list {
-    margin-top: 20px;
-}
-
-.work {
-    display: grid;
-    grid-template-columns: 80px 1fr 40px;
-    align-items: center;
-    padding: 40px 0;
-    border-bottom: 1px solid rgba(0,0,0,0.08);
-    transition: background 0.3s, padding-left 0.3s;
-    text-decoration: none;
-    color: inherit;
-}
-
-.work:first-child {
-    border-top: 1px solid rgba(0,0,0,0.08);
-}
-
-.work:hover {
-    background: rgba(0,0,0,0.03);
-    padding-left: 20px;
-}
-
-.work-number {
-    color: #999;
-    font-size: 0.75rem;
-    font-family: "Inter", sans-serif;
-}
-
-.work h3 {
-    font-family: "Shippori Mincho", serif;
-    font-size: clamp(1.5rem, 3vw, 2.2rem);
-    font-weight: 400;
-}
-
-.work p {
-    margin-top: 8px;
-    color: #777;
-    font-family: "Inter", sans-serif;
-    font-size: 0.85rem;
-}
+.work-list{margin-top:20px}
+.work{position:relative;display:grid;grid-template-columns:80px 1fr 40px;align-items:center;padding:40px 0;text-decoration:none;color:inherit;border-top:1px solid rgba(0,0,0,.08);transition:padding-left .5s cubic-bezier(.16,1,.3,1)}
+.work:last-child{border-bottom:1px solid rgba(0,0,0,.08)}
+.work::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;background:var(--ink);transform:scaleX(0);transform-origin:left;transition:transform .8s cubic-bezier(.77,0,.18,1)}
+.work:hover{padding-left:20px}.work:hover::after{transform:scaleX(1)}
+.work-number{color:#999;font-size:.75rem;font-family:"Inter",sans-serif}
+.work h3{font-family:"Shippori Mincho",serif;font-size:clamp(1.5rem,3vw,2.2rem);font-weight:400}
+.work p{margin-top:8px;color:#777;font-family:"Inter",sans-serif;font-size:.85rem}
+.arrow{font-size:1.2rem;color:#888;transition:transform .5s,color .5s}
+.work:hover .arrow{transform:translate(4px,-4px);color:var(--red)}
 
 /* PHILOSOPHY */
-.philosophy-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10vw;
-    align-items: center;
+.philosophy-grid{display:grid;grid-template-columns:1fr 1fr;gap:10vw;align-items:center}
+.philosophy-copy{color:#444;font-family:"Shippori Mincho",serif;font-size:clamp(1rem,2vw,1.2rem);line-height:2.2}
+
+/* CONTACT */
+.socials{display:flex;flex-wrap:wrap;gap:1.2rem 2.4rem}
+.contact{color:#111;font-family:"Shippori Mincho",serif;font-size:1.2rem;text-decoration:none;position:relative;padding-bottom:8px}
+.contact::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:#333;transform-origin:right;transition:transform .6s cubic-bezier(.77,0,.18,1)}
+.contact:hover::after{transform:scaleX(0)}
+.status{margin-top:5rem;font-family:"Inter",sans-serif;font-size:.6rem;letter-spacing:.3em;color:#8b8983}
+footer{display:flex;justify-content:space-between;padding:30px 8vw;background:#ecebe5;color:#888;font-family:"Inter",sans-serif;font-size:.6rem;letter-spacing:.3em}
+
+/* REVEALS */
+.rv{opacity:0;transform:translateY(24px);transition:opacity 1s ease calc(var(--d,0)*1ms),transform 1s cubic-bezier(.16,1,.3,1) calc(var(--d,0)*1ms)}
+.rv.in{opacity:1;transform:none}
+.ink{clip-path:inset(-10% 100% -10% -5%);transition:clip-path 1.4s cubic-bezier(.77,0,.18,1)}
+.ink.in{clip-path:inset(-10% -5% -10% -5%)}
+
+@keyframes letterIn{to{opacity:1;transform:none}}
+@keyframes fadeIn{to{opacity:1}}
+@keyframes stamp{0%{opacity:0;transform:scale(1.8) rotate(-8deg)}60%{opacity:1;transform:scale(.94) rotate(6deg)}100%{opacity:.92;transform:scale(1) rotate(6deg)}}
+@keyframes slash{0%{opacity:0;transform:scaleX(0) rotate(-2deg)}30%{opacity:.9}100%{opacity:0;transform:scaleX(1) rotate(-2deg)}}
+@keyframes katanaStrike{0%{opacity:0;transform:translate(20%,-150%) rotate(30deg);filter:blur(8px)}30%{opacity:1;filter:blur(0) drop-shadow(0 20px 35px rgba(0,0,0,.9))}100%{opacity:1;transform:translate(-50%,-50%) rotate(-2deg)}}
+@keyframes katanaStrikeMobile{0%{opacity:0;transform:translate(20%,-150%) rotate(30deg);filter:blur(8px)}30%{opacity:1;filter:blur(0) drop-shadow(0 20px 35px rgba(0,0,0,.9))}100%{opacity:1;transform:translate(-47%,-46%) rotate(-3deg)}}
+@keyframes scrollPulse{0%,100%{height:30px;opacity:.4}50%{height:60px;opacity:1}}
+
+@media(prefers-reduced-motion:reduce){
+html{scroll-behavior:auto}
+.rv,.ink{opacity:1;transform:none;clip-path:none;transition:none}
+.char,.hero-label,.hero-subtitle{animation-duration:.01s;animation-delay:0s!important}
+.scroll-line{animation:none}.hanko{opacity:.92}
 }
 
-.philosophy-copy {
-    color: #444;
-    font-family: "Shippori Mincho", serif;
-    font-size: clamp(1rem, 2vw, 1.2rem);
-    line-height: 2.2;
-}
-
-/* CONTACT & FOOTER */
-.contact {
-    display: inline-block;
-    color: #111;
-    font-family: "Shippori Mincho", serif;
-    font-size: 1.2rem;
-    text-decoration: none;
-    border-bottom: 1px solid #333;
-    padding-bottom: 8px;
-    transition: opacity 0.3s;
-}
-
-.contact:hover {
-    opacity: 0.6;
-}
-
-footer {
-    display: flex;
-    justify-content: space-between;
-    padding: 30px 8vw;
-    background: #ecebe5;
-    color: #888;
-    font-family: "Inter", sans-serif;
-    font-size: 0.6rem;
-    letter-spacing: 0.3em;
-}
-
-/* =====================================================
-   KEYFRAMES
-===================================================== */
-@keyframes letterIn {
-    to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes fadeIn {
-    to { opacity: 1; }
-}
-
-@keyframes katanaStrike {
-    0% {
-        opacity: 0;
-        transform: translate(20%, -150%) rotate(30deg);
-        filter: blur(8px) drop-shadow(0 0px 0px rgba(0,0,0,0));
-    }
-    30% {
-        opacity: 1;
-        filter: blur(0px) drop-shadow(0 20px 35px rgba(0,0,0,0.9));
-    }
-    100% {
-        opacity: 1;
-        transform: translate(-50%, -50%) rotate(-2deg);
-    }
-}
-
-@keyframes katanaStrikeMobile {
-    0% {
-        opacity: 0;
-        transform: translate(20%, -150%) rotate(30deg);
-        filter: blur(8px) drop-shadow(0 0px 0px rgba(0,0,0,0));
-    }
-    30% {
-        opacity: 1;
-        filter: blur(0px) drop-shadow(0 20px 35px rgba(0,0,0,0.9));
-    }
-    100% {
-        opacity: 1;
-        /* shifted slightly right/down so the hilt sits past the last letter */
-        transform: translate(-47%, -46%) rotate(-3deg);
-    }
-}
-
-@keyframes scrollPulse {
-    0%, 100% { height: 30px; opacity: 0.4; }
-    50% { height: 60px; opacity: 1; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    html { scroll-behavior: auto; }
-    .char, .hero-label, .hero-subtitle { animation-duration: 0.01s; animation-delay: 0s !important; }
-    .scroll-line { animation: none; }
-}
-
-/* =====================================================
-   MOBILE RESPONSIVENESS
-===================================================== */
-@media (max-width: 768px) {
-    .video-canvas {
-        width: max(100vw, 177.7778vh);
-        height: max(56.25vw, 100dvh);
-    }
-
-    .name {
-        flex-direction: column;
-        font-size: clamp(4.5rem, 16vw, 8rem);
-        line-height: 0.85;
-        row-gap: 16px;
-    }
-    .space {
-        display: none;
-    }
-
-    .sword {
-        width: 96vw;
-    }
-
-    .sword.active {
-        animation: katanaStrikeMobile 1s cubic-bezier(0.05, 0.9, 0.1, 1) forwards;
-    }
-
-    .jp-mark {
-        display: none;
-    }
-
-    .about-grid, .philosophy-grid {
-        grid-template-columns: 1fr;
-        gap: 40px;
-    }
-    .work {
-        grid-template-columns: 50px 1fr;
-        padding: 25px 0;
-    }
-    .section {
-        padding-left: 8vw;
-        padding-right: 8vw;
-    }
-    .about-section { padding-top: 25vw; }
-    .contact-section { padding-bottom: 25vw; }
-    .color-boundary img {
-        width: 95vw;
-    }
+@media(max-width:768px){
+.nav-links{display:none}.menu-btn{display:block}
+.name{flex-direction:column;font-size:clamp(4.5rem,16vw,8rem);line-height:.85;row-gap:16px}
+.space,.jp-mark{display:none}
+.sword{width:96vw}.sword.active{animation:katanaStrikeMobile 1s cubic-bezier(.05,.9,.1,1) forwards}
+.about-grid,.philosophy-grid{grid-template-columns:1fr;gap:40px}
+.work{grid-template-columns:44px 1fr 28px;padding:25px 0}
+.section{padding-left:8vw;padding-right:8vw}
+.about-section{padding-top:25vw}.contact-section{padding-bottom:25vw}
+.hanko{top:-70px}
 }
 </style>
 </head>
 <body>
 
+<nav class="nav" id="nav">
+  <a class="brand" href="index.html">NITHAN.</a>
+  <div class="nav-links">
+    <a href="blog.html">Logs</a><a href="game.html">Game</a><a href="gallery.html">Gallery</a>
+  </div>
+  <button class="menu-btn" id="menuBtn" aria-label="Toggle menu" aria-expanded="false"><i></i><i></i></button>
+</nav>
+<div class="m-menu" id="mMenu" aria-hidden="true">
+  <a class="m-link" href="index.html"><small>家</small>Home</a>
+  <a class="m-link" href="blog.html"><small>記</small>Logs</a>
+  <a class="m-link" href="game.html"><small>遊</small>Game</a>
+  <a class="m-link" href="gallery.html"><small>絵</small>Gallery</a>
+</div>
+<div class="progress" id="progress" aria-hidden="true"></div>
+<canvas id="petals" aria-hidden="true"></canvas>
+
 <!-- HERO -->
 <section class="hero" id="home">
-    <div class="video-canvas">
-        <video id="backgroundVideo" class="hero-video" autoplay muted loop playsinline webkit-playsinline preload="auto" tabindex="-1">
-            <source src="./Leafs.MP4" type="video/mp4">
-        </video>
-        <div class="video-darkness"></div>
-        <div class="video-grain"></div>
+  <div class="video-canvas">
+    <video id="backgroundVideo" class="hero-video" autoplay muted loop playsinline webkit-playsinline preload="auto" tabindex="-1"><source src="./Leafs.MP4" type="video/mp4"></video>
+    <div class="video-darkness"></div><div class="video-grain"></div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-label">NITHAN · 2026</div>
+    <div class="title-wrapper">
+      <h1 class="name" id="name" aria-label="Nithan Najeeb"></h1>
+      <img class="sword" id="sword" src="./Sword.PNG" alt="">
+      <span class="slash" id="slash"></span>
     </div>
-
-    <div class="hero-content">
-        <div class="hero-label">NITHAN · 2026</div>
-
-        <div class="title-wrapper">
-            <h1 class="name" id="name"></h1>
-            <img class="sword" id="sword" src="./Sword.PNG" alt="">
-        </div>
-
-        <div class="hero-subtitle">STUDENT · CREATOR · BUILDER</div>
-    </div>
-
-    <div class="jp-mark">静 · 創 · 夢</div>
-
-    <a class="scroll" href="#about">
-        <span>SCROLL</span>
-        <span class="scroll-line"></span>
-    </a>
+    <div class="hero-subtitle">STUDENT · CREATOR · BUILDER</div>
+  </div>
+  <div class="jp-mark">静 · 創 · 夢</div>
+  <a class="scroll" href="#about"><span>SCROLL</span><span class="scroll-line"></span></a>
 </section>
 
-<!-- CONTENT -->
 <main class="page">
 
-    <!-- ABOUT SECTION -->
-    <section class="section about-section" id="about">
-        <span class="section-number">一 / ABOUT</span>
-        <div class="section-inner">
-            <div class="eyebrow">WHO I AM · 私について</div>
-            <h2>Who is<br><em>Nithan?</em></h2>
-
-            <div class="about-grid">
-                <div class="about-lead">
-                    I am Nithan Najeeb, a student and creator fascinated by technology, design and stories.
-                </div>
-                <div class="about-copy">
-                    <p>I enjoy building digital experiences that combine technology with visual storytelling.</p>
-                    <br>
-                    <p>My interests move between web design, creative development, artificial intelligence and experimental projects.</p>
-                </div>
-            </div>
+  <section class="section about-section" id="about">
+    <span class="mark" data-speed="-.06" aria-hidden="true">私</span>
+    <span class="section-number">一 / ABOUT</span>
+    <div class="section-inner">
+      <div class="eyebrow rv">WHO I AM · 私について</div>
+      <h2 class="ink">Who is<br><em>Nithan?</em></h2>
+      <div class="about-grid">
+        <div>
+          <p class="about-lead rv">I build and experiment with intelligent systems, web infrastructure and emerging technologies, and I'm studying B.Com in Kerala, India.</p>
+          <div class="about-copy rv" style="--d:150">
+            <p>I'm a curious student who enjoys understanding how things work and turning ideas into practical, useful things: from AI-powered tools to structured knowledge systems.</p>
+            <p>I believe growth comes from asking questions and staying open to new perspectives. The goal is simple: build useful things, document progress, and evolve.</p>
+          </div>
+          <div class="tech rv" style="--d:250">
+            <span><b>Core</b>HTML5 · CSS3 · Vanilla JS</span>
+            <span><b>Motion</b>GSAP · Lottie · Canvas</span>
+            <span><b>R&amp;D</b>Ollama (local LLMs)</span>
+          </div>
         </div>
-    </section>
-
-    <!-- BOUNDARY DIVIDER -->
-    <div class="color-boundary">
-        <img src="./Line.PNG" alt="">
+        <div class="profile rv" style="--d:200">
+          <span class="hanko" id="hanko" aria-hidden="true">夢</span>
+          <div><span>名 NAME</span>Nithan Najeeb</div>
+          <div><span>号 ALIAS</span>Rubin Stellar</div>
+          <div><span>学 STUDY</span>B.Com</div>
+          <div><span>校 COLLEGE</span>MES College</div>
+          <div><span>地 FROM</span>Kerala, India</div>
+          <div><span>生 BORN</span>2004</div>
+          <div><span>作 PROJECT</span>Mind Atlas</div>
+        </div>
+      </div>
     </div>
+  </section>
 
-    <!-- WORK SECTION -->
-    <section class="section work-section" id="work">
-        <span class="section-number">二 / WORK</span>
-        <div class="section-inner">
-            <div class="eyebrow">SELECTED WORK · 制作</div>
-            <h2>Things I<br><em>create.</em></h2>
+  <div class="color-boundary"><img src="./Line.PNG" alt=""></div>
 
-            <div class="work-list">
-                <a href="#" class="work">
-                    <span class="work-number">01</span>
-                    <div>
-                        <h3>Web Design</h3>
-                        <p>Cinematic and minimal digital experiences.</p>
-                    </div>
-                </a>
-                <a href="#" class="work">
-                    <span class="work-number">02</span>
-                    <div>
-                        <h3>Creative Projects</h3>
-                        <p>Visual concepts, stories and interactive ideas.</p>
-                    </div>
-                </a>
-                <a href="#" class="work">
-                    <span class="work-number">03</span>
-                    <div>
-                        <h3>Technology</h3>
-                        <p>Programming, AI and experimental projects.</p>
-                    </div>
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- BOUNDARY DIVIDER -->
-    <div class="color-boundary">
-        <img src="./Line.PNG" alt="">
+  <section class="section work-section" id="work">
+    <span class="mark" data-speed="-.06" aria-hidden="true">作</span>
+    <span class="section-number">二 / WORK</span>
+    <div class="section-inner">
+      <div class="eyebrow rv">SELECTED WORK · 制作</div>
+      <h2 class="ink">Things I<br><em>create.</em></h2>
+      <div class="work-list">
+        <a href="#" class="work rv"><span class="work-number">01</span><div><h3>Mind Atlas</h3><p>A personal knowledge node tracking science and code logic.</p></div><span class="arrow">↗</span></a>
+        <a href="#" class="work rv" style="--d:100"><span class="work-number">02</span><div><h3>Forenexa</h3><p>Storefront architecture built for physical hardware.</p></div><span class="arrow">↗</span></a>
+        <a href="#" class="work rv" style="--d:200"><span class="work-number">03</span><div><h3>Ollama Uplink</h3><p>Connecting local AI models to clean, fast frontends.</p></div><span class="arrow">↗</span></a>
+      </div>
     </div>
+  </section>
 
-    <!-- PHILOSOPHY SECTION -->
-    <section class="section philosophy-section">
-        <span class="section-number">三 / PHILOSOPHY</span>
-        <div class="section-inner">
-            <div class="philosophy-grid">
-                <div>
-                    <div class="eyebrow">思想</div>
-                    <h2>Less noise.<br><em>More meaning.</em></h2>
-                </div>
-                <div class="philosophy-copy">
-                    Good design doesn't need to scream.<br><br>
-                    It can be quiet. It can breathe.<br><br>
-                    The goal isn't to fill every pixel. It's to make every element matter.
-                </div>
-            </div>
+  <div class="color-boundary"><img src="./Line.PNG" alt=""></div>
+
+  <section class="section philosophy-section">
+    <span class="mark" data-speed="-.06" aria-hidden="true">静</span>
+    <span class="section-number">三 / PHILOSOPHY</span>
+    <div class="section-inner">
+      <div class="philosophy-grid">
+        <div>
+          <div class="eyebrow rv">思想</div>
+          <h2 class="ink">Less noise.<br><em>More meaning.</em></h2>
         </div>
-    </section>
-
-    <!-- BOUNDARY DIVIDER -->
-    <div class="color-boundary">
-        <img src="./Line.PNG" alt="">
+        <div class="philosophy-copy rv" style="--d:200">
+          Good design doesn't need to scream.<br><br>
+          It can be quiet. It can breathe.<br><br>
+          The goal isn't to fill every pixel. It's to make every element matter.
+        </div>
+      </div>
     </div>
+  </section>
 
-    <!-- CONTACT SECTION -->
-    <section class="section contact-section" id="contact">
-        <span class="section-number">四 / CONTACT</span>
-        <div class="section-inner">
-            <div class="eyebrow">CONTACT · 連絡</div>
-            <h2>Let's create<br><em>something.</em></h2>
-            <a class="contact" href="mailto:your@email.com">your@email.com ↗</a>
-        </div>
-    </section>
+  <div class="color-boundary"><img src="./Line.PNG" alt=""></div>
+
+  <section class="section contact-section" id="contact">
+    <span class="mark" data-speed="-.06" aria-hidden="true">縁</span>
+    <span class="section-number">四 / CONTACT</span>
+    <div class="section-inner">
+      <div class="eyebrow rv">CONTACT · 連絡</div>
+      <h2 class="ink">Let's create<br><em>something.</em></h2>
+      <div class="socials rv" style="--d:200">
+        <a class="contact" href="https://instagram.com/nithannajeeb_" target="_blank" rel="noopener">Instagram ↗</a>
+        <a class="contact" href="https://www.threads.net/@nithannajeeb_" target="_blank" rel="noopener">Threads ↗</a>
+        <a class="contact" href="https://www.linkedin.com/in/nithannajeeb" target="_blank" rel="noopener">LinkedIn ↗</a>
+        <a class="contact" href="https://www.facebook.com/nithan.najeeb" target="_blank" rel="noopener">Facebook ↗</a>
+      </div>
+      <p class="status rv">HOSTED AT NITHAN.IN</p>
+    </div>
+  </section>
 </main>
 
-<footer>
-    <span>NITHAN NAJEEB</span>
-    <span>© 2026</span>
-</footer>
+<footer><span>NITHAN NAJEEB</span><span>© <time id="year">2026</time></span></footer>
 
-<!-- SCRIPTS -->
 <script>
-/* =====================================================
-   TYPOGRAPHY INJECTION
-===================================================== */
-const nameText = "Nithan Najeeb";
-const nameElement = document.getElementById("name");
-
-const words = nameText.split(" ");
-let totalLetterCount = 0;
-
-words.forEach((word, wordIndex) => {
-    const wordSpan = document.createElement("span");
-    wordSpan.className = "word";
-
-    [...word].forEach((character) => {
-        const charSpan = document.createElement("span");
-        charSpan.className = "char";
-        charSpan.textContent = character;
-        charSpan.style.animationDelay = `${totalLetterCount * 60}ms`;
-        wordSpan.appendChild(charSpan);
-        totalLetterCount++;
-    });
-
-    nameElement.appendChild(wordSpan);
-
-    if (wordIndex < words.length - 1) {
-        const space = document.createElement("span");
-        space.className = "space";
-        space.textContent = " ";
-        nameElement.appendChild(space);
-    }
+/* NAME */
+const nameEl=document.getElementById("name");let n=0;
+"Nithan Najeeb".split(" ").forEach((w,i,a)=>{
+  const ws=document.createElement("span");ws.className="word";ws.setAttribute("aria-hidden","true");
+  [...w].forEach(c=>{const s=document.createElement("span");s.className="char";s.textContent=c;s.style.animationDelay=n*60+"ms";ws.appendChild(s);n++});
+  nameEl.appendChild(ws);
+  if(i<a.length-1){const sp=document.createElement("span");sp.className="space";sp.textContent=" ";nameEl.appendChild(sp)}
 });
-
-/* =====================================================
-   SWORD ANIMATION SYNC
-===================================================== */
-const sword = document.getElementById("sword");
-const nameDuration = (totalLetterCount * 60) + 700;
-
-setTimeout(() => {
-    sword.classList.add("active");
-}, nameDuration + 150);
-
-/* =====================================================
-   VIDEO & FALLBACK
-===================================================== */
-const video = document.getElementById("backgroundVideo");
-
-function startVideo() {
-    video.muted = true;
-    video.play().catch(() => {
-        document.querySelector('.video-canvas').classList.add('fallback');
+/* SWORD + SLASH */
+const sword=document.getElementById("sword"),slash=document.getElementById("slash"),t=n*60+850;
+setTimeout(()=>sword.classList.add("active"),t);
+setTimeout(()=>slash.classList.add("go"),t+650);
+/* VIDEO */
+const v=document.getElementById("backgroundVideo");
+const sv=()=>{v.muted=true;v.play().catch(()=>{})};
+sv();addEventListener("load",sv);v.addEventListener("loadedmetadata",sv);
+/* SCROLL LINK */
+document.querySelector(".scroll").addEventListener("click",e=>{e.preventDefault();document.getElementById("about").scrollIntoView({behavior:"smooth"})});
+/* MENU */
+const mb=document.getElementById("menuBtn"),mm=document.getElementById("mMenu");
+function tog(o){document.body.classList.toggle("menu-open",o);mb.setAttribute("aria-expanded",o);mm.setAttribute("aria-hidden",!o);document.body.style.overflow=o?"hidden":""}
+mb.addEventListener("click",()=>tog(!document.body.classList.contains("menu-open")));
+mm.querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>tog(false)));
+/* REVEALS */
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}}),{threshold:.15});
+document.querySelectorAll(".rv,.ink").forEach(el=>io.observe(el));
+io.observe(document.getElementById("hanko"));
+/* SCROLL: progress line + kanji drift */
+const pg=document.getElementById("progress"),marks=[...document.querySelectorAll(".mark")];let tick=false;
+function onScroll(){
+  const h=document.documentElement.scrollHeight-innerHeight;
+  pg.style.transform="scaleY("+(h>0?scrollY/h:0)+")";
+  marks.forEach(m=>{const r=m.parentElement.getBoundingClientRect();m.style.setProperty("--py",(r.top*parseFloat(m.dataset.speed))+"px")});
+  tick=false;
+}
+addEventListener("scroll",()=>{if(!tick){tick=true;requestAnimationFrame(onScroll)}},{passive:true});onScroll();
+/* SAKURA PETALS */
+if(!matchMedia("(prefers-reduced-motion: reduce)").matches){
+  const c=document.getElementById("petals"),x=c.getContext("2d");let W,H;
+  const rs=()=>{W=c.width=innerWidth;H=c.height=innerHeight};rs();addEventListener("resize",rs);
+  const P=Array.from({length:innerWidth<768?12:24},()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:4+Math.random()*5,v:.3+Math.random()*.6,s:Math.random()*6,a:Math.random()*6,w:.01+Math.random()*.02}));
+  (function d(){
+    x.clearRect(0,0,W,H);
+    P.forEach(p=>{
+      p.y+=p.v;p.s+=p.w;p.x+=Math.sin(p.s)*.6+.25;p.a+=.015;
+      if(p.y>H+10||p.x>W+10){p.y=-10;p.x=Math.random()*W}
+      x.save();x.translate(p.x,p.y);x.rotate(p.a);x.scale(1,Math.abs(Math.cos(p.a*.7))*.6+.4);
+      x.beginPath();x.ellipse(0,0,p.r,p.r*.55,0,0,7);x.fillStyle="rgba(214,140,156,.5)";x.fill();x.restore();
     });
+    requestAnimationFrame(d);
+  })();
 }
-
-if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", startVideo);
-} else {
-    startVideo();
-}
-window.addEventListener("load", startVideo);
-video.addEventListener("loadedmetadata", startVideo);
-
-/* =====================================================
-   SMOOTH SCROLLING
-===================================================== */
-document.querySelector(".scroll").addEventListener("click", function(e) {
-    e.preventDefault();
-    document.getElementById("about").scrollIntoView({ behavior: "smooth" });
-});
+document.getElementById("year").textContent=new Date().getFullYear();
 </script>
 </body>
 </html>
