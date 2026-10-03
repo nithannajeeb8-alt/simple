@@ -24,6 +24,11 @@ html, body {
     background-color: #000;
 }
 
+:root {
+    /* half the height of the branch divider (image is ~0.3x its width) */
+    --branch-half: calc(min(95vw, 650px) * 0.15);
+}
+
 html {
     scroll-behavior: smooth;
 }
@@ -267,6 +272,20 @@ video::-webkit-media-controls {
 .philosophy-section { background: #e3e2db; }
 .contact-section    { background: #ecebe5; }
 
+/* Spacing around the branch dividers:
+   above = just enough to clear the branch's upper half,
+   below = clears the lower half before any label/heading starts */
+.about-section,
+.work-section,
+.philosophy-section {
+    padding-bottom: calc(var(--branch-half) + 36px);
+}
+.work-section,
+.philosophy-section,
+.contact-section {
+    padding-top: calc(var(--branch-half) + 72px);
+}
+
 .section-inner {
     width: min(1180px, 100%);
     margin: auto;
@@ -275,7 +294,7 @@ video::-webkit-media-controls {
 /* FIX: pushed lower so the branch's bottom half never touches it */
 .section-number {
     position: absolute;
-    top: clamp(70px, 14vw, 110px);
+    top: calc(var(--branch-half) + 28px);
     left: 8vw;
     color: #8b8983;
     font-family: "Shippori Mincho", serif;
@@ -340,7 +359,6 @@ video::-webkit-media-controls {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 8vw;
-    padding-bottom: 10vw; /* room for the branch's upper half */
 }
 
 .about-lead {
@@ -359,7 +377,6 @@ video::-webkit-media-controls {
 /* WORK */
 .work-list {
     margin-top: 20px;
-    padding-bottom: 10vw;
 }
 
 .work {
@@ -407,7 +424,6 @@ video::-webkit-media-controls {
     grid-template-columns: 1fr 1fr;
     gap: 10vw;
     align-items: center;
-    padding-bottom: 10vw;
 }
 
 .philosophy-copy {
@@ -539,11 +555,11 @@ footer {
         padding: 25px 0;
     }
     .section {
-        padding: 25vw 8vw;
+        padding-left: 8vw;
+        padding-right: 8vw;
     }
-    .about-grid, .work-list, .philosophy-grid {
-        padding-bottom: 16vw; /* upper half of the branch */
-    }
+    .about-section { padding-top: 25vw; }
+    .contact-section { padding-bottom: 25vw; }
     .color-boundary img {
         width: 95vw;
     }
