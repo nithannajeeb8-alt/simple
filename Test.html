@@ -2,30 +2,36 @@
 <html lang="en">
 
 <head>
+
 <meta charset="UTF-8">
 
 <meta
-  name="viewport"
-  content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
 >
 
 <meta name="theme-color" content="#000000">
 
 <title>Nithan Najeeb</title>
 
+
+<!-- =====================================================
+     FONTS
+===================================================== -->
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 
 <link
-  href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Noto+Serif+JP:wght@300;400;500&family=Inter:wght@300;400;500&display=swap"
-  rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Noto+Serif+JP:wght@300;400;500&family=Inter:wght@300;400;500&display=swap"
+    rel="stylesheet"
 >
 
 
 <style>
 
-/* =========================================================
+/* =====================================================
    RESET
-========================================================= */
+===================================================== */
 
 * {
     margin: 0;
@@ -39,39 +45,75 @@ html {
 
 body {
     margin: 0;
-    background: #f7f6f1;
-    color: #111;
     overflow-x: hidden;
+    background: #f5f4ef;
+    color: #111;
 }
 
 
-/* =========================================================
+/* =====================================================
    HERO
-========================================================= */
+===================================================== */
 
 .hero {
+
     position: relative;
+
     width: 100%;
+
     height: 100svh;
-    min-height: 700px;
+
+    min-height: 680px;
 
     overflow: hidden;
 
     background: #000;
 
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    isolation: isolate;
 }
 
 
-/* =========================================================
-   BACKGROUND VIDEO
+/* =====================================================
+   16:9 VIDEO CANVAS
 
-   leafs.MP4
-========================================================= */
+   The actual video keeps a 16:9 aspect ratio.
+
+   The canvas scales automatically with the viewport.
+
+   On a portrait phone it is enlarged to cover the
+   entire screen without stretching.
+===================================================== */
+
+.video-canvas {
+
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    width: max(100vw, 177.7778vh);
+
+    height: max(56.25vw, 100vh);
+
+    transform:
+        translate(-50%, -50%);
+
+    aspect-ratio: 16 / 9;
+
+    overflow: hidden;
+
+    z-index: -3;
+
+    background: #000;
+}
+
+
+/* =====================================================
+   VIDEO
+===================================================== */
 
 .hero-video {
+
     position: absolute;
 
     inset: 0;
@@ -82,57 +124,132 @@ body {
     display: block;
 
     object-fit: cover;
+
     object-position: center center;
 
-    z-index: 0;
+    border: 0;
+
+    outline: 0;
 
     background: #000;
 
-    border: none;
-
     /*
-       IMPORTANT:
-       Keep the video visible.
-       Do NOT add opacity: 0.
+       Keep the actual video monochrome.
     */
 
     filter:
-        grayscale(100%)
-        brightness(0.48)
-        contrast(1.08);
+        grayscale(1)
+        brightness(.48)
+        contrast(1.12);
+
+    /*
+       IMPORTANT:
+       Never use controls.
+    */
 
     pointer-events: none;
+
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 
-/* Dark cinematic overlay */
+/* =====================================================
+   HIDE WEBKIT VIDEO UI
 
-.hero::after {
-    content: "";
+   This prevents browser video controls where Safari
+   allows CSS control of them.
+===================================================== */
+
+video::-webkit-media-controls {
+
+    display: none !important;
+
+}
+
+video::-webkit-media-controls-enclosure {
+
+    display: none !important;
+
+}
+
+video::-webkit-media-controls-panel {
+
+    display: none !important;
+
+}
+
+video::-webkit-media-controls-play-button {
+
+    display: none !important;
+
+}
+
+video::-webkit-media-controls-start-playback-button {
+
+    display: none !important;
+
+    -webkit-appearance: none;
+
+}
+
+
+/* =====================================================
+   CINEMATIC OVERLAY
+===================================================== */
+
+.video-darkness {
 
     position: absolute;
 
     inset: 0;
 
-    z-index: 1;
+    z-index: -2;
 
     pointer-events: none;
 
     background:
+
         linear-gradient(
             to bottom,
-            rgba(0,0,0,0.22),
-            rgba(0,0,0,0.12) 45%,
-            rgba(0,0,0,0.62) 100%
+            rgba(0,0,0,.15) 0%,
+            rgba(0,0,0,.04) 42%,
+            rgba(0,0,0,.58) 100%
         );
+
 }
 
 
-/* =========================================================
+/* =====================================================
+   SUBTLE FILM GRAIN
+===================================================== */
+
+.video-grain {
+
+    position: absolute;
+
+    inset: 0;
+
+    z-index: -1;
+
+    pointer-events: none;
+
+    opacity: .08;
+
+    background-image:
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.45'/%3E%3C/svg%3E");
+
+    mix-blend-mode:
+        screen;
+}
+
+
+/* =====================================================
    HERO CONTENT
-========================================================= */
+===================================================== */
 
 .hero-content {
+
     position: relative;
 
     z-index: 5;
@@ -141,181 +258,236 @@ body {
     height: 100%;
 
     display: flex;
+
     flex-direction: column;
 
     align-items: center;
 
     text-align: center;
 
-    padding-top: 13vh;
+    padding-top: 15vh;
 }
 
 
-/* =========================================================
-   TOP LABEL
-========================================================= */
+/* =====================================================
+   LABEL
+===================================================== */
 
 .hero-label {
-    color: rgba(255,255,255,0.72);
 
-    font-family: "Inter", sans-serif;
+    color:
+        rgba(255,255,255,.68);
 
-    font-size: 0.62rem;
+    font-family:
+        "Inter",
+        sans-serif;
 
-    font-weight: 300;
+    font-size:
+        .62rem;
 
-    letter-spacing: 0.48em;
+    font-weight:
+        300;
 
-    margin-bottom: 35px;
+    letter-spacing:
+        .48em;
 
-    text-transform: uppercase;
+    text-transform:
+        uppercase;
+
+    margin-bottom:
+        30px;
+
+    opacity:
+        0;
+
+    animation:
+        fadeIn .8s ease forwards;
+
+    animation-delay:
+        .15s;
 }
 
 
-/* =========================================================
+/* =====================================================
    NAME
+===================================================== */
 
-   MUCH BIGGER THAN THE SWORD
-========================================================= */
+.name {
 
-#name {
     position: relative;
 
-    z-index: 10;
+    z-index: 20;
 
-    color: #f4f3ef;
+    color:
+        #f5f4ef;
 
     font-family:
         "Cormorant Garamond",
         "Noto Serif JP",
         serif;
 
+    font-weight:
+        500;
+
+    /*
+       BIGGER THAN THE SWORD
+    */
+
     font-size:
         clamp(
-            4.2rem,
-            11vw,
-            10rem
+            4.5rem,
+            11.5vw,
+            11rem
         );
 
-    font-weight: 500;
+    line-height:
+        .82;
 
-    line-height: 0.92;
+    letter-spacing:
+        -.035em;
 
-    letter-spacing: -0.025em;
-
-    white-space: nowrap;
+    white-space:
+        nowrap;
 
     text-shadow:
-        0 4px 30px rgba(0,0,0,0.8);
+        0 6px 35px rgba(0,0,0,.9);
 }
 
 
-/* Individual letters */
+/* Letters */
 
-#name span {
-    display: inline-block;
+.name span {
 
-    opacity: 0;
+    display:
+        inline-block;
+
+    opacity:
+        0;
 
     transform:
-        translateY(30px);
+        translateY(35px);
 
     animation:
-        nameIn
-        0.7s
+        letterIn
+        .7s
         cubic-bezier(.16,.8,.2,1)
         forwards;
 }
 
 
-@keyframes nameIn {
+@keyframes letterIn {
 
     to {
+
         opacity: 1;
 
         transform:
             translateY(0);
+
     }
 
 }
 
 
-/* =========================================================
-   SWORD AREA
+@keyframes fadeIn {
 
-   Sword is BELOW the name.
-========================================================= */
+    to {
+        opacity: 1;
+    }
 
-.sword-area {
+}
+
+
+/* =====================================================
+   SWORD STAGE
+
+   The sword sits BELOW the name.
+
+   It does NOT compete with the typography.
+===================================================== */
+
+.sword-stage {
 
     position: relative;
 
     width: 100%;
 
-    height: 145px;
+    height: clamp(
+        110px,
+        12vw,
+        175px
+    );
 
-    margin-top: 30px;
+    margin-top:
+        28px;
 
-    overflow: visible;
-
-    display: flex;
-
-    justify-content: center;
-
-    align-items: center;
+    overflow:
+        visible;
 }
 
 
-/* =========================================================
+/* =====================================================
    SWORD
+===================================================== */
 
-   Sword is deliberately smaller than name.
-========================================================= */
-
-#sword {
+.sword {
 
     position: absolute;
 
-    top: 50%;
     left: 50%;
+    top: 50%;
+
+    /*
+       Deliberately smaller than the name.
+    */
 
     width:
         min(
-            850px,
-            82vw
+            780px,
+            78vw
         );
 
-    height: auto;
+    height:
+        auto;
 
-    max-width: none;
+    max-width:
+        none;
 
-    opacity: 0;
+    opacity:
+        0;
 
     transform:
-        translate(115vw, -50%);
-
-    filter:
-        contrast(1.15)
-        brightness(0.92)
-        drop-shadow(
-            0 10px 20px
-            rgba(0,0,0,0.55)
+        translate(
+            120vw,
+            -50%
         );
 
-    z-index: 6;
+    z-index:
+        10;
 
-    pointer-events: none;
+    pointer-events:
+        none;
+
+    filter:
+        contrast(1.12)
+        brightness(.94)
+        drop-shadow(
+            0 12px 22px
+            rgba(0,0,0,.65)
+        );
 }
 
 
-/* Sword enters from right */
+/* =====================================================
+   SWORD SLICE
+===================================================== */
 
-#sword.slice {
+.sword.active {
 
     animation:
         swordSlice
-        1.2s
-        cubic-bezier(.12,.82,.18,1)
+        1.25s
+        cubic-bezier(.1,.8,.16,1)
         forwards;
 }
 
@@ -327,143 +499,173 @@ body {
         opacity: 0;
 
         transform:
-            translate(115vw, -50%);
+            translate(
+                120vw,
+                -50%
+            )
+            rotate(-1deg);
     }
 
-    8% {
+    7% {
 
-        opacity: 1;
+        opacity:
+            1;
     }
 
     100% {
 
-        opacity: 1;
+        opacity:
+            1;
 
         transform:
-            translate(-50%, -50%);
+            translate(
+                -50%,
+                -50%
+            )
+            rotate(-1deg);
     }
 }
 
 
-/* =========================================================
+/* =====================================================
    SUBTITLE
-========================================================= */
+===================================================== */
 
 .hero-subtitle {
 
-    position: relative;
+    position:
+        relative;
 
-    z-index: 8;
+    z-index:
+        15;
 
-    margin-top: 8px;
+    margin-top:
+        4px;
 
     color:
-        rgba(255,255,255,0.72);
+        rgba(255,255,255,.68);
 
     font-family:
         "Inter",
         sans-serif;
 
     font-size:
-        0.62rem;
+        .6rem;
 
-    font-weight: 300;
+    font-weight:
+        300;
 
     letter-spacing:
-        0.42em;
+        .43em;
 
     text-transform:
         uppercase;
 }
 
 
-/* =========================================================
-   JAPANESE SIDE MARK
-========================================================= */
+/* =====================================================
+   JAPANESE SIDE TEXT
+===================================================== */
 
-.japanese-mark {
+.jp-mark {
 
-    position: absolute;
+    position:
+        absolute;
 
-    right: 4vw;
+    right:
+        4vw;
 
-    top: 50%;
+    top:
+        50%;
 
     transform:
         translateY(-50%);
 
-    z-index: 5;
+    z-index:
+        5;
 
     color:
-        rgba(255,255,255,0.28);
+        rgba(255,255,255,.25);
 
     font-family:
         "Noto Serif JP",
         serif;
 
-    font-size:
-        0.9rem;
-
     writing-mode:
         vertical-rl;
 
+    font-size:
+        .85rem;
+
     letter-spacing:
-        0.55em;
+        .5em;
 }
 
 
-/* =========================================================
+/* =====================================================
    SCROLL
-========================================================= */
+===================================================== */
 
 .scroll {
 
-    position: absolute;
+    position:
+        absolute;
 
-    z-index: 10;
+    left:
+        50%;
 
-    left: 50%;
-
-    bottom: 27px;
+    bottom:
+        25px;
 
     transform:
         translateX(-50%);
 
-    display: flex;
+    z-index:
+        30;
 
-    flex-direction: column;
+    display:
+        flex;
 
-    align-items: center;
+    flex-direction:
+        column;
 
-    gap: 13px;
+    align-items:
+        center;
+
+    gap:
+        12px;
 
     color:
-        rgba(255,255,255,0.72);
+        rgba(255,255,255,.7);
 
-    text-decoration: none;
+    text-decoration:
+        none;
 
     font-family:
         "Inter",
         sans-serif;
 
     font-size:
-        0.56rem;
+        .55rem;
 
-    font-weight: 300;
+    font-weight:
+        300;
 
     letter-spacing:
-        0.42em;
+        .42em;
 }
 
 
 .scroll-line {
 
-    width: 1px;
+    width:
+        1px;
 
-    height: 52px;
+    height:
+        50px;
 
     background:
-        rgba(255,255,255,0.65);
+        rgba(255,255,255,.7);
 
     animation:
         scrollPulse
@@ -477,47 +679,59 @@ body {
 
     0%,
     100% {
-        height: 38px;
-        opacity: 0.35;
+
+        height:
+            35px;
+
+        opacity:
+            .35;
     }
 
     50% {
-        height: 62px;
-        opacity: 1;
+
+        height:
+            62px;
+
+        opacity:
+            1;
     }
 }
 
 
-/* =========================================================
-   WHITE JAPANESE-INSPIRED CONTENT
-========================================================= */
+/* =====================================================
+   WHITE JAPANESE-INSPIRED PAGE
+===================================================== */
 
 .page {
-    background: #f7f6f1;
+
+    background:
+        #f5f4ef;
+
+    color:
+        #161616;
 }
 
 
 .section {
 
-    position: relative;
+    position:
+        relative;
 
-    min-height: 90vh;
+    min-height:
+        90vh;
 
     padding:
-        14vw 8vw;
-
-    background:
-        #f7f6f1;
+        15vw 8vw;
 
     border-bottom:
-        1px solid #deddd6;
+        1px solid #dcdad3;
 }
 
 
 .section-inner {
 
     width:
-        min(1150px, 100%);
+        min(1180px, 100%);
 
     margin:
         auto;
@@ -526,48 +740,54 @@ body {
 
 .section-number {
 
-    position: absolute;
+    position:
+        absolute;
 
-    left: 8vw;
+    top:
+        35px;
 
-    top: 35px;
+    left:
+        8vw;
 
-    color: #888;
+    color:
+        #8b8983;
 
     font-family:
         "Noto Serif JP",
         serif;
 
     font-size:
-        0.62rem;
+        .6rem;
 
     letter-spacing:
-        0.25em;
+        .25em;
 }
 
 
 .eyebrow {
 
-    color: #777;
+    color:
+        #77746e;
 
     font-family:
         "Noto Serif JP",
         serif;
 
     font-size:
-        0.65rem;
+        .65rem;
 
     letter-spacing:
-        0.35em;
+        .35em;
 
     margin-bottom:
-        25px;
+        28px;
 }
 
 
 .section h2 {
 
-    color: #161616;
+    color:
+        #171717;
 
     font-family:
         "Cormorant Garamond",
@@ -585,13 +805,13 @@ body {
         400;
 
     line-height:
-        0.95;
+        .9;
 
     letter-spacing:
-        -0.03em;
+        -.035em;
 
     margin-bottom:
-        70px;
+        75px;
 }
 
 
@@ -605,11 +825,11 @@ body {
 }
 
 
-/* =========================================================
+/* =====================================================
    ABOUT
-========================================================= */
+===================================================== */
 
-.about-layout {
+.about-grid {
 
     display:
         grid;
@@ -622,24 +842,21 @@ body {
 }
 
 
-.about-intro {
+.about-lead {
 
     font-family:
         "Noto Serif JP",
         serif;
 
     font-size:
-        1.6rem;
+        1.65rem;
 
     line-height:
-        1.65;
+        1.7;
 }
 
 
-.about-text {
-
-    max-width:
-        520px;
+.about-copy {
 
     color:
         #666;
@@ -649,25 +866,25 @@ body {
         sans-serif;
 
     font-size:
-        0.95rem;
+        .95rem;
 
     line-height:
         2;
 }
 
 
-/* =========================================================
+/* =====================================================
    WORK
-========================================================= */
+===================================================== */
 
 .work-list {
 
     border-top:
-        1px solid #d5d4ce;
+        1px solid #d3d1ca;
 }
 
 
-.work-item {
+.work {
 
     min-height:
         170px;
@@ -676,16 +893,13 @@ body {
         grid;
 
     grid-template-columns:
-        80px 1fr 40px;
+        70px 1fr 30px;
 
     align-items:
         center;
 
-    gap:
-        30px;
-
     border-bottom:
-        1px solid #d5d4ce;
+        1px solid #d3d1ca;
 
     transition:
         background .3s,
@@ -693,13 +907,13 @@ body {
 }
 
 
-.work-item:hover {
+.work:hover {
 
     background:
-        #ecebe6;
+        #ebeae4;
 
     padding-left:
-        20px;
+        18px;
 }
 
 
@@ -709,11 +923,11 @@ body {
         #999;
 
     font-size:
-        0.7rem;
+        .7rem;
 }
 
 
-.work-item h3 {
+.work h3 {
 
     font-family:
         "Noto Serif JP",
@@ -727,41 +941,31 @@ body {
 }
 
 
-.work-item p {
+.work p {
+
+    margin-top:
+        8px;
 
     color:
         #777;
 
     font-size:
-        0.8rem;
-
-    margin-top:
-        8px;
+        .8rem;
 }
 
 
-.work-arrow {
-
-    font-size:
-        1.5rem;
-
-    color:
-        #555;
-}
-
-
-/* =========================================================
+/* =====================================================
    PHILOSOPHY
-========================================================= */
+===================================================== */
 
 .philosophy {
 
     background:
-        #eeede8;
+        #ecebe5;
 }
 
 
-.philosophy-layout {
+.philosophy-grid {
 
     display:
         grid;
@@ -777,7 +981,7 @@ body {
 }
 
 
-.philosophy-text {
+.philosophy-copy {
 
     color:
         #555;
@@ -794,11 +998,11 @@ body {
 }
 
 
-/* =========================================================
+/* =====================================================
    CONTACT
-========================================================= */
+===================================================== */
 
-.contact-link {
+.contact {
 
     display:
         inline-block;
@@ -817,16 +1021,16 @@ body {
         none;
 
     border-bottom:
-        1px solid #555;
+        1px solid #444;
 
     padding-bottom:
         10px;
 }
 
 
-/* =========================================================
+/* =====================================================
    FOOTER
-========================================================= */
+===================================================== */
 
 footer {
 
@@ -840,129 +1044,137 @@ footer {
         25px 8vw;
 
     background:
-        #f7f6f1;
+        #f5f4ef;
 
     border-top:
-        1px solid #d5d4ce;
+        1px solid #d3d1ca;
 
     color:
         #888;
 
     font-size:
-        0.55rem;
+        .55rem;
 
     letter-spacing:
-        0.3em;
+        .3em;
 }
 
 
-/* =========================================================
+/* =====================================================
    MOBILE
-========================================================= */
+===================================================== */
 
 @media (max-width: 700px) {
 
     .hero {
-        min-height: 700px;
+
+        min-height:
+            700px;
     }
 
 
     /*
-       On phones the video remains a real
-       background video and fills the entire hero.
+       Maintain the 16:9 video canvas.
+       The canvas is enlarged to cover the
+       portrait display without distortion.
     */
 
-    .hero-video {
-        width: 100%;
-        height: 100%;
+    .video-canvas {
 
-        object-fit: cover;
+        width:
+            max(
+                100vw,
+                177.7778vh
+            );
 
-        object-position:
-            center center;
+        height:
+            max(
+                56.25vw,
+                100vh
+            );
     }
 
 
     .hero-content {
 
         padding-top:
-            12vh;
+            14vh;
     }
 
 
     .hero-label {
 
         font-size:
-            0.5rem;
+            .5rem;
 
         letter-spacing:
-            0.34em;
+            .34em;
 
         margin-bottom:
-            27px;
+            28px;
     }
 
 
     /*
-       BIG NAME
+       VERY LARGE NAME
     */
 
-    #name {
+    .name {
 
         font-size:
             clamp(
-                3.15rem,
-                13vw,
-                5rem
+                3.35rem,
+                13.5vw,
+                5.5rem
             );
 
         line-height:
-            0.95;
+            .86;
 
         letter-spacing:
-            -0.035em;
+            -.045em;
     }
 
 
     /*
-       Smaller sword.
-       Clearly below the name.
+       Sword stays clearly below the name.
     */
 
-    .sword-area {
+    .sword-stage {
 
         height:
-            105px;
+            100px;
 
         margin-top:
-            25px;
+            28px;
     }
 
 
-    #sword {
+    .sword {
 
         width:
-            720px;
-
-        max-width:
-            none;
+            min(
+                700px,
+                82vw
+            );
     }
 
 
     .hero-subtitle {
 
         margin-top:
-            8px;
+            5px;
 
         font-size:
-            0.49rem;
+            .48rem;
 
         letter-spacing:
-            0.25em;
+            .25em;
     }
 
 
-    .japanese-mark {
+    .jp-mark {
+
         display:
             none;
     }
@@ -971,7 +1183,7 @@ footer {
     .scroll {
 
         bottom:
-            24px;
+            23px;
     }
 
 
@@ -993,8 +1205,8 @@ footer {
     }
 
 
-    .about-layout,
-    .philosophy-layout {
+    .about-grid,
+    .philosophy-grid {
 
         grid-template-columns:
             1fr;
@@ -1004,7 +1216,7 @@ footer {
     }
 
 
-    .work-item {
+    .work {
 
         grid-template-columns:
             45px 1fr;
@@ -1014,13 +1226,7 @@ footer {
     }
 
 
-    .work-arrow {
-        display:
-            none;
-    }
-
-
-    .work-item h3 {
+    .work h3 {
 
         font-size:
             1.5rem;
@@ -1029,30 +1235,54 @@ footer {
 }
 
 
-/* =========================================================
-   VERY SMALL PHONES
-========================================================= */
+/* =====================================================
+   SMALL IPHONES
+===================================================== */
 
 @media (max-width: 390px) {
 
-    #name {
+    .name {
 
         font-size:
-            2.9rem;
+            3rem;
+    }
+
+}
+
+
+/* =====================================================
+   REDUCED MOTION
+===================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+
+        animation-duration:
+            .01ms !important;
+
+        animation-iteration-count:
+            1 !important;
+
+        scroll-behavior:
+            auto !important;
     }
 
 }
 
 </style>
+
 </head>
 
 
 <body>
 
 
-<!-- =======================================================
+<!-- =====================================================
      HERO
-======================================================= -->
+===================================================== -->
 
 <section
     class="hero"
@@ -1060,69 +1290,103 @@ footer {
 >
 
 
-    <!-- ===================================================
-         BACKGROUND VIDEO
+    <!-- ================================================
+         TRUE 16:9 VIDEO CANVAS
+    ================================================= -->
 
-         GitHub files:
+    <div class="video-canvas">
 
-         test.html
-         leafs.MP4
-         Sword.PNG
-    ==================================================== -->
 
-    <video
-        id="heroVideo"
+        <video
+            id="backgroundVideo"
 
-        class="hero-video"
+            class="hero-video"
 
-        autoplay
-        muted
-        loop
-        playsinline
-        webkit-playsinline
+            autoplay
 
-        preload="auto"
+            muted
 
-        aria-hidden="true"
-    >
+            loop
 
-        <source
-            src="./Leafs.MP4"
-            type="video/mp4"
+            playsinline
+
+            webkit-playsinline
+
+            preload="auto"
+
+            disablepictureinpicture
+
+            disableremoteplayback
+
+            tabindex="-1"
+
+            aria-hidden="true"
         >
 
-    </video>
+            <source
+                src="./Leafs.MP4"
+                type="video/mp4"
+            >
+
+        </video>
 
 
-    <!-- HERO CONTENT -->
+        <div
+            class="video-darkness"
+        ></div>
 
-    <div class="hero-content">
+
+        <div
+            class="video-grain"
+        ></div>
+
+    </div>
 
 
-        <div class="hero-label">
+    <!-- =================================================
+         CONTENT
+    ================================================= -->
+
+    <div
+        class="hero-content"
+    >
+
+
+        <div
+            class="hero-label"
+        >
             NITHAN · 2026
         </div>
 
 
         <!-- NAME -->
 
-        <h1 id="name"></h1>
+        <h1
+            class="name"
+            id="name"
+        ></h1>
 
 
         <!-- SWORD -->
 
-        <div class="sword-area">
+        <div
+            class="sword-stage"
+        >
 
             <img
+                class="sword"
                 id="sword"
                 src="./Sword.PNG"
                 alt=""
+                draggable="false"
             >
 
         </div>
 
 
-        <div class="hero-subtitle">
+        <div
+            class="hero-subtitle"
+        >
             STUDENT · CREATOR · BUILDER
         </div>
 
@@ -1130,9 +1394,11 @@ footer {
     </div>
 
 
-    <!-- Japanese decoration -->
+    <!-- Japanese vertical text -->
 
-    <div class="japanese-mark">
+    <div
+        class="jp-mark"
+    >
         静 · 創 · 夢
     </div>
 
@@ -1140,44 +1406,57 @@ footer {
     <!-- Scroll -->
 
     <a
-        href="#about"
         class="scroll"
+        href="#about"
     >
 
         <span>
             SCROLL
         </span>
 
-        <span class="scroll-line"></span>
+        <span
+            class="scroll-line"
+        ></span>
 
     </a>
+
 
 </section>
 
 
 
-<!-- =======================================================
+<!-- =====================================================
      WHITE CONTENT
-======================================================= -->
+===================================================== -->
 
-<main class="page">
+<main
+    class="page"
+>
 
 
-    <!-- ABOUT -->
+    <!-- =================================================
+         ABOUT
+    ================================================= -->
 
     <section
         class="section"
         id="about"
     >
 
-        <span class="section-number">
+        <span
+            class="section-number"
+        >
             一 / ABOUT
         </span>
 
 
-        <div class="section-inner">
+        <div
+            class="section-inner"
+        >
 
-            <div class="eyebrow">
+            <div
+                class="eyebrow"
+            >
                 WHO I AM · 私について
             </div>
 
@@ -1188,9 +1467,13 @@ footer {
             </h2>
 
 
-            <div class="about-layout">
+            <div
+                class="about-grid"
+            >
 
-                <div class="about-intro">
+                <div
+                    class="about-lead"
+                >
 
                     I am Nithan Najeeb,
                     a student and creator
@@ -1200,7 +1483,9 @@ footer {
                 </div>
 
 
-                <div class="about-text">
+                <div
+                    class="about-copy"
+                >
 
                     <p>
                         I enjoy building digital
@@ -1229,21 +1514,29 @@ footer {
 
 
 
-    <!-- WORK -->
+    <!-- =================================================
+         WORK
+    ================================================= -->
 
     <section
         class="section"
         id="work"
     >
 
-        <span class="section-number">
+        <span
+            class="section-number"
+        >
             二 / WORK
         </span>
 
 
-        <div class="section-inner">
+        <div
+            class="section-inner"
+        >
 
-            <div class="eyebrow">
+            <div
+                class="eyebrow"
+            >
                 SELECTED WORK · 制作
             </div>
 
@@ -1254,14 +1547,21 @@ footer {
             </h2>
 
 
-            <div class="work-list">
+            <div
+                class="work-list"
+            >
 
 
-                <article class="work-item">
+                <article
+                    class="work"
+                >
 
-                    <span class="work-number">
+                    <span
+                        class="work-number"
+                    >
                         01
                     </span>
+
 
                     <div>
 
@@ -1276,18 +1576,20 @@ footer {
 
                     </div>
 
-                    <span class="work-arrow">
-                        ↗
-                    </span>
-
                 </article>
 
 
-                <article class="work-item">
 
-                    <span class="work-number">
+                <article
+                    class="work"
+                >
+
+                    <span
+                        class="work-number"
+                    >
                         02
                     </span>
+
 
                     <div>
 
@@ -1302,18 +1604,20 @@ footer {
 
                     </div>
 
-                    <span class="work-arrow">
-                        ↗
-                    </span>
-
                 </article>
 
 
-                <article class="work-item">
 
-                    <span class="work-number">
+                <article
+                    class="work"
+                >
+
+                    <span
+                        class="work-number"
+                    >
                         03
                     </span>
+
 
                     <div>
 
@@ -1328,10 +1632,6 @@ footer {
 
                     </div>
 
-                    <span class="work-arrow">
-                        ↗
-                    </span>
-
                 </article>
 
 
@@ -1343,26 +1643,33 @@ footer {
 
 
 
-    <!-- PHILOSOPHY -->
+    <!-- =================================================
+         PHILOSOPHY
+    ================================================= -->
 
     <section
         class="section philosophy"
     >
 
-        <span class="section-number">
+        <span
+            class="section-number"
+        >
             三 / PHILOSOPHY
         </span>
 
 
         <div
-            class="section-inner philosophy-layout"
+            class="section-inner philosophy-grid"
         >
 
             <div>
 
-                <div class="eyebrow">
+                <div
+                    class="eyebrow"
+                >
                     思想
                 </div>
+
 
                 <h2>
                     Less noise.<br>
@@ -1372,7 +1679,9 @@ footer {
             </div>
 
 
-            <div class="philosophy-text">
+            <div
+                class="philosophy-copy"
+            >
 
                 Good design doesn't need to scream.
 
@@ -1394,21 +1703,29 @@ footer {
 
 
 
-    <!-- CONTACT -->
+    <!-- =================================================
+         CONTACT
+    ================================================= -->
 
     <section
         class="section"
         id="contact"
     >
 
-        <span class="section-number">
+        <span
+            class="section-number"
+        >
             四 / CONTACT
         </span>
 
 
-        <div class="section-inner">
+        <div
+            class="section-inner"
+        >
 
-            <div class="eyebrow">
+            <div
+                class="eyebrow"
+            >
                 CONTACT · 連絡
             </div>
 
@@ -1420,8 +1737,8 @@ footer {
 
 
             <a
+                class="contact"
                 href="mailto:your@email.com"
-                class="contact-link"
             >
                 your@email.com ↗
             </a>
@@ -1429,6 +1746,7 @@ footer {
         </div>
 
     </section>
+
 
 </main>
 
@@ -1450,9 +1768,9 @@ footer {
 
 <script>
 
-/* =========================================================
-   NAME ANIMATION
-========================================================= */
+/* =====================================================
+   NAME
+===================================================== */
 
 const nameText = "Nithan Najeeb";
 
@@ -1463,34 +1781,35 @@ const nameElement =
 [...nameText].forEach(
     (character, index) => {
 
-        const letter =
+        const span =
             document.createElement("span");
 
-        letter.textContent =
+        span.textContent =
             character === " "
                 ? "\u00A0"
                 : character;
 
-        letter.style.animationDelay =
-            `${index * 65}ms`;
+        span.style.animationDelay =
+            `${index * 55}ms`;
 
-        nameElement.appendChild(letter);
+        nameElement.appendChild(span);
 
     }
 );
 
 
-/* =========================================================
-   VIDEO AUTOPLAY
-========================================================= */
+/* =====================================================
+   VIDEO
+===================================================== */
 
 const video =
-    document.getElementById("heroVideo");
+    document.getElementById(
+        "backgroundVideo"
+    );
 
 
 /*
-   Explicitly force the settings required
-   for iPhone/Safari autoplay.
+   Explicit autoplay configuration.
 */
 
 video.muted = true;
@@ -1503,13 +1822,18 @@ video.loop = true;
 
 video.playsInline = true;
 
+
+/*
+   Safari / iPhone attributes.
+*/
+
 video.setAttribute(
-    "muted",
+    "autoplay",
     ""
 );
 
 video.setAttribute(
-    "autoplay",
+    "muted",
     ""
 );
 
@@ -1520,155 +1844,131 @@ video.setAttribute(
 
 video.setAttribute(
     "webkit-playsinline",
-    ""
-);
+    "");
 
 
 /*
-   Try to start immediately.
+   Remove any possibility of native controls.
 */
 
-function playBackgroundVideo() {
+video.removeAttribute(
+    "controls"
+);
+
+video.controls = false;
+
+video.disablePictureInPicture = true;
+
+
+/* =====================================================
+   START VIDEO
+===================================================== */
+
+function startVideo() {
 
     video.muted = true;
 
-    const promise =
-        video.play();
-
-    if (promise !== undefined) {
-
-        promise.catch(() => {
-
-            /*
-               Safari may wait for the first
-               interaction if the MP4 codec is
-               unsupported or autoplay is blocked.
-            */
+    video.play()
+        .then(() => {
 
             console.log(
-                "Video autoplay was blocked."
+                "Background video playing."
+            );
+
+        })
+        .catch(() => {
+
+            console.warn(
+                "Autoplay was blocked by the browser."
             );
 
         });
 
-    }
 }
 
 
 /*
-   Try at several stages because Safari
-   occasionally behaves like it has never
-   encountered a video before.
+   Attempt playback when ready.
 */
 
-document.addEventListener(
-    "DOMContentLoaded",
-    playBackgroundVideo
-);
+if (
+    document.readyState ===
+    "loading"
+) {
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        startVideo
+    );
+
+} else {
+
+    startVideo();
+
+}
+
 
 window.addEventListener(
     "load",
-    playBackgroundVideo
+    startVideo
 );
 
+
 video.addEventListener(
-    "loadeddata",
-    playBackgroundVideo
+    "loadedmetadata",
+    startVideo
 );
+
 
 video.addEventListener(
     "canplay",
-    playBackgroundVideo
+    startVideo
 );
 
 
-/*
-   If Safari allows playback after interaction,
-   immediately resume it.
-*/
-
-document.addEventListener(
-    "touchstart",
-    () => {
-
-        if (video.paused) {
-            video.play().catch(() => {});
-        }
-
-    },
-    {
-        passive: true
-    }
-);
-
-
-/* =========================================================
-   SWORD TIMING
-========================================================= */
+/* =====================================================
+   SWORD
+===================================================== */
 
 const sword =
-    document.getElementById("sword");
+    document.getElementById(
+        "sword"
+    );
 
 
 /*
-   Wait until the name has completely appeared.
+   Name animation:
+
+   13 characters
+   55ms between letters
+   700ms animation
 */
 
-const nameAnimationDuration =
-    ((nameText.length - 1) * 65) + 700;
+const nameDuration =
+    ((nameText.length - 1) * 55)
+    + 700;
 
 
 /*
-   Then sword enters from the RIGHT.
+   Sword begins only AFTER
+   the complete name appears.
 */
 
 setTimeout(
     () => {
 
         sword.classList.add(
-            "slice"
+            "active"
         );
 
     },
-    nameAnimationDuration + 250
+    nameDuration + 250
 );
 
 
-/* =========================================================
-   IMAGE ERROR
-========================================================= */
-
-sword.addEventListener(
-    "error",
-    () => {
-
-        console.error(
-            "Sword.PNG could not be loaded."
-        );
-
-    }
-);
-
-
-/* =========================================================
-   VIDEO ERROR
-========================================================= */
-
-video.addEventListener(
-    "error",
-    () => {
-
-        console.error(
-            "leafs.MP4 could not be loaded."
-        );
-
-    }
-);
-
-
-/* =========================================================
+/* =====================================================
    SCROLL
-========================================================= */
+===================================================== */
 
 document
     .querySelector(".scroll")
@@ -1687,8 +1987,37 @@ document
         }
     );
 
+
+/* =====================================================
+   ERROR REPORTING
+===================================================== */
+
+video.addEventListener(
+    "error",
+    () => {
+
+        console.error(
+            "Leafs.MP4 could not be loaded."
+        );
+
+    }
+);
+
+
+sword.addEventListener(
+    "error",
+    () => {
+
+        console.error(
+            "Sword.PNG could not be loaded."
+        );
+
+    }
+);
+
 </script>
 
 
 </body>
+
 </html>
