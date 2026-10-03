@@ -170,9 +170,8 @@ video::-webkit-media-controls {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 75vw; 
+    width: 90vw; /* Kept tight to the viewport so it doesn't get clipped */
     max-width: 950px;
-    margin-left: 6vw; 
     z-index: 20;
     pointer-events: none;
     opacity: 0;
@@ -256,8 +255,14 @@ video::-webkit-media-controls {
 
 .section {
     position: relative;
-    padding: 10vw 8vw 6vw 8vw; /* Adjusted padding so dividers fit cleanly inside */
+    padding: 10vw 8vw; 
 }
+
+/* Specific background colors to show off the boundary blending */
+.about-section { background: #f5f4ef; }
+.work-section { background: #ecebe5; }
+.philosophy-section { background: #e3e2db; }
+.contact-section { background: #ecebe5; }
 
 .section-inner {
     width: min(1180px, 100%);
@@ -299,20 +304,25 @@ video::-webkit-media-controls {
 }
 
 /* =====================================================
-   THE BETTER FLORAL DIVIDER
+   BOUNDARY FLORAL DIVIDER (The Fix)
 ===================================================== */
-.floral-divider {
-    display: block;
+.color-boundary {
     width: 100%;
-    max-width: 700px;
-    height: clamp(60px, 12vw, 130px);
-    margin: 8vw auto 0 auto; /* Creates organic spacing at the bottom of sections */
-    background-image: url('./Line.PNG');
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
+    height: 0; /* Takes zero vertical space */
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 20; /* Keep it above the sections so it bridges them */
+}
+
+.color-boundary img {
+    width: 90vw;
+    max-width: 650px;
+    transform: translateY(-50%); /* Pulls the image up exactly halfway */
     mix-blend-mode: multiply;
-    opacity: 0.75;
+    opacity: 0.85;
+    pointer-events: none;
 }
 
 /* ABOUT */
@@ -320,6 +330,7 @@ video::-webkit-media-controls {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 8vw;
+    padding-bottom: 4vw; /* Give some breathing room before the branch */
 }
 
 .about-lead {
@@ -338,6 +349,7 @@ video::-webkit-media-controls {
 /* WORK */
 .work-list {
     margin-top: 20px;
+    padding-bottom: 4vw;
 }
 
 .work {
@@ -356,7 +368,7 @@ video::-webkit-media-controls {
 }
 
 .work:hover {
-    background: #ebeae4;
+    background: rgba(0,0,0,0.03);
     padding-left: 20px;
 }
 
@@ -380,15 +392,12 @@ video::-webkit-media-controls {
 }
 
 /* PHILOSOPHY */
-.philosophy {
-    background: #ecebe5; /* The divider inside here will automatically blend with this color perfectly */
-}
-
 .philosophy-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 10vw;
     align-items: center;
+    padding-bottom: 4vw;
 }
 
 .philosophy-copy {
@@ -418,7 +427,7 @@ footer {
     display: flex;
     justify-content: space-between;
     padding: 30px 8vw;
-    background: #f5f4ef;
+    background: #ecebe5;
     color: #888;
     font-family: "Inter", sans-serif;
     font-size: 0.6rem;
@@ -448,11 +457,10 @@ footer {
     }
     100% {
         opacity: 1;
-        transform: translate(-50%, -50%) rotate(-2deg); /* Default desktop rotation */
+        transform: translate(-50%, -50%) rotate(-2deg);
     }
 }
 
-/* Mobile specific katana strike end-state */
 @keyframes katanaStrikeMobile {
     0% {
         opacity: 0;
@@ -465,7 +473,7 @@ footer {
     }
     100% {
         opacity: 1;
-        /* Custom offset for mobile to hit the gap perfectly */
+        /* Custom offset for mobile */
         transform: translate(-50%, -46%) rotate(-3deg); 
     }
 }
@@ -488,19 +496,17 @@ footer {
         flex-direction: column;
         font-size: clamp(4.5rem, 16vw, 8rem);
         line-height: 0.85; 
-        row-gap: 16px; /* A precise, fixed empty gap for the sword */
+        row-gap: 16px; 
     }
     .space {
         display: none; 
     }
 
     .sword {
-        width: 125vw; /* Slightly longer to ensure it bleeds completely right */
-        margin-left: 8vw; 
+        width: 96vw; /* Reduced to fit perfectly without cropping the hilt */
     }
     
     .sword.active {
-        /* Use the mobile specific keyframe that shifts it down just enough to sit in the row-gap */
         animation: katanaStrikeMobile 1s cubic-bezier(0.05, 0.9, 0.1, 1) forwards;
     }
 
@@ -517,7 +523,10 @@ footer {
         padding: 25px 0;
     }
     .section {
-        padding: 25vw 8vw 12vw 8vw;
+        padding: 25vw 8vw;
+    }
+    .color-boundary img {
+        width: 95vw; /* Make branch larger on mobile */
     }
 }
 </style>
@@ -557,7 +566,7 @@ footer {
 <main class="page">
     
     <!-- ABOUT SECTION -->
-    <section class="section" id="about">
+    <section class="section about-section" id="about">
         <span class="section-number">一 / ABOUT</span>
         <div class="section-inner">
             <div class="eyebrow">WHO I AM · 私について</div>
@@ -573,14 +582,16 @@ footer {
                     <p>My interests move between web design, creative development, artificial intelligence and experimental projects.</p>
                 </div>
             </div>
-            
-            <!-- Floral Divider embedded inside the section so it shares the background perfectly -->
-            <div class="floral-divider"></div>
         </div>
     </section>
 
+    <!-- PERFECT CENTER BOUNDARY DIVIDER -->
+    <div class="color-boundary">
+        <img src="./Line.PNG" alt="">
+    </div>
+
     <!-- WORK SECTION -->
-    <section class="section" id="work">
+    <section class="section work-section" id="work">
         <span class="section-number">二 / WORK</span>
         <div class="section-inner">
             <div class="eyebrow">SELECTED WORK · 制作</div>
@@ -609,14 +620,16 @@ footer {
                     </div>
                 </a>
             </div>
-
-            <!-- Floral Divider -->
-            <div class="floral-divider"></div>
         </div>
     </section>
 
+    <!-- PERFECT CENTER BOUNDARY DIVIDER -->
+    <div class="color-boundary">
+        <img src="./Line.PNG" alt="">
+    </div>
+
     <!-- PHILOSOPHY SECTION -->
-    <section class="section philosophy">
+    <section class="section philosophy-section">
         <span class="section-number">三 / PHILOSOPHY</span>
         <div class="section-inner">
             <div class="philosophy-grid">
@@ -630,14 +643,16 @@ footer {
                     The goal isn't to fill every pixel. It's to make every element matter.
                 </div>
             </div>
-
-            <!-- Floral Divider (Will seamlessly blend with #ecebe5 background) -->
-            <div class="floral-divider"></div>
         </div>
     </section>
 
+    <!-- PERFECT CENTER BOUNDARY DIVIDER -->
+    <div class="color-boundary">
+        <img src="./Line.PNG" alt="">
+    </div>
+
     <!-- CONTACT SECTION -->
-    <section class="section" id="contact">
+    <section class="section contact-section" id="contact">
         <span class="section-number">四 / CONTACT</span>
         <div class="section-inner">
             <div class="eyebrow">CONTACT · 連絡</div>
@@ -703,8 +718,7 @@ const video = document.getElementById("backgroundVideo");
 
 function startVideo() {
     video.muted = true;
-    video.play().then(() => {
-    }).catch(() => {
+    video.play().catch(() => {
         document.querySelector('.video-canvas').classList.add('fallback');
     });
 }
