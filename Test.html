@@ -6,7 +6,6 @@
 <meta name="theme-color" content="#000000">
 <title>Nithan Najeeb | Portfolio</title>
 
-<!-- Upgraded Fonts: Cinzel for cinematic English, Shippori Mincho for elegant Japanese -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Inter:wght@300;400&family=Shippori+Mincho:wght@400;500;600&display=swap" rel="stylesheet">
@@ -21,7 +20,6 @@
     box-sizing: border-box;
 }
 
-/* Core backgrounds must be black to prevent iOS bounce showing white */
 html, body {
     background-color: #000; 
 }
@@ -42,8 +40,11 @@ body {
 .hero {
     position: relative;
     width: 100%;
-    height: 100svh;
+    
+    /* Using dvh (dynamic viewport height) fixes iOS Safari toolbar jumps */
+    height: 100dvh; 
     min-height: 600px;
+    
     background: #000;
     overflow: hidden;
     display: flex;
@@ -58,7 +59,7 @@ body {
     left: 50%;
     top: 50%;
     width: max(100vw, 177.7778vh);
-    height: max(56.25vw, 100vh);
+    height: max(56.25vw, 100dvh); /* Sync with dvh */
     transform: translate(-50%, -50%);
     aspect-ratio: 16 / 9;
     z-index: -3;
@@ -78,7 +79,6 @@ body {
     user-select: none;
 }
 
-/* Hide native Safari controls */
 video::-webkit-media-controls,
 video::-webkit-media-controls-enclosure,
 video::-webkit-media-controls-panel {
@@ -178,28 +178,23 @@ video::-webkit-media-controls-panel {
 }
 
 /* =====================================================
-   SWORD SLICE ANIMATION (Right to Center)
+   SWORD SLICE ANIMATION (Desktop Base)
 ===================================================== */
 .sword {
     position: absolute;
     top: 50%;
-    
-    /* Pulls the grip off the right edge of the screen */
-    right: -4vw; 
-    
-    /* Make the sword wide enough to cross the text */
-    width: 65vw; 
-    max-width: 1000px;
-    
+    left: 50%;
+    width: 75vw; 
+    max-width: 950px;
+    margin-left: 6vw; /* Pushes grip off right edge, keeps tip visible */
     z-index: 20;
     pointer-events: none;
     opacity: 0;
-    transform: translateY(-50%) rotate(-2deg);
+    transform: translate(-50%, -50%) rotate(-2deg);
     filter: drop-shadow(0 15px 25px rgba(0,0,0,0.9)) brightness(0.9);
 }
 
 .sword.active {
-    /* Fast, sharp cubic-bezier for a cutting motion */
     animation: katanaStrike 1s cubic-bezier(0.05, 0.9, 0.1, 1) forwards;
 }
 
@@ -436,12 +431,10 @@ footer {
     to { opacity: 1; }
 }
 
-/* The aggressive right-to-center strike animation */
 @keyframes katanaStrike {
     0% {
         opacity: 0;
-        /* Starts high, rotated, and far to the right */
-        transform: translateY(-150%) translateX(40vw) rotate(30deg);
+        transform: translate(20%, -150%) rotate(30deg);
         filter: blur(8px) drop-shadow(0 0px 0px rgba(0,0,0,0));
     }
     30% {
@@ -450,8 +443,7 @@ footer {
     }
     100% {
         opacity: 1;
-        /* Settles exactly in the center vertically, rotated slightly */
-        transform: translateY(-50%) translateX(0) rotate(-2deg);
+        transform: translate(-50%, -50%) rotate(-2deg);
     }
 }
 
@@ -466,26 +458,30 @@ footer {
 @media (max-width: 768px) {
     .video-canvas {
         width: max(100vw, 177.7778vh);
-        height: max(56.25vw, 100vh);
+        height: max(56.25vw, 100dvh);
     }
     .hero-content {
         gap: 0;
     }
     
-    /* Stack the name to allow for massive typography */
     .name {
         flex-direction: column;
         font-size: clamp(5rem, 18vw, 8rem);
-        row-gap: 5px;
+        /* Creates the perfect gap for the sword to pass through */
+        row-gap: 20px; 
     }
     .space {
-        display: none; /* Hide the space element when stacked */
+        display: none; 
     }
 
-    /* Adjust sword so grip is hidden on the right side of mobile screen */
+    /* PERFECT MOBILE SWORD ALIGNMENT */
     .sword {
-        right: -15vw; 
-        width: 125vw; /* Long enough to cut completely across */
+        /* Total width is 110% of screen */
+        width: 110vw; 
+        
+        /* Pushes sword to the right so left tip is perfectly exposed (~5vw from edge), 
+           while the right handle heavily bleeds off-screen */
+        margin-left: 12vw; 
     }
 
     .jp-mark {
@@ -525,7 +521,6 @@ footer {
         <div class="hero-label">NITHAN · 2026</div>
         
         <div class="title-wrapper">
-            <!-- JS populates the name -->
             <h1 class="name" id="name"></h1>
             <img class="sword" id="sword" src="./Sword.PNG" alt="">
         </div>
@@ -632,7 +627,7 @@ footer {
 <!-- SCRIPTS -->
 <script>
 /* =====================================================
-   TYPOGRAPHY INJECTION (Allows stacking on mobile)
+   TYPOGRAPHY INJECTION
 ===================================================== */
 const nameText = "Nithan Najeeb";
 const nameElement = document.getElementById("name");
@@ -648,8 +643,6 @@ words.forEach((word, wordIndex) => {
         const charSpan = document.createElement("span");
         charSpan.className = "char";
         charSpan.textContent = character;
-        
-        // Stagger the animation across all letters
         charSpan.style.animationDelay = `${totalLetterCount * 60}ms`;
         wordSpan.appendChild(charSpan);
         totalLetterCount++;
@@ -657,7 +650,6 @@ words.forEach((word, wordIndex) => {
     
     nameElement.appendChild(wordSpan);
     
-    // Add space element between words (hidden on mobile via CSS)
     if (wordIndex < words.length - 1) {
         const space = document.createElement("span");
         space.className = "space";
@@ -670,7 +662,6 @@ words.forEach((word, wordIndex) => {
    SWORD ANIMATION SYNC
 ===================================================== */
 const sword = document.getElementById("sword");
-// Wait for all letters to animate before striking
 const nameDuration = (totalLetterCount * 60) + 700;
 
 setTimeout(() => {
@@ -678,16 +669,14 @@ setTimeout(() => {
 }, nameDuration + 150);
 
 /* =====================================================
-   VIDEO & LOW POWER MODE FALLBACK
+   VIDEO & FALLBACK
 ===================================================== */
 const video = document.getElementById("backgroundVideo");
 
 function startVideo() {
     video.muted = true;
     video.play().then(() => {
-        // Video playing successfully
     }).catch(() => {
-        console.warn("Autoplay blocked (likely iOS Low Power Mode). Displaying fallback.");
         document.querySelector('.video-canvas').classList.add('fallback');
     });
 }
