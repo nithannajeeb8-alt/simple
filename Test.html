@@ -12,7 +12,7 @@
 
 <style>
 /* =====================================================
-   RESET & BASE 
+   RESET & BASE
 ===================================================== */
 * {
     margin: 0;
@@ -21,7 +21,7 @@
 }
 
 html, body {
-    background-color: #000; 
+    background-color: #000;
 }
 
 html {
@@ -40,7 +40,7 @@ body {
 .hero {
     position: relative;
     width: 100%;
-    height: 100dvh; 
+    height: 100dvh;
     min-height: 600px;
     background: #000;
     overflow: hidden;
@@ -56,7 +56,7 @@ body {
     left: 50%;
     top: 50%;
     width: max(100vw, 177.7778vh);
-    height: max(56.25vw, 100dvh); 
+    height: max(56.25vw, 100dvh);
     transform: translate(-50%, -50%);
     aspect-ratio: 16 / 9;
     z-index: -3;
@@ -137,14 +137,14 @@ video::-webkit-media-controls {
 
 .name {
     position: relative;
-    z-index: 10;
+    z-index: 10; /* text always sits ABOVE the sword */
     color: #fff;
     font-family: "Cinzel", serif;
     font-weight: 500;
     font-size: clamp(4rem, 9vw, 9rem);
     line-height: 0.9;
     letter-spacing: -0.02em;
-    text-shadow: 0 15px 40px rgba(0,0,0,1);
+    text-shadow: 0 10px 30px rgba(0,0,0,0.55);
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
@@ -165,14 +165,16 @@ video::-webkit-media-controls {
 
 /* =====================================================
    SWORD SLICE ANIMATION
+   FIX: sword is now layered BEHIND the name (z-index 5 < 10)
+   so the wrapped hilt can never cover the letters.
 ===================================================== */
 .sword {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 90vw; /* Kept tight to the viewport so it doesn't get clipped */
+    width: 90vw;
     max-width: 950px;
-    z-index: 20;
+    z-index: 5;
     pointer-events: none;
     opacity: 0;
     transform: translate(-50%, -50%) rotate(-2deg);
@@ -245,6 +247,8 @@ video::-webkit-media-controls {
 
 /* =====================================================
    MINIMALIST CONTENT PAGE
+   .page is a stacking context (z-index 10), so the
+   branch dividers blend against the sections inside it.
 ===================================================== */
 .page {
     position: relative;
@@ -255,23 +259,23 @@ video::-webkit-media-controls {
 
 .section {
     position: relative;
-    padding: 10vw 8vw; 
+    padding: 10vw 8vw;
 }
 
-/* Specific background colors to show off the boundary blending */
-.about-section { background: #f5f4ef; }
-.work-section { background: #ecebe5; }
+.about-section      { background: #f5f4ef; }
+.work-section       { background: #ecebe5; }
 .philosophy-section { background: #e3e2db; }
-.contact-section { background: #ecebe5; }
+.contact-section    { background: #ecebe5; }
 
 .section-inner {
     width: min(1180px, 100%);
     margin: auto;
 }
 
+/* FIX: pushed lower so the branch's bottom half never touches it */
 .section-number {
     position: absolute;
-    top: 40px;
+    top: clamp(70px, 14vw, 110px);
     left: 8vw;
     color: #8b8983;
     font-family: "Shippori Mincho", serif;
@@ -304,22 +308,28 @@ video::-webkit-media-controls {
 }
 
 /* =====================================================
-   BOUNDARY FLORAL DIVIDER (The Fix)
+   BOUNDARY BRANCH DIVIDER (FIXED)
+   - No z-index / stacking context on the wrapper, so
+     mix-blend-mode: multiply actually blends with the
+     section colors behind it (no visible image box).
+   - Absolutely centered on the exact color boundary:
+     half over the section above, half over the one below.
 ===================================================== */
 .color-boundary {
-    width: 100%;
-    height: 0; /* Takes zero vertical space */
     position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 20; /* Keep it above the sections so it bridges them */
+    width: 100%;
+    height: 0;
 }
 
 .color-boundary img {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    z-index: 20;
     width: 90vw;
     max-width: 650px;
-    transform: translateY(-50%); /* Pulls the image up exactly halfway */
+    height: auto;
+    transform: translate(-50%, -50%);
     mix-blend-mode: multiply;
     opacity: 0.85;
     pointer-events: none;
@@ -330,7 +340,7 @@ video::-webkit-media-controls {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 8vw;
-    padding-bottom: 4vw; /* Give some breathing room before the branch */
+    padding-bottom: 10vw; /* room for the branch's upper half */
 }
 
 .about-lead {
@@ -349,7 +359,7 @@ video::-webkit-media-controls {
 /* WORK */
 .work-list {
     margin-top: 20px;
-    padding-bottom: 4vw;
+    padding-bottom: 10vw;
 }
 
 .work {
@@ -357,7 +367,7 @@ video::-webkit-media-controls {
     grid-template-columns: 80px 1fr 40px;
     align-items: center;
     padding: 40px 0;
-    border-bottom: 1px solid rgba(0,0,0,0.08); 
+    border-bottom: 1px solid rgba(0,0,0,0.08);
     transition: background 0.3s, padding-left 0.3s;
     text-decoration: none;
     color: inherit;
@@ -397,7 +407,7 @@ video::-webkit-media-controls {
     grid-template-columns: 1fr 1fr;
     gap: 10vw;
     align-items: center;
-    padding-bottom: 4vw;
+    padding-bottom: 10vw;
 }
 
 .philosophy-copy {
@@ -473,14 +483,20 @@ footer {
     }
     100% {
         opacity: 1;
-        /* Custom offset for mobile */
-        transform: translate(-50%, -46%) rotate(-3deg); 
+        /* shifted slightly right/down so the hilt sits past the last letter */
+        transform: translate(-47%, -46%) rotate(-3deg);
     }
 }
 
 @keyframes scrollPulse {
     0%, 100% { height: 30px; opacity: 0.4; }
     50% { height: 60px; opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .char, .hero-label, .hero-subtitle { animation-duration: 0.01s; animation-delay: 0s !important; }
+    .scroll-line { animation: none; }
 }
 
 /* =====================================================
@@ -491,21 +507,21 @@ footer {
         width: max(100vw, 177.7778vh);
         height: max(56.25vw, 100dvh);
     }
-    
+
     .name {
         flex-direction: column;
         font-size: clamp(4.5rem, 16vw, 8rem);
-        line-height: 0.85; 
-        row-gap: 16px; 
+        line-height: 0.85;
+        row-gap: 16px;
     }
     .space {
-        display: none; 
+        display: none;
     }
 
     .sword {
-        width: 96vw; /* Reduced to fit perfectly without cropping the hilt */
+        width: 96vw;
     }
-    
+
     .sword.active {
         animation: katanaStrikeMobile 1s cubic-bezier(0.05, 0.9, 0.1, 1) forwards;
     }
@@ -513,7 +529,7 @@ footer {
     .jp-mark {
         display: none;
     }
-    
+
     .about-grid, .philosophy-grid {
         grid-template-columns: 1fr;
         gap: 40px;
@@ -525,8 +541,11 @@ footer {
     .section {
         padding: 25vw 8vw;
     }
+    .about-grid, .work-list, .philosophy-grid {
+        padding-bottom: 16vw; /* upper half of the branch */
+    }
     .color-boundary img {
-        width: 95vw; /* Make branch larger on mobile */
+        width: 95vw;
     }
 }
 </style>
@@ -545,7 +564,7 @@ footer {
 
     <div class="hero-content">
         <div class="hero-label">NITHAN · 2026</div>
-        
+
         <div class="title-wrapper">
             <h1 class="name" id="name"></h1>
             <img class="sword" id="sword" src="./Sword.PNG" alt="">
@@ -564,14 +583,14 @@ footer {
 
 <!-- CONTENT -->
 <main class="page">
-    
+
     <!-- ABOUT SECTION -->
     <section class="section about-section" id="about">
         <span class="section-number">一 / ABOUT</span>
         <div class="section-inner">
             <div class="eyebrow">WHO I AM · 私について</div>
             <h2>Who is<br><em>Nithan?</em></h2>
-            
+
             <div class="about-grid">
                 <div class="about-lead">
                     I am Nithan Najeeb, a student and creator fascinated by technology, design and stories.
@@ -585,7 +604,7 @@ footer {
         </div>
     </section>
 
-    <!-- PERFECT CENTER BOUNDARY DIVIDER -->
+    <!-- BOUNDARY DIVIDER -->
     <div class="color-boundary">
         <img src="./Line.PNG" alt="">
     </div>
@@ -596,7 +615,7 @@ footer {
         <div class="section-inner">
             <div class="eyebrow">SELECTED WORK · 制作</div>
             <h2>Things I<br><em>create.</em></h2>
-            
+
             <div class="work-list">
                 <a href="#" class="work">
                     <span class="work-number">01</span>
@@ -623,7 +642,7 @@ footer {
         </div>
     </section>
 
-    <!-- PERFECT CENTER BOUNDARY DIVIDER -->
+    <!-- BOUNDARY DIVIDER -->
     <div class="color-boundary">
         <img src="./Line.PNG" alt="">
     </div>
@@ -646,7 +665,7 @@ footer {
         </div>
     </section>
 
-    <!-- PERFECT CENTER BOUNDARY DIVIDER -->
+    <!-- BOUNDARY DIVIDER -->
     <div class="color-boundary">
         <img src="./Line.PNG" alt="">
     </div>
@@ -681,7 +700,7 @@ let totalLetterCount = 0;
 words.forEach((word, wordIndex) => {
     const wordSpan = document.createElement("span");
     wordSpan.className = "word";
-    
+
     [...word].forEach((character) => {
         const charSpan = document.createElement("span");
         charSpan.className = "char";
@@ -690,9 +709,9 @@ words.forEach((word, wordIndex) => {
         wordSpan.appendChild(charSpan);
         totalLetterCount++;
     });
-    
+
     nameElement.appendChild(wordSpan);
-    
+
     if (wordIndex < words.length - 1) {
         const space = document.createElement("span");
         space.className = "space";
