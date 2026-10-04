@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nithan Najeeb · Scene 1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Zen+Old+Mincho&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#ecebe5;--ink:#161616;--red:#b3282d}
+*{margin:0;padding:0;box-sizing:border-box}
+html{background:var(--paper)}
+body{font-family:"Zen Old Mincho",serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+
+.track{height:540vh;position:relative}
+.stage{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;isolation:isolate;
+  background:radial-gradient(120% 90% at 64% 30%,#f3f2ec 0%,#e5e4dd 65%,#d8d7d0 100%)}
+
+/* ---------- portal: lies on the ground, seen from above ---------- */
+.portal{position:absolute;z-index:1;transform-origin:50% 50%;will-change:transform;
+  box-shadow:0 18px 0 -3px #1b1b1b,0 50px 50px -18px rgba(0,0,0,.5),0 0 0 1px var(--ink)}
+.portal::after{content:"";position:absolute;inset:-12px;border:1px solid rgba(22,22,22,.28);pointer-events:none}
+.clip{position:absolute;inset:0;overflow:hidden;background:#d6d5cf;box-shadow:inset 0 0 70px rgba(0,0,0,.4)}
+.layer{position:absolute;inset:0}
+.layer img{display:block;width:100%;height:100%;object-fit:cover}
+.drift{animation:drift 20s ease-in-out infinite alternate}
+.b2{animation:xf 4.5s ease-in-out infinite alternate}     /* B1 ⇄ B2 */
+@keyframes drift{to{transform:scale(1.05) translate(-1%,-.6%)}}
+@keyframes xf{from{opacity:0}to{opacity:1}}
+.seal{position:absolute;right:-18px;bottom:-30px;width:46px;height:46px;background:var(--red);color:#f5f4ef;
+  display:grid;place-items:center;font-size:25px;line-height:1}
+
+/* ---------- trail the samurai follows (it is never finished) ---------- */
+.trail{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;overflow:visible}
+.trail path{fill:none;stroke:rgba(22,22,22,.55);stroke-width:2.2;stroke-linecap:round;stroke-dasharray:1 11}
+
+/* ---------- samurai (white background disappears via multiply) ---------- */
+.shadow{position:absolute;z-index:1;left:0;top:0;pointer-events:none;opacity:0;will-change:transform;
+  background:radial-gradient(closest-side,rgba(0,0,0,.3),rgba(0,0,0,0))}
+.sam{position:absolute;z-index:2;left:0;top:0;mix-blend-mode:multiply;transform-origin:50% 100%;
+  will-change:transform,opacity;pointer-events:none;opacity:0}
+.sam img{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:contain}
+.sam .r2{opacity:0}
+
+/* ---------- writing ---------- */
+.t{position:absolute;z-index:3;opacity:0;pointer-events:none;font-family:Cinzel,serif;
+  letter-spacing:.05em;line-height:1.3;will-change:clip-path,opacity}
+.t0{left:6vw;top:42vh;font-size:clamp(17px,1.7vw,26px);max-width:11em}
+.ta{left:6vw;top:10vh;font-size:clamp(21px,2.7vw,40px);max-width:12em}
+.tb{right:6vw;bottom:10vh;text-align:right;font-size:clamp(21px,2.7vw,40px);max-width:13em}
+.tc{right:6vw;bottom:9vh;text-align:right;font-family:"Zen Old Mincho",serif;letter-spacing:.02em;line-height:1.75;
+  font-size:clamp(15px,1.25vw,19px);max-width:26em}
+.tc b{display:block;margin-top:.6em;font:500 clamp(20px,2.2vw,32px)/1.2 Cinzel,serif;letter-spacing:.05em}
+.tv{right:2.6vw;top:50%;margin-top:-4.5em;writing-mode:vertical-rl;font-size:clamp(16px,1.5vw,22px);
+  letter-spacing:.7em;color:rgba(22,22,22,.6)}
+.hint{position:absolute;z-index:3;left:50%;bottom:calc(3.5vh + env(safe-area-inset-bottom,0px));transform:translateX(-50%);
+  display:grid;justify-items:center;gap:10px;font-size:13px;letter-spacing:.3em;color:rgba(22,22,22,.55)}
+.hint i{display:block;width:1px;height:38px;background:currentColor;animation:pulse 2.2s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scaleY(.4);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}}
+
+@media(max-width:720px){
+  .t0{left:0;right:0;top:44vh;text-align:center;max-width:none;padding:0 8vw}
+  .ta{left:7vw;right:7vw;top:6vh;max-width:none;font-size:20px}
+  .tb{left:7vw;right:7vw;top:45vh;bottom:auto;text-align:left;max-width:none;font-size:20px}
+  .tc{left:7vw;right:7vw;top:45vh;bottom:auto;text-align:left;font-size:15px}
+  .tv{display:none}
+  .seal{width:34px;height:34px;font-size:18px;right:-10px;bottom:-22px}
+}
+@media(prefers-reduced-motion:reduce){.drift,.b2,.hint i{animation:none}}
+</style>
+</head>
+<body>
+<div class="track" id="track">
+  <div class="stage" id="stage">
+
+    <div class="portal" id="portal" role="img" aria-label="A temple courtyard seen through a portal lying on the ground">
+      <div class="clip">
+        <div class="layer drift"><img id="zoom1" src="./B1.webp" alt=""></div>
+        <!-- B2 = your second portal image. If the file is missing, this layer removes itself. -->
+        <div class="layer drift b2"><img id="zoom2" src="./B2.webp" alt="" onerror="this.closest('.layer').remove()"></div>
+      </div>
+      <div class="seal" aria-hidden="true">夢</div>
+    </div>
+
+    <svg class="trail" id="trail" aria-hidden="true"><path id="trailPath"/></svg>
+    <div class="shadow" id="shadow"></div>
+    <div class="sam" id="sam" aria-hidden="true">
+      <img class="r1" src="./R1.webp" alt="">
+      <!-- R2 = your second samurai image. If the file is missing, the walk just uses R1. -->
+      <img class="r2" id="r2" src="./R2.webp" alt="" onerror="this.remove()">
+    </div>
+
+    <p class="t t0" data-t="-0.1,0,0.06,0.15">Every journey begins as a small door.</p>
+    <p class="t ta" data-t="0.16,0.3,0.5,0.58">Discipline taught me where to stand.</p>
+    <p class="t tb" data-t="0.52,0.64,0.78,0.86">Curiosity taught me what to build.</p>
+    <p class="t tc" data-t="0.8,0.93,9,10">Nithan Najeeb, B.Com student from Kerala, building Mind Atlas, Forenexa and Ollama Uplink.<b>The door is open. I am still walking.</b></p>
+    <p class="t tv" data-t="0.1,0.3,9,10" aria-hidden="true">静創夢</p>
+
+    <div class="hint" id="hint"><span>scroll</span><i></i></div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const easeIO = t => t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2;
+  const easeO = t => 1 - (1 - t) * (1 - t);
+
+  const track = $('#track'), stage = $('#stage'), portal = $('#portal'), sam = $('#sam'), shadow = $('#shadow'),
+        trail = $('#trail'), path = $('#trailPath'), hint = $('#hint'), r2 = $('#r2');
+  const z1 = $('#zoom1'), z2 = $('#zoom2');
+  const texts = [...document.querySelectorAll('[data-t]')].map(el => ({ el, r: el.dataset.t.split(',').map(Number) }));
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const SMAX = .28;                   // the samurai only ever gets about a third of the way to the portal
+  let W, H, mob, Pw, Ph, cx, cy, rx, rz, S, SW, kFull, L;
+  let want = 0, cur = -1, shown = -1;
+
+  function measure() {
+    W = stage.clientWidth; H = stage.clientHeight; mob = W < 720;
+    if (mob) { Pw = W * .84; cx = W * .5; cy = H * .25; rx = 44; rz = -9; S = Math.min(H * .58, W * 1.05); }
+    else     { Pw = Math.min(W * .52, H * 1.05); cx = W * .63; cy = H * .32; rx = 56; rz = -17; S = H * .72; }
+    Ph = Pw * 9 / 16;
+    const PhA = Ph * Math.cos(rx * Math.PI / 180);           // apparent height once laid down
+    SW = S * 16 / 9;
+    const fx = mob ? W * .5 : W * .15, fy = H * (mob ? .97 : .985);
+    const tx = cx - Pw * .14, ty = cy + PhA * .55;           // near edge of the portal
+    kFull = PhA * .5 / S;                                    // his size if he ever stood at the portal
+
+    portal.style.width = Pw + 'px'; portal.style.height = Ph + 'px';
+    portal.style.left = (cx - Pw / 2) + 'px'; portal.style.top = (cy - Ph / 2) + 'px';
+    sam.style.width = SW + 'px'; sam.style.height = S + 'px';
+    trail.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    path.setAttribute('d', `M${fx} ${fy} C${fx + (tx - fx) * .05} ${fy - (fy - ty) * .55} ${tx - (tx - fx) * .45} ${ty + (fy - ty) * .15} ${tx} ${ty}`);
+    L = path.getTotalLength();
+    shown = -1;
+  }
+
+  function render(p, now) {
+    // 1) a small box opens and lies down flat: the portal, seen from above
+    const a = easeIO(clamp(p / .26));
+    portal.style.transform =
+      `perspective(1500px) rotateX(${lerp(14, rx, a)}deg) rotateZ(${lerp(-3, rz, a)}deg) scale(${lerp(mob ? .16 : .08, 1, a)})`;
+    const push = lerp(1.5, 1, a) * (1 + .1 * clamp((p - .26) / .74));
+    z1.style.transform = `scale(${push})`; if (z2 && z2.isConnected) z2.style.transform = `scale(${push})`;
+
+    // 2) the samurai follows the trail, shrinking with distance, and stops short
+    const q = clamp((p - .26) / .62), walking = q > 0 && q < 1;
+    const s = SMAX * (easeO(q) * .5 + q * .5);
+    const pt = path.getPointAtLength(L * s), p2 = path.getPointAtLength(L * Math.min(1, s + .01));
+    const lean = Math.atan2(p2.x - pt.x, -(p2.y - pt.y)) * 180 / Math.PI * .55;   // leans into the turn
+    const k = lerp(1, kFull, easeO(Math.min(1, s / .42)));   // far smaller than he would be at the door
+    const bob = walking ? Math.sin(q * 80) * S * k * .005 : 0;
+    const sway = walking ? Math.sin(q * 40) * .6 : 0;
+    sam.style.opacity = clamp((p - .1) / .16);
+    sam.style.transform = `translate3d(${pt.x - SW / 2}px,${pt.y - S + bob}px,0) rotate(${lean + sway}deg) scale(${k})`;
+    shadow.style.opacity = sam.style.opacity;
+    shadow.style.width = S * .5 * k + 'px'; shadow.style.height = S * .09 * k + 'px';
+    shadow.style.transform = `translate3d(${pt.x - S * .25 * k}px,${pt.y - S * .045 * k}px,0)`;
+
+    // R1 ⇄ R2: stepping while he walks, a slow flutter of the scarf while he waits
+    if (r2 && r2.isConnected) {
+      const f = walking ? Math.floor(q * 26) % 2 : Math.floor(now / 800) % 2;
+      r2.style.opacity = f;
+    }
+
+    // 3) writing, brushed in left to right, then faded out
+    for (const { el, r } of texts) {
+      const tin = clamp((p - r[0]) / (r[1] - r[0])), tout = clamp((p - r[2]) / (r[3] - r[2]));
+      el.style.opacity = 1 - tout;
+      el.style.clipPath = el.classList.contains('tv')
+        ? `inset(0 0 ${(1 - easeIO(tin)) * 100}% 0)`
+        : `inset(-20% ${(1 - easeIO(tin)) * 100}% -20% -5%)`;
+    }
+    trail.style.opacity = clamp((p - .14) / .12);
+    hint.style.opacity = 1 - clamp(p / .05);
+  }
+
+  function onScroll() {
+    const r = track.getBoundingClientRect();
+    want = clamp(-r.top / (r.height - innerHeight));
+  }
+
+  let lastFrame = -1;
+  function tick(now) {
+    cur = reduce ? want : cur + (want - cur) * .09;
+    if (Math.abs(want - cur) < .0003) cur = want;
+    const idleFrame = Math.floor(now / 800);                  // lets the idle R1/R2 flutter keep ticking
+    if (cur !== shown || idleFrame !== lastFrame) { render(cur, now); shown = cur; lastFrame = idleFrame; }
+    requestAnimationFrame(tick);
+  }
+
+  addEventListener('scroll', onScroll, { passive: true });
+  addEventListener('resize', () => { measure(); onScroll(); });
+  measure(); onScroll(); cur = want; requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>
