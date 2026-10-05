@@ -2,16 +2,21 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport"
-      content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+>
 
 <title>Nithan Najeeb · Prologue</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Pinyon+Script&display=swap"
-      rel="stylesheet">
+<link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Pinyon+Script&display=swap"
+    rel="stylesheet"
+>
 
 <style>
 
@@ -20,14 +25,33 @@
 ========================================================= */
 
 :root {
+
     --paper: #eee9dd;
     --ink: #17140f;
     --soft-ink: rgba(23,20,15,.68);
     --red: #9f3032;
 
-    --unit: 1px;
-    --progress: 0;
+    --mouse-x: 0;
+    --mouse-y: 0;
+
+    --portal-scale: 0;
+
+    --character-distance: 90px;
+    --character-scale: .72;
+
+    --walk-a: 0;
+    --walk-b: 0;
+    --idle: 1;
+
+    --shadow-scale: .65;
+
+    --mist-x: 0;
 }
+
+
+/* =========================================================
+   RESET
+========================================================= */
 
 * {
     margin: 0;
@@ -35,45 +59,67 @@
     box-sizing: border-box;
 }
 
+
 html {
+
     background: var(--paper);
+
     scroll-behavior: auto;
+
+    -webkit-text-size-adjust: 100%;
 }
 
+
 body {
+
+    margin: 0;
+
     background: var(--paper);
+
     color: var(--ink);
+
     font-family:
         "Cormorant Garamond",
         Georgia,
         serif;
 
     overflow-x: hidden;
+
     -webkit-font-smoothing: antialiased;
+
+    text-rendering: optimizeLegibility;
 }
 
 
 /* =========================================================
-   LONG SCROLL TRACK
+   STORY SCROLL TRACK
 ========================================================= */
 
 .story {
+
     position: relative;
-    height: 700vh;
+
+    height: 520vh;
+
 }
 
 
 /* =========================================================
-   FIXED SCENE
+   MAIN SCENE
 ========================================================= */
 
 .scene {
+
     position: sticky;
+
     top: 0;
 
     width: 100%;
+
     height: 100vh;
     height: 100svh;
+
+    min-height: 520px;
 
     overflow: hidden;
 
@@ -82,31 +128,10 @@ body {
     background:
         radial-gradient(
             ellipse at 50% 38%,
-            #f8f4e9 0%,
+            #faf6eb 0%,
             #eee9dd 58%,
             #d8d0c1 100%
         );
-}
-
-
-/* =========================================================
-   PAPER TEXTURE
-========================================================= */
-
-.paper {
-    position: absolute;
-    inset: 0;
-
-    z-index: 100;
-
-    pointer-events: none;
-
-    opacity: .24;
-
-    mix-blend-mode: multiply;
-
-    background-image:
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='.28'/%3E%3C/svg%3E");
 }
 
 
@@ -115,59 +140,75 @@ body {
 ========================================================= */
 
 .world {
+
     position: absolute;
-    inset: -5%;
+
+    inset: -3%;
+
+    z-index: 1;
 
     transform:
         translate3d(
-            calc(var(--mouse-x) * -10px),
-            calc(var(--mouse-y) * -5px),
+            calc(var(--mouse-x) * -8px),
+            calc(var(--mouse-y) * -4px),
             0
         );
 
-    transition: transform .15s linear;
+    transition:
+        transform .12s linear;
+
 }
 
 
 /* =========================================================
-   BACKGROUND MOUNTAINS
+   MOUNTAIN BACKGROUND
 ========================================================= */
 
 .background {
+
     position: absolute;
+
     inset: 0;
 
     z-index: 1;
 
     transform:
         translate3d(
-            calc(var(--mouse-x) * -5px),
-            calc(var(--mouse-y) * -3px),
+            calc(var(--mouse-x) * -4px),
+            calc(var(--mouse-y) * -2px),
             0
         )
-        scale(1.05);
+        scale(1.055);
+
 }
 
+
 .background img {
+
+    display: block;
+
     width: 100%;
     height: 100%;
 
     object-fit: cover;
 
-    display: block;
+    object-position: center;
 
     filter:
-        contrast(.94)
+        contrast(.96)
         saturate(.78);
+
 }
 
 
 /* =========================================================
-   DISTANT ATMOSPHERE
+   ATMOSPHERE
 ========================================================= */
 
 .atmosphere {
+
     position: absolute;
+
     inset: 0;
 
     z-index: 5;
@@ -177,10 +218,54 @@ body {
     background:
         linear-gradient(
             to bottom,
-            rgba(255,252,242,.12),
+            rgba(255,252,242,.10),
             transparent 35%,
-            rgba(230,223,207,.32) 100%
+            rgba(220,211,194,.30) 100%
         );
+
+}
+
+
+/* =========================================================
+   PORTAL GLOW
+========================================================= */
+
+.portal-glow {
+
+    position: absolute;
+
+    z-index: 10;
+
+    left: 50%;
+    top: 29%;
+
+    width: 58vw;
+    height: 58vw;
+
+    max-width: 900px;
+    max-height: 900px;
+
+    transform:
+        translate(-50%, -50%);
+
+    background:
+        radial-gradient(
+            ellipse,
+            rgba(255,246,211,.30),
+            rgba(255,246,211,.08) 35%,
+            transparent 70%
+        );
+
+    filter: blur(22px);
+
+    opacity:
+        calc(
+            .10 +
+            var(--portal-scale) * .42
+        );
+
+    pointer-events: none;
+
 }
 
 
@@ -195,27 +280,25 @@ body {
     z-index: 20;
 
     left: 50%;
-    top: 30%;
+    top: 29%;
 
-    width: min(34vw, 620px);
+    width: min(35vw, 620px);
 
     transform:
         translate(-50%, -50%)
         translate3d(
-            calc(var(--mouse-x) * 7px),
-            calc(var(--mouse-y) * 4px),
+            calc(var(--mouse-x) * 6px),
+            calc(var(--mouse-y) * 3px),
             0
         );
 
     transform-origin: center;
 
     transition:
-        transform .15s linear,
-        width .3s ease;
+        transform .12s linear;
+
 }
 
-
-/* portal image */
 
 .portal {
 
@@ -223,80 +306,49 @@ body {
 
     width: 100%;
 
-    filter:
-        drop-shadow(
-            0 18px 18px rgba(35,27,17,.20)
-        );
-
     transform:
         scale(
             calc(
-                1 + var(--portal-scale) * .08
+                .94 +
+                var(--portal-scale) * .08
             )
         );
 
-    transition: transform .1s linear;
+    transition:
+        transform .1s linear;
+
+    filter:
+        drop-shadow(
+            0 18px 22px
+            rgba(35,27,17,.22)
+        );
+
 }
 
+
 .portal img {
+
+    display: block;
 
     width: 100%;
     height: auto;
 
-    display: block;
 }
 
 
-/* portal light */
+/* portal light directly over image */
 
 .portal-light {
 
     position: absolute;
 
+    z-index: -1;
+
     left: 50%;
     top: 48%;
 
-    width: 125%;
-    height: 110%;
-
-    transform: translate(-50%, -50%);
-
-    background:
-        radial-gradient(
-            ellipse,
-            rgba(255,246,207,.48),
-            rgba(255,246,207,0) 65%
-        );
-
-    filter: blur(25px);
-
-    opacity:
-        calc(
-            .18 + var(--portal-scale) * .35
-        );
-
-    pointer-events: none;
-}
-
-
-/* =========================================================
-   PORTAL GLOW
-========================================================= */
-
-.portal-glow {
-
-    position: absolute;
-
-    z-index: 15;
-
-    left: 50%;
-    top: 30%;
-
-    width: 55vw;
-    height: 55vw;
-
-    max-width: 900px;
-    max-height: 900px;
+    width: 130%;
+    height: 115%;
 
     transform:
         translate(-50%, -50%);
@@ -304,23 +356,25 @@ body {
     background:
         radial-gradient(
             ellipse,
-            rgba(255,247,211,.23),
-            transparent 65%
+            rgba(255,247,213,.48),
+            transparent 68%
         );
 
-    filter: blur(18px);
+    filter: blur(20px);
 
     opacity:
         calc(
-            .15 + var(--portal-scale) * .3
+            .12 +
+            var(--portal-scale) * .38
         );
 
     pointer-events: none;
+
 }
 
 
 /* =========================================================
-   MIST
+   FAR MIST
 ========================================================= */
 
 .mist {
@@ -329,30 +383,69 @@ body {
 
     inset: -15%;
 
-    z-index: 35;
+    z-index: 30;
 
     pointer-events: none;
 
     background:
+
         radial-gradient(
-            ellipse at 30% 55%,
-            rgba(255,255,255,.28),
-            transparent 32%
-        ),
-        radial-gradient(
-            ellipse at 70% 62%,
+            ellipse at 25% 52%,
             rgba(255,255,255,.25),
             transparent 30%
+        ),
+
+        radial-gradient(
+            ellipse at 72% 58%,
+            rgba(255,255,255,.22),
+            transparent 32%
         );
 
-    filter: blur(15px);
+    filter: blur(14px);
 
     transform:
         translateX(
             calc(var(--mist-x) * 1px)
         );
 
-    opacity: .75;
+    opacity: .68;
+
+}
+
+
+/* =========================================================
+   CHARACTER SHADOW
+========================================================= */
+
+.character-shadow {
+
+    position: absolute;
+
+    z-index: 39;
+
+    left: 50%;
+
+    bottom: 7%;
+
+    width: min(21vw, 340px);
+
+    height: 34px;
+
+    transform:
+        translateX(-50%)
+        scaleX(var(--shadow-scale));
+
+    background:
+        radial-gradient(
+            ellipse,
+            rgba(20,16,10,.34),
+            rgba(20,16,10,0)
+        );
+
+    filter: blur(7px);
+
+    pointer-events: none;
+
 }
 
 
@@ -375,22 +468,24 @@ body {
     transform:
         translateX(-50%)
         translateY(
-            calc(var(--character-distance) * 1px)
+            var(--character-distance)
         )
         scale(
             var(--character-scale)
         );
 
-    transform-origin: center bottom;
+    transform-origin:
+        center bottom;
 
     pointer-events: none;
 
-    transition:
-        transform .08s linear;
+    will-change:
+        transform;
+
 }
 
 
-/* character image */
+/* every frame */
 
 .character img {
 
@@ -399,10 +494,10 @@ body {
     left: 0;
     bottom: 0;
 
+    display: block;
+
     width: 100%;
     height: auto;
-
-    display: block;
 
     object-fit: contain;
 
@@ -410,59 +505,43 @@ body {
         contrast(1.04)
         brightness(.98);
 
-    transition: opacity .08s linear;
+    pointer-events: none;
+
 }
 
-.walk-a {
-    opacity: var(--walk-a);
-}
 
-.walk-b {
-    opacity: var(--walk-b);
-}
+/* idle */
 
 .idle {
-    opacity: var(--idle);
+
+    position: relative !important;
+
+    opacity:
+        var(--idle);
+
+}
+
+
+/* walking frames */
+
+.walk-a {
+
+    opacity:
+        var(--walk-a);
+
+}
+
+
+.walk-b {
+
+    opacity:
+        var(--walk-b);
+
 }
 
 
 /* =========================================================
-   CHARACTER SHADOW
-========================================================= */
-
-.character-shadow {
-
-    position: absolute;
-
-    z-index: 40;
-
-    left: 50%;
-    bottom: 7%;
-
-    width: min(20vw, 340px);
-    height: 35px;
-
-    transform:
-        translateX(-50%)
-        scaleX(
-            var(--shadow-scale)
-        );
-
-    background:
-        radial-gradient(
-            ellipse,
-            rgba(20,16,10,.32),
-            rgba(20,16,10,0)
-        );
-
-    filter: blur(7px);
-
-    pointer-events: none;
-}
-
-
-/* =========================================================
-   FOREGROUND ATMOSPHERE
+   NEAR MIST
 ========================================================= */
 
 .near-mist {
@@ -478,11 +557,12 @@ body {
     background:
         linear-gradient(
             to top,
-            rgba(238,233,221,.20),
-            transparent 25%
+            rgba(238,233,221,.22),
+            transparent 27%
         );
 
-    opacity: .8;
+    opacity: .82;
+
 }
 
 
@@ -498,12 +578,16 @@ body {
 
     z-index: 65;
 
+    width: 100%;
+    height: 100%;
+
     pointer-events: none;
+
 }
 
 
 /* =========================================================
-   STORY TYPOGRAPHY
+   STORY TEXT BASE
 ========================================================= */
 
 .story-text {
@@ -516,30 +600,38 @@ body {
 
     opacity: 0;
 
-    transition:
-        opacity .7s ease,
-        transform .8s cubic-bezier(.2,.8,.2,1);
+    will-change:
+        opacity,
+        transform;
+
 }
 
 
-/* main title */
+/* =========================================================
+   BORN IN 2004
+========================================================= */
 
 .birth {
 
-    top: 7%;
-
     left: 50%;
+
+    top: 6.5%;
 
     transform:
         translate(-50%, 15px);
 
     text-align: center;
+
 }
 
+
 .birth.visible {
+
     transform:
         translate(-50%, 0);
+
 }
+
 
 .birth .script {
 
@@ -553,22 +645,29 @@ body {
     line-height: .9;
 
     white-space: nowrap;
+
 }
 
 
-/* side information */
+/* =========================================================
+   INFORMATION
+========================================================= */
 
 .info {
 
-    width: 260px;
+    width: 250px;
 
     transform:
         translateY(20px);
+
 }
 
+
 .info.visible {
+
     transform:
         translateY(0);
+
 }
 
 
@@ -576,28 +675,49 @@ body {
 
     left: 8%;
 
-    top: 38%;
+    top: 39%;
+
 }
+
 
 .info-right {
 
     right: 7%;
 
     top: 47%;
+
 }
 
 
-.info .vertical-line {
+.vertical-line {
 
     width: 1px;
 
     height: 65px;
 
-    background: var(--ink);
+    margin-bottom: 14px;
+
+    background:
+        var(--ink);
 
     opacity: .35;
 
-    margin-bottom: 14px;
+}
+
+
+.info .year {
+
+    color:
+        var(--red);
+
+    font-size: 13px;
+
+    letter-spacing: .25em;
+
+    text-transform: uppercase;
+
+    margin-bottom: 7px;
+
 }
 
 
@@ -612,6 +732,7 @@ body {
     text-transform: uppercase;
 
     margin-bottom: 8px;
+
 }
 
 
@@ -621,28 +742,14 @@ body {
 
     line-height: 1.25;
 
-    color: var(--soft-ink);
-}
+    color:
+        var(--soft-ink);
 
-
-/* red year */
-
-.year {
-
-    color: var(--red);
-
-    font-size: 13px;
-
-    letter-spacing: .25em;
-
-    text-transform: uppercase;
-
-    margin-bottom: 7px;
 }
 
 
 /* =========================================================
-   SIDE BRUSH TEXT
+   HANDWRITTEN BRUSH TEXT
 ========================================================= */
 
 .brush {
@@ -662,10 +769,10 @@ body {
 
     white-space: nowrap;
 
-    transition:
-        opacity .8s ease,
-        transform 1s cubic-bezier(.2,.8,.2,1);
+    pointer-events: none;
+
 }
+
 
 .brush-left {
 
@@ -674,9 +781,10 @@ body {
     bottom: 25%;
 
     transform:
-        rotate(-8deg)
-        translateX(-20px);
+        rotate(-8deg);
+
 }
+
 
 .brush-right {
 
@@ -685,13 +793,13 @@ body {
     top: 31%;
 
     transform:
-        rotate(8deg)
-        translateX(20px);
+        rotate(8deg);
+
 }
 
 
 /* =========================================================
-   FINAL TITLE
+   FINAL NAME
 ========================================================= */
 
 .final {
@@ -701,7 +809,10 @@ body {
     z-index: 80;
 
     left: 50%;
+
     top: 54%;
+
+    width: 90%;
 
     transform:
         translate(-50%, 30px);
@@ -710,18 +821,14 @@ body {
 
     opacity: 0;
 
-    transition:
-        opacity 1.4s ease,
-        transform 1.4s cubic-bezier(.2,.8,.2,1);
 }
 
 
 .final.visible {
 
-    opacity: 1;
-
     transform:
         translate(-50%, 0);
+
 }
 
 
@@ -737,6 +844,7 @@ body {
     line-height: .8;
 
     white-space: nowrap;
+
 }
 
 
@@ -751,6 +859,7 @@ body {
     text-transform: uppercase;
 
     opacity: .65;
+
 }
 
 
@@ -765,6 +874,7 @@ body {
     z-index: 90;
 
     left: 50%;
+
     bottom: 4%;
 
     transform:
@@ -786,7 +896,8 @@ body {
 
     opacity: .55;
 
-    transition: opacity .5s;
+    pointer-events: none;
+
 }
 
 
@@ -796,23 +907,34 @@ body {
 
     height: 50px;
 
-    background: var(--ink);
+    background:
+        var(--ink);
 
-    transform-origin: top;
+    transform-origin:
+        top;
 
     animation:
         scrollPulse 2s ease-in-out infinite;
+
 }
+
 
 @keyframes scrollPulse {
 
-    0%,100% {
-        transform: scaleY(.35);
+    0%, 100% {
+
+        transform:
+            scaleY(.35);
+
     }
 
     50% {
-        transform: scaleY(1);
+
+        transform:
+            scaleY(1);
+
     }
+
 }
 
 
@@ -837,7 +959,32 @@ body {
             rgba(50,39,25,.15) 100%
         );
 
-    opacity: .75;
+    opacity: .68;
+
+}
+
+
+/* =========================================================
+   PAPER
+========================================================= */
+
+.paper {
+
+    position: absolute;
+
+    inset: 0;
+
+    z-index: 100;
+
+    pointer-events: none;
+
+    opacity: .18;
+
+    mix-blend-mode: multiply;
+
+    background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='.28'/%3E%3C/svg%3E");
+
 }
 
 
@@ -847,66 +994,323 @@ body {
 
 @media (max-width: 700px) {
 
+
+    .story {
+
+        height: 520vh;
+
+    }
+
+
+    .scene {
+
+        min-height: 520px;
+
+    }
+
+
+    .world {
+
+        inset: -2%;
+
+    }
+
+
+    .background {
+
+        transform:
+            translate3d(
+                calc(var(--mouse-x) * -2px),
+                calc(var(--mouse-y) * -1px),
+                0
+            )
+            scale(1.08);
+
+    }
+
+
     .portal-wrap {
 
-        width: 64vw;
+        width: 68vw;
 
-        top: 28%;
+        top: 27%;
+
     }
+
+
+    .portal-glow {
+
+        width: 110vw;
+
+        height: 110vw;
+
+    }
+
 
     .character {
 
-        width: 55vw;
+        width: 58vw;
 
-        bottom: 12%;
+        max-width: 310px;
+
+        bottom: 11%;
+
     }
+
+
+    .character-shadow {
+
+        width: 40vw;
+
+        max-width: 220px;
+
+        height: 22px;
+
+        bottom: 9%;
+
+    }
+
+
+    .birth {
+
+        top: 7%;
+
+    }
+
+
+    .birth .script {
+
+        font-size:
+            clamp(
+                38px,
+                10vw,
+                55px
+            );
+
+    }
+
 
     .info {
 
-        width: 170px;
+        width: 145px;
+
     }
+
 
     .info-left {
 
         left: 5%;
 
-        top: 51%;
+        top: 53%;
+
     }
+
 
     .info-right {
 
-        right: 4%;
+        right: 5%;
 
         top: 63%;
+
     }
+
 
     .info h2 {
 
-        font-size: 14px;
+        font-size: 13px;
+
+        letter-spacing: .18em;
+
     }
+
 
     .info p {
 
         font-size: 15px;
+
+        line-height: 1.2;
+
     }
+
+
+    .vertical-line {
+
+        height: 40px;
+
+    }
+
+
+    .info .year {
+
+        font-size: 10px;
+
+        letter-spacing: .18em;
+
+    }
+
 
     .brush {
 
-        font-size: 32px;
+        font-size: 30px;
+
     }
+
 
     .brush-left {
 
         left: 4%;
 
-        bottom: 31%;
+        bottom: 29%;
+
     }
+
 
     .brush-right {
 
-        right: 3%;
+        right: 4%;
 
         top: 40%;
+
+    }
+
+
+    .final {
+
+        width: 92%;
+
+        top: 53%;
+
+    }
+
+
+    .final-name {
+
+        font-size:
+            clamp(
+                52px,
+                14vw,
+                78px
+            );
+
+    }
+
+
+    .final-sub {
+
+        margin-top: 20px;
+
+        font-size: 11px;
+
+        letter-spacing: .15em;
+
+    }
+
+
+    .scroll-hint {
+
+        bottom: 3%;
+
+        font-size: 10px;
+
+    }
+
+
+    .scroll-line {
+
+        height: 38px;
+
+    }
+
+
+    .mist {
+
+        filter: blur(9px);
+
+        opacity: .52;
+
+    }
+
+
+    .portal-light {
+
+        filter: blur(15px);
+
+    }
+
+
+    .vignette {
+
+        opacity: .48;
+
+    }
+
+
+    .paper {
+
+        opacity: .12;
+
+    }
+
+}
+
+
+/* =========================================================
+   VERY SMALL PHONES
+========================================================= */
+
+@media (max-width: 390px) {
+
+
+    .portal-wrap {
+
+        width: 72vw;
+
+        top: 26%;
+
+    }
+
+
+    .character {
+
+        width: 62vw;
+
+        bottom: 10%;
+
+    }
+
+
+    .info {
+
+        width: 130px;
+
+    }
+
+
+    .info-left {
+
+        left: 4%;
+
+    }
+
+
+    .info-right {
+
+        right: 4%;
+
+    }
+
+
+    .info p {
+
+        font-size: 14px;
+
+    }
+
+
+    .brush {
+
+        font-size: 27px;
+
     }
 
 }
@@ -918,15 +1322,18 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
 
-    *,
-    *::before,
-    *::after {
 
-        animation-duration: .01ms !important;
+    * {
 
-        animation-iteration-count: 1 !important;
+        animation-duration:
+            .01ms !important;
 
-        scroll-behavior: auto !important;
+        animation-iteration-count:
+            1 !important;
+
+        scroll-behavior:
+            auto !important;
+
     }
 
 }
@@ -937,1061 +1344,1332 @@ body {
 
 <body>
 
-<main class="story" id="story">
 
-    <section class="scene" id="scene">
-
-        <!-- =============================================
-             WORLD
-        ============================================== -->
-
-        <div class="world" id="world">
+<main
+    class="story"
+    id="story"
+>
 
 
-            <!-- BACKGROUND -->
-
-            <div class="background">
-                <img
-                    src="./assets/BG_MOUNTAINS.WEBP"
-                    alt="">
-            </div>
+<section
+    class="scene"
+    id="scene"
+>
 
 
-            <!-- ATMOSPHERE -->
+<!-- =====================================================
+     WORLD
+====================================================== -->
 
-            <div class="atmosphere"></div>
-
-
-            <!-- PORTAL LIGHT -->
-
-            <div class="portal-glow"></div>
-
-
-            <!-- PORTAL -->
-
-            <div class="portal-wrap" id="portalWrap">
-
-                <div class="portal-light"></div>
-
-                <div class="portal">
-
-                    <img
-                        src="./assets/PORTAL_TEMPLE.WEBP"
-                        alt="Temple beyond the portal">
-
-                </div>
-
-            </div>
+<div
+    class="world"
+    id="world"
+>
 
 
-            <!-- FAR MIST -->
+    <!-- MOUNTAIN BACKGROUND -->
 
-            <div
-                class="mist"
-                id="farMist">
-            </div>
+    <div class="background">
 
+        <img
+            src="./BG_MOUNTAINS.WEBP"
+            alt=""
+            draggable="false"
+        >
 
-            <!-- CHARACTER SHADOW -->
-
-            <div
-                class="character-shadow"
-                id="characterShadow">
-            </div>
+    </div>
 
 
-            <!-- SAMURAI -->
+    <!-- ATMOSPHERE -->
+
+    <div class="atmosphere"></div>
+
+
+    <!-- PORTAL LIGHT -->
+
+    <div class="portal-glow"></div>
+
+
+    <!-- =================================================
+         PORTAL
+    ================================================== -->
+
+    <div
+        class="portal-wrap"
+        id="portalWrap"
+    >
+
+        <div class="portal">
 
             <div
-                class="character"
-                id="character">
-
-                <img
-                    class="idle"
-                    id="samuraiIdle"
-                    src="./assets/SAMURAI_IDLE.WEBP"
-                    alt="">
-
-                <img
-                    class="walk-a"
-                    id="walkA"
-                    src="./assets/SAMURAI_WALK_A.WEBP"
-                    alt="">
-
-                <img
-                    class="walk-b"
-                    id="walkB"
-                    src="./assets/SAMURAI_WALK_B.WEBP"
-                    alt="">
-
-            </div>
+                class="portal-light"
+            ></div>
 
 
-            <!-- NEAR MIST -->
-
-            <div
-                class="near-mist"
-                id="nearMist">
-            </div>
-
+            <img
+                src="./PORTAL_TEMPLE.WEBP"
+                alt="Temple beyond the portal"
+                draggable="false"
+            >
 
         </div>
 
-
-        <!-- =============================================
-             PETALS
-        ============================================== -->
-
-        <canvas id="petals"></canvas>
+    </div>
 
 
-        <!-- =============================================
-             STORY TEXT
-        ============================================== -->
+    <!-- FAR MIST -->
+
+    <div
+        class="mist"
+        id="farMist"
+    ></div>
 
 
-        <div
-            class="story-text birth"
-            id="birth">
+    <!-- =================================================
+         CHARACTER SHADOW
+    ================================================== -->
 
-            <div class="script">
-                Born in 2004
-            </div>
-
-        </div>
-
-
-        <!-- LEFT INFORMATION -->
-
-        <div
-            class="story-text info info-left"
-            id="infoLeft">
-
-            <div class="vertical-line"></div>
-
-            <div class="year">
-                The beginning
-            </div>
-
-            <h2>
-                Learning
-            </h2>
-
-            <p>
-                Curiosity came first.
-                Questions followed.
-            </p>
-
-        </div>
+    <div
+        class="character-shadow"
+        id="characterShadow"
+    ></div>
 
 
-        <!-- RIGHT INFORMATION -->
+    <!-- =================================================
+         SAMURAI
+    ================================================== -->
 
-        <div
-            class="story-text info info-right"
-            id="infoRight">
-
-            <div class="vertical-line"></div>
-
-            <div class="year">
-                The journey
-            </div>
-
-            <h2>
-                Building
-            </h2>
-
-            <p>
-                Commerce,
-                technology and ideas
-                slowly became one path.
-            </p>
-
-        </div>
+    <div
+        class="character"
+        id="character"
+    >
 
 
-        <!-- BRUSH TEXT -->
+        <!-- RESTING FRAME -->
 
-        <div
-            class="brush brush-left"
-            id="brushLeft">
-
-            still learning.
-
-        </div>
-
-
-        <div
-            class="brush brush-right"
-            id="brushRight">
-
-            still creating.
-
-        </div>
+        <img
+            class="idle"
+            id="samuraiIdle"
+            src="./SAMURAI_IDLE.WEBP"
+            alt=""
+            draggable="false"
+        >
 
 
-        <!-- FINAL -->
+        <!-- WALK FRAME A -->
 
-        <div
-            class="final"
-            id="final">
-
-            <div class="final-name">
-                Nithan Najeeb
-            </div>
-
-            <div class="final-sub">
-                Still walking forward
-            </div>
-
-        </div>
+        <img
+            class="walk-a"
+            id="walkA"
+            src="./SAMURAI_WALK_A.WEBP"
+            alt=""
+            draggable="false"
+        >
 
 
-        <!-- SCROLL -->
+        <!-- WALK FRAME B -->
 
-        <div
-            class="scroll-hint"
-            id="scrollHint">
+        <img
+            class="walk-b"
+            id="walkB"
+            src="./SAMURAI_WALK_B.WEBP"
+            alt=""
+            draggable="false"
+        >
 
-            <span>Scroll</span>
-
-            <span class="scroll-line"></span>
-
-        </div>
-
-
-        <!-- VIGNETTE -->
-
-        <div class="vignette"></div>
+    </div>
 
 
-        <!-- PAPER -->
+    <!-- NEAR MIST -->
 
-        <div class="paper"></div>
+    <div
+        class="near-mist"
+        id="nearMist"
+    ></div>
 
-    </section>
+
+</div>
+
+
+<!-- =====================================================
+     PETALS
+====================================================== -->
+
+<canvas
+    id="petals"
+></canvas>
+
+
+<!-- =====================================================
+     STORY: BIRTH
+====================================================== -->
+
+<div
+    class="story-text birth"
+    id="birth"
+>
+
+    <div class="script">
+
+        Born in 2004
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     STORY: LEARNING
+====================================================== -->
+
+<div
+    class="story-text info info-left"
+    id="infoLeft"
+>
+
+    <div
+        class="vertical-line"
+    ></div>
+
+
+    <div class="year">
+
+        THE BEGINNING
+
+    </div>
+
+
+    <h2>
+
+        Learning
+
+    </h2>
+
+
+    <p>
+
+        Curiosity came first.
+        Questions followed.
+
+    </p>
+
+</div>
+
+
+<!-- =====================================================
+     STORY: BUILDING
+====================================================== -->
+
+<div
+    class="story-text info info-right"
+    id="infoRight"
+>
+
+    <div
+        class="vertical-line"
+    ></div>
+
+
+    <div class="year">
+
+        THE JOURNEY
+
+    </div>
+
+
+    <h2>
+
+        Building
+
+    </h2>
+
+
+    <p>
+
+        Commerce, technology
+        and ideas slowly became
+        one path.
+
+    </p>
+
+</div>
+
+
+<!-- =====================================================
+     HANDWRITTEN PHRASES
+====================================================== -->
+
+<div
+    class="brush brush-left"
+    id="brushLeft"
+>
+
+    still learning.
+
+</div>
+
+
+<div
+    class="brush brush-right"
+    id="brushRight"
+>
+
+    still creating.
+
+</div>
+
+
+<!-- =====================================================
+     FINAL
+====================================================== -->
+
+<div
+    class="final"
+    id="final"
+>
+
+    <div class="final-name">
+
+        Nithan Najeeb
+
+    </div>
+
+
+    <div class="final-sub">
+
+        Still walking forward
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     SCROLL INDICATOR
+====================================================== -->
+
+<div
+    class="scroll-hint"
+    id="scrollHint"
+>
+
+    <span>
+
+        Scroll
+
+    </span>
+
+
+    <span
+        class="scroll-line"
+    ></span>
+
+</div>
+
+
+<!-- VIGNETTE -->
+
+<div
+    class="vignette"
+></div>
+
+
+<!-- PAPER TEXTURE -->
+
+<div
+    class="paper"
+></div>
+
+
+</section>
 
 </main>
 
 
 <script>
 
+/* =========================================================
+   VISUAL NOVEL ENGINE
+========================================================= */
+
 (() => {
 
-    /* =====================================================
-       ELEMENTS
-    ===================================================== */
 
-    const story =
-        document.getElementById("story");
+/* =========================================================
+   ELEMENTS
+========================================================= */
 
-    const character =
-        document.getElementById("character");
+const story =
+    document.getElementById("story");
 
-    const characterShadow =
-        document.getElementById("characterShadow");
+const character =
+    document.getElementById("character");
 
-    const portalWrap =
-        document.getElementById("portalWrap");
+const characterShadow =
+    document.getElementById("characterShadow");
 
-    const birth =
-        document.getElementById("birth");
+const portalWrap =
+    document.getElementById("portalWrap");
 
-    const infoLeft =
-        document.getElementById("infoLeft");
+const birth =
+    document.getElementById("birth");
 
-    const infoRight =
-        document.getElementById("infoRight");
+const infoLeft =
+    document.getElementById("infoLeft");
 
-    const brushLeft =
-        document.getElementById("brushLeft");
+const infoRight =
+    document.getElementById("infoRight");
 
-    const brushRight =
-        document.getElementById("brushRight");
+const brushLeft =
+    document.getElementById("brushLeft");
 
-    const final =
-        document.getElementById("final");
+const brushRight =
+    document.getElementById("brushRight");
 
-    const scrollHint =
-        document.getElementById("scrollHint");
+const final =
+    document.getElementById("final");
 
-    const idle =
-        document.getElementById("samuraiIdle");
-
-    const walkA =
-        document.getElementById("walkA");
-
-    const walkB =
-        document.getElementById("walkB");
-
-    const root =
-        document.documentElement;
+const scrollHint =
+    document.getElementById("scrollHint");
 
 
-    /* =====================================================
-       STATE
-    ===================================================== */
+/* =========================================================
+   MEDIA
+========================================================= */
 
-    let targetProgress = 0;
+const reducedMotion =
+    window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+    ).matches;
 
-    let progress = 0;
+const mobile =
+    window.matchMedia(
+        "(max-width: 700px)"
+    ).matches;
 
-    let mouseX = 0;
-    let mouseY = 0;
-
-    let targetMouseX = 0;
-    let targetMouseY = 0;
-
-    let lastTime = performance.now();
-
-    let reducedMotion =
-        window.matchMedia(
-            "(prefers-reduced-motion: reduce)"
-        ).matches;
+const touch =
+    window.matchMedia(
+        "(pointer: coarse)"
+    ).matches;
 
 
-    /* =====================================================
-       CLAMP
-    ===================================================== */
+/* =========================================================
+   STATE
+========================================================= */
 
-    function clamp(value, min = 0, max = 1) {
+let targetProgress = 0;
 
-        return Math.min(
-            max,
-            Math.max(min, value)
+let progress = 0;
+
+let mouseX = 0;
+let mouseY = 0;
+
+let targetMouseX = 0;
+let targetMouseY = 0;
+
+let lastTime =
+    performance.now();
+
+
+/* =========================================================
+   ROOT
+========================================================= */
+
+const root =
+    document.documentElement;
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function clamp(
+    value,
+    min = 0,
+    max = 1
+) {
+
+    return Math.min(
+        max,
+        Math.max(min, value)
+    );
+
+}
+
+
+function lerp(
+    a,
+    b,
+    t
+) {
+
+    return a +
+        (b - a) * t;
+
+}
+
+
+function easeInOut(t) {
+
+    t = clamp(t);
+
+    return t < .5
+
+        ? 4 * t * t * t
+
+        : 1 -
+          Math.pow(
+              -2 * t + 2,
+              3
+          ) / 2;
+
+}
+
+
+function easeOut(t) {
+
+    t = clamp(t);
+
+    return 1 -
+        Math.pow(
+            1 - t,
+            3
         );
 
-    }
+}
 
 
-    /* =====================================================
-       EASING
-    ===================================================== */
+/* =========================================================
+   SCROLL
+========================================================= */
 
-    function easeInOut(t) {
+function updateScroll() {
 
-        t = clamp(t);
+    const rect =
+        story.getBoundingClientRect();
 
-        return t < .5
-
-            ? 4 * t * t * t
-
-            : 1 -
-              Math.pow(
-                  -2 * t + 2,
-                  3
-              ) / 2;
-
-    }
+    const total =
+        story.offsetHeight -
+        window.innerHeight;
 
 
-    function easeOut(t) {
+    if (total <= 0) {
 
-        t = clamp(t);
+        targetProgress = 0;
 
-        return 1 -
-            Math.pow(
-                1 - t,
-                3
-            );
+        return;
 
     }
 
 
-    function lerp(a, b, t) {
+    targetProgress =
+        clamp(
+            -rect.top / total
+        );
 
-        return a +
-            (b - a) * t;
+}
 
+
+window.addEventListener(
+    "scroll",
+    updateScroll,
+    {
+        passive: true
     }
+);
 
 
-    /* =====================================================
-       SCROLL PROGRESS
-    ===================================================== */
-
-    function updateScroll() {
-
-        const rect =
-            story.getBoundingClientRect();
-
-        const total =
-            story.offsetHeight -
-            window.innerHeight;
-
-        targetProgress =
-            clamp(
-                -rect.top / total
-            );
-
-    }
+window.addEventListener(
+    "resize",
+    updateScroll
+);
 
 
-    window.addEventListener(
-        "scroll",
-        updateScroll,
-        { passive: true }
-    );
+/* =========================================================
+   DESKTOP PARALLAX
+========================================================= */
 
-
-    window.addEventListener(
-        "resize",
-        updateScroll
-    );
-
-
-    /* =====================================================
-       MOUSE PARALLAX
-    ===================================================== */
+if (!touch && !mobile) {
 
     window.addEventListener(
         "pointermove",
         event => {
 
             targetMouseX =
-                (event.clientX /
-                window.innerWidth - .5) * 2;
+                (
+                    event.clientX /
+                    window.innerWidth
+                    - .5
+                ) * 2;
+
 
             targetMouseY =
-                (event.clientY /
-                window.innerHeight - .5) * 2;
+                (
+                    event.clientY /
+                    window.innerHeight
+                    - .5
+                ) * 2;
 
         },
-        { passive: true }
+        {
+            passive: true
+        }
     );
+
+}
+
+
+/* =========================================================
+   PETAL CANVAS
+========================================================= */
+
+const canvas =
+    document.getElementById(
+        "petals"
+    );
+
+const ctx =
+    canvas.getContext(
+        "2d"
+    );
+
+
+let petals = [];
+
+
+function resizeCanvas() {
+
+    const dpr =
+        Math.min(
+            window.devicePixelRatio || 1,
+            2
+        );
+
+
+    canvas.width =
+        window.innerWidth * dpr;
+
+
+    canvas.height =
+        window.innerHeight * dpr;
+
+
+    canvas.style.width =
+        window.innerWidth + "px";
+
+
+    canvas.style.height =
+        window.innerHeight + "px";
+
+
+    ctx.setTransform(
+        dpr,
+        0,
+        0,
+        dpr,
+        0,
+        0
+    );
+
+}
+
+
+resizeCanvas();
+
+
+window.addEventListener(
+    "resize",
+    resizeCanvas
+);
+
+
+/* =========================================================
+   PETAL CREATION
+========================================================= */
+
+function createPetal() {
+
+    return {
+
+        x:
+            window.innerWidth *
+            (
+                .35 +
+                Math.random() *
+                .30
+            ),
+
+        y:
+            window.innerHeight *
+            (
+                .16 +
+                Math.random() *
+                .30
+            ),
+
+        size:
+            3 +
+            Math.random() *
+            (
+                mobile
+                    ? 3
+                    : 6
+            ),
+
+        speed:
+            15 +
+            Math.random() *
+            30,
+
+        drift:
+            -18 +
+            Math.random() *
+            36,
+
+        rotation:
+            Math.random() *
+            Math.PI *
+            2,
+
+        rotationSpeed:
+            -1.5 +
+            Math.random() *
+            3,
+
+        opacity:
+            .20 +
+            Math.random() *
+            .35
+
+    };
+
+}
+
+
+/* =========================================================
+   DRAW PETALS
+========================================================= */
+
+function drawPetals(dt) {
+
+    ctx.clearRect(
+        0,
+        0,
+        window.innerWidth,
+        window.innerHeight
+    );
+
+
+    if (
+        reducedMotion ||
+        progress < .10
+    ) {
+
+        return;
+
+    }
+
+
+    const targetCount =
+        mobile
+            ? 7
+            : 20;
+
+
+    while (
+        petals.length <
+        targetCount
+    ) {
+
+        petals.push(
+            createPetal()
+        );
+
+    }
+
+
+    for (
+        let i =
+            petals.length - 1;
+
+        i >= 0;
+
+        i--
+    ) {
+
+        const petal =
+            petals[i];
+
+
+        petal.y +=
+            petal.speed *
+            dt;
+
+
+        petal.x +=
+            petal.drift *
+            dt;
+
+
+        petal.rotation +=
+            petal.rotationSpeed *
+            dt;
+
+
+        if (
+            petal.y >
+            window.innerHeight + 30
+        ) {
+
+            petals[i] =
+                createPetal();
+
+            continue;
+
+        }
+
+
+        ctx.save();
+
+
+        ctx.translate(
+            petal.x,
+            petal.y
+        );
+
+
+        ctx.rotate(
+            petal.rotation
+        );
+
+
+        ctx.globalAlpha =
+            petal.opacity *
+            clamp(
+                (progress - .10) *
+                2
+            );
+
+
+        ctx.fillStyle =
+            Math.random() > .82
+
+                ? "#9f3032"
+
+                : "#332c22";
+
+
+        ctx.beginPath();
+
+
+        ctx.ellipse(
+            0,
+            0,
+            petal.size,
+            petal.size * .55,
+            0,
+            0,
+            Math.PI * 2
+        );
+
+
+        ctx.fill();
+
+
+        ctx.restore();
+
+    }
+
+}
+
+
+/* =========================================================
+   VISIBILITY HELPER
+========================================================= */
+
+function setOpacity(
+    element,
+    amount
+) {
+
+    element.style.opacity =
+        clamp(amount);
+
+}
+
+
+/* =========================================================
+   MAIN RENDER
+========================================================= */
+
+function render(
+    now,
+    dt
+) {
+
+
+    /* -----------------------------------------------------
+       SMOOTH SCROLL
+    ----------------------------------------------------- */
+
+    progress =
+        reducedMotion
+
+            ? targetProgress
+
+            : lerp(
+                progress,
+                targetProgress,
+                1 -
+                Math.exp(
+                    -dt * 7
+                )
+            );
+
+
+    /* -----------------------------------------------------
+       PARALLAX
+    ----------------------------------------------------- */
+
+    mouseX =
+        lerp(
+            mouseX,
+            targetMouseX,
+            1 -
+            Math.exp(
+                -dt * 5
+            )
+        );
+
+
+    mouseY =
+        lerp(
+            mouseY,
+            targetMouseY,
+            1 -
+            Math.exp(
+                -dt * 5
+            )
+        );
+
+
+    root.style.setProperty(
+        "--mouse-x",
+        mouseX
+    );
+
+
+    root.style.setProperty(
+        "--mouse-y",
+        mouseY
+    );
+
+
+    /* =====================================================
+       PORTAL
+    ===================================================== */
+
+    const portalProgress =
+        easeInOut(
+            clamp(
+                (progress - .02) /
+                .68
+            )
+        );
+
+
+    root.style.setProperty(
+        "--portal-scale",
+        portalProgress
+    );
+
+
+    /*
+     * The portal rises slightly.
+     */
+
+    const portalY =
+        lerp(
+            0,
+            -48,
+            portalProgress
+        );
+
+
+    portalWrap.style.marginTop =
+        portalY + "px";
+
+
+    /* =====================================================
+       SAMURAI
+    ===================================================== */
+
+
+    /*
+     * Walking starts after the opening.
+     */
+
+    const walkProgress =
+        clamp(
+            (progress - .13) /
+            .63
+        );
+
+
+    const walking =
+        walkProgress > .015 &&
+        walkProgress < .985;
+
+
+    /*
+     * Character moves toward the temple.
+     *
+     * Important:
+     *
+     * He does NOT reach the portal.
+     */
+
+    const distance =
+        easeOut(
+            walkProgress
+        );
+
+
+    const characterDistance =
+        lerp(
+            90,
+            -40,
+            distance
+        );
+
+
+    const characterScale =
+        lerp(
+            .72,
+            1,
+            distance
+        );
+
+
+    root.style.setProperty(
+        "--character-distance",
+        characterDistance + "px"
+    );
+
+
+    root.style.setProperty(
+        "--character-scale",
+        characterScale
+    );
+
+
+    /* =====================================================
+       WALKING FRAMES
+    ===================================================== */
+
+    const walkClock =
+        walkProgress *
+        (
+            mobile
+                ? 11
+                : 16
+        );
+
+
+    const frame =
+        Math.floor(
+            walkClock
+        ) % 2;
+
+
+    root.style.setProperty(
+        "--walk-a",
+        walking && frame === 0
+            ? 1
+            : 0
+    );
+
+
+    root.style.setProperty(
+        "--walk-b",
+        walking && frame === 1
+            ? 1
+            : 0
+    );
+
+
+    /*
+     * Idle frame at beginning/end.
+     */
+
+    root.style.setProperty(
+        "--idle",
+        walking
+            ? 0
+            : 1
+    );
+
+
+    /* =====================================================
+       SHADOW
+    ===================================================== */
+
+    root.style.setProperty(
+        "--shadow-scale",
+        lerp(
+            .65,
+            1,
+            distance
+        )
+    );
+
+
+    /* =====================================================
+       BIRTH TEXT
+    ===================================================== */
+
+    const birthAmount =
+        1 -
+        clamp(
+            (progress - .13) /
+            .12
+        );
+
+
+    setOpacity(
+        birth,
+        birthAmount
+    );
+
+
+    birth.classList.toggle(
+        "visible",
+        birthAmount > .5
+    );
+
+
+    /* =====================================================
+       LEARNING
+    ===================================================== */
+
+    const learningIn =
+        clamp(
+            (progress - .24) /
+            .15
+        );
+
+
+    const learningOut =
+        1 -
+        clamp(
+            (progress - .48) /
+            .12
+        );
+
+
+    const learning =
+        learningIn *
+        learningOut;
+
+
+    setOpacity(
+        infoLeft,
+        learning
+    );
+
+
+    infoLeft.classList.toggle(
+        "visible",
+        learning > .5
+    );
+
+
+    /* =====================================================
+       BUILDING
+    ===================================================== */
+
+    const buildingIn =
+        clamp(
+            (progress - .42) /
+            .16
+        );
+
+
+    const buildingOut =
+        1 -
+        clamp(
+            (progress - .70) /
+            .12
+        );
+
+
+    const building =
+        buildingIn *
+        buildingOut;
+
+
+    setOpacity(
+        infoRight,
+        building
+    );
+
+
+    infoRight.classList.toggle(
+        "visible",
+        building > .5
+    );
+
+
+    /* =====================================================
+       BRUSH TEXT
+    ===================================================== */
+
+    const brushLeftAmount =
+        clamp(
+            (progress - .55) /
+            .12
+        ) *
+        (
+            1 -
+            clamp(
+                (progress - .78) /
+                .10
+            )
+        );
+
+
+    const brushRightAmount =
+        clamp(
+            (progress - .67) /
+            .12
+        ) *
+        (
+            1 -
+            clamp(
+                (progress - .86) /
+                .08
+            )
+        );
+
+
+    brushLeft.style.opacity =
+        brushLeftAmount;
+
+
+    brushRight.style.opacity =
+        brushRightAmount;
+
+
+    /* =====================================================
+       FINAL
+    ===================================================== */
+
+    const finalAmount =
+        easeInOut(
+            clamp(
+                (progress - .82) /
+                .14
+            )
+        );
+
+
+    final.style.opacity =
+        finalAmount;
+
+
+    final.classList.toggle(
+        "visible",
+        finalAmount > .5
+    );
+
+
+    /* =====================================================
+       SCROLL HINT
+    ===================================================== */
+
+    scrollHint.style.opacity =
+        1 -
+        clamp(
+            progress * 8
+        );
+
+
+    /* =====================================================
+       MIST
+    ===================================================== */
+
+    if (!reducedMotion) {
+
+        root.style.setProperty(
+            "--mist-x",
+            Math.sin(
+                now * .00018
+            ) * (
+                mobile
+                    ? 18
+                    : 35
+            )
+        );
+
+    }
 
 
     /* =====================================================
        PETALS
     ===================================================== */
 
-    const canvas =
-        document.getElementById("petals");
+    drawPetals(dt);
 
-    const ctx =
-        canvas.getContext("2d");
+}
 
-    let petals = [];
 
-    function resizeCanvas() {
+/* =========================================================
+   ANIMATION LOOP
+========================================================= */
 
-        const dpr =
-            Math.min(
-                window.devicePixelRatio || 1,
-                2
-            );
+function loop(now) {
 
-        canvas.width =
-            window.innerWidth * dpr;
-
-        canvas.height =
-            window.innerHeight * dpr;
-
-        canvas.style.width =
-            window.innerWidth + "px";
-
-        canvas.style.height =
-            window.innerHeight + "px";
-
-        ctx.setTransform(
-            dpr,
-            0,
-            0,
-            dpr,
-            0,
-            0
+    const dt =
+        Math.min(
+            .05,
+            (
+                now -
+                lastTime
+            ) / 1000
         );
 
-    }
 
-    resizeCanvas();
+    lastTime =
+        now;
 
-    window.addEventListener(
-        "resize",
-        resizeCanvas
+
+    render(
+        now,
+        dt
     );
 
-
-    function createPetal() {
-
-        return {
-
-            x:
-                window.innerWidth *
-                (.38 + Math.random() * .24),
-
-            y:
-                window.innerHeight *
-                (.20 + Math.random() * .28),
-
-            size:
-                3 + Math.random() * 6,
-
-            speed:
-                15 + Math.random() * 35,
-
-            drift:
-                -18 + Math.random() * 36,
-
-            rotation:
-                Math.random() * Math.PI * 2,
-
-            rotationSpeed:
-                -1.5 + Math.random() * 3,
-
-            opacity:
-                .25 + Math.random() * .45
-
-        };
-
-    }
-
-
-    function drawPetals(dt) {
-
-        ctx.clearRect(
-            0,
-            0,
-            window.innerWidth,
-            window.innerHeight
-        );
-
-        if (
-            reducedMotion ||
-            progress < .12
-        ) return;
-
-
-        const targetCount =
-            window.innerWidth < 700
-                ? 12
-                : 24;
-
-
-        while (
-            petals.length <
-            targetCount
-        ) {
-
-            petals.push(
-                createPetal()
-            );
-
-        }
-
-
-        for (
-            let i = petals.length - 1;
-            i >= 0;
-            i--
-        ) {
-
-            const p =
-                petals[i];
-
-            p.y +=
-                p.speed * dt;
-
-            p.x +=
-                p.drift * dt;
-
-            p.rotation +=
-                p.rotationSpeed * dt;
-
-
-            if (
-                p.y >
-                window.innerHeight + 30
-            ) {
-
-                petals[i] =
-                    createPetal();
-
-                continue;
-
-            }
-
-
-            ctx.save();
-
-            ctx.translate(
-                p.x,
-                p.y
-            );
-
-            ctx.rotate(
-                p.rotation
-            );
-
-            ctx.globalAlpha =
-                p.opacity *
-                clamp(
-                    (progress - .12) * 2
-                );
-
-
-            ctx.fillStyle =
-                Math.random() > .8
-                    ? "#9f3032"
-                    : "#332c22";
-
-
-            ctx.beginPath();
-
-            ctx.ellipse(
-                0,
-                0,
-                p.size,
-                p.size * .55,
-                0,
-                0,
-                Math.PI * 2
-            );
-
-            ctx.fill();
-
-            ctx.restore();
-
-        }
-
-    }
-
-
-    /* =====================================================
-       STORY VISIBILITY
-    ===================================================== */
-
-    function show(element, amount) {
-
-        element.style.opacity =
-            clamp(amount);
-
-    }
-
-
-    /* =====================================================
-       MAIN RENDER
-    ===================================================== */
-
-    function render(now, dt) {
-
-        /*
-         * Smooth everything.
-         */
-
-        progress =
-            reducedMotion
-
-                ? targetProgress
-
-                : lerp(
-                    progress,
-                    targetProgress,
-                    1 -
-                    Math.exp(-dt * 7)
-                );
-
-
-        mouseX =
-            lerp(
-                mouseX,
-                targetMouseX,
-                1 -
-                Math.exp(-dt * 5)
-            );
-
-        mouseY =
-            lerp(
-                mouseY,
-                targetMouseY,
-                1 -
-                Math.exp(-dt * 5)
-            );
-
-
-        /*
-         * CSS variables
-         */
-
-        root.style.setProperty(
-            "--mouse-x",
-            mouseX
-        );
-
-        root.style.setProperty(
-            "--mouse-y",
-            mouseY
-        );
-
-
-        /* =================================================
-           PORTAL
-        ================================================= */
-
-        /*
-         * Portal grows slowly.
-         * It NEVER fills the screen.
-         */
-
-        const portalProgress =
-            easeInOut(
-                clamp(
-                    (progress - .02) /
-                    .65
-                )
-            );
-
-
-        root.style.setProperty(
-            "--portal-scale",
-            portalProgress
-        );
-
-
-        /*
-         * Portal rises slightly as we scroll.
-         */
-
-        const portalY =
-            lerp(
-                0,
-                -55,
-                portalProgress
-            );
-
-
-        portalWrap.style.marginTop =
-            portalY + "px";
-
-
-        /* =================================================
-           SAMURAI
-        ================================================= */
-
-        /*
-         * Walking begins around 15%.
-         * He stops around 78%.
-         */
-
-        const walkProgress =
-            clamp(
-                (progress - .13) /
-                .63
-            );
-
-
-        const walking =
-            walkProgress > .02 &&
-            walkProgress < .98;
-
-
-        /*
-         * Distance from camera.
-         *
-         * Starts large.
-         * Gets smaller.
-         * But never reaches portal.
-         */
-
-        const distance =
-            easeOut(
-                walkProgress
-            );
-
-
-        const characterDistance =
-            lerp(
-                90,
-                -40,
-                distance
-            );
-
-
-        /*
-         * Scale.
-         */
-
-        const characterScale =
-            lerp(
-                .72,
-                1.0,
-                distance
-            );
-
-
-        root.style.setProperty(
-            "--character-distance",
-            characterDistance
-        );
-
-        root.style.setProperty(
-            "--character-scale",
-            characterScale
-        );
-
-
-        /*
-         * Walking animation.
-         *
-         * We use scroll as the animation clock,
-         * so the animation remains synchronized
-         * with the story.
-         */
-
-        const walkClock =
-            walkProgress * 18;
-
-
-        const frame =
-            Math.floor(
-                walkClock
-            ) % 2;
-
-
-        root.style.setProperty(
-            "--walk-a",
-            walking && frame === 0
-                ? 1
-                : 0
-        );
-
-        root.style.setProperty(
-            "--walk-b",
-            walking && frame === 1
-                ? 1
-                : 0
-        );
-
-
-        /*
-         * Idle at beginning and end.
-         */
-
-        root.style.setProperty(
-            "--idle",
-            walking
-                ? 0
-                : 1
-        );
-
-
-        /*
-         * Shadow changes according
-         * to distance.
-         */
-
-        root.style.setProperty(
-            "--shadow-scale",
-            lerp(
-                .65,
-                1,
-                distance
-            )
-        );
-
-
-        /* =================================================
-           TEXT
-        ================================================= */
-
-        /*
-         * Born in 2004
-         */
-
-        const birthAmount =
-            1 -
-            clamp(
-                (progress - .13) /
-                .12
-            );
-
-        show(
-            birth,
-            birthAmount
-        );
-
-
-        birth.classList.toggle(
-            "visible",
-            birthAmount > .5
-        );
-
-
-        /*
-         * Learning
-         */
-
-        const learning =
-            clamp(
-                (progress - .24) /
-                .16
-            ) *
-            (
-                1 -
-                clamp(
-                    (progress - .47) /
-                    .14
-                )
-            );
-
-        show(
-            infoLeft,
-            learning
-        );
-
-        infoLeft.classList.toggle(
-            "visible",
-            learning > .5
-        );
-
-
-        /*
-         * Building
-         */
-
-        const building =
-            clamp(
-                (progress - .42) /
-                .18
-            ) *
-            (
-                1 -
-                clamp(
-                    (progress - .70) /
-                    .12
-                )
-            );
-
-        show(
-            infoRight,
-            building
-        );
-
-        infoRight.classList.toggle(
-            "visible",
-            building > .5
-        );
-
-
-        /*
-         * Brush text
-         */
-
-        const brushA =
-            clamp(
-                (progress - .55) /
-                .12
-            ) *
-            (
-                1 -
-                clamp(
-                    (progress - .78) /
-                    .12
-                )
-            );
-
-        brushLeft.style.opacity =
-            brushA;
-
-
-        brushRight.style.opacity =
-            clamp(
-                (progress - .68) /
-                .12
-            );
-
-
-        /* =================================================
-           FINAL
-        ================================================= */
-
-        const finalAmount =
-            easeInOut(
-                clamp(
-                    (progress - .82) /
-                    .14
-                )
-            );
-
-
-        final.style.opacity =
-            finalAmount;
-
-
-        final.classList.toggle(
-            "visible",
-            finalAmount > .5
-        );
-
-
-        /*
-         * Scroll indicator disappears.
-         */
-
-        scrollHint.style.opacity =
-            1 -
-            clamp(
-                progress * 8
-            );
-
-
-        /* =================================================
-           MIST
-        ================================================= */
-
-        root.style.setProperty(
-            "--mist-x",
-            Math.sin(
-                now * .00018
-            ) * 35
-        );
-
-
-        /* =================================================
-           PETALS
-        ================================================= */
-
-        drawPetals(dt);
-
-    }
-
-
-    /* =====================================================
-       ANIMATION LOOP
-    ===================================================== */
-
-    function loop(now) {
-
-        const dt =
-            Math.min(
-                .05,
-                (now - lastTime) /
-                1000
-            );
-
-        lastTime = now;
-
-        render(
-            now,
-            dt
-        );
-
-        requestAnimationFrame(
-            loop
-        );
-
-    }
-
-
-    /* =====================================================
-       START
-    ===================================================== */
-
-    updateScroll();
 
     requestAnimationFrame(
         loop
     );
+
+}
+
+
+/* =========================================================
+   INITIALIZE
+========================================================= */
+
+updateScroll();
+
+progress =
+    targetProgress;
+
+
+requestAnimationFrame(
+    loop
+);
+
 
 })();
 
