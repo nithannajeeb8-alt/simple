@@ -2,201 +2,1840 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Nithan Najeeb · Scene 1</title>
+<meta name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+<title>Nithan Najeeb · Visual Novel</title>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Zen+Old+Mincho&display=swap" rel="stylesheet">
+
+<link href="
+https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&family=Pinyon+Script&display=swap"
+rel="stylesheet">
+
 <style>
-:root{--paper:#ecebe5;--ink:#161616;--red:#b3282d}
-*{margin:0;padding:0;box-sizing:border-box}
-html{background:var(--paper)}
-body{font-family:"Zen Old Mincho",serif;color:var(--ink);-webkit-font-smoothing:antialiased}
-
-.track{height:540vh;position:relative}
-.stage{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;isolation:isolate;
-  background:radial-gradient(120% 90% at 64% 30%,#f3f2ec 0%,#e5e4dd 65%,#d8d7d0 100%)}
-
-/* ---------- portal: lies on the ground, seen from above ---------- */
-.portal{position:absolute;z-index:1;transform-origin:50% 50%;will-change:transform;
-  box-shadow:0 18px 0 -3px #1b1b1b,0 50px 50px -18px rgba(0,0,0,.5),0 0 0 1px var(--ink)}
-.portal::after{content:"";position:absolute;inset:-12px;border:1px solid rgba(22,22,22,.28);pointer-events:none}
-.clip{position:absolute;inset:0;overflow:hidden;background:#d6d5cf;box-shadow:inset 0 0 70px rgba(0,0,0,.4)}
-.layer{position:absolute;inset:0}
-.layer img{display:block;width:100%;height:100%;object-fit:cover}
-.drift{animation:drift 20s ease-in-out infinite alternate}
-.b2{animation:xf 4.5s ease-in-out infinite alternate}     /* B1 ⇄ B2 */
-@keyframes drift{to{transform:scale(1.05) translate(-1%,-.6%)}}
-@keyframes xf{from{opacity:0}to{opacity:1}}
-.seal{position:absolute;right:-18px;bottom:-30px;width:46px;height:46px;background:var(--red);color:#f5f4ef;
-  display:grid;place-items:center;font-size:25px;line-height:1}
-
-/* ---------- trail the samurai follows (it is never finished) ---------- */
-.trail{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;overflow:visible}
-.trail path{fill:none;stroke:rgba(22,22,22,.55);stroke-width:2.2;stroke-linecap:round;stroke-dasharray:1 11}
-
-/* ---------- samurai (white background disappears via multiply) ---------- */
-.shadow{position:absolute;z-index:1;left:0;top:0;pointer-events:none;opacity:0;will-change:transform;
-  background:radial-gradient(closest-side,rgba(0,0,0,.3),rgba(0,0,0,0))}
-.sam{position:absolute;z-index:2;left:0;top:0;mix-blend-mode:multiply;transform-origin:50% 100%;
-  will-change:transform,opacity;pointer-events:none;opacity:0}
-.sam img{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:contain}
-.sam .r2{opacity:0}
-
-/* ---------- writing ---------- */
-.t{position:absolute;z-index:3;opacity:0;pointer-events:none;font-family:Cinzel,serif;
-  letter-spacing:.05em;line-height:1.3;will-change:clip-path,opacity}
-.t0{left:6vw;top:42vh;font-size:clamp(17px,1.7vw,26px);max-width:11em}
-.ta{left:6vw;top:10vh;font-size:clamp(21px,2.7vw,40px);max-width:12em}
-.tb{right:6vw;bottom:10vh;text-align:right;font-size:clamp(21px,2.7vw,40px);max-width:13em}
-.tc{right:6vw;bottom:9vh;text-align:right;font-family:"Zen Old Mincho",serif;letter-spacing:.02em;line-height:1.75;
-  font-size:clamp(15px,1.25vw,19px);max-width:26em}
-.tc b{display:block;margin-top:.6em;font:500 clamp(20px,2.2vw,32px)/1.2 Cinzel,serif;letter-spacing:.05em}
-.tv{right:2.6vw;top:50%;margin-top:-4.5em;writing-mode:vertical-rl;font-size:clamp(16px,1.5vw,22px);
-  letter-spacing:.7em;color:rgba(22,22,22,.6)}
-.hint{position:absolute;z-index:3;left:50%;bottom:calc(3.5vh + env(safe-area-inset-bottom,0px));transform:translateX(-50%);
-  display:grid;justify-items:center;gap:10px;font-size:13px;letter-spacing:.3em;color:rgba(22,22,22,.55)}
-.hint i{display:block;width:1px;height:38px;background:currentColor;animation:pulse 2.2s ease-in-out infinite}
-@keyframes pulse{0%,100%{transform:scaleY(.4);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}}
-
-@media(max-width:720px){
-  .t0{left:0;right:0;top:44vh;text-align:center;max-width:none;padding:0 8vw}
-  .ta{left:7vw;right:7vw;top:6vh;max-width:none;font-size:20px}
-  .tb{left:7vw;right:7vw;top:45vh;bottom:auto;text-align:left;max-width:none;font-size:20px}
-  .tc{left:7vw;right:7vw;top:45vh;bottom:auto;text-align:left;font-size:15px}
-  .tv{display:none}
-  .seal{width:34px;height:34px;font-size:18px;right:-10px;bottom:-22px}
+:root{
+  --ink:#17150f;
+  --cream:#f5f0e5;
+  --paper:#ebe3d2;
+  --gold:#c9a85d;
+  --red:#9f292d;
+  --muted:#bdb4a3;
+  --panel:rgba(19,17,14,.78);
+  --panel-soft:rgba(27,24,20,.58);
+  --line:rgba(245,240,229,.18);
+  --u:1px;
 }
-@media(prefers-reduced-motion:reduce){.drift,.b2,.hint i{animation:none}}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+html{
+  background:#080806;
+  scroll-behavior:auto;
+}
+
+body{
+  background:#080806;
+  color:var(--cream);
+  font-family:"Cormorant Garamond",Georgia,serif;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* =========================================================
+   STORY TRACK
+   ========================================================= */
+
+.story{
+  position:relative;
+  height:620vh;
+}
+
+.viewport{
+  position:sticky;
+  top:0;
+  width:100%;
+  height:100vh;
+  height:100svh;
+  min-height:520px;
+  overflow:hidden;
+  isolation:isolate;
+  background:#080806;
+}
+
+/* =========================================================
+   BACKGROUND
+   ========================================================= */
+
+.background{
+  position:absolute;
+  inset:-5%;
+  z-index:0;
+  overflow:hidden;
+}
+
+.bg-layer{
+  position:absolute;
+  inset:0;
+  background-position:center;
+  background-size:cover;
+  background-repeat:no-repeat;
+  transform:scale(1.06);
+  will-change:transform,opacity;
+}
+
+#bg1{
+  background-image:url("./B1.JPEG");
+}
+
+#bg2{
+  background-image:url("./B2.JPEG");
+  opacity:0;
+}
+
+.background::after{
+  content:"";
+  position:absolute;
+  inset:0;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(5,5,4,.62) 0%,
+      rgba(5,5,4,.05) 26%,
+      rgba(5,5,4,.08) 50%,
+      rgba(5,5,4,.84) 100%
+    );
+
+  pointer-events:none;
+}
+
+/* =========================================================
+   CINEMATIC ATMOSPHERE
+   ========================================================= */
+
+.vignette{
+  position:absolute;
+  inset:0;
+  z-index:2;
+  pointer-events:none;
+
+  background:
+    radial-gradient(
+      ellipse at center,
+      transparent 35%,
+      rgba(0,0,0,.12) 58%,
+      rgba(0,0,0,.78) 100%
+    );
+}
+
+.color-grade{
+  position:absolute;
+  inset:0;
+  z-index:3;
+  pointer-events:none;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(126,90,41,.13),
+      transparent 30%,
+      rgba(20,30,23,.12)
+    );
+}
+
+.grain{
+  position:absolute;
+  inset:-50%;
+  z-index:20;
+  pointer-events:none;
+  opacity:.11;
+  mix-blend-mode:soft-light;
+
+  background-image:url("
+    data:image/svg+xml,
+    %3Csvg xmlns='http://www.w3.org/2000/svg'
+    width='180' height='180'%3E
+    %3Cfilter id='noise'%3E
+    %3CfeTurbulence
+    type='fractalNoise'
+    baseFrequency='.9'
+    numOctaves='3'
+    stitchTiles='stitch'/%3E
+    %3C/filter%3E
+    %3Crect width='100%25'
+    height='100%25'
+    filter='url(%23noise)'/%3E
+    %3C/svg%3E
+  ");
+
+  animation:grainMove .3s steps(2) infinite;
+}
+
+@keyframes grainMove{
+  0%{transform:translate(0,0)}
+  25%{transform:translate(2%, -1%)}
+  50%{transform:translate(-1%,2%)}
+  75%{transform:translate(2%,1%)}
+  100%{transform:translate(-2%,-1%)}
+}
+
+/* Soft sunlight */
+
+.light{
+  position:absolute;
+  z-index:1;
+  pointer-events:none;
+
+  width:75vw;
+  height:75vw;
+
+  left:50%;
+  top:16%;
+
+  transform:translate(-50%,-50%);
+  border-radius:50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(255,238,192,.26) 0%,
+      rgba(255,231,174,.10) 30%,
+      transparent 72%
+    );
+
+  filter:blur(25px);
+}
+
+/* Vertical rays */
+
+.rays{
+  position:absolute;
+  inset:0;
+  z-index:2;
+  pointer-events:none;
+  overflow:hidden;
+  opacity:.34;
+}
+
+.ray{
+  position:absolute;
+  top:-20%;
+  width:13vw;
+  height:150%;
+  transform:rotate(17deg);
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(255,236,190,.13),
+      transparent
+    );
+
+  filter:blur(15px);
+}
+
+.ray:nth-child(1){
+  left:22%;
+}
+
+.ray:nth-child(2){
+  left:47%;
+  transform:rotate(12deg);
+  opacity:.55;
+}
+
+.ray:nth-child(3){
+  left:72%;
+  transform:rotate(19deg);
+  opacity:.35;
+}
+
+/* =========================================================
+   PARTICLES
+   ========================================================= */
+
+#particles{
+  position:absolute;
+  inset:0;
+  z-index:8;
+  pointer-events:none;
+}
+
+/* =========================================================
+   TOP HUD
+   ========================================================= */
+
+.hud{
+  position:absolute;
+  left:0;
+  right:0;
+  top:0;
+
+  z-index:15;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+
+  padding:
+    calc(22px + env(safe-area-inset-top))
+    max(28px,4vw)
+    16px;
+
+  pointer-events:none;
+}
+
+.chapter{
+  display:flex;
+  align-items:center;
+  gap:14px;
+
+  font-family:"Manrope",sans-serif;
+  text-transform:uppercase;
+  letter-spacing:.24em;
+  font-size:10px;
+  color:rgba(245,240,229,.72);
+}
+
+.chapter-mark{
+  width:28px;
+  height:28px;
+  border:1px solid rgba(201,168,93,.55);
+
+  display:grid;
+  place-items:center;
+
+  font-family:"Cormorant Garamond",serif;
+  font-size:16px;
+  color:var(--gold);
+
+  transform:rotate(45deg);
+}
+
+.chapter-mark span{
+  transform:rotate(-45deg);
+}
+
+.hud-right{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.chapter-count{
+  font-family:"Manrope",sans-serif;
+  font-size:10px;
+  letter-spacing:.2em;
+  color:rgba(245,240,229,.5);
+}
+
+.progress{
+  width:110px;
+  height:1px;
+  background:rgba(255,255,255,.13);
+  overflow:hidden;
+}
+
+.progress span{
+  display:block;
+  width:0%;
+  height:100%;
+  background:var(--gold);
+}
+
+/* =========================================================
+   OPENING TITLE
+   ========================================================= */
+
+.opening{
+  position:absolute;
+  inset:0;
+  z-index:10;
+
+  display:grid;
+  place-items:center;
+
+  pointer-events:none;
+}
+
+.opening-content{
+  text-align:center;
+  transform:translateY(-4vh);
+}
+
+.kicker{
+  font-family:"Manrope",sans-serif;
+  font-size:10px;
+  text-transform:uppercase;
+  letter-spacing:.5em;
+  color:rgba(245,240,229,.55);
+
+  margin-bottom:22px;
+}
+
+.opening-title{
+  font-family:"Pinyon Script",cursive;
+  font-size:clamp(62px,8vw,140px);
+  line-height:.9;
+  font-weight:400;
+  color:#f4ecdb;
+
+  text-shadow:
+    0 15px 40px rgba(0,0,0,.45);
+}
+
+.opening-subtitle{
+  margin-top:22px;
+
+  font-size:clamp(15px,1.6vw,22px);
+  font-style:italic;
+  letter-spacing:.07em;
+
+  color:rgba(245,240,229,.78);
+}
+
+/* =========================================================
+   SAMURAI SPRITE
+   ========================================================= */
+
+.character{
+  position:absolute;
+  z-index:9;
+
+  left:50%;
+  bottom:-2%;
+
+  width:min(48vw,720px);
+  height:min(82vh,900px);
+
+  transform:
+    translateX(-50%)
+    translateY(13vh)
+    scale(.88);
+
+  opacity:0;
+
+  pointer-events:none;
+
+  will-change:transform,opacity;
+}
+
+.character img{
+  position:absolute;
+  inset:0;
+
+  width:100%;
+  height:100%;
+
+  object-fit:contain;
+  object-position:center bottom;
+
+  filter:
+    drop-shadow(0 28px 45px rgba(0,0,0,.5));
+
+  will-change:opacity,transform;
+}
+
+.character .r2{
+  opacity:0;
+}
+
+/* =========================================================
+   GROUND SHADOW
+   ========================================================= */
+
+.shadow{
+  position:absolute;
+  z-index:7;
+
+  left:50%;
+  bottom:9%;
+
+  width:min(35vw,520px);
+  height:80px;
+
+  transform:translateX(-50%);
+
+  border-radius:50%;
+
+  background:
+    radial-gradient(
+      ellipse,
+      rgba(0,0,0,.58),
+      rgba(0,0,0,0) 72%
+    );
+
+  filter:blur(13px);
+
+  opacity:0;
+}
+
+/* =========================================================
+   DIALOGUE AREA
+   ========================================================= */
+
+.dialogue-wrap{
+  position:absolute;
+  z-index:14;
+
+  left:50%;
+  bottom:
+    max(32px,calc(30px + env(safe-area-inset-bottom)));
+
+  width:min(1180px,88vw);
+
+  transform:
+    translateX(-50%)
+    translateY(130px);
+
+  opacity:0;
+
+  transition:
+    opacity .8s ease,
+    transform .8s cubic-bezier(.2,.8,.2,1);
+
+  pointer-events:none;
+}
+
+.dialogue-wrap.visible{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+
+/* Decorative horizontal rule */
+
+.dialogue-topline{
+  position:absolute;
+
+  left:6%;
+  right:6%;
+  top:-9px;
+
+  height:1px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(201,168,93,.65),
+      transparent
+    );
+}
+
+.dialogue{
+  position:relative;
+
+  min-height:155px;
+
+  padding:
+    38px
+    42px
+    28px;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(22,20,17,.76),
+      rgba(11,10,8,.91)
+    );
+
+  border:1px solid rgba(235,224,197,.2);
+
+  box-shadow:
+    0 25px 80px rgba(0,0,0,.4),
+    inset 0 1px 0 rgba(255,255,255,.045);
+
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
+
+/* Corner ornaments */
+
+.dialogue::before,
+.dialogue::after{
+  content:"";
+  position:absolute;
+
+  width:18px;
+  height:18px;
+
+  border-color:rgba(201,168,93,.7);
+}
+
+.dialogue::before{
+  left:-1px;
+  top:-1px;
+
+  border-left:1px solid;
+  border-top:1px solid;
+}
+
+.dialogue::after{
+  right:-1px;
+  bottom:-1px;
+
+  border-right:1px solid;
+  border-bottom:1px solid;
+}
+
+/* =========================================================
+   NAMEPLATE
+   ========================================================= */
+
+.nameplate{
+  position:absolute;
+
+  left:26px;
+  top:-22px;
+
+  min-width:160px;
+
+  padding:9px 25px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(26,23,18,.97),
+      rgba(51,40,24,.96)
+    );
+
+  border:1px solid rgba(201,168,93,.7);
+
+  box-shadow:
+    0 10px 25px rgba(0,0,0,.35);
+}
+
+.nameplate::before{
+  content:"";
+
+  position:absolute;
+
+  left:-9px;
+  top:50%;
+
+  width:14px;
+  height:14px;
+
+  transform:
+    translateY(-50%)
+    rotate(45deg);
+
+  background:#2b2419;
+
+  border-left:1px solid rgba(201,168,93,.65);
+  border-bottom:1px solid rgba(201,168,93,.65);
+}
+
+.name{
+  font-family:"Manrope",sans-serif;
+
+  text-transform:uppercase;
+  letter-spacing:.2em;
+
+  font-size:11px;
+  font-weight:600;
+
+  color:#e8d5a3;
+}
+
+/* =========================================================
+   DIALOGUE TEXT
+   ========================================================= */
+
+#dialogueText{
+  max-width:980px;
+
+  min-height:72px;
+
+  font-size:clamp(18px,2.1vw,28px);
+  line-height:1.42;
+
+  color:#f5eee1;
+
+  text-shadow:
+    0 2px 10px rgba(0,0,0,.4);
+}
+
+/* Blinking cursor */
+
+.cursor{
+  display:inline-block;
+
+  width:4px;
+  height:1em;
+
+  margin-left:6px;
+
+  vertical-align:-.08em;
+
+  background:var(--gold);
+
+  animation:blink 1s steps(1) infinite;
+}
+
+@keyframes blink{
+  50%{opacity:0}
+}
+
+/* =========================================================
+   CHOICE BUTTONS
+   ========================================================= */
+
+.choices{
+  display:flex;
+  gap:12px;
+
+  margin-top:16px;
+
+  opacity:0;
+  transform:translateY(10px);
+
+  transition:.5s ease;
+}
+
+.choices.visible{
+  opacity:1;
+  transform:translateY(0);
+}
+
+.choice{
+  appearance:none;
+
+  border:1px solid rgba(201,168,93,.35);
+
+  background:rgba(17,15,12,.76);
+
+  color:#eee6d7;
+
+  padding:12px 22px;
+
+  font-family:"Manrope",sans-serif;
+  font-size:11px;
+  letter-spacing:.06em;
+
+  cursor:pointer;
+
+  transition:
+    background .25s ease,
+    border-color .25s ease,
+    transform .25s ease;
+}
+
+.choice:hover{
+  background:rgba(93,65,28,.8);
+  border-color:rgba(201,168,93,.8);
+  transform:translateY(-2px);
+}
+
+/* =========================================================
+   BOTTOM CONTROLS
+   ========================================================= */
+
+.controls{
+  position:absolute;
+
+  right:0;
+  bottom:-38px;
+
+  display:flex;
+  align-items:center;
+  gap:5px;
+
+  font-family:"Manrope",sans-serif;
+}
+
+.ctrl{
+  appearance:none;
+
+  border:0;
+  border-right:1px solid rgba(255,255,255,.1);
+
+  background:transparent;
+
+  color:rgba(245,240,229,.48);
+
+  padding:5px 12px;
+
+  font-family:inherit;
+  font-size:9px;
+
+  letter-spacing:.16em;
+  text-transform:uppercase;
+
+  cursor:pointer;
+
+  transition:
+    color .2s ease,
+    background .2s ease;
+}
+
+.ctrl:hover{
+  color:#fff;
+  background:rgba(255,255,255,.05);
+}
+
+/* =========================================================
+   SCROLL HINT
+   ========================================================= */
+
+.scroll-hint{
+  position:absolute;
+  z-index:16;
+
+  left:50%;
+  bottom:6%;
+
+  transform:translateX(-50%);
+
+  display:grid;
+  justify-items:center;
+  gap:9px;
+
+  font-family:"Manrope",sans-serif;
+  font-size:9px;
+  letter-spacing:.38em;
+  text-transform:uppercase;
+
+  color:rgba(245,240,229,.5);
+
+  transition:opacity .4s ease;
+}
+
+.scroll-line{
+  width:1px;
+  height:42px;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(201,168,93,.9),
+      transparent
+    );
+
+  animation:scrollPulse 2s ease-in-out infinite;
+}
+
+@keyframes scrollPulse{
+  0%,100%{
+    opacity:.25;
+    transform:scaleY(.5);
+    transform-origin:top;
+  }
+
+  50%{
+    opacity:1;
+    transform:scaleY(1);
+  }
+}
+
+/* =========================================================
+   SCENE TRANSITION
+   ========================================================= */
+
+.scene-label{
+  position:absolute;
+  z-index:13;
+
+  left:50%;
+  top:22%;
+
+  transform:
+    translate(-50%,20px);
+
+  opacity:0;
+
+  text-align:center;
+
+  transition:.8s ease;
+
+  pointer-events:none;
+}
+
+.scene-label.visible{
+  opacity:1;
+  transform:translate(-50%,0);
+}
+
+.scene-label small{
+  display:block;
+
+  font-family:"Manrope",sans-serif;
+
+  font-size:9px;
+  letter-spacing:.42em;
+  text-transform:uppercase;
+
+  color:rgba(245,240,229,.5);
+
+  margin-bottom:10px;
+}
+
+.scene-label h2{
+  font-size:clamp(26px,3.2vw,52px);
+  font-weight:500;
+  letter-spacing:.03em;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media(max-width:800px){
+
+  .hud{
+    padding-left:18px;
+    padding-right:18px;
+  }
+
+  .chapter{
+    letter-spacing:.15em;
+  }
+
+  .chapter-mark{
+    width:22px;
+    height:22px;
+    font-size:13px;
+  }
+
+  .chapter-count{
+    display:none;
+  }
+
+  .progress{
+    width:70px;
+  }
+
+  .character{
+    width:72vw;
+    height:70vh;
+    bottom:9%;
+  }
+
+  .dialogue-wrap{
+    width:92vw;
+    bottom:
+      max(22px,calc(22px + env(safe-area-inset-bottom)));
+  }
+
+  .dialogue{
+    min-height:135px;
+    padding:
+      34px
+      22px
+      24px;
+  }
+
+  .nameplate{
+    left:18px;
+  }
+
+  .controls{
+    display:none;
+  }
+
+  #dialogueText{
+    font-size:18px;
+    min-height:68px;
+  }
+
+  .choices{
+    flex-direction:column;
+  }
+
+  .choice{
+    width:100%;
+    text-align:left;
+  }
+}
+
+@media(orientation:portrait){
+
+  .viewport{
+    min-height:100svh;
+  }
+
+  .character{
+    width:92vw;
+    height:61vh;
+    bottom:21%;
+  }
+
+  .dialogue-wrap{
+    bottom:3%;
+  }
+
+  .dialogue{
+    min-height:150px;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media(prefers-reduced-motion:reduce){
+
+  *,
+  *::before,
+  *::after{
+    animation:none!important;
+    transition:none!important;
+  }
+
+  html{
+    scroll-behavior:auto;
+  }
+}
 </style>
 </head>
+
 <body>
-<div class="track" id="track">
-  <div class="stage" id="stage">
 
-    <div class="portal" id="portal" role="img" aria-label="A temple courtyard seen through a portal lying on the ground">
-      <div class="clip">
-        <div class="layer drift"><img id="zoom1" src="./B1.webp" alt=""></div>
-        <!-- B2 = your second portal image. If the file is missing, this layer removes itself. -->
-        <div class="layer drift b2"><img id="zoom2" src="./B2.webp" alt="" onerror="this.closest('.layer').remove()"></div>
+<main class="story" id="story">
+
+  <section class="viewport" id="viewport">
+
+    <!-- BACKGROUND -->
+    <div class="background">
+      <div class="bg-layer" id="bg1"></div>
+      <div class="bg-layer" id="bg2"></div>
+    </div>
+
+    <!-- CINEMATIC LIGHT -->
+    <div class="light"></div>
+
+    <div class="rays">
+      <div class="ray"></div>
+      <div class="ray"></div>
+      <div class="ray"></div>
+    </div>
+
+    <div class="vignette"></div>
+    <div class="color-grade"></div>
+
+    <!-- OPENING -->
+    <div class="opening" id="opening">
+
+      <div class="opening-content">
+
+        <div class="kicker">
+          An interactive story
+        </div>
+
+        <h1 class="opening-title">
+          Every Path Begins Quietly
+        </h1>
+
+        <p class="opening-subtitle">
+          A journey through silence, memory and becoming.
+        </p>
+
       </div>
-      <div class="seal" aria-hidden="true">夢</div>
+
     </div>
 
-    <svg class="trail" id="trail" aria-hidden="true"><path id="trailPath"/></svg>
+    <!-- SCENE TITLE -->
+    <div class="scene-label" id="sceneLabel">
+
+      <small>
+        Chapter I · Scene 01
+      </small>
+
+      <h2>
+        The First Step
+      </h2>
+
+    </div>
+
+    <!-- HUD -->
+    <header class="hud">
+
+      <div class="chapter">
+
+        <div class="chapter-mark">
+          <span>一</span>
+        </div>
+
+        <div>
+          NITHAN · VISUAL NOVEL
+        </div>
+
+      </div>
+
+      <div class="hud-right">
+
+        <span class="chapter-count">
+          SCENE 01
+        </span>
+
+        <div class="progress">
+          <span id="progressBar"></span>
+        </div>
+
+      </div>
+
+    </header>
+
+    <!-- CHARACTER -->
+    <div class="character" id="character">
+
+      <img
+        id="samurai1"
+        src="./R1.PNG"
+        alt="Samurai character"
+      >
+
+      <img
+        id="samurai2"
+        class="r2"
+        src="./R2.PNG"
+        alt=""
+        onerror="this.remove()"
+      >
+
+    </div>
+
     <div class="shadow" id="shadow"></div>
-    <div class="sam" id="sam" aria-hidden="true">
-      <img class="r1" src="./R1.webp" alt="">
-      <!-- R2 = your second samurai image. If the file is missing, the walk just uses R1. -->
-      <img class="r2" id="r2" src="./R2.webp" alt="" onerror="this.remove()">
+
+    <!-- PARTICLES -->
+    <canvas id="particles"></canvas>
+
+    <!-- DIALOGUE -->
+    <section class="dialogue-wrap" id="dialogueWrap">
+
+      <div class="dialogue-topline"></div>
+
+      <div class="dialogue">
+
+        <div class="nameplate">
+          <span class="name">
+            Narrator
+          </span>
+        </div>
+
+        <div id="dialogueText"></div>
+
+        <div class="choices" id="choices">
+
+          <button class="choice">
+            Follow the path.
+          </button>
+
+          <button class="choice">
+            Stay and observe.
+          </button>
+
+        </div>
+
+      </div>
+
+      <div class="controls">
+
+        <button class="ctrl">Back</button>
+        <button class="ctrl">History</button>
+        <button class="ctrl">Auto</button>
+        <button class="ctrl">Save</button>
+        <button class="ctrl">Menu</button>
+
+      </div>
+
+    </section>
+
+    <!-- SCROLL -->
+    <div class="scroll-hint" id="scrollHint">
+
+      <span>Scroll to continue</span>
+
+      <span class="scroll-line"></span>
+
     </div>
 
-    <p class="t t0" data-t="-0.1,0,0.06,0.15">Every journey begins as a small door.</p>
-    <p class="t ta" data-t="0.16,0.3,0.5,0.58">Discipline taught me where to stand.</p>
-    <p class="t tb" data-t="0.52,0.64,0.78,0.86">Curiosity taught me what to build.</p>
-    <p class="t tc" data-t="0.8,0.93,9,10">Nithan Najeeb, B.Com student from Kerala, building Mind Atlas, Forenexa and Ollama Uplink.<b>The door is open. I am still walking.</b></p>
-    <p class="t tv" data-t="0.1,0.3,9,10" aria-hidden="true">静創夢</p>
+    <!-- FILM GRAIN -->
+    <div class="grain"></div>
 
-    <div class="hint" id="hint"><span>scroll</span><i></i></div>
-  </div>
-</div>
+  </section>
+
+</main>
 
 <script>
 (() => {
-  const $ = s => document.querySelector(s);
-  const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
-  const lerp = (a, b, t) => a + (b - a) * t;
-  const easeIO = t => t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2;
-  const easeO = t => 1 - (1 - t) * (1 - t);
 
-  const track = $('#track'), stage = $('#stage'), portal = $('#portal'), sam = $('#sam'), shadow = $('#shadow'),
-        trail = $('#trail'), path = $('#trailPath'), hint = $('#hint'), r2 = $('#r2');
-  const z1 = $('#zoom1'), z2 = $('#zoom2');
-  const texts = [...document.querySelectorAll('[data-t]')].map(el => ({ el, r: el.dataset.t.split(',').map(Number) }));
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = (selector) =>
+    document.querySelector(selector);
 
-  const SMAX = .28;                   // the samurai only ever gets about a third of the way to the portal
-  let W, H, mob, Pw, Ph, cx, cy, rx, rz, S, SW, kFull, L;
-  let want = 0, cur = -1, shown = -1;
+  const story = $("#story");
+  const viewport = $("#viewport");
 
-  function measure() {
-    W = stage.clientWidth; H = stage.clientHeight; mob = W < 720;
-    if (mob) { Pw = W * .84; cx = W * .5; cy = H * .25; rx = 44; rz = -9; S = Math.min(H * .58, W * 1.05); }
-    else     { Pw = Math.min(W * .52, H * 1.05); cx = W * .63; cy = H * .32; rx = 56; rz = -17; S = H * .72; }
-    Ph = Pw * 9 / 16;
-    const PhA = Ph * Math.cos(rx * Math.PI / 180);           // apparent height once laid down
-    SW = S * 16 / 9;
-    const fx = mob ? W * .5 : W * .15, fy = H * (mob ? .97 : .985);
-    const tx = cx - Pw * .14, ty = cy + PhA * .55;           // near edge of the portal
-    kFull = PhA * .5 / S;                                    // his size if he ever stood at the portal
+  const bg1 = $("#bg1");
+  const bg2 = $("#bg2");
 
-    portal.style.width = Pw + 'px'; portal.style.height = Ph + 'px';
-    portal.style.left = (cx - Pw / 2) + 'px'; portal.style.top = (cy - Ph / 2) + 'px';
-    sam.style.width = SW + 'px'; sam.style.height = S + 'px';
-    trail.setAttribute('viewBox', `0 0 ${W} ${H}`);
-    path.setAttribute('d', `M${fx} ${fy} C${fx + (tx - fx) * .05} ${fy - (fy - ty) * .55} ${tx - (tx - fx) * .45} ${ty + (fy - ty) * .15} ${tx} ${ty}`);
-    L = path.getTotalLength();
-    shown = -1;
+  const opening = $("#opening");
+  const sceneLabel = $("#sceneLabel");
+
+  const character = $("#character");
+  const samurai1 = $("#samurai1");
+  const samurai2 = $("#samurai2");
+
+  const shadow = $("#shadow");
+
+  const dialogueWrap = $("#dialogueWrap");
+  const dialogueText = $("#dialogueText");
+
+  const choices = $("#choices");
+
+  const progressBar = $("#progressBar");
+  const scrollHint = $("#scrollHint");
+
+  const canvas = $("#particles");
+  const ctx = canvas.getContext("2d");
+
+  const reduceMotion =
+    window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+  const finePointer =
+    window.matchMedia(
+      "(pointer:fine)"
+    ).matches;
+
+  let targetProgress = 0;
+  let progress = 0;
+
+  let mouseX = 0;
+  let mouseY = 0;
+
+  let particles = [];
+
+  let lastTime = performance.now();
+
+  /* ======================================================
+     DIALOGUE
+     ====================================================== */
+
+  const lines = [
+    {
+      start:.40,
+      end:.52,
+      speaker:"Narrator",
+      text:"The road ahead was quiet."
+    },
+
+    {
+      start:.52,
+      end:.64,
+      speaker:"Narrator",
+      text:"No applause. No certainty. Only another step waiting to be taken."
+    },
+
+    {
+      start:.64,
+      end:.75,
+      speaker:"Nithan",
+      text:"Then I will take it."
+    },
+
+    {
+      start:.75,
+      end:.88,
+      speaker:"Narrator",
+      text:"And so the journey began."
+    }
+  ];
+
+  let currentLine = -1;
+  let typingTimer = null;
+
+  function typeLine(line){
+
+    clearInterval(typingTimer);
+
+    dialogueText.textContent = "";
+
+    const cursor = document.createElement("span");
+
+    cursor.className = "cursor";
+
+    dialogueText.appendChild(cursor);
+
+    let index = 0;
+
+    typingTimer = setInterval(() => {
+
+      if(index >= line.text.length){
+
+        clearInterval(typingTimer);
+
+        return;
+      }
+
+      dialogueText.insertBefore(
+        document.createTextNode(
+          line.text[index]
+        ),
+        cursor
+      );
+
+      index++;
+
+    },28);
   }
 
-  function render(p, now) {
-    // 1) a small box opens and lies down flat: the portal, seen from above
-    const a = easeIO(clamp(p / .26));
-    portal.style.transform =
-      `perspective(1500px) rotateX(${lerp(14, rx, a)}deg) rotateZ(${lerp(-3, rz, a)}deg) scale(${lerp(mob ? .16 : .08, 1, a)})`;
-    const push = lerp(1.5, 1, a) * (1 + .1 * clamp((p - .26) / .74));
-    z1.style.transform = `scale(${push})`; if (z2 && z2.isConnected) z2.style.transform = `scale(${push})`;
+  function setDialogue(line){
 
-    // 2) the samurai follows the trail, shrinking with distance, and stops short
-    const q = clamp((p - .26) / .62), walking = q > 0 && q < 1;
-    const s = SMAX * (easeO(q) * .5 + q * .5);
-    const pt = path.getPointAtLength(L * s), p2 = path.getPointAtLength(L * Math.min(1, s + .01));
-    const lean = Math.atan2(p2.x - pt.x, -(p2.y - pt.y)) * 180 / Math.PI * .55;   // leans into the turn
-    const k = lerp(1, kFull, easeO(Math.min(1, s / .42)));   // far smaller than he would be at the door
-    const bob = walking ? Math.sin(q * 80) * S * k * .005 : 0;
-    const sway = walking ? Math.sin(q * 40) * .6 : 0;
-    sam.style.opacity = clamp((p - .1) / .16);
-    sam.style.transform = `translate3d(${pt.x - SW / 2}px,${pt.y - S + bob}px,0) rotate(${lean + sway}deg) scale(${k})`;
-    shadow.style.opacity = sam.style.opacity;
-    shadow.style.width = S * .5 * k + 'px'; shadow.style.height = S * .09 * k + 'px';
-    shadow.style.transform = `translate3d(${pt.x - S * .25 * k}px,${pt.y - S * .045 * k}px,0)`;
+    $(".name").textContent =
+      line.speaker;
 
-    // R1 ⇄ R2: stepping while he walks, a slow flutter of the scarf while he waits
-    if (r2 && r2.isConnected) {
-      const f = walking ? Math.floor(q * 26) % 2 : Math.floor(now / 800) % 2;
-      r2.style.opacity = f;
+    typeLine(line);
+  }
+
+  function updateDialogue(p){
+
+    let found = -1;
+
+    for(let i = 0; i < lines.length; i++){
+
+      if(
+        p >= lines[i].start &&
+        p < lines[i].end
+      ){
+        found = i;
+        break;
+      }
+
     }
 
-    // 3) writing, brushed in left to right, then faded out
-    for (const { el, r } of texts) {
-      const tin = clamp((p - r[0]) / (r[1] - r[0])), tout = clamp((p - r[2]) / (r[3] - r[2]));
-      el.style.opacity = 1 - tout;
-      el.style.clipPath = el.classList.contains('tv')
-        ? `inset(0 0 ${(1 - easeIO(tin)) * 100}% 0)`
-        : `inset(-20% ${(1 - easeIO(tin)) * 100}% -20% -5%)`;
+    if(found !== currentLine){
+
+      currentLine = found;
+
+      if(found >= 0){
+
+        setDialogue(
+          lines[found]
+        );
+
+        dialogueWrap.classList.add(
+          "visible"
+        );
+
+      }else if(p < .39){
+
+        dialogueWrap.classList.remove(
+          "visible"
+        );
+
+      }
     }
-    trail.style.opacity = clamp((p - .14) / .12);
-    hint.style.opacity = 1 - clamp(p / .05);
+
+    if(p > .86){
+
+      choices.classList.add(
+        "visible"
+      );
+
+    }else{
+
+      choices.classList.remove(
+        "visible"
+      );
+
+    }
   }
 
-  function onScroll() {
-    const r = track.getBoundingClientRect();
-    want = clamp(-r.top / (r.height - innerHeight));
+  /* ======================================================
+     PARTICLES
+     ====================================================== */
+
+  function resizeCanvas(){
+
+    const dpr =
+      Math.min(
+        window.devicePixelRatio || 1,
+        2
+      );
+
+    canvas.width =
+      viewport.clientWidth * dpr;
+
+    canvas.height =
+      viewport.clientHeight * dpr;
+
+    canvas.style.width =
+      viewport.clientWidth + "px";
+
+    canvas.style.height =
+      viewport.clientHeight + "px";
+
+    ctx.setTransform(
+      dpr,0,0,dpr,0,0
+    );
   }
 
-  let lastFrame = -1;
-  function tick(now) {
-    cur = reduce ? want : cur + (want - cur) * .09;
-    if (Math.abs(want - cur) < .0003) cur = want;
-    const idleFrame = Math.floor(now / 800);                  // lets the idle R1/R2 flutter keep ticking
-    if (cur !== shown || idleFrame !== lastFrame) { render(cur, now); shown = cur; lastFrame = idleFrame; }
-    requestAnimationFrame(tick);
+  function spawnParticle(){
+
+    particles.push({
+
+      x:
+        viewport.clientWidth *
+        (.35 + Math.random()*.3),
+
+      y:
+        viewport.clientHeight *
+        (.45 + Math.random()*.15),
+
+      vx:
+        (Math.random()-.5)*18,
+
+      vy:
+        10 + Math.random()*24,
+
+      size:
+        1.5 + Math.random()*4,
+
+      rotation:
+        Math.random()*Math.PI*2,
+
+      rotationSpeed:
+        (Math.random()-.5)*1.5,
+
+      opacity:
+        .15 + Math.random()*.35
+
+    });
+
   }
 
-  addEventListener('scroll', onScroll, { passive: true });
-  addEventListener('resize', () => { measure(); onScroll(); });
-  measure(); onScroll(); cur = want; requestAnimationFrame(tick);
+  function drawParticles(dt,p){
+
+    ctx.clearRect(
+      0,
+      0,
+      viewport.clientWidth,
+      viewport.clientHeight
+    );
+
+    if(
+      reduceMotion ||
+      p < .25
+    ){
+
+      return;
+    }
+
+    const count =
+      viewport.clientWidth < 700
+      ? 12
+      : 22;
+
+    if(
+      particles.length < count &&
+      Math.random() < dt*3
+    ){
+
+      spawnParticle();
+    }
+
+    for(
+      let i = particles.length-1;
+      i >= 0;
+      i--
+    ){
+
+      const q = particles[i];
+
+      q.x += q.vx * dt;
+      q.y += q.vy * dt;
+
+      q.rotation +=
+        q.rotationSpeed * dt;
+
+      if(
+        q.y >
+        viewport.clientHeight + 30
+      ){
+
+        particles.splice(i,1);
+
+        continue;
+      }
+
+      ctx.save();
+
+      ctx.translate(
+        q.x,
+        q.y
+      );
+
+      ctx.rotate(
+        q.rotation
+      );
+
+      ctx.globalAlpha =
+        q.opacity *
+        Math.min(
+          1,
+          (p-.25)*4
+        );
+
+      ctx.fillStyle =
+        Math.random() < .15
+        ? "#b3292e"
+        : "#e8ddc5";
+
+      ctx.beginPath();
+
+      ctx.ellipse(
+        0,
+        0,
+        q.size*1.8,
+        q.size,
+        0,
+        0,
+        Math.PI*2
+      );
+
+      ctx.fill();
+
+      ctx.restore();
+    }
+  }
+
+  /* ======================================================
+     MAIN SCROLL STATE
+     ====================================================== */
+
+  function clamp(v,min=0,max=1){
+
+    return Math.min(
+      max,
+      Math.max(min,v)
+    );
+  }
+
+  function ease(t){
+
+    return t*t*(3-2*t);
+  }
+
+  function lerp(a,b,t){
+
+    return a + (b-a)*t;
+  }
+
+  function updateTarget(){
+
+    const rect =
+      story.getBoundingClientRect();
+
+    targetProgress =
+      clamp(
+        -rect.top /
+        (rect.height -
+        window.innerHeight)
+      );
+  }
+
+  window.addEventListener(
+    "scroll",
+    updateTarget,
+    {passive:true}
+  );
+
+  /* ======================================================
+     RENDER
+     ====================================================== */
+
+  function render(p){
+
+    const parallaxX =
+      mouseX * 16;
+
+    const parallaxY =
+      mouseY * 10;
+
+    /* ---------- Background ---------- */
+
+    const bgScale =
+      1.06 + p*.035;
+
+    bg1.style.transform = `
+      translate3d(
+        ${parallaxX*.35}px,
+        ${parallaxY*.35}px,
+        0
+      )
+      scale(${bgScale})
+    `;
+
+    const bg2Opacity =
+      clamp(
+        (p-.35)/.28
+      );
+
+    bg2.style.opacity =
+      bg2Opacity;
+
+    bg2.style.transform = `
+      translate3d(
+        ${parallaxX*.55}px,
+        ${parallaxY*.55}px,
+        0
+      )
+      scale(${1.08+p*.04})
+    `;
+
+    /* ---------- Opening ---------- */
+
+    const openingFade =
+      clamp(
+        1 - p/.19
+      );
+
+    opening.style.opacity =
+      openingFade;
+
+    /* ---------- Scene title ---------- */
+
+    if(p > .18){
+
+      sceneLabel.classList.add(
+        "visible"
+      );
+
+    }else{
+
+      sceneLabel.classList.remove(
+        "visible"
+      );
+
+    }
+
+    /* ---------- Character ---------- */
+
+    const charStart = .20;
+    const charEnd = .56;
+
+    const cp =
+      clamp(
+        (p-charStart) /
+        (charEnd-charStart)
+      );
+
+    const ce =
+      ease(cp);
+
+    const charOpacity =
+      clamp(
+        (p-.17)/.11
+      );
+
+    character.style.opacity =
+      charOpacity;
+
+    const scale =
+      lerp(.78,1,ce);
+
+    const translateY =
+      lerp(
+        16,
+        0,
+        ce
+      );
+
+    const walkSway =
+      reduceMotion
+      ? 0
+      : Math.sin(p*48)*.7;
+
+    character.style.transform = `
+      translateX(-50%)
+      translateY(${translateY}vh)
+      scale(${scale})
+      rotate(${walkSway}deg)
+    `;
+
+    /* ---------- Sprite alternation ---------- */
+
+    if(
+      samurai2 &&
+      samurai2.isConnected &&
+      p > .30
+    ){
+
+      const blink =
+        Math.floor(
+          p*70
+        ) % 2;
+
+      samurai2.style.opacity =
+        blink ? ".0" : ".22";
+
+    }
+
+    /* ---------- Shadow ---------- */
+
+    shadow.style.opacity =
+      clamp(
+        (p-.22)/.18
+      ) * .9;
+
+    shadow.style.transform =
+      `
+      translateX(-50%)
+      scale(${lerp(.6,1.15,ce)})
+      `;
+
+    /* ---------- Dialogue ---------- */
+
+    updateDialogue(p);
+
+    /* ---------- Progress ---------- */
+
+    progressBar.style.width =
+      `${p*100}%`;
+
+    /* ---------- Scroll hint ---------- */
+
+    scrollHint.style.opacity =
+      clamp(
+        1-p/.08
+      );
+
+    /* ---------- Atmospheric fade ---------- */
+
+    document.documentElement.style
+      .setProperty(
+        "--scene-intensity",
+        p
+      );
+  }
+
+  /* ======================================================
+     POINTER PARALLAX
+     ====================================================== */
+
+  if(finePointer && !reduceMotion){
+
+    window.addEventListener(
+      "pointermove",
+      event => {
+
+        mouseX =
+          (event.clientX /
+           window.innerWidth -
+           .5) * 2;
+
+        mouseY =
+          (event.clientY /
+           window.innerHeight -
+           .5) * 2;
+
+      },
+      {passive:true}
+    );
+
+  }
+
+  /* ======================================================
+     LOOP
+     ====================================================== */
+
+  function frame(now){
+
+    const dt =
+      Math.min(
+        .05,
+        (now-lastTime)/1000
+      );
+
+    lastTime = now;
+
+    progress =
+      reduceMotion
+      ? targetProgress
+      : lerp(
+          progress,
+          targetProgress,
+          1-Math.exp(-dt*6)
+        );
+
+    render(progress);
+
+    drawParticles(
+      dt,
+      progress
+    );
+
+    requestAnimationFrame(frame);
+  }
+
+  /* ======================================================
+     BUTTONS
+     ====================================================== */
+
+  document.querySelectorAll(
+    ".choice"
+  ).forEach(button => {
+
+    button.addEventListener(
+      "click",
+      () => {
+
+        button.animate(
+          [
+            {
+              transform:
+                "translateY(0)"
+            },
+
+            {
+              transform:
+                "translateY(-3px)"
+            },
+
+            {
+              transform:
+                "translateY(0)"
+            }
+          ],
+          {
+            duration:280,
+            easing:"ease-out"
+          }
+        );
+
+      }
+    );
+
+  });
+
+  /* ======================================================
+     INITIALIZE
+     ====================================================== */
+
+  resizeCanvas();
+
+  window.addEventListener(
+    "resize",
+    resizeCanvas
+  );
+
+  updateTarget();
+
+  requestAnimationFrame(
+    frame
+  );
+
 })();
 </script>
+
 </body>
 </html>
