@@ -180,6 +180,8 @@ function renderPages() {
       <div class="page-card-footer"><span class="page-name" title="${escapeHtml(page.name)}">${escapeHtml(page.name)}</span><span class="page-meta">${page.width} × ${page.height} px</span></div>
       <div class="page-controls">
         <button class="page-control" type="button" data-action="rotate" title="Rotate page" aria-label="Rotate page ${index + 1}">${iconSvg('rotate-cw')}</button>
+        <button class="page-control" type="button" data-action="trim" title="Auto-trim blank margins" aria-label="Auto-trim page ${index + 1}">${iconSvg('crop')}</button>
+        <button class="page-control" type="button" data-action="split" title="Split a two-page book spread" aria-label="Split book spread at page ${index + 1}">${iconSvg('split')}</button>
         <button class="page-control" type="button" data-action="select" title="Select page" aria-label="Select page ${index + 1}">${iconSvg('eye')}</button>
         <button class="page-control delete" type="button" data-action="delete" title="Remove page" aria-label="Remove page ${index + 1}">${iconSvg('trash-2')}</button>
       </div>
@@ -220,6 +222,85 @@ function rotatePage(id) {
   if (!page) return;
   page.rotation = (page.rotation + 90) % 360;
   renderPages();
+}
+async function canvasCropDataUrl(image, sx, sy, sw, sh) {
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.max(1, Math.round(sw));
+  canvas.height = Math.max(1, Math.round(sh));
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(image, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
+  const result = canvas.toDataURL('image/jpeg', 0.94);
+  canvas.width = 1; canvas.height = 1;
+  return result;
+}
+async function autoTrimPage(id) {
+  const page = state.pages.find((item) => item.id === id);
+  if (!page || state.busy) return;
+  try {
+    const image = await loadImage(page.dataUrl);
+    const canvas = document.createElement('canvas');
+    const scale = Math.min(1, 1000 / Math.max(image.naturalWidth, image.naturalHeight));
+    canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+    canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+    const { data, width, height } = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    let minX = width, minY = height, maxX = -1, maxY = -1;
+    // Ignore near-white pixels so blank scanner margins are removed while printed text and page shadows remain.
+    for (let y = 0; y < height; y += 2) {
+      for (let x = 0; x < width; x += 2) {
+        const i = (y * width + x) * 4;
+        if (data[i] < 239 || data[i + 1] < 239 || data[i + 2] < 239) {
+          minX = Math.min(minX, x); minY = Math.min(minY, y);
+          maxX = Math.max(maxX, x); maxY = Math.max(maxY, y);
+        }
+      }
+    }
+    canvas.width = 1; canvas.height = 1;
+    if (maxX < 0 || (maxX - minX) < width * 0.25 || (maxY - minY) < height * 0.25) {
+      showToast('Could not detect useful page borders. Keep the original image.', 'error');
+      return;
+    }
+    const padX = Math.round((maxX - minX) * 0.012);
+    const padY = Math.round((maxY - minY) * 0.012);
+    const sx = Math.max(0, Math.floor(minX - padX)) / scale;
+    const sy = Math.max(0, Math.floor(minY - padY)) / scale;
+    const ex = Math.min(Math.round(image.naturalWidth * scale), Math.ceil(maxX + padX)) / scale;
+    const ey = Math.min(Math.round(image.naturalHeight * scale), Math.ceil(maxY + padY)) / scale;
+    page.dataUrl = await canvasCropDataUrl(image, sx, sy, ex - sx, ey - sy);
+    const cropped = await loadImage(page.dataUrl);
+    page.width = cropped.naturalWidth; page.height = cropped.naturalHeight;
+    renderPages();
+    showToast('Blank outer margins trimmed. Check the preview before exporting.');
+  } catch (error) {
+    showToast('Auto-trim could not process this image.', 'error');
+  }
+}
+async function splitBookSpread(id) {
+  const page = state.pages.find((item) => item.id === id);
+  if (!page || state.busy) return;
+  try {
+    const image = await loadImage(page.dataUrl);
+    if (image.naturalWidth < image.naturalHeight * 1.05) {
+      showToast('This image is portrait. Split book spreads work best with landscape photos.', 'error');
+      return;
+    }
+    const middle = Math.round(image.naturalWidth / 2);
+    const leftData = await canvasCropDataUrl(image, 0, 0, middle, image.naturalHeight);
+    const rightData = await canvasCropDataUrl(image, middle, 0, image.naturalWidth - middle, image.naturalHeight);
+    const leftImage = await loadImage(leftData);
+    const rightImage = await loadImage(rightData);
+    const baseName = page.name.replace(/\.[^.]+$/, '') || 'book-page';
+    const leftPage = { ...page, id: makeId(), name: `${baseName}-left.jpg`, dataUrl: leftData, width: leftImage.naturalWidth, height: leftImage.naturalHeight, rotation: page.rotation };
+    const rightPage = { ...page, id: makeId(), name: `${baseName}-right.jpg`, dataUrl: rightData, width: rightImage.naturalWidth, height: rightImage.naturalHeight, rotation: page.rotation };
+    const index = state.pages.findIndex((item) => item.id === id);
+    state.pages.splice(index, 1, leftPage, rightPage);
+    state.selectedId = leftPage.id;
+    renderPages();
+    showToast('Book spread split into left and right pages. Review the center edge before exporting.');
+  } catch (error) {
+    showToast('Could not split this image.', 'error');
+  }
 }
 function deletePage(id) {
   const index = state.pages.findIndex((page) => page.id === id);
@@ -538,6 +619,8 @@ function initEvents() {
     if (!card) return;
     const action = event.target.closest('[data-action]')?.dataset.action;
     if (action === 'rotate') { rotatePage(card.dataset.pageId); return; }
+    if (action === 'trim') { autoTrimPage(card.dataset.pageId); return; }
+    if (action === 'split') { splitBookSpread(card.dataset.pageId); return; }
     if (action === 'delete') { deletePage(card.dataset.pageId); return; }
     setSelected(card.dataset.pageId);
   });
