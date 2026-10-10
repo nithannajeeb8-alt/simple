@@ -212,6 +212,15 @@ function renderSelectedPreview() {
   if (brightness) { brightness.value = String(page.brightness); $('#brightness-value').textContent = `${page.brightness}%`; }
   if (contrast) { contrast.value = String(page.contrast); $('#contrast-value').textContent = `${page.contrast}%`; }
 }
+function updatePageAdjustmentPreview(page) {
+  if (!page) return;
+  const filter = `brightness(${page.brightness}%) contrast(${page.contrast}%)`;
+  const previewImg = $('#selected-page-preview');
+  if (previewImg) previewImg.style.filter = filter;
+  const card = $$('.page-card').find((item) => item.dataset.pageId === page.id);
+  const cardImage = card?.querySelector('.page-image-wrap img');
+  if (cardImage) cardImage.style.filter = filter;
+}
 function setSelected(id) {
   if (!state.pages.some((page) => page.id === id)) return;
   state.selectedId = id;
@@ -647,29 +656,24 @@ function initEvents() {
     if (!page) { showToast('Add and select a page first.'); return; }
     page.brightness = Number(event.target.value);
     $('#brightness-value').textContent = `${page.brightness}%`;
-    renderSelectedPreview();
-    const card = $(`.page-card[data-page-id="${CSS.escape(page.id)}"]`);
-    const image = card?.querySelector('img');
-    if (image) image.style.filter = `brightness(${page.brightness}%) contrast(${page.contrast}%)`;
+    updatePageAdjustmentPreview(page);
   });
   $('#contrast-range').addEventListener('input', (event) => {
     const page = selectedPage();
     if (!page) { showToast('Add and select a page first.'); return; }
     page.contrast = Number(event.target.value);
     $('#contrast-value').textContent = `${page.contrast}%`;
-    renderSelectedPreview();
-    const card = $(`.page-card[data-page-id="${CSS.escape(page.id)}"]`);
-    const image = card?.querySelector('img');
-    if (image) image.style.filter = `brightness(${page.brightness}%) contrast(${page.contrast}%)`;
+    updatePageAdjustmentPreview(page);
   });
   $('#reset-adjustments').addEventListener('click', () => {
     const page = selectedPage();
     if (!page) { showToast('Add and select a page first.'); return; }
     page.brightness = 100; page.contrast = 100;
-    renderSelectedPreview();
-    const card = $(`.page-card[data-page-id="${CSS.escape(page.id)}"]`);
-    const image = card?.querySelector('img');
-    if (image) image.style.filter = 'brightness(100%) contrast(100%)';
+    $('#brightness-range').value = '100';
+    $('#contrast-range').value = '100';
+    $('#brightness-value').textContent = '100%';
+    $('#contrast-value').textContent = '100%';
+    updatePageAdjustmentPreview(page);
     showToast('Page adjustments reset.');
   });
   $('#export-button').addEventListener('click', exportPdf);
