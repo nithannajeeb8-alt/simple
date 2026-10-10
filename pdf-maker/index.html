@@ -1,1 +1,157 @@
-helo
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f8f9fa" />
+  <meta name="description" content="A colorful, private PDF maker. Turn images into polished multi-page PDFs right in your browser." />
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="./icons/icon-192.png" />
+  <link rel="stylesheet" href="./styles.css" />
+  <title>PageBloom · PDF Studio</title>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="PageBloom home">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        <span class="brand-copy"><strong>pagebloom</strong><small>PDF STUDIO</small></span>
+      </a>
+      <div class="privacy-pill"><span class="privacy-dot"></span><span>Your files stay on your device</span></div>
+      <div class="top-actions">
+        <button class="icon-button help-button" id="help-button" aria-label="Help" title="How it works"></button>
+        <button class="button button-primary" id="export-button" disabled><span class="button-icon" id="export-icon"></span><span>Export PDF</span></button>
+      </div>
+    </header>
+
+    <div class="app-layout">
+      <aside class="sidebar" aria-label="Workspace navigation">
+        <div class="sidebar-label">WORKSPACE</div>
+        <button class="side-link active" id="create-nav"><span class="side-link-icon" data-icon="file-stack"></span><span>PDF workspace</span><span class="side-link-count" id="sidebar-count">0</span></button>
+        <div class="sidebar-label sidebar-label-spaced">ADD PAGES</div>
+        <button class="side-link" id="sidebar-import"><span class="side-link-icon" data-icon="images"></span><span>Choose images</span></button>
+        <button class="side-link" id="sidebar-camera"><span class="side-link-icon" data-icon="camera"></span><span>Use camera</span></button>
+        <div class="sidebar-note note-purple">
+          <span class="note-icon" data-icon="sparkles"></span>
+          <div><strong>A little design magic</strong><p>Keep pages in order. You can rotate or remove any page before exporting.</p></div>
+        </div>
+        <div class="sidebar-bottom">
+          <div class="local-badge"><span data-icon="shield-check"></span><div><strong>Private by design</strong><small>Processing happens locally.</small></div></div>
+          <button class="side-link muted-link" id="clear-workspace"><span class="side-link-icon" data-icon="trash-2"></span><span>Clear workspace</span></button>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <div class="page-heading">
+          <div>
+            <div class="eyebrow"><span class="eyebrow-star" data-icon="sparkles"></span> YOUR DOCUMENT WORKSPACE</div>
+            <h1>Make pages <span class="headline-highlight">shareable.</span></h1>
+            <p class="heading-description">Turn photos and scans into one tidy PDF, without the paperwork circus.</p>
+          </div>
+          <div class="heading-counter"><span class="counter-number" id="heading-count">0</span><span>pages<br />added</span></div>
+        </div>
+
+        <section class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Choose images or drop files here">
+          <div class="drop-illustration" aria-hidden="true">
+            <div class="paper-shape paper-shape-back"></div>
+            <div class="paper-shape paper-shape-front"><span class="paper-sun"></span><span class="paper-line line-one"></span><span class="paper-line line-two"></span><span class="paper-line line-three"></span></div>
+            <span class="upload-bubble" data-icon="plus"></span>
+          </div>
+          <div class="drop-copy"><strong>Drop your pages here</strong><span>Images become PDF pages. JPG, PNG, WebP and other browser-supported images.</span></div>
+          <button class="button button-dark" id="choose-files"><span data-icon="upload"></span> Choose images</button>
+          <span class="drop-footnote">You can add more pages anytime</span>
+        </section>
+
+        <section class="pages-section" aria-labelledby="pages-title">
+          <div class="section-heading">
+            <div><div class="section-title-row"><h2 id="pages-title">Your pages</h2><span class="count-chip" id="pages-count">0 pages</span></div><p>Drag cards to change their order.</p></div>
+            <div class="section-actions">
+              <button class="button button-outline" id="preview-button" disabled><span data-icon="eye"></span> Preview PDF</button>
+              <button class="button button-soft" id="add-more-button"><span data-icon="plus"></span> Add pages</button>
+            </div>
+          </div>
+          <div class="empty-state" id="empty-state">
+            <div class="empty-orbit orbit-blue"></div><div class="empty-orbit orbit-yellow"></div>
+            <div class="empty-icon" data-icon="file-stack"></div>
+            <h3>Your first page goes here</h3>
+            <p>Choose one or more images to start building your document.</p>
+            <button class="text-button" id="empty-choose">Choose images <span data-icon="arrow-right"></span></button>
+          </div>
+          <div class="page-grid" id="page-grid" hidden></div>
+        </section>
+        <div class="workspace-footnote"><span data-icon="lock-keyhole"></span> Nothing is uploaded. Your pages are processed in this browser.</div>
+      </main>
+
+      <aside class="inspector" aria-label="Document settings">
+        <div class="inspector-heading"><div><div class="inspector-kicker">MAKE IT YOURS</div><h2>Document setup</h2></div><span class="settings-glyph" data-icon="sliders-horizontal"></span></div>
+
+        <section class="inspector-card card-blue">
+          <div class="inspector-card-heading"><span class="card-icon" data-icon="file-text"></span><div><strong>Paper setup</strong><small>Choose your page shape</small></div></div>
+          <label class="field-label" for="paper-size">Paper size</label>
+          <select class="select-control" id="paper-size"><option value="A4">A4 · 210 × 297 mm</option><option value="Letter">US Letter · 8.5 × 11 in</option><option value="A5">A5 · 148 × 210 mm</option><option value="Fit">Fit to image</option></select>
+          <div class="field-label field-label-space">Orientation</div>
+          <div class="segmented-control" role="group" aria-label="Page orientation"><button class="segment active" data-orientation="portrait"><span data-icon="rectangle-vertical"></span> Portrait</button><button class="segment" data-orientation="landscape"><span data-icon="rectangle-horizontal"></span> Landscape</button></div>
+        </section>
+
+        <section class="inspector-card card-purple selected-adjustments-card">
+          <div class="inspector-card-heading"><span class="card-icon" data-icon="sliders-horizontal"></span><div><strong>Selected page</strong><small>Fine-tune this page only</small></div></div>
+          <div class="selected-preview-stage">
+            <div class="selected-preview-empty" id="selected-preview-empty"><span data-icon="image"></span><small>Select a page to preview it</small></div>
+            <img id="selected-page-preview" alt="Selected page preview" hidden />
+          </div>
+          <div class="selected-preview-label" id="selected-preview-label">Nothing selected</div>
+          <div class="range-label-row"><label for="brightness-range">Brightness</label><output id="brightness-value">100%</output></div>
+          <input class="range-control purple-range" id="brightness-range" type="range" min="60" max="140" step="5" value="100" />
+          <div class="range-label-row range-secondary"><label for="contrast-range">Contrast</label><output id="contrast-value">100%</output></div>
+          <input class="range-control purple-range" id="contrast-range" type="range" min="60" max="150" step="5" value="100" />
+          <button class="button button-reset" id="reset-adjustments" type="button"><span data-icon="rotate-ccw"></span> Reset adjustments</button>
+        </section>
+
+        <section class="inspector-card card-yellow">
+          <div class="inspector-card-heading"><span class="card-icon" data-icon="scan"></span><div><strong>Page spacing</strong><small>Give the page some breathing room</small></div></div>
+          <div class="range-label-row"><label for="margin-range">Margins</label><output id="margin-value">8 mm</output></div>
+          <input class="range-control" id="margin-range" type="range" min="0" max="24" step="2" value="8" />
+          <div class="range-ends"><span>Edge to edge</span><span>Roomy</span></div>
+          <div class="field-label field-label-space">Image fitting</div>
+          <div class="fit-options" role="group" aria-label="Image fitting">
+            <button class="fit-option active" data-fit="contain"><span class="fit-icon fit-contain"></span><span>Fit</span></button>
+            <button class="fit-option" data-fit="cover"><span class="fit-icon fit-cover"></span><span>Fill</span></button>
+            <button class="fit-option" data-fit="stretch"><span class="fit-icon fit-stretch"></span><span>Stretch</span></button>
+          </div>
+        </section>
+
+        <section class="inspector-card card-green">
+          <div class="inspector-card-heading"><span class="card-icon" data-icon="image"></span><div><strong>Image quality</strong><small>Clear pages, sensible file size</small></div></div>
+          <div class="range-label-row"><label for="quality-range">Export quality</label><output id="quality-value">90%</output></div>
+          <input class="range-control green-range" id="quality-range" type="range" min="55" max="100" step="5" value="90" />
+          <div class="setting-divider"></div>
+          <label class="toggle-row" for="page-numbers"><span><strong>Page numbers</strong><small>Add a small number at the bottom</small></span><input id="page-numbers" type="checkbox" /><span class="toggle-ui"></span></label>
+        </section>
+
+        <section class="inspector-card card-peach file-name-card">
+          <div class="inspector-card-heading"><span class="card-icon" data-icon="file-pen"></span><div><strong>File name</strong><small>Give your PDF a name</small></div></div>
+          <div class="filename-input-wrap"><input type="text" id="file-name" value="my-document" maxlength="70" aria-label="PDF file name" /><span>.pdf</span></div>
+        </section>
+
+        <div class="export-hint"><span data-icon="check-circle"></span><span>Ready when you are. Review the pages, then export your PDF.</span></div>
+        <button class="button button-primary inspector-export" id="inspector-export" disabled><span data-icon="download"></span> Create my PDF</button>
+      </aside>
+    </div>
+  </div>
+
+  <input id="file-input" type="file" accept="image/*" multiple hidden />
+  <input id="camera-input" type="file" accept="image/*" capture="environment" multiple hidden />
+
+  <div class="modal-backdrop" id="modal-backdrop" hidden>
+    <section class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <header class="modal-header"><div><span class="modal-kicker" id="modal-kicker">YOUR DOCUMENT</span><h2 id="modal-title">PDF preview</h2></div><button class="icon-button modal-close" id="modal-close" aria-label="Close preview"></button></header>
+      <div class="modal-body" id="modal-body"><div class="preview-loading"><span class="spinner"></span><strong>Preparing your preview…</strong><span>This stays on your device.</span></div></div>
+      <footer class="modal-footer"><span id="modal-footer-note">Your pages, in the order you arranged them.</span><button class="button button-primary" id="modal-download"><span data-icon="download"></span> Download PDF</button></footer>
+    </section>
+  </div>
+
+  <div class="toast-region" id="toast-region" aria-live="polite" aria-atomic="true"></div>
+  <script src="./app.js" defer></script>
+</body>
+</html>
