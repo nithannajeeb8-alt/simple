@@ -169,108 +169,61 @@ html.large-text{--font-scale:1.08} html.xlarge-text{--font-scale:1.16}
 @media (prefers-reduced-motion:reduce) { #screen-diary .entry-card { transition:none; } }
 
 
-/* Quiet Pages organic scrapbook cards v2: final overrides */
-#screen-diary .entry-stack {
-  gap: 0 !important;
-  padding-bottom: calc(112px + env(safe-area-inset-bottom)) !important;
-}
+/* Quiet Pages spacing system: consistent 8pt rhythm, compact scrapbook cards, and safe-area-aware controls. */
+:root { --qp-space-1:4px; --qp-space-2:8px; --qp-space-3:12px; --qp-space-4:16px; --qp-space-5:24px; --qp-space-6:32px; }
+#screen-diary .entry-stack { gap: 18px !important; padding: 8px 0 calc(142px + env(safe-area-inset-bottom)) !important; }
 #screen-diary .entry-card {
-  grid-template-columns: minmax(0, 1fr) minmax(112px, 37%) !important;
-  gap: 0 !important;
-  height: clamp(286px, 78vw, 322px) !important;
-  min-height: 286px !important;
-  padding: 15px !important;
-  border-radius: 34px 48px 34px 42px !important;
-  overflow: hidden !important;
-  background:
-    radial-gradient(120% 90% at 100% 0%, rgba(255,255,255,.48), transparent 58%),
-    linear-gradient(135deg, var(--card-bg-a), var(--card-bg-b)) !important;
-  box-shadow: 0 12px 30px rgba(38,62,48,.11), inset 0 1px 0 rgba(255,255,255,.78) !important;
+  box-sizing:border-box; display:grid; grid-template-columns:minmax(0,1fr) minmax(116px,37%); gap:18px;
+  height:clamp(238px,64vw,292px); min-height:238px; padding:22px 22px 20px;
+  margin:0 !important; border-radius:36px 52px 38px 48px; overflow:hidden;
+  box-shadow:0 12px 30px rgba(35,51,45,.10), inset 0 1px 0 rgba(255,255,255,.82);
 }
-#screen-diary .entry-card + .entry-card {
-  margin-top: -24px !important;
+#screen-diary .entry-card + .entry-card { margin-top:0 !important; }
+#screen-diary .entry-card:nth-child(n) { width:100%; margin-left:0; }
+#screen-diary .entry-card.theme-sky { --card-bg-a:#dcecf7; --card-bg-b:#c7e0ef; --card-ink:#294455; }
+#screen-diary .entry-card.theme-mint { --card-bg-a:#d8efe1; --card-bg-b:#edf4df; --card-ink:#2c4d3f; }
+#screen-diary .entry-card.theme-coral { --card-bg-a:#ffd6c8; --card-bg-b:#ffe9c8; --card-ink:#5b3933; }
+#screen-diary .entry-card.theme-lavender { --card-bg-a:#e7def7; --card-bg-b:#f7e5ef; --card-ink:#493a55; }
+#screen-diary .entry-copy { grid-column:1; min-width:0; gap:12px; padding:2px 0; }
+#screen-diary .card-topline { align-items:center; gap:8px 10px; font-size:10px; letter-spacing:.055em; }
+#screen-diary .entry-pill { max-width:100%; white-space:normal; text-align:center; }
+#screen-diary .entry-copy h3 { margin: auto 0 0; font-size:clamp(25px,6.4vw,38px); line-height:1.04; overflow-wrap:anywhere; }
+#screen-diary .entry-excerpt { font-size:clamp(13px,3.4vw,15px); line-height:1.48; -webkit-line-clamp:3; }
+#screen-diary .card-bottom { justify-content:flex-start; gap:12px; margin-top:auto; }
+#screen-diary .arrow-circle { margin-left:0; flex-basis:40px; width:40px; height:40px; }
+#screen-diary .entry-photo-frame { grid-column:2; grid-row:1; min-width:0; height:100%; border-radius:44px 58px 32px 46px; overflow:hidden; }
+#screen-diary .entry-cover-photo { object-fit:cover; object-position:center; }
+#screen-diary .entry-card.no-cover { display:block; height:auto; min-height:218px; }
+#screen-diary .entry-card.no-cover .entry-copy { min-height:174px; }
+#screen-diary .entry-card.no-cover .entry-copy h3 { max-width:100%; }
+#screen-diary .entry-card.no-cover .entry-excerpt { max-width:95%; }
+#screen-diary .floating-add { right:max(24px, calc((100vw - 850px)/2 + 24px)); bottom:calc(104px + env(safe-area-inset-bottom)); width:56px; height:56px; border-radius:20px; z-index:25; }
+#screen-diary .bottom-nav { gap:8px; padding:10px 14px calc(10px + env(safe-area-inset-bottom)); }
+#screen-diary .nav-item { min-height:54px; min-width:0; flex:1; padding:7px 8px; gap:5px; }
+#screen-diary .nav-item i { font-size:20px; }
+#screen-diary .nav-item span { font-size:10px; }
+#screen-diary .entry-card:focus-visible, #floatingAdd:focus-visible, .nav-item:focus-visible { outline:3px solid color-mix(in srgb,var(--accent) 60%,white); outline-offset:3px; }
+@media(max-width:560px) {
+  .app-shell { padding-left:17px; padding-right:17px; padding-bottom:calc(150px + env(safe-area-inset-bottom)); }
+  #screen-diary .entry-stack { gap:16px !important; padding-bottom:calc(24px + env(safe-area-inset-bottom)) !important; }
+  #screen-diary .entry-card { grid-template-columns:minmax(0,1fr) minmax(108px,37%); gap:12px; height:clamp(244px,68vw,290px); min-height:244px; padding:18px 17px; border-radius:32px 46px 34px 42px; }
+  #screen-diary .entry-card.no-cover { display:block; height:auto; min-height:205px; padding:20px 22px; }
+  #screen-diary .entry-card.no-cover .entry-copy { min-height:164px; }
+  #screen-diary .entry-copy { gap:10px; }
+  #screen-diary .entry-copy h3 { font-size:clamp(24px,6.8vw,32px); }
+  #screen-diary .entry-excerpt { font-size:13px; }
+  #screen-diary .entry-photo-frame { border-radius:36px 46px 26px 38px; }
+  #screen-diary .card-topline { font-size:9px; }
+  #screen-diary .entry-pill { padding:5px 8px; font-size:9px; }
+  #screen-diary .card-bottom { gap:10px; font-size:11px; }
+  #screen-diary .arrow-circle { width:38px; height:38px; flex-basis:38px; }
+  #screen-diary .floating-add { right:22px; bottom:calc(104px + env(safe-area-inset-bottom)); }
+  #screen-diary .bottom-nav { gap:6px; padding-inline:12px; }
 }
-#screen-diary .entry-card:nth-child(2) { margin-left: 5px !important; width: calc(100% - 5px) !important; }
-#screen-diary .entry-card:nth-child(3) { margin-left: 10px !important; width: calc(100% - 10px) !important; }
-#screen-diary .entry-card:nth-child(n + 4) { margin-left: 0 !important; width: 100% !important; }
-#screen-diary .entry-copy {
-  grid-column: 1 !important;
-  grid-row: 1 !important;
-  min-width: 0 !important;
-  padding: 2px 10px 2px 2px !important;
-  gap: 8px !important;
-  justify-content: space-between !important;
+@media(min-width:800px) {
+  #screen-diary .entry-stack { gap:20px !important; padding-bottom:28px !important; }
+  #screen-diary .entry-card { height:292px; }
+  #screen-diary .entry-card.no-cover { min-height:218px; }
+  #screen-diary .floating-add { bottom:30px; }
 }
-#screen-diary .entry-copy h3 {
-  margin-top: auto !important;
-  font-size: clamp(25px, 6.2vw, 35px) !important;
-  line-height: 1.03 !important;
-}
-#screen-diary .entry-excerpt {
-  -webkit-line-clamp: 3 !important;
-  font-size: 12px !important;
-  line-height: 1.45 !important;
-}
-#screen-diary .card-bottom {
-  margin-top: auto !important;
-  min-height: 34px !important;
-  gap: 8px !important;
-}
-#screen-diary .arrow-circle {
-  flex: 0 0 34px !important;
-  width: 34px !important;
-  height: 34px !important;
-  align-self: flex-end !important;
-}
-#screen-diary .entry-photo-frame {
-  grid-column: 2 !important;
-  grid-row: 1 !important;
-  min-width: 0 !important;
-  min-height: 0 !important;
-  height: 100% !important;
-  margin: 0 0 0 -14px !important;
-  width: calc(100% + 14px) !important;
-  border-radius: 38px 48px 34px 44px !important;
-  overflow: hidden !important;
-  background: rgba(255,255,255,.32) !important;
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,.6), 0 5px 18px rgba(42,55,48,.06) !important;
-}
-#screen-diary .entry-cover-photo { border-radius: inherit !important; object-fit: cover !important; }
-#screen-diary .entry-art { border-radius: inherit !important; }
-#screen-diary .entry-card.no-cover {
-  display: block !important;
-  height: auto !important;
-  min-height: 238px !important;
-  padding: 18px 20px 17px !important;
-  border-radius: 34px 48px 34px 42px !important;
-}
-#screen-diary .entry-card.no-cover .entry-copy {
-  display: flex !important;
-  min-height: 200px !important;
-  height: 100% !important;
-  padding: 0 !important;
-}
-#screen-diary .entry-card.no-cover .entry-copy h3 { margin-top: auto !important; }
-#screen-diary .entry-card.no-cover .entry-photo-frame { display: none !important; }
-@media (max-width: 560px) {
-  #screen-diary .entry-card {
-    grid-template-columns: minmax(0, 1fr) minmax(106px, 38%) !important;
-    height: clamp(286px, 78vw, 316px) !important;
-    min-height: 286px !important;
-    padding: 14px !important;
-    border-radius: 32px 43px 32px 38px !important;
-  }
-  #screen-diary .entry-card + .entry-card { margin-top: -22px !important; }
-  #screen-diary .entry-copy { padding-right: 8px !important; gap: 8px !important; }
-  #screen-diary .entry-photo-frame {
-    margin-left: -10px !important;
-    width: calc(100% + 10px) !important;
-    border-radius: 32px 40px 28px 38px !important;
-  }
-  #screen-diary .entry-card.no-cover { min-height: 226px !important; padding: 17px 18px !important; }
-  #screen-diary .entry-card.no-cover .entry-copy { min-height: 190px !important; }
-  #screen-diary .entry-copy h3 { font-size: clamp(25px, 7vw, 31px) !important; }
-  #screen-diary .card-topline { gap: 6px !important; }
-  #screen-diary .entry-pill { white-space: normal !important; }
-  #screen-diary .card-bottom { font-size: 11px !important; }
-}
+@media(prefers-reduced-motion:reduce) { #screen-diary .entry-card { transition:none; } }

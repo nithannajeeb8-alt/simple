@@ -382,14 +382,7 @@
   function getEntry(idValue) { return state.entries.find(entry => entry.id === idValue); }
   function moodInfo(value) { return MOODS.find(mood => mood.value === value); }
   function coverPhoto(entry) { return entry && Array.isArray(entry.photos) ? (entry.photos.find(photo => photo.cover) || entry.photos[0]) : null; }
-  function cardTheme(entry, index = 0) {
-    // Rotate the four scrapbook colours across entries so neighbouring cards do not all match.
-    // A user's explicit entry theme is retained only when it differs from the global default.
-    const saved = THEMES.includes(entry.theme) ? entry.theme : null;
-    const globalTheme = activeTheme();
-    if (saved && saved !== globalTheme) return saved;
-    return THEMES[index % THEMES.length];
-  }
+  function cardTheme(entry) { return THEMES.includes(entry.theme) ? entry.theme : activeTheme(); }
   function renderDiary() {
     const query = ($('#searchInput')?.value || '').trim().toLowerCase();
     const list = sortedEntries().filter(entry => !query || `${entry.title} ${richTextPlain(entry.body)} ${entry.date} ${entry.mood}`.toLowerCase().includes(query));
@@ -404,11 +397,14 @@
       const hasText = Boolean(richTextPlain(entry.body).trim());
       const hasInlineImage = /<img\b/i.test(String(entry.body || ''));
       const title = entry.title.trim() || 'An untitled page';
-      const className = `entry-card theme-${cardTheme(entry, index)}${cover ? ' has-cover' : ''}${cover ? '' : ' no-cover'}`;
+      // Rotate the scrapbook palette per visible card so adjacent entries never all inherit one theme.
+      const cardPalette = ['sky', 'mint', 'coral', 'lavender'];
+      const visualTheme = cardPalette[index % cardPalette.length];
+      const className = `entry-card theme-${visualTheme}${cover ? ' has-cover' : ' no-cover'}`;
       const date = formatDate(entry.date, { month: 'short', day: 'numeric', year: 'numeric' });
       const photoMarkup = cover
-        ? `<img class="entry-cover-photo" src="${escapeHTML(cover.dataUrl)}" alt="" loading="lazy">`
-        : `<div class="entry-art" aria-hidden="true"><span class="entry-art-orb"></span><i class="bi bi-journal-richtext"></i></div>`;
+        ? `<div class="entry-photo-frame"><img class="entry-cover-photo" src="${escapeHTML(cover.dataUrl)}" alt="" loading="lazy"></div>`
+        : '';
       const excerptText = hasText ? excerpt(entry.body) : (hasInlineImage ? 'A moment, kept between the words.' : 'A blank page, ready for another thought.');
       return `<article class="${className}" data-open-entry="${escapeHTML(entry.id)}" tabindex="0" role="button" aria-label="Open ${escapeHTML(title)}">
         <div class="entry-copy">
@@ -416,7 +412,7 @@
           <h3>${escapeHTML(title)}</h3><p class="entry-excerpt">${escapeHTML(excerptText)}</p>
           <div class="card-bottom"><span>${entry.photos?.length ? `<i class="bi bi-images"></i> ${entry.photos.length} ${entry.photos.length === 1 ? 'photo' : 'photos'}` : 'A page of your own'}</span><span class="arrow-circle"><i class="bi bi-arrow-up-right"></i></span></div>
         </div>
-        ${cover ? `<div class="entry-photo-frame">${photoMarkup}</div>` : ''}
+        ${photoMarkup}
       </article>`;
     }).join('');
     $('#emptyState').classList.toggle('hidden', list.length !== 0);
