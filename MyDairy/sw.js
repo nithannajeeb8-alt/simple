@@ -1,5 +1,5 @@
 /* Best-effort app-shell cache. User data is stored by the page in IndexedDB, not in this cache. */
-const CACHE_NAME = 'quiet-pages-shell-v7-spacing-cards';
+const CACHE_NAME = 'quiet-pages-shell-v11-think-filter-spacing';
 const BASE = self.registration.scope;
 const SHELL = ['./', './index.html', './styles.css', './app.js', './manifest.webmanifest', './icons/icon.svg', './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png'];
 
@@ -36,6 +36,21 @@ self.addEventListener('fetch', event => {
         return fresh;
       } catch (_) {
         return (await caches.match(new URL('./index.html', BASE))) || (await caches.match(new URL('./', BASE)));
+      }
+    })());
+    return;
+  }
+  if (url.pathname.endsWith('/app.js') || url.pathname.endsWith('/styles.css')) {
+    event.respondWith((async () => {
+      try {
+        const fresh = await fetch(request, { cache: 'no-store' });
+        if (fresh.ok) {
+          const cache = await caches.open(CACHE_NAME);
+          cache.put(request, fresh.clone()).catch(() => {});
+        }
+        return fresh;
+      } catch (_) {
+        return (await caches.match(request)) || new Response('Offline: this resource is not cached yet.', { status: 503 });
       }
     })());
     return;
