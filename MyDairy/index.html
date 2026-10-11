@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en" data-theme="sky">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#e8f2fa">
+  <meta name="description" content="A quiet, private diary with a thoughtful on-device AI companion.">
+  <meta name="color-scheme" content="light">
+  <title>Quiet Pages — A little room for you</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="app-shell" id="appShell">
+    <header class="topbar">
+      <a class="brand" href="#diary" aria-label="Quiet Pages home" data-nav="diary">
+        <span class="brand-mark">q.</span>
+        <span class="brand-name">quiet pages</span>
+      </a>
+      <div class="topbar-actions">
+        <button class="icon-button" id="searchToggle" aria-label="Search diary" title="Search diary"><i class="bi bi-search"></i></button>
+        <button class="avatar-button" id="settingsShortcut" aria-label="Open settings" title="Settings"><i class="bi bi-sliders2"></i></button>
+      </div>
+    </header>
+
+    <main id="mainContent" tabindex="-1">
+      <section class="screen active" id="screen-diary" data-screen="diary">
+        <div class="home-intro">
+          <div class="eyebrow"><span class="eyebrow-dot"></span><span id="todayLabel">A little note for today</span></div>
+          <h1 id="homeHeading">Your quiet<br><em>corner.</em></h1>
+          <p class="intro-copy" id="homeSubheading">A place to leave the day for a moment, and keep what matters.</p>
+        </div>
+        <div class="search-panel hidden" id="searchPanel">
+          <label class="sr-only" for="searchInput">Search entries</label>
+          <i class="bi bi-search"></i><input type="search" id="searchInput" placeholder="Search your memories…" autocomplete="off">
+          <button class="icon-button compact" id="closeSearch" aria-label="Close search"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <div class="section-heading">
+          <div><span class="section-kicker">YOUR JOURNAL</span><h2 id="entriesHeading">Recent pages</h2></div>
+          <span class="subtle-count" id="entryCount">0 pages</span>
+        </div>
+        <div id="entryStack" class="entry-stack"></div>
+        <div id="emptyState" class="empty-state hidden">
+          <div class="empty-art"><span></span><i class="bi bi-feather"></i></div>
+          <h3>Your first page is waiting.</h3>
+          <p>Start with one small thing: what stayed with you today?</p>
+          <button class="primary-button" data-action="new-entry"><i class="bi bi-plus-lg"></i> Write your first entry</button>
+        </div>
+        <div class="bottom-note"><i class="bi bi-shield-lock"></i><span>Your pages stay on this device by default.</span></div>
+      </section>
+
+      <section class="screen" id="screen-companion" data-screen="companion">
+        <div class="page-intro compact-intro">
+          <div class="eyebrow"><span class="eyebrow-dot"></span>YOUR QUIET COMPANION</div>
+          <h1>A little space<br><em>to untangle.</em></h1>
+          <p>Ask about your past pages, collect important things, or think out loud. No judgement, no rush.</p>
+        </div>
+        <div class="companion-status" id="companionStatus"><span class="status-dot"></span><span>Local journal memory is ready · AI model not loaded</span></div>
+        <div class="chat-card">
+          <div class="chat-header"><div class="assistant-avatar"><i class="bi bi-stars"></i></div><div><strong>Little by little</strong><span>Your private companion</span></div><span class="local-pill"><i class="bi bi-lock"></i> Local</span></div>
+          <div id="chatMessages" class="chat-messages" aria-live="polite"></div>
+          <div class="prompt-chips" id="promptChips">
+            <button class="prompt-chip" data-prompt="What have I been thinking about lately?">What’s on my mind?</button>
+            <button class="prompt-chip" data-prompt="Help me reflect on this month using my diary entries.">Reflect on this month</button>
+            <button class="prompt-chip" data-prompt="What goals or intentions have I mentioned?">My goals</button>
+          </div>
+          <form id="chatForm" class="chat-form">
+            <label class="sr-only" for="chatInput">Write a message</label>
+            <textarea id="chatInput" rows="1" maxlength="3000" placeholder="Write what’s on your mind…"></textarea>
+            <button class="send-button" type="submit" aria-label="Send message"><i class="bi bi-arrow-up"></i></button>
+          </form>
+          <p class="privacy-hint"><i class="bi bi-shield-check"></i> Your diary context is processed in this browser. The optional model runtime and model files are downloaded from their providers.</p>
+        </div>
+        <section class="memory-section">
+          <div class="section-heading"><div><span class="section-kicker">THINGS TO REMEMBER</span><h2>Your memory shelf</h2></div><button class="text-button" id="addMemoryButton"><i class="bi bi-plus-lg"></i> Add</button></div>
+          <p class="section-description">Keep the facts you want your companion to remember. You can edit or delete them anytime.</p>
+          <form id="memoryForm" class="memory-form hidden">
+            <label for="memoryText">A detail worth keeping</label>
+            <textarea id="memoryText" maxlength="800" rows="3" placeholder="A goal, preference, important date, or something you want to remember…" required></textarea>
+            <div class="form-row end"><button type="button" class="secondary-button" id="cancelMemory">Cancel</button><button type="submit" class="primary-button small-button">Save memory</button></div>
+          </form>
+          <div id="memoryList" class="memory-list"></div>
+          <div id="memoryEmpty" class="mini-empty">Your memory shelf is empty. Add something you would like to keep in mind.</div>
+        </section>
+      </section>
+
+      <section class="screen" id="screen-calendar" data-screen="calendar">
+        <div class="page-intro compact-intro">
+          <div class="eyebrow"><span class="eyebrow-dot"></span>YOUR DAYS, KEPT</div>
+          <h1>Time, in little<br><em>pieces.</em></h1>
+          <p>Every dot is a page you chose to keep.</p>
+        </div>
+        <div class="calendar-card">
+          <div class="calendar-toolbar"><button class="icon-button" id="prevMonth" aria-label="Previous month"><i class="bi bi-chevron-left"></i></button><div><h2 id="calendarMonth">October 2026</h2><button class="text-button today-button" id="goToday">Today</button></div><button class="icon-button" id="nextMonth" aria-label="Next month"><i class="bi bi-chevron-right"></i></button></div>
+          <div class="calendar-weekdays" aria-hidden="true"><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span><span>SUN</span></div>
+          <div class="calendar-grid" id="calendarGrid" role="grid" aria-label="Diary calendar"></div>
+          <div class="calendar-legend"><span><i class="legend-dot"></i> A page was written</span><span><i class="legend-today"></i> Today</span></div>
+        </div>
+        <div class="calendar-day-section"><div class="section-heading"><div><span class="section-kicker" id="selectedDateLabel">SELECTED DAY</span><h2 id="selectedDateHeading">Choose a day</h2></div><button class="text-button" id="newForSelectedDate"><i class="bi bi-plus-lg"></i> Write</button></div><div id="selectedDayEntries" class="day-entries"></div></div>
+      </section>
+
+      <section class="screen" id="screen-settings" data-screen="settings">
+        <div class="page-intro compact-intro">
+          <div class="eyebrow"><span class="eyebrow-dot"></span>MAKE IT YOURS</div>
+          <h1>Your space,<br><em>your rules.</em></h1>
+          <p>Small adjustments that make this place feel like yours.</p>
+        </div>
+        <section class="settings-group">
+          <div class="settings-heading"><span class="setting-icon"><i class="bi bi-palette2"></i></span><div><h2>Appearance</h2><p>Colors and the feeling of each page.</p></div></div>
+          <div class="theme-grid" id="themeGrid">
+            <button class="theme-choice active" data-theme-choice="sky"><span class="theme-swatch sky-swatch"></span><strong>Sky</strong><small>Calm & clear</small></button>
+            <button class="theme-choice" data-theme-choice="coral"><span class="theme-swatch coral-swatch"></span><strong>Coral</strong><small>Warm & open</small></button>
+            <button class="theme-choice" data-theme-choice="mint"><span class="theme-swatch mint-swatch"></span><strong>Mint</strong><small>Fresh & bright</small></button>
+            <button class="theme-choice" data-theme-choice="lavender"><span class="theme-swatch lavender-swatch"></span><strong>Lavender</strong><small>Soft & dreamy</small></button>
+            <button class="theme-choice dynamic-choice" data-theme-choice="dynamic"><span class="theme-swatch dynamic-swatch"><i class="bi bi-stars"></i></span><strong>Dynamic</strong><small>Changes each day</small></button>
+          </div>
+          <div class="setting-row"><div><strong>Comfortable text</strong><p>Increase the text size across the app.</p></div><select id="textScale" aria-label="Text size"><option value="normal">Standard</option><option value="large">Large</option><option value="xlarge">Extra large</option></select></div>
+          <label class="setting-row"><div><strong>Reduce motion</strong><p>Use fewer transitions and animations.</p></div><input type="checkbox" id="reduceMotion" class="toggle-input"></label>
+        </section>
+        <section class="settings-group">
+          <div class="settings-heading"><span class="setting-icon"><i class="bi bi-cpu"></i></span><div><h2>Your local companion</h2><p>Download a compatible model to generate responses on this device.</p></div></div>
+          <div class="model-panel">
+            <div class="model-status-line"><span class="model-orb"><i class="bi bi-stars"></i></span><div class="model-status-copy"><strong id="modelStatusTitle">AI model not loaded</strong><p id="modelStatusText">The diary works without AI. Loading a model requires WebGPU, memory, and a model download.</p></div></div>
+            <div class="model-controls"><button class="secondary-button" id="checkModelsButton"><i class="bi bi-cloud-download"></i> Find compatible models</button><select id="modelSelect" aria-label="Select AI model" class="hidden"><option value="">Choose a supported model</option></select><button class="primary-button hidden" id="loadModelButton"><i class="bi bi-download"></i> Download &amp; load</button><button class="secondary-button hidden" id="unloadModelButton"><i class="bi bi-eject"></i> Unload</button></div>
+            <div class="model-progress hidden" id="modelProgressWrap"><div class="progress-track"><span id="modelProgressBar"></span></div><p id="modelProgressText">Preparing the local model…</p></div>
+            <p class="model-disclaimer"><i class="bi bi-info-circle"></i> We check the runtime's actual built-in model catalogue. Qwen3 1.7B is not guaranteed to be supported; unsupported models are not offered. The first download can be large.</p>
+          </div>
+        </section>
+        <section class="settings-group">
+          <div class="settings-heading"><span class="setting-icon"><i class="bi bi-database-lock"></i></span><div><h2>Privacy &amp; your data</h2><p>Your pages are saved in browser storage on this device.</p></div></div>
+          <div class="privacy-card"><i class="bi bi-shield-lock"></i><div><strong>No account. No diary server.</strong><p>Quiet Pages does not send your entries to a diary backend. Export backups regularly because browser storage can be cleared by the operating system or browser.</p></div></div>
+          <div class="settings-actions"><button class="action-row" id="exportButton"><span><i class="bi bi-box-arrow-up-right"></i></span><div><strong>Export a backup</strong><small>Save entries, memories, settings and photos.</small></div><i class="bi bi-chevron-right"></i></button><button class="action-row" id="importButton"><span><i class="bi bi-box-arrow-in-down-left"></i></span><div><strong>Restore a backup</strong><small>Import a previously exported JSON file.</small></div><i class="bi bi-chevron-right"></i></button><input type="file" id="importFile" accept="application/json,.json" class="hidden">
+            <button class="action-row danger-row" id="clearDataButton"><span><i class="bi bi-trash3"></i></span><div><strong>Delete all local data</strong><small>Remove diary entries and memories from this browser.</small></div><i class="bi bi-chevron-right"></i></button></div>
+        </section>
+        <footer class="settings-footer"><span class="brand-mark mini-mark">q.</span><p>Quiet Pages · A little room for you</p><small>Private by default, imperfect by design. Please keep a backup.</small></footer>
+      </section>
+
+      <section class="screen" id="screen-detail" data-screen="detail"></section>
+      <section class="screen" id="screen-editor" data-screen="editor"></section>
+    </main>
+
+    <button class="floating-add" id="floatingAdd" aria-label="Write a new diary entry" title="Write a new entry"><i class="bi bi-plus-lg"></i></button>
+
+    <nav class="bottom-nav" aria-label="Main navigation">
+      <button class="nav-item active" data-nav="diary" aria-label="Diary"><i class="bi bi-journal-bookmark"></i><span>Diary</span></button>
+      <button class="nav-item" data-nav="companion" aria-label="Companion"><i class="bi bi-chat-heart"></i><span>Companion</span></button>
+      <button class="nav-item" data-nav="calendar" aria-label="Calendar"><i class="bi bi-calendar3"></i><span>Calendar</span></button>
+      <button class="nav-item" data-nav="settings" aria-label="Settings"><i class="bi bi-sliders"></i><span>Settings</span></button>
+    </nav>
+  </div>
+
+  <div class="toast-region" id="toastRegion" aria-live="polite" aria-atomic="true"></div>
+  <dialog class="confirm-dialog" id="confirmDialog"><div class="dialog-icon"><i class="bi bi-question-lg"></i></div><h2 id="dialogTitle">Are you sure?</h2><p id="dialogMessage">This action cannot be undone.</p><div class="dialog-actions"><button class="secondary-button" id="dialogCancel">Cancel</button><button class="primary-button danger-button" id="dialogConfirm">Continue</button></div></dialog>
+  <script src="./app.js" defer></script>
+  <script>
+    // Register offline support only on HTTPS or localhost. Relative path works in GitHub Pages subdirectories.
+    if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+      window.addEventListener('load', () => navigator.serviceWorker.register(new URL('./sw.js', document.baseURI)).catch(() => {}));
+    }
+  </script>
+</body>
+</html>
