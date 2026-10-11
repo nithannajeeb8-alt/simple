@@ -285,12 +285,16 @@
       const title = entry.title.trim() || 'An untitled page';
       const className = `entry-card theme-${cardTheme(entry)}${cover ? ' has-cover' : ''}`;
       const date = formatDate(entry.date, { month: 'short', day: 'numeric', year: 'numeric' });
-      const photo = cover ? `<img class="entry-cover-bg" src="${escapeHTML(cover.dataUrl)}" alt="" loading="lazy">` : '';
+      const photo = cover
+        ? `<div class="entry-photo-frame"><img class="entry-cover-photo" src="${escapeHTML(cover.dataUrl)}" alt="" loading="lazy"></div>`
+        : `<div class="entry-photo-frame entry-art"><span class="entry-art-orb"></span><i class="bi ${entry.mood === 'happy' ? 'bi-sun' : entry.mood === 'sad' ? 'bi-cloud-rain' : 'bi-stars'}"></i></div>`;
       const excerptText = hasText ? excerpt(entry.body) : 'A blank page, ready for another thought.';
       return `<article class="${className}" data-open-entry="${escapeHTML(entry.id)}" tabindex="0" role="button" aria-label="Open ${escapeHTML(title)}">
-        ${photo}<div class="card-topline"><span>${escapeHTML(date)}</span>${mood ? `<span class="entry-pill">${mood.emoji} ${escapeHTML(mood.label)}</span>` : `<span class="entry-pill"><i class="bi bi-bookmark-heart"></i> Kept</span>`}</div>
-        <h3>${escapeHTML(title)}</h3><p class="entry-excerpt">${escapeHTML(excerptText)}</p>
-        <div class="card-bottom"><span>${entry.photos?.length ? `<i class="bi bi-images"></i> ${entry.photos.length} ${entry.photos.length === 1 ? 'photo' : 'photos'}` : 'A page of your own'}</span><span class="arrow-circle"><i class="bi bi-arrow-up-right"></i></span></div>
+        <div class="entry-copy">
+          <div class="card-topline"><span>${escapeHTML(date)}</span>${mood ? `<span class="entry-pill">${mood.emoji} ${escapeHTML(mood.label)}</span>` : ''}</div>
+          <h3>${escapeHTML(title)}</h3><p class="entry-excerpt">${escapeHTML(excerptText)}</p>
+          <div class="card-bottom"><span>${entry.photos?.length ? `<i class="bi bi-images"></i> ${entry.photos.length} ${entry.photos.length === 1 ? 'photo' : 'photos'}` : 'A page of your own'}</span><span class="arrow-circle"><i class="bi bi-arrow-up-right"></i></span></div>
+        </div>${photo}
       </article>`;
     }).join('');
     $('#emptyState').classList.toggle('hidden', list.length !== 0);
