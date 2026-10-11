@@ -43,6 +43,8 @@
   let importBusy = false;
   let pendingConfirmation = null;
   let state = freshState();
+  let greetingRequestKey = '';
+  let greetingRequestInFlight = false;
 
   function freshState() {
     return {
@@ -277,7 +279,8 @@
     $('#entryCount').textContent = `${list.length} ${list.length === 1 ? 'page' : 'pages'}`;
     $('#entriesHeading').textContent = query ? 'Search results' : 'Recent pages';
     $('#todayLabel').textContent = new Intl.DateTimeFormat(undefined, { weekday: 'long', month: 'long', day: 'numeric' }).format(new Date());
-    $('#homeSubheading').textContent = query ? `A small search through the things you've kept.` : THEME_INFO[activeTheme()].hello;
+    $('#homeSubheading').textContent = query ? `A small search through the things you've kept.` : getGreetingFallback();
+    if (!query) refreshGreeting();
     $('#entryStack').innerHTML = list.map((entry, index) => {
       const cover = coverPhoto(entry);
       const mood = moodInfo(entry.mood);
@@ -285,16 +288,12 @@
       const title = entry.title.trim() || 'An untitled page';
       const className = `entry-card theme-${cardTheme(entry)}${cover ? ' has-cover' : ''}`;
       const date = formatDate(entry.date, { month: 'short', day: 'numeric', year: 'numeric' });
-      const photo = cover
-        ? `<div class="entry-photo-frame"><img class="entry-cover-photo" src="${escapeHTML(cover.dataUrl)}" alt="" loading="lazy"></div>`
-        : `<div class="entry-photo-frame entry-art"><span class="entry-art-orb"></span><i class="bi ${entry.mood === 'happy' ? 'bi-sun' : entry.mood === 'sad' ? 'bi-cloud-rain' : 'bi-stars'}"></i></div>`;
+      const photo = cover ? `<img class="entry-cover-bg" src="${escapeHTML(cover.dataUrl)}" alt="" loading="lazy">` : '';
       const excerptText = hasText ? excerpt(entry.body) : 'A blank page, ready for another thought.';
       return `<article class="${className}" data-open-entry="${escapeHTML(entry.id)}" tabindex="0" role="button" aria-label="Open ${escapeHTML(title)}">
-        <div class="entry-copy">
-          <div class="card-topline"><span>${escapeHTML(date)}</span>${mood ? `<span class="entry-pill">${mood.emoji} ${escapeHTML(mood.label)}</span>` : ''}</div>
-          <h3>${escapeHTML(title)}</h3><p class="entry-excerpt">${escapeHTML(excerptText)}</p>
-          <div class="card-bottom"><span>${entry.photos?.length ? `<i class="bi bi-images"></i> ${entry.photos.length} ${entry.photos.length === 1 ? 'photo' : 'photos'}` : 'A page of your own'}</span><span class="arrow-circle"><i class="bi bi-arrow-up-right"></i></span></div>
-        </div>${photo}
+        ${photo}<div class="card-topline"><span>${escapeHTML(date)}</span>${mood ? `<span class="entry-pill">${mood.emoji} ${escapeHTML(mood.label)}</span>` : `<span class="entry-pill"><i class="bi bi-bookmark-heart"></i> Kept</span>`}</div>
+        <h3>${escapeHTML(title)}</h3><p class="entry-excerpt">${escapeHTML(excerptText)}</p>
+        <div class="card-bottom"><span>${entry.photos?.length ? `<i class="bi bi-images"></i> ${entry.photos.length} ${entry.photos.length === 1 ? 'photo' : 'photos'}` : 'A page of your own'}</span><span class="arrow-circle"><i class="bi bi-arrow-up-right"></i></span></div>
       </article>`;
     }).join('');
     $('#emptyState').classList.toggle('hidden', list.length !== 0);
@@ -303,6 +302,76 @@
     $('#emptyState p').textContent = query ? 'Try another word, date, or mood.' : 'Start with one small thing: what stayed with you today?';
     $('#emptyState .primary-button').classList.toggle('hidden', Boolean(query));
     applySettings();
+  }
+
+  function greetingPeriod(date = new Date()) {
+    const hour = date.getHours();
+    if (hour >= 5 && hour < 12) return 'morning';
+    if (hour >= 12 && hour < 17) return 'afternoon';
+    if (hour >= 17 && hour < 22) return 'evening';
+    return 'night';
+  }
+  function greetingCacheKey() {
+    return `quiet-pages-greeting-v1:${dateKey(new Date())}:${greetingPeriod()}`;
+  }
+  function getGreetingFallback() {
+    const defaults = {
+      morning: 'A new morning, a little room to begin.',
+      afternoon: 'Take a breath. There is still room for your own thoughts.',
+      evening: 'Let the day settle. Keep what matters, leave the rest.',
+      night: 'A quiet moment for whatever is on your mind.'
+    };
+    try {
+      const cached = JSON.parse(localStorage.getItem(greetingCacheKey()) || 'null');
+      if (cached && typeof cached.text === 'string' && cached.text.trim()) return cached.text;
+    } catch (_) {}
+    return defaults[greetingPeriod()];
+  }
+  async function refreshGreeting(force = false) {
+    if (currentScreen !== 'diary' || $('#searchInput')?.value?.trim()) return;
+    const key = greetingCacheKey();
+    if (greetingRequestInFlight || (!force && greetingRequestKey === key)) return;
+    let cached = null;
+    try { cached = JSON.parse(localStorage.getItem(key) || 'null'); } catch (_) {}
+    if (!force && cached && typeof cached.text === 'string' && cached.text.trim()) {
+      $('#homeSubheading').textContent = cached.text;
+      greetingRequestKey = key;
+      return;
+    }
+    if (!engine) {
+      $('#homeSubheading').textContent = getGreetingFallback();
+      greetingRequestKey = key;
+      return;
+    }
+    greetingRequestInFlight = true;
+    greetingRequestKey = key;
+    const fallback = getGreetingFallback();
+    try {
+      const period = greetingPeriod();
+      const recentEntries = sortedEntries().slice(0, 3).map(entry =>
+        `[${entry.date}] ${entry.title || 'Untitled'}: ${excerpt(entry.body, 450)}${entry.mood ? ` (mood: ${entry.mood})` : ''}`
+      ).join('\n');
+      const memories = state.memories.slice(0, 8).map(memory => `- ${memory.text}`).join('\n');
+      const response = await engine.chat.completions.create({
+        messages: [
+          { role: 'system', content: `Write one brief, natural greeting for the home screen of a private diary app. It is currently ${period}. Use 1 or 2 sentences, maximum 35 words. Be warm, specific only when the supplied diary or approved memories support it, and never claim to know the user's feelings or invent events. Do not mention being an AI. If context is sparse, write a simple time-appropriate greeting. Do not use quotation marks or markdown.\n\nApproved memories:\n${memories || '(none)'}\n\nRecent diary entries:\n${recentEntries || '(no entries yet)'}` },
+          { role: 'user', content: `Write a fresh ${period} greeting for today. Keep it gentle and not overly sentimental. Avoid repeating a generic greeting if the context allows something more personal.` }
+        ],
+        temperature: 0.85,
+        max_tokens: 70
+      });
+      const text = response?.choices?.[0]?.message?.content?.trim().replace(/^['"“”]+|['"“”]+$/g, '');
+      if (text && currentScreen === 'diary' && greetingCacheKey() === key) {
+        const greeting = text.split(/\n+/)[0].slice(0, 240);
+        $('#homeSubheading').textContent = greeting;
+        try { localStorage.setItem(key, JSON.stringify({ text: greeting, generatedAt: new Date().toISOString() })); } catch (_) {}
+      }
+    } catch (error) {
+      // Keep the diary usable if local inference fails; do not block the home screen.
+      if (currentScreen === 'diary' && greetingCacheKey() === key) $('#homeSubheading').textContent = fallback;
+    } finally {
+      greetingRequestInFlight = false;
+    }
   }
 
   function renderCompanion() {
@@ -736,7 +805,9 @@
       $('#unloadModelButton').classList.remove('hidden');
       button.classList.add('hidden');
       $('#companionStatus').innerHTML = `<span class="status-dot"></span><span>Local AI loaded · ${escapeHTML(modelId)}</span>`;
+      greetingRequestKey = '';
       toast('Local AI is ready. Your prompts are processed in this browser.');
+      if (currentScreen === 'diary') refreshGreeting(true);
     } catch (error) {
       engine = null;
       $('#modelStatusTitle').textContent = 'Could not load this model';
