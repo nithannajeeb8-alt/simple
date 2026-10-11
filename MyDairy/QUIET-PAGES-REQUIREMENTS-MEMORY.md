@@ -26,3 +26,10 @@ This file records the product constraints shared in the project conversation. Ke
 ## Delivery discipline
 - Package PWA overlays without a native iOS project. Preserve unrelated files/assets. Use a new service-worker cache version when deployed JS/CSS changes.
 - Say what was actually syntax/package tested; do not claim physical iPhone/Android testing unless it happened.
+
+
+## Mobile editor keyboard accessory (v16)
+- Formatting toolbar is portaled to a direct child of `document.body` while the editor is mounted, avoiding transformed/scrolling ancestor fixed-position bugs in iOS Safari.
+- Toolbar accessory is removed when leaving the editor; keyboard CSS state and inset reset.
+- Title input is not auto-focused during editor screen transition; title remains editable by explicit tap.
+- No diary data/local-storage keys or visual theme tokens changed.

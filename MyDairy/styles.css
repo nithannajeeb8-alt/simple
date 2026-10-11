@@ -118,15 +118,15 @@ html.large-text{--font-scale:1.08} html.xlarge-text{--font-scale:1.16}
 #screen-editor .editor-card { max-width:900px; margin:0 auto 30px; padding:clamp(20px,5vw,44px); overflow:visible; border-radius:30px; }
 #screen-editor .editor-intro-note { margin:8px 0 24px; color:var(--muted); font-size:14px; line-height:1.7; }
 #screen-editor .editor-field.writing-field { margin-top:24px; }
-#screen-editor .rich-toolbar { position:sticky; top:calc(env(safe-area-inset-top) + 8px); z-index:12; display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin:12px 0 0; padding:10px; border:1px solid var(--line); border-radius:18px 18px 0 0; background:color-mix(in srgb,var(--surface) 95%,transparent); box-shadow:0 8px 22px rgba(40,65,52,.06); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); }
-#screen-editor .rich-toolbar button,#screen-editor .rich-toolbar .highlight-picker,#screen-editor .rich-toolbar .text-color-picker { position:relative; display:inline-flex; align-items:center; justify-content:center; gap:5px; min-width:38px; min-height:38px; padding:8px 10px; border:1px solid rgba(57,83,68,.12); border-radius:11px; background:var(--surface-2); color:var(--accent-strong); font-size:15px; font-weight:700; cursor:pointer; }
-#screen-editor .rich-toolbar button:hover,#screen-editor .rich-toolbar button:focus-visible { background:var(--accent-soft); border-color:color-mix(in srgb,var(--accent) 30%,var(--line)); }
-#screen-editor .rich-toolbar button:active { transform:scale(.97); }
-#screen-editor .rich-toolbar .bi { display:inline-block; font-size:17px; line-height:1; }
-#screen-editor .rich-toolbar select { width:auto; max-width:105px; min-width:76px; min-height:38px; padding:6px 8px; border:1px solid var(--line); border-radius:11px; background:var(--surface); color:var(--ink); font-size:11px; }
-#screen-editor .rich-toolbar .toolbar-divider { width:1px; height:25px; background:var(--line); margin:0 2px; }
-#screen-editor .rich-toolbar .highlight-picker,#screen-editor .rich-toolbar .text-color-picker { overflow:hidden; }
-#screen-editor .rich-toolbar input[type=color] { position:absolute; inset:0; width:100%; height:100%; opacity:0; cursor:pointer; }
+#screen-editor .rich-toolbar, #qpEditorAccessory .rich-toolbar { position:sticky; top:calc(env(safe-area-inset-top) + 8px); z-index:12; display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin:12px 0 0; padding:10px; border:1px solid var(--line); border-radius:18px 18px 0 0; background:color-mix(in srgb,var(--surface) 95%,transparent); box-shadow:0 8px 22px rgba(40,65,52,.06); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); }
+#screen-editor .rich-toolbar button,#screen-editor .rich-toolbar .highlight-picker,#screen-editor .rich-toolbar .text-color-picker,#qpEditorAccessory .rich-toolbar button,#qpEditorAccessory .rich-toolbar .highlight-picker,#qpEditorAccessory .rich-toolbar .text-color-picker { position:relative; display:inline-flex; align-items:center; justify-content:center; gap:5px; min-width:38px; min-height:38px; padding:8px 10px; border:1px solid rgba(57,83,68,.12); border-radius:11px; background:var(--surface-2); color:var(--accent-strong); font-size:15px; font-weight:700; cursor:pointer; }
+#screen-editor .rich-toolbar button:hover,#screen-editor .rich-toolbar button:focus-visible,#qpEditorAccessory .rich-toolbar button:hover,#qpEditorAccessory .rich-toolbar button:focus-visible { background:var(--accent-soft); border-color:color-mix(in srgb,var(--accent) 30%,var(--line)); }
+#screen-editor .rich-toolbar button:active,#qpEditorAccessory .rich-toolbar button:active { transform:scale(.97); }
+#screen-editor .rich-toolbar .bi,#qpEditorAccessory .rich-toolbar .bi { display:inline-block; font-size:17px; line-height:1; }
+#screen-editor .rich-toolbar select,#qpEditorAccessory .rich-toolbar select { width:auto; max-width:105px; min-width:76px; min-height:38px; padding:6px 8px; border:1px solid var(--line); border-radius:11px; background:var(--surface); color:var(--ink); font-size:11px; }
+#screen-editor .rich-toolbar .toolbar-divider,#qpEditorAccessory .rich-toolbar .toolbar-divider { width:1px; height:25px; background:var(--line); margin:0 2px; }
+#screen-editor .rich-toolbar .highlight-picker,#screen-editor .rich-toolbar .text-color-picker,#qpEditorAccessory .rich-toolbar .highlight-picker,#qpEditorAccessory .rich-toolbar .text-color-picker { overflow:hidden; }
+#screen-editor .rich-toolbar input[type=color],#qpEditorAccessory .rich-toolbar input[type=color] { position:absolute; inset:0; width:100%; height:100%; opacity:0; cursor:pointer; }
 #screen-editor .rich-editor { display:block; width:100%; max-width:none; min-height:clamp(460px,60vh,900px); padding:clamp(22px,5vw,38px) clamp(18px,4vw,34px); border:1px solid var(--line); border-top:0; border-radius:0 0 20px 20px; background:color-mix(in srgb,var(--surface) 94%,var(--page)); color:var(--ink); font-family:var(--serif); font-size:19px; line-height:1.95; white-space:normal; overflow-wrap:anywhere; outline:none; box-shadow:0 9px 26px rgba(31,45,55,.025); -webkit-user-select:text; user-select:text; }
 #screen-editor .rich-editor:focus { border-color:color-mix(in srgb,var(--accent) 42%,var(--line)); box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 9%,transparent); }
 #screen-editor .rich-editor:empty::before { content:attr(data-placeholder); color:#a3aaa5; pointer-events:none; }
@@ -158,14 +158,14 @@ html.large-text{--font-scale:1.08} html.xlarge-text{--font-scale:1.16}
  #screen-diary .entry-pill { padding:5px 7px; font-size:9px; }
  #screen-diary .entry-photo-frame { border-radius:21px; }
  #screen-editor .editor-card { padding:18px; border-radius:24px; }
- #screen-editor .rich-toolbar { gap:5px; padding:8px; }
- #screen-editor .rich-toolbar button,#screen-editor .rich-toolbar .highlight-picker,#screen-editor .rich-toolbar .text-color-picker { min-width:34px; min-height:35px; padding:7px 8px; }
- #screen-editor .rich-toolbar select { min-width:67px; max-width:82px; min-height:35px; font-size:10px; }
+ #screen-editor .rich-toolbar, #qpEditorAccessory .rich-toolbar { gap:5px; padding:8px; }
+ #screen-editor .rich-toolbar button,#screen-editor .rich-toolbar .highlight-picker,#screen-editor .rich-toolbar .text-color-picker,#qpEditorAccessory .rich-toolbar button,#qpEditorAccessory .rich-toolbar .highlight-picker,#qpEditorAccessory .rich-toolbar .text-color-picker { min-width:34px; min-height:35px; padding:7px 8px; }
+ #screen-editor .rich-toolbar select,#qpEditorAccessory .rich-toolbar select { min-width:67px; max-width:82px; min-height:35px; font-size:10px; }
  #screen-editor .rich-editor { min-height:58vh; padding:23px 17px; font-size:18px; line-height:1.9; }
  #screen-editor .editor-meta-grid { grid-template-columns:1fr; }
  .floating-add { bottom:calc(84px + env(safe-area-inset-bottom)); }
 }
-@media (max-width:360px) { #screen-diary .entry-card { grid-template-columns:minmax(0,1fr) minmax(88px,36%); padding-left:14px; } #screen-diary .entry-excerpt { font-size:10.5px; } #screen-editor .rich-toolbar select { min-width:58px; max-width:72px; } }
+@media (max-width:360px) { #screen-diary .entry-card { grid-template-columns:minmax(0,1fr) minmax(88px,36%); padding-left:14px; } #screen-diary .entry-excerpt { font-size:10.5px; } #screen-editor .rich-toolbar select,#qpEditorAccessory .rich-toolbar select { min-width:58px; max-width:72px; } }
 @media (prefers-reduced-motion:reduce) { #screen-diary .entry-card { transition:none; } }
 
 
@@ -345,46 +345,47 @@ html.large-text{--font-scale:1.08} html.xlarge-text{--font-scale:1.16}
   body.qp-keyboard-open #screen-editor .editor-intro-note,
   body.qp-keyboard-open #screen-editor .writing-field > label { display:none !important; }
 
-  /* Keep the entry title row in the document at all times so it can be revisited
-     while the keyboard is open. The viewport may scroll it out of view, but never
-     make the actual title input un-focusable with display:none. */
-  body.qp-keyboard-open:not(.qp-body-focused) #screen-editor .rich-toolbar { display:none !important; }
+  /* The toolbar is portaled to a direct body child so iOS fixed positioning is not
+     trapped by the screen's scrolling/animation containing block. */
+  #qpEditorAccessory { display:none; }
+  body.qp-keyboard-open #qpEditorAccessory { display:block; }
+  body.qp-keyboard-open:not(.qp-body-focused) #qpEditorAccessory { display:none !important; }
   body.qp-keyboard-open #screen-editor .editor-field.writing-field { margin-top:0 !important; }
-
-  /* Use a bottom inset instead of a calculated top coordinate. The JS updates the
-     inset from VisualViewport on keyboard resize, viewport scroll, and page scroll. */
-  body.qp-body-focused #screen-editor .rich-toolbar {
+  body.qp-body-focused #qpEditorAccessory {
     position:fixed !important;
-    top:auto !important;
-    bottom:calc(var(--qp-keyboard-inset, 0px) + 8px) !important;
     left:10px !important; right:10px !important;
-    z-index:1000; display:flex; flex-wrap:nowrap; overflow-x:auto; overscroll-behavior-x:contain; scrollbar-width:none;
-    width:auto; max-width:none; margin:0 !important; padding:7px !important; gap:5px !important;
+    bottom:calc(var(--qp-keyboard-inset, 0px) + env(safe-area-inset-bottom) + 6px) !important;
+    z-index:2147483000 !important;
+    display:block !important;
+    pointer-events:auto;
+  }
+  body.qp-body-focused #qpEditorAccessory .rich-toolbar {
+    position:relative !important; inset:auto !important;
+    display:flex !important; flex-wrap:nowrap; overflow-x:auto; overscroll-behavior-x:contain; scrollbar-width:none;
+    width:100%; max-width:none; margin:0 !important; padding:7px !important; gap:5px !important;
     border:1px solid var(--line); border-radius:15px !important; background:color-mix(in srgb,var(--surface) 96%,transparent);
     box-shadow:0 5px 20px rgba(40,65,52,.18); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
     scroll-padding-inline:8px; -webkit-overflow-scrolling:touch;
   }
-  body.qp-body-focused #screen-editor .rich-toolbar::-webkit-scrollbar { display:none; }
-  body.qp-body-focused #screen-editor .rich-toolbar button,
-  body.qp-body-focused #screen-editor .rich-toolbar .highlight-picker,
-  body.qp-body-focused #screen-editor .rich-toolbar .text-color-picker { flex:0 0 auto; min-width:42px; min-height:42px; }
-  body.qp-body-focused #screen-editor .rich-toolbar select { flex:0 0 auto; min-height:42px; min-width:78px; }
+  body.qp-body-focused #qpEditorAccessory .rich-toolbar::-webkit-scrollbar { display:none; }
+  body.qp-body-focused #qpEditorAccessory .rich-toolbar button,
+  body.qp-body-focused #qpEditorAccessory .rich-toolbar .highlight-picker,
+  body.qp-body-focused #qpEditorAccessory .rich-toolbar .text-color-picker { flex:0 0 auto; min-width:42px; min-height:42px; }
+  body.qp-body-focused #qpEditorAccessory .rich-toolbar select { flex:0 0 auto; min-height:42px; min-width:78px; }
   body.qp-body-focused #screen-editor .rich-editor {
-    min-height:36vh !important; padding:16px 14px 78px !important; border-radius:14px !important;
+    min-height:36vh !important; padding:16px 14px 96px !important; border-radius:14px !important;
     font-size:18px; line-height:1.75; scroll-margin-top:12px;
   }
   body.qp-body-focused #screen-editor .hint { font-size:11px; margin:8px 2px; }
 }
 @media (max-width: 799px) {
-  #screen-editor .rich-toolbar { scroll-behavior:smooth; }
+  #screen-editor .rich-toolbar, #qpEditorAccessory .rich-toolbar { scroll-behavior:smooth; }
   #screen-editor .rich-toolbar button:focus-visible,
-  #screen-editor .rich-toolbar select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+  #screen-editor .rich-toolbar select:focus-visible,
+  #qpEditorAccessory .rich-toolbar button:focus-visible,
+  #qpEditorAccessory .rich-toolbar select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
 }
 
-/* The generic .screen animation ends with transform:translateY(0) and fill-mode:both.
-   A transform creates a containing block for fixed descendants, so the editor's
-   keyboard toolbar would be fixed to the screen section and drift with page scroll.
-   Keep the same soft entrance using opacity only; opacity does not create that
-   fixed-position containing block. */
+/* Keep editor entrance opacity-only; the keyboard accessory is portaled to body. */
 #screen-editor { animation: qp-editor-fade-in .28s ease both; }
 @keyframes qp-editor-fade-in { from { opacity:0; } to { opacity:1; } }

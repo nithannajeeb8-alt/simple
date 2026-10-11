@@ -23,3 +23,8 @@ Phone validation checklist:
 - Dismiss the keyboard: the bar hides and navigation returns.
 
 Validation performed here: JavaScript syntax and ZIP integrity. Physical iPhone Safari validation has not been performed in this environment.
+
+
+V16 structural repair: the formatting toolbar is moved to a direct child of document.body while the editor is mounted. This avoids fixed-position elements being constrained by the screen/app-shell containing block on iOS. The toolbar is placed above the software keyboard using the viewport inset, and removed when leaving the editor. The title is no longer auto-focused during the screen transition, so the user can deliberately tap the title field without the keyboard opening mid-transition.
+
+Validation note: source syntax and ZIP integrity are checked; this cannot substitute for a physical iPhone Safari test.

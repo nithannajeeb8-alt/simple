@@ -394,7 +394,12 @@
   }
   function navTo(screen) {
     if (!['diary', 'companion', 'calendar', 'settings', 'detail', 'editor'].includes(screen)) screen = 'diary';
-    if (currentScreen === 'editor' && screen !== 'editor') flushEditorSave();
+    if (currentScreen === 'editor' && screen !== 'editor') {
+      flushEditorSave();
+      document.getElementById('qpEditorAccessory')?.remove();
+      document.body.classList.remove('qp-keyboard-open', 'qp-body-focused', 'qp-title-focused');
+      document.documentElement.style.setProperty('--qp-keyboard-inset', '0px');
+    }
     // Preserve the originating tab while opening an editor or a detail view.
     if (['diary', 'calendar'].includes(currentScreen) && ['detail', 'editor'].includes(screen)) previousScreen = currentScreen;
     else if (!['detail', 'editor'].includes(screen)) previousScreen = screen;
@@ -671,7 +676,8 @@
     previousScreen = currentScreen === 'calendar' ? 'calendar' : (currentScreen === 'detail' ? previousScreen : 'diary');
     renderEditor();
     navTo('editor');
-    setTimeout(() => $('#editorTitle')?.focus({ preventScroll: true }), 120);
+    // Do not auto-focus the title: iOS Safari can open the keyboard during the screen transition
+    // and scroll the title out from under the user. Let the user choose title or body explicitly.
   }
   function renderEditor() {
     savedEditorRange = null;
@@ -699,6 +705,22 @@
       <div class="autosave-status" id="autosaveStatus">${editorIsNew ? 'Your page is not saved until you start writing.' : 'All changes are saved on this device.'}</div>
       <div class="editor-footer"><div class="left">${editorIsNew ? '' : `<button class="secondary-button editor-delete" data-action="delete-entry" data-entry-id="${escapeHTML(data.id)}"><i class="bi bi-trash3"></i> Delete</button>`}</div><button type="button" class="primary-button" id="saveEntryButton"><i class="bi bi-check2"></i> Save page</button></div></div>`;
     bindEditorEvents();
+    mountEditorToolbarAccessory();
+  }
+  function mountEditorToolbarAccessory() {
+    // A fixed element inside .screen/.app-shell can inherit a transformed containing block on iOS.
+    // Move the toolbar to a direct body-level accessory and leave a placeholder in the editor flow.
+    document.getElementById('qpEditorAccessory')?.remove();
+    const toolbar = $('#screen-editor .rich-toolbar');
+    if (!toolbar) return;
+    const placeholder = document.createComment('Quiet Pages formatting toolbar position');
+    toolbar.parentNode.insertBefore(placeholder, toolbar);
+    const accessory = document.createElement('div');
+    accessory.id = 'qpEditorAccessory';
+    accessory.appendChild(toolbar);
+    document.body.appendChild(accessory);
+    toolbar.dataset.portal = 'true';
+    toolbar._qpPlaceholder = placeholder;
   }
   function bindEditorEvents() {
     const title = $('#editorTitle');
@@ -746,15 +768,15 @@
     title.addEventListener('input', track);
     body.addEventListener('input', track);
     // Prevent mouse-down from discarding the selected range before a toolbar command runs.
-    $$('.rich-toolbar button', $('#screen-editor')).forEach(button => button.addEventListener('mousedown', event => event.preventDefault()));
-    $$('.rich-toolbar [data-format]', $('#screen-editor')).forEach(button => button.addEventListener('click', () => {
+    $$('.rich-toolbar button', document).forEach(button => button.addEventListener('mousedown', event => event.preventDefault()));
+    $$('.rich-toolbar [data-format]', document).forEach(button => button.addEventListener('click', () => {
       restoreSelection();
       document.execCommand('styleWithCSS', false, true);
       document.execCommand(button.dataset.format, false, null);
       track();
       rememberSelection();
     }));
-    $$('.rich-toolbar [data-block]', $('#screen-editor')).forEach(button => button.addEventListener('click', () => {
+    $$('.rich-toolbar [data-block]', document).forEach(button => button.addEventListener('click', () => {
       restoreSelection();
       document.execCommand('formatBlock', false, `<${button.dataset.block}>`);
       track();
@@ -1601,7 +1623,7 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
       // While a toolbar control is focused/tapped, retain the previous body focus
       // so the keyboard and toolbar do not disappear between a tap and command.
       const active = document.activeElement;
-      const activeInToolbar = !!active?.closest?.('#screen-editor .rich-toolbar');
+      const activeInToolbar = !!active?.closest?.('.rich-toolbar');
       if (!focusedField && !activeInToolbar) {
         lastEditorField = null;
       }
@@ -1648,7 +1670,7 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
         lastEditorField = event.target.id === 'editorBody' ? 'body' : 'title';
         clearTimeout(blurTimer);
         scheduleSettledRefresh();
-      } else if (event.target?.closest?.('#screen-editor .rich-toolbar') && lastEditorField === 'body') {
+      } else if (event.target?.closest?.('.rich-toolbar') && lastEditorField === 'body') {
         clearTimeout(blurTimer);
         scheduleSettledRefresh();
       }
@@ -1661,7 +1683,7 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
         const next = activeEditorField();
         if (next) {
           lastEditorField = next;
-        } else if (!document.activeElement?.closest?.('#screen-editor .rich-toolbar')) {
+        } else if (!document.activeElement?.closest?.('.rich-toolbar')) {
           lastEditorField = null;
         }
         scheduleSettledRefresh();
