@@ -1580,6 +1580,10 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
       const vv = window.visualViewport;
       const visibleHeight = vv?.height || window.innerHeight;
       const keyboardLikelyOpen = editorFocused && (baselineHeight - visibleHeight > 120);
+      // Distance between the visible viewport bottom and layout viewport bottom.
+      // This places the fixed format bar directly above the on-screen keyboard.
+      const keyboardBottom = vv ? Math.max(0, window.innerHeight - (vv.height + (vv.offsetTop || 0))) : Math.max(0, baselineHeight - visibleHeight);
+      document.documentElement.style.setProperty('--qp-keyboard-bottom', `${keyboardLikelyOpen ? keyboardBottom : 0}px`);
       document.body.classList.toggle('qp-keyboard-open', keyboardLikelyOpen);
       if (!editorFocused && visibleHeight > baselineHeight - 80) baselineHeight = visibleHeight;
     };
