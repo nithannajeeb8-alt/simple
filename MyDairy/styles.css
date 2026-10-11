@@ -343,13 +343,11 @@ html.large-text{--font-scale:1.08} html.xlarge-text{--font-scale:1.16}
   body.qp-keyboard-open #screen-editor .editor-card { padding:12px 12px 18px !important; border-radius:18px !important; }
   body.qp-keyboard-open #screen-editor .editor-card > .eyebrow,
   body.qp-keyboard-open #screen-editor .editor-intro-note,
-  body.qp-keyboard-open #screen-editor .writing-field > label { display:none !important; }
-  /* Keep the title input visible when it has focus. Hide it only while the body is being edited. */
-  body.qp-body-focused #screen-editor .editor-field:has(#editorTitle) { display:none !important; }
-  body.qp-keyboard-open:not(.qp-body-focused) #screen-editor .rich-toolbar { display:none !important; }
+  body.qp-keyboard-open #screen-editor .writing-field > label,
+  body.qp-keyboard-open #screen-editor .editor-field:has(#editorTitle) { display:none !important; }
   body.qp-keyboard-open #screen-editor .editor-field.writing-field { margin-top:0 !important; }
-  body.qp-body-focused #screen-editor .rich-toolbar {
-    /* Anchor formatting to the visible viewport edge above the software keyboard. */
+  body.qp-keyboard-open #screen-editor .rich-toolbar {
+    /* Keep formatting at the bottom, immediately above the iOS keyboard. */
     position:fixed !important; left:10px; right:10px;
     top:var(--qp-toolbar-top, 45vh) !important; bottom:auto !important;
     z-index:1000; display:flex; flex-wrap:nowrap; overflow-x:auto; overscroll-behavior-x:contain; scrollbar-width:none;
@@ -358,16 +356,16 @@ html.large-text{--font-scale:1.08} html.xlarge-text{--font-scale:1.16}
     box-shadow:0 5px 20px rgba(40,65,52,.18); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
     scroll-padding-inline:8px; -webkit-overflow-scrolling:touch;
   }
-  body.qp-body-focused #screen-editor .rich-toolbar::-webkit-scrollbar { display:none; }
-  body.qp-body-focused #screen-editor .rich-toolbar button,
-  body.qp-body-focused #screen-editor .rich-toolbar .highlight-picker,
-  body.qp-body-focused #screen-editor .rich-toolbar .text-color-picker { flex:0 0 auto; min-width:42px; min-height:42px; }
-  body.qp-body-focused #screen-editor .rich-toolbar select { flex:0 0 auto; min-height:42px; min-width:78px; }
-  body.qp-body-focused #screen-editor .rich-editor {
+  body.qp-keyboard-open #screen-editor .rich-toolbar::-webkit-scrollbar { display:none; }
+  body.qp-keyboard-open #screen-editor .rich-toolbar button,
+  body.qp-keyboard-open #screen-editor .rich-toolbar .highlight-picker,
+  body.qp-keyboard-open #screen-editor .rich-toolbar .text-color-picker { flex:0 0 auto; min-width:42px; min-height:42px; }
+  body.qp-keyboard-open #screen-editor .rich-toolbar select { flex:0 0 auto; min-height:42px; min-width:78px; }
+  body.qp-keyboard-open #screen-editor .rich-editor {
     min-height:36vh !important; padding:16px 14px 78px !important; border-radius:14px !important;
     font-size:18px; line-height:1.75; scroll-margin-top:12px;
   }
-  body.qp-body-focused #screen-editor .hint { font-size:11px; margin:8px 2px; }
+  body.qp-keyboard-open #screen-editor .hint { font-size:11px; margin:8px 2px; }
 }
 @media (max-width: 799px) {
   #screen-editor .rich-toolbar { scroll-behavior:smooth; }
