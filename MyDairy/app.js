@@ -1305,22 +1305,34 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
     try {
       webllmModule = await import('https://esm.run/@mlc-ai/web-llm');
       const allModels = webllmModule.prebuiltAppConfig?.model_list || [];
-      const smallModels = allModels.filter(model => {
-        const name = `${model.model_id} ${model.model || ''}`.toLowerCase();
-        const recognizedFamily = /(qwen|gemma|llama|phi|smollm|stablelm)/.test(name);
-        const likelySmall = /(0\.5b|0\.6b|1b|1\.0b|1\.5b|1\.7b|2b|2\.0b|2\.5b|3b|3\.0b)/.test(name);
-        const likelyLarge = /(7b|8b|9b|11b|13b|70b)/.test(name);
-        return recognizedFamily && likelySmall && !likelyLarge;
+      // The installed WebLLM build is the source of truth. Offer only its prebuilt entries.
+      // Include compact families and up to 8B options for capable devices, grouped by estimated size.
+      const candidates = allModels.filter(model => {
+        const name = `${model.model_id || ''} ${model.model || ''}`.toLowerCase();
+        const recognizedFamily = /(qwen|gemma|llama|phi|smollm|stablelm|mistral)/.test(name);
+        const size = modelSizeB(name);
+        const memory = Number(model.vram_required_MB || 0);
+        // Some IDs encode a release number (for example Phi-3.5-mini), not parameter size.
+        // Keep such models only when the runtime itself marks them low-resource or gives a modest memory estimate.
+        return recognizedFamily && (size > 0 ? size <= 8 : Boolean(model.low_resource_required || (memory > 0 && memory <= 7000)));
       });
-      const candidates = smallModels.length ? smallModels : allModels.filter(model => model.low_resource_required && !/(7b|8b|9b|11b|13b|70b)/i.test(model.model_id)).slice(0, 8);
-      if (!candidates.length) throw new Error('The runtime did not list any small prebuilt models.');
-      candidates.sort((a, b) => modelPreference(a.model_id) - modelPreference(b.model_id));
-      $('#modelSelect').innerHTML = `<option value="">Choose a supported model</option>${candidates.map(model => `<option value="${escapeHTML(model.model_id)}">${escapeHTML(model.model_id)}${model.vram_required_MB ? ` · approx. ${Math.round(model.vram_required_MB)} MB GPU memory` : ''}</option>`).join('')}`;
+      if (!candidates.length) throw new Error('This WebLLM build did not list supported compact Qwen, Phi, Gemma, Llama, SmolLM, StableLM or Mistral models.');
+      candidates.sort((a, b) => modelPreference(a.model_id) - modelPreference(b.model_id) || String(a.model_id).localeCompare(String(b.model_id)));
+      const tiers = [
+        { label: 'Lite · lower-memory devices', test: m => modelTierSize(m) <= 1.5 },
+        { label: 'Balanced · everyday devices', test: m => modelTierSize(m) > 1.5 && modelTierSize(m) <= 3.5 },
+        { label: 'Advanced · capable devices', test: m => modelTierSize(m) > 3.5 }
+      ];
+      const groups = tiers.map(tier => {
+        const items = candidates.filter(tier.test);
+        return items.length ? `<optgroup label="${tier.label}">${items.map(model => `<option value="${escapeHTML(model.model_id)}">${escapeHTML(model.model_id)}${model.vram_required_MB ? ` · approx. ${Math.round(model.vram_required_MB)} MB GPU memory` : ''}</option>`).join('')}</optgroup>` : '';
+      }).join('');
+      $('#modelSelect').innerHTML = `<option value="">Choose a supported model</option>${groups}`;
       $('#modelSelect').classList.remove('hidden');
-      $('#modelSelect').value = candidates.some(m => m.model_id === state.settings.modelId) ? state.settings.modelId : (candidates[0]?.model_id || '');
+      $('#modelSelect').value = candidates.some(m => m.model_id === state.settings.modelId) ? state.settings.modelId : (candidates.find(m => modelTierSize(m) <= 1.5)?.model_id || candidates[0]?.model_id || '');
       $('#loadModelButton').classList.toggle('hidden', !$('#modelSelect').value);
       $('#modelStatusTitle').textContent = `${candidates.length} compatible model option${candidates.length === 1 ? '' : 's'} found`;
-      $('#modelStatusText').textContent = 'Choose a model below. The runtime catalogue is authoritative; Qwen3 1.7B will appear only if this WebLLM build actually supports it.';
+      $('#modelStatusText').textContent = 'Only models listed by this runtime are shown. Lite, Balanced and Advanced are size-based guidance, not a guarantee of speed or memory fit. Apple Foundation Models is native-iOS-only and is not a Safari model option.';
       toast('Model catalogue loaded. Choose a small model to begin.');
     } catch (error) {
       $('#modelStatusTitle').textContent = 'Could not load model catalogue';
@@ -1332,14 +1344,31 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
       renderCompanion();
     }
   }
+  function modelSizeB(modelId) {
+    const name = String(modelId || '').toLowerCase();
+    // Match explicit parameter sizes (0.6b, 1.5b, 3b, 7b, etc.), not quantization digits.
+    const matches = [...name.matchAll(/(?:^|[^a-z0-9])(\d+(?:\.\d+)?)\s*b(?:[^a-z0-9]|$)/g)];
+    if (!matches.length) return 0;
+    const values = matches.map(match => Number(match[1])).filter(value => value > 0 && value <= 1000);
+    return values.length ? Math.min(...values) : 0;
+  }
+  function modelTierSize(model) {
+    const parsed = modelSizeB(model?.model_id || model);
+    if (parsed > 0) return parsed;
+    // Runtime memory estimates are approximate; this is only a fallback for labels/order.
+    const memory = Number(model?.vram_required_MB || 0);
+    return memory > 0 ? memory / 900 : (model?.low_resource_required ? 1.5 : 4);
+  }
   function modelPreference(modelId) {
-    const name = modelId.toLowerCase();
-    if (name.includes('qwen3')) return 0;
+    const name = String(modelId || '').toLowerCase();
+    if (name.includes('qwen3') && modelSizeB(name) <= 1.5) return 0;
     if (name.includes('qwen')) return 1;
-    if (name.includes('gemma')) return 2;
-    if (name.includes('llama-3.2-1b')) return 3;
-    if (name.includes('phi')) return 4;
-    return 5;
+    if (name.includes('phi')) return 2;
+    if (name.includes('gemma')) return 3;
+    if (name.includes('smollm')) return 4;
+    if (name.includes('llama')) return 5;
+    if (name.includes('mistral')) return 6;
+    return 7;
   }
   async function loadSelectedModel() {
     if (!webllmModule) return toast('Find compatible models first.');
