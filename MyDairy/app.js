@@ -1574,17 +1574,27 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
   // iOS may resize the visual viewport without resizing the layout viewport.
   (() => {
     let editorFocused = false;
+    let writingBodyFocused = false;
     let baselineHeight = window.visualViewport?.height || window.innerHeight;
     let closeTimer = 0;
     const refreshKeyboardLayout = () => {
       const vv = window.visualViewport;
       const visibleHeight = vv?.height || window.innerHeight;
       const keyboardLikelyOpen = editorFocused && (baselineHeight - visibleHeight > 120);
-      // Distance between the visible viewport bottom and layout viewport bottom.
-      // This places the fixed format bar directly above the on-screen keyboard.
-      const keyboardBottom = vv ? Math.max(0, window.innerHeight - (vv.height + (vv.offsetTop || 0))) : Math.max(0, baselineHeight - visibleHeight);
-      document.documentElement.style.setProperty('--qp-keyboard-bottom', `${keyboardLikelyOpen ? keyboardBottom : 0}px`);
+      const bodyFocused = writingBodyFocused && document.activeElement === document.querySelector('#screen-editor #editorBody');
+      // Anchor the toolbar to the *visible viewport's* bottom edge, not the
+      // document's bottom. On iOS Safari the layout viewport can remain tall
+      // while the visual viewport shrinks above the keyboard.
+      const toolbar = document.querySelector('#screen-editor .rich-toolbar');
+      if (vv && toolbar && keyboardLikelyOpen) {
+        const toolbarHeight = toolbar.getBoundingClientRect().height || 58;
+        const visibleBottom = (vv.offsetTop || 0) + vv.height;
+        const top = Math.max((vv.offsetTop || 0) + 6, visibleBottom - toolbarHeight - 8);
+        document.documentElement.style.setProperty('--qp-toolbar-top', `${top}px`);
+      }
       document.body.classList.toggle('qp-keyboard-open', keyboardLikelyOpen);
+      document.body.classList.toggle('qp-body-focused', keyboardLikelyOpen && bodyFocused);
+      document.body.classList.toggle('qp-title-focused', keyboardLikelyOpen && document.activeElement === document.querySelector('#screen-editor #editorTitle'));
       if (!editorFocused && visibleHeight > baselineHeight - 80) baselineHeight = visibleHeight;
     };
     const bindEditorFocus = () => {
@@ -1593,6 +1603,7 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
       [editor, title].filter(Boolean).forEach(el => {
         el.addEventListener('focus', () => {
           editorFocused = true;
+          writingBodyFocused = el.id === 'editorBody';
           clearTimeout(closeTimer);
           setTimeout(refreshKeyboardLayout, 80);
           setTimeout(refreshKeyboardLayout, 320);
@@ -1600,7 +1611,8 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
         el.addEventListener('blur', () => {
           closeTimer = setTimeout(() => {
             editorFocused = !!document.querySelector('#screen-editor :is(#editorBody,#editorTitle):focus');
-            if (!editorFocused) document.body.classList.remove('qp-keyboard-open');
+            writingBodyFocused = document.activeElement?.id === 'editorBody';
+            if (!editorFocused) document.body.classList.remove('qp-keyboard-open','qp-body-focused','qp-title-focused');
             refreshKeyboardLayout();
           }, 220);
         });
@@ -1612,10 +1624,10 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
     window.visualViewport?.addEventListener('scroll', refreshKeyboardLayout);
     window.addEventListener('resize', refreshKeyboardLayout);
     document.addEventListener('focusin', event => {
-      if (event.target.matches('#editorBody,#editorTitle')) { editorFocused = true; refreshKeyboardLayout(); }
+      if (event.target.matches('#editorBody,#editorTitle')) { editorFocused = true; writingBodyFocused = event.target.id === 'editorBody'; refreshKeyboardLayout(); }
     });
     document.addEventListener('focusout', event => {
-      if (event.target.matches('#editorBody,#editorTitle')) setTimeout(refreshKeyboardLayout, 250);
+      if (event.target.matches('#editorBody,#editorTitle')) setTimeout(() => { writingBodyFocused = document.activeElement?.id === 'editorBody'; refreshKeyboardLayout(); }, 250);
     });
     bindEditorFocus();
   })();
