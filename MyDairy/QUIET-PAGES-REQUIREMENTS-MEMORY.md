@@ -10,9 +10,9 @@ This file records the product constraints shared in the project conversation. Ke
 
 ## Mobile writing UX
 - While the keyboard is open, hide the Diary/Companion/Calendar/Settings navigation, floating add button and top navigation to free space. Restore them on dismiss.
-- On iPhone, keep formatting controls within easy reach immediately above the software keyboard. Controls should scroll horizontally rather than requiring the user to scroll to the top of a long entry.
+- On iPhone, use a scroll-direction formatting toolbar: show when the user scrolls up a small accumulated distance, hide after deliberate downward scrolling, and keep its screen position stable while visible. Controls scroll horizontally.
 - Keep the title/heading input visible and typeable when it has focus. Hide its row only while the body editor is focused, if needed for space.
-- Keep the toolbar in the visible viewport during long body scrolling and keyboard viewport changes; reset positioning when the keyboard closes. Account for iOS Safari VisualViewport quirks.
+- Do not continuously reposition the toolbar from VisualViewport events. Scroll direction controls visibility; the toolbar stays at a stable top-of-viewport position. Account for iOS Safari fixed-position quirks and validate on a physical device.
 - Do not break body selection/range when tapping toolbar controls. Use touch-friendly targets and safe-area-aware styling.
 
 ## AI companion and models
@@ -33,3 +33,9 @@ This file records the product constraints shared in the project conversation. Ke
 - Toolbar accessory is removed when leaving the editor; keyboard CSS state and inset reset.
 - Title input is not auto-focused during editor screen transition; title remains editable by explicit tap.
 - No diary data/local-storage keys or visual theme tokens changed.
+
+## Scroll-direction toolbar (v17)
+- Initial body focus shows the toolbar at the top of the viewport. Accumulated upward scroll of about 9 px reveals it; downward movement of about 14 px hides it.
+- Toolbar clicks reveal/retain it during formatting; a subsequent downward scroll hides it.
+- Toolbar position is not continuously recalculated from keyboard viewport geometry.
+- Verification is limited to source syntax and ZIP integrity; physical iPhone testing remains required.

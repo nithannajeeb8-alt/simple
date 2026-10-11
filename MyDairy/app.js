@@ -1592,10 +1592,9 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
 
   // Let the interface appear immediately, then hydrate saved data. If storage fails, the app remains usable.
   applySettings();
-  // Keyboard-aware writing layout for iOS Safari/PWA.
-  // Keep this delegated (not MutationObserver-bound) so typing in contenteditable
-  // cannot repeatedly attach focus handlers. Anchor the toolbar from the bottom
-  // of the visual viewport; reset the inset whenever the keyboard is not open.
+  // Keyboard-aware writing layout plus scroll-direction toolbar controller.
+  // The toolbar is positioned once at the top of the viewport; scrolling only
+  // changes its visibility. This avoids continuously chasing iOS keyboard geometry.
   (() => {
     const root = document.documentElement;
     const bodyClass = document.body.classList;
@@ -1604,12 +1603,62 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
     let blurTimer = 0;
     let frame = 0;
     let followupTimers = [];
+    let lastScrollY = window.scrollY || 0;
+    let accumulatedUp = 0;
+    let accumulatedDown = 0;
+    let formattingMode = false;
+    let lastDirection = 'none';
+    const SHOW_AFTER_UP = 9;
+    const HIDE_AFTER_DOWN = 14;
 
     const activeEditorField = () => {
       const active = document.activeElement;
       if (active?.id === 'editorTitle') return 'title';
       if (active?.id === 'editorBody') return 'body';
       return null;
+    };
+
+    const setToolbarVisible = visible => {
+      bodyClass.toggle('qp-toolbar-visible', !!visible);
+    };
+
+    const resetToolbarState = () => {
+      accumulatedUp = 0;
+      accumulatedDown = 0;
+      formattingMode = false;
+      lastDirection = 'none';
+      setToolbarVisible(false);
+    };
+
+    const handleUserScroll = () => {
+      const currentY = window.scrollY || root.scrollTop || 0;
+      const delta = currentY - lastScrollY;
+      lastScrollY = currentY;
+      if (!bodyClass.contains('qp-body-focused') || Math.abs(delta) < 1) return;
+      // Ignore scrolls at the top boundary and very small Safari layout adjustments.
+      if (currentY <= 1 && delta < 0) {
+        accumulatedUp = 0;
+        return;
+      }
+      if (delta < 0) {
+        if (lastDirection !== 'up') accumulatedUp = 0;
+        lastDirection = 'up';
+        accumulatedUp += -delta;
+        accumulatedDown = 0;
+        if (accumulatedUp >= SHOW_AFTER_UP) {
+          setToolbarVisible(true);
+          formattingMode = false;
+        }
+      } else {
+        if (lastDirection !== 'down') accumulatedDown = 0;
+        lastDirection = 'down';
+        accumulatedDown += delta;
+        accumulatedUp = 0;
+        if (accumulatedDown >= HIDE_AFTER_DOWN) {
+          setToolbarVisible(false);
+          formattingMode = false;
+        }
+      }
     };
 
     const refreshKeyboardLayout = () => {
@@ -1619,50 +1668,46 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
       const visibleHeight = vv?.height || layoutHeight;
       const focusedField = activeEditorField();
       if (focusedField) lastEditorField = focusedField;
-
-      // While a toolbar control is focused/tapped, retain the previous body focus
-      // so the keyboard and toolbar do not disappear between a tap and command.
       const active = document.activeElement;
       const activeInToolbar = !!active?.closest?.('.rich-toolbar');
-      if (!focusedField && !activeInToolbar) {
-        lastEditorField = null;
-      }
+      if (!focusedField && !activeInToolbar) lastEditorField = null;
 
       const keyboardDifference = Math.max(baselineHeight - visibleHeight, layoutHeight - visibleHeight);
       const keyboardOpen = !!lastEditorField && keyboardDifference > 120;
       const bodyFocused = keyboardOpen && lastEditorField === 'body';
       const titleFocused = keyboardOpen && lastEditorField === 'title';
-
+      const wasBodyFocused = bodyClass.contains('qp-body-focused');
       bodyClass.toggle('qp-keyboard-open', keyboardOpen);
       bodyClass.toggle('qp-body-focused', bodyFocused);
       bodyClass.toggle('qp-title-focused', titleFocused);
 
+      // Show on first entry into body editing. Thereafter scroll direction owns visibility.
+      if (bodyFocused && !wasBodyFocused) {
+        accumulatedUp = accumulatedDown = 0;
+        formattingMode = false;
+        lastDirection = 'none';
+        setToolbarVisible(true);
+        lastScrollY = window.scrollY || 0;
+      }
+      if (!bodyFocused) resetToolbarState();
+
+      // Retained only for existing editor layout compatibility. It does not position the toolbar.
       if (keyboardOpen) {
-        // For a screen-fixed accessory, use the hidden portion of the layout
-        // viewport as the keyboard inset. Do not include visualViewport.offsetTop:
-        // iOS Safari can leave that value stale after dismissal or change it while
-        // panning the document to keep the caret visible. Height-only anchoring keeps
-        // the toolbar at the keyboard's top edge during long-entry scrolling.
         const keyboardInset = Math.max(0, layoutHeight - visibleHeight);
         root.style.setProperty('--qp-keyboard-inset', `${keyboardInset}px`);
       } else {
-        // Also clears stale iOS 26 visualViewport offsets after keyboard dismissal.
         root.style.setProperty('--qp-keyboard-inset', '0px');
-        if (!lastEditorField) {
-          bodyClass.remove('qp-keyboard-open', 'qp-body-focused', 'qp-title-focused');
-          baselineHeight = Math.max(visibleHeight, layoutHeight);
-        }
+        if (!lastEditorField) baselineHeight = Math.max(visibleHeight, layoutHeight);
       }
     };
 
     const scheduleRefresh = () => {
       if (!frame) frame = requestAnimationFrame(refreshKeyboardLayout);
     };
-
     const scheduleSettledRefresh = () => {
       scheduleRefresh();
       followupTimers.forEach(clearTimeout);
-      followupTimers = [90, 260, 520].map(delay => setTimeout(scheduleRefresh, delay));
+      followupTimers = [100, 280, 520].map(delay => setTimeout(scheduleRefresh, delay));
     };
 
     document.addEventListener('focusin', event => {
@@ -1671,29 +1716,38 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
         clearTimeout(blurTimer);
         scheduleSettledRefresh();
       } else if (event.target?.closest?.('.rich-toolbar') && lastEditorField === 'body') {
+        // Keep the toolbar open while a formatting control is being used.
+        formattingMode = true;
+        setToolbarVisible(true);
         clearTimeout(blurTimer);
         scheduleSettledRefresh();
       }
     });
+
+    document.addEventListener('click', event => {
+      if (event.target?.closest?.('.rich-toolbar')) {
+        formattingMode = true;
+        setToolbarVisible(true);
+      }
+      if (event.target?.closest?.('[data-action="cancel-editor"], #saveEntryButton')) {
+        resetToolbarState();
+      }
+    }, true);
 
     document.addEventListener('focusout', event => {
       if (event.target?.id !== 'editorTitle' && event.target?.id !== 'editorBody') return;
       clearTimeout(blurTimer);
       blurTimer = setTimeout(() => {
         const next = activeEditorField();
-        if (next) {
-          lastEditorField = next;
-        } else if (!document.activeElement?.closest?.('.rich-toolbar')) {
-          lastEditorField = null;
-        }
+        if (next) lastEditorField = next;
+        else if (!document.activeElement?.closest?.('.rich-toolbar')) lastEditorField = null;
         scheduleSettledRefresh();
       }, 140);
     });
 
+    window.addEventListener('scroll', handleUserScroll, { passive: true });
     window.visualViewport?.addEventListener('resize', scheduleRefresh, { passive: true });
-    window.visualViewport?.addEventListener('scroll', scheduleRefresh, { passive: true });
     window.addEventListener('resize', scheduleRefresh, { passive: true });
-    window.addEventListener('scroll', scheduleRefresh, { passive: true });
     window.addEventListener('orientationchange', scheduleSettledRefresh, { passive: true });
     window.addEventListener('pageshow', scheduleSettledRefresh, { passive: true });
     scheduleSettledRefresh();

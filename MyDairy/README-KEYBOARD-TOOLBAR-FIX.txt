@@ -1,13 +1,13 @@
-Quiet Pages: keyboard toolbar + title input repair (v15)
+Quiet Pages: scroll-direction formatting toolbar (v17)
 
 Fixes in this update:
-- The entry title input is never hidden by keyboard CSS, so it stays focusable and typeable. Scroll back to it whenever needed.
-- Removed the MutationObserver-based focus rebinding that repeatedly attached duplicate handlers as contenteditable changed.
-- Replaced the fragile calculated toolbar top position with a bottom inset derived from the hidden layout-viewport height, using VisualViewport height only (not offsetTop, which can be stale or change during iOS caret panning).
-- Disabled the editor screen’s fill-mode translate animation while writing: a transformed ancestor was causing `position: fixed` to behave as if it were fixed to the page section, not the screen. This was the key reason the toolbar drifted during scrolling.
-- Updates the inset on VisualViewport resize/scroll, page scroll, window resize, orientation changes, and pageshow.
-- Resets the inset after keyboard dismissal, including the stale VisualViewport offset seen in some iOS Safari releases.
-- Navigation remains hidden while the keyboard is active; the regular layout returns when editing focus/keyboard closes.
+- Replaced the always-follow-the-keyboard toolbar behavior with a scroll-direction interaction.
+- When body editing begins, the toolbar is shown at a stable top-of-viewport position. Scrolling down about 14 px hides it; scrolling up about 9 px reveals it again.
+- The toolbar is portaled to a direct child of document.body so it does not inherit the editor screen's scrolling/transform containing block.
+- Scroll events control visibility only. JavaScript does not continuously change the toolbar's top/bottom position in response to VisualViewport events.
+- Toolbar clicks keep it visible while formatting; subsequent downward scrolling can hide it again.
+- The title is not auto-focused during the editor transition, preserving deliberate title editing.
+- Existing keyboard layout behavior still hides app navigation while the keyboard is open. Existing entry content, selection/range handling, editor features, and theme are preserved.
 - Bumped the service-worker cache name so GitHub Pages clients can retrieve the updated files.
 
 Deploy safely:
@@ -17,10 +17,10 @@ Deploy safely:
 
 Phone validation checklist:
 - Open an entry: the title remains visible when its field has focus and accepts typing.
-- Tap the body: the title remains available in the document, and the formatting bar appears immediately above the keyboard.
-- Scroll a long entry with the keyboard open: the bar remains anchored above the keyboard.
+- Tap the body: the formatting bar appears near the top of the viewport.
+- Scroll downward: the bar hides after the configured threshold. Scroll upward: it reappears after a small movement.
 - Tap Bold/Heading/Quote, type again, and verify formatting applies at the selection.
-- Dismiss the keyboard: the bar hides and navigation returns.
+- Verify toolbar stays still during typing, title is editable, and navigation returns after keyboard dismissal.
 
 Validation performed here: JavaScript syntax and ZIP integrity. Physical iPhone Safari validation has not been performed in this environment.
 

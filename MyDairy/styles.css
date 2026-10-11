@@ -351,12 +351,25 @@ html.large-text{--font-scale:1.08} html.xlarge-text{--font-scale:1.16}
   body.qp-keyboard-open #qpEditorAccessory { display:block; }
   body.qp-keyboard-open:not(.qp-body-focused) #qpEditorAccessory { display:none !important; }
   body.qp-keyboard-open #screen-editor .editor-field.writing-field { margin-top:0 !important; }
+  /* Scroll-direction toolbar: its position is stable at the top of the visible
+     editing interface. JS only changes visibility, never its top/bottom offset. */
   body.qp-body-focused #qpEditorAccessory {
     position:fixed !important;
+    top:calc(env(safe-area-inset-top) + 8px) !important;
     left:10px !important; right:10px !important;
-    bottom:calc(var(--qp-keyboard-inset, 0px) + env(safe-area-inset-bottom) + 6px) !important;
     z-index:2147483000 !important;
     display:block !important;
+    pointer-events:none;
+    transform:translateY(calc(-100% - env(safe-area-inset-top) - 16px));
+    opacity:0;
+    visibility:hidden;
+    transition:transform .16s ease, opacity .14s ease, visibility .14s;
+    will-change:transform;
+  }
+  body.qp-body-focused.qp-toolbar-visible #qpEditorAccessory {
+    transform:translateY(0);
+    opacity:1;
+    visibility:visible;
     pointer-events:auto;
   }
   body.qp-body-focused #qpEditorAccessory .rich-toolbar {
