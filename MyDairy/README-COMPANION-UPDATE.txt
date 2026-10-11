@@ -30,3 +30,11 @@ FOLLOW-UP FIX (v11)
 - The service worker uses a new cache version and network-first fetching for app.js and styles.css to reduce stale-code problems.
 - Added Apple-inspired spacing refinements to chat bubbles, suggestion chips, text input, navigation, and floating add button while retaining the current design language.
 - Verified with Node syntax checks and focused sanitizer tests. Live iPhone Safari / WebLLM testing is still required.
+
+MOBILE EDITOR UX UPDATE (v12)
+- On small screens, focusing the diary title/body enters a keyboard-aware writing mode.
+- Main navigation, floating add button, top brand bar and editor intro are hidden while the keyboard is open to reclaim vertical space.
+- Rich formatting toolbar remains sticky, horizontally scrollable and uses 42px touch targets.
+- Uses VisualViewport resize/scroll events with a focus-state fallback; it does not rely on the limited VirtualKeyboard API.
+- Existing diary storage schema and saved entries are not cleared or migrated.
+- This was syntax/packaging checked in a desktop environment; still test in Safari on the actual iPhone because keyboard behaviour varies by iOS release.

@@ -330,3 +330,42 @@ html.large-text{--font-scale:1.08} html.xlarge-text{--font-scale:1.16}
   #screen-companion .suggestion-row { gap: 8px; padding: 10px 12px; }
   #floatingAdd { right: 18px; bottom: calc(92px + env(safe-area-inset-bottom)); }
 }
+
+/* iPhone writing mode: reclaim screen space and keep formatting within reach. */
+@media (max-width: 799px) {
+  body.qp-keyboard-open .bottom-nav,
+  body.qp-keyboard-open #floatingAdd,
+  body.qp-keyboard-open .topbar { display:none !important; }
+  body.qp-keyboard-open .app-shell { padding-bottom: max(8px, env(safe-area-inset-bottom)) !important; }
+  body.qp-keyboard-open #mainContent { padding-bottom: 8px !important; }
+  body.qp-keyboard-open #screen-editor { padding-bottom: 8px !important; }
+  body.qp-keyboard-open #screen-editor .back-row { display:none !important; }
+  body.qp-keyboard-open #screen-editor .editor-card { padding:12px 12px 18px !important; border-radius:18px !important; }
+  body.qp-keyboard-open #screen-editor .editor-card > .eyebrow,
+  body.qp-keyboard-open #screen-editor .editor-intro-note,
+  body.qp-keyboard-open #screen-editor .writing-field > label,
+  body.qp-keyboard-open #screen-editor .editor-field:has(#editorTitle) { display:none !important; }
+  body.qp-keyboard-open #screen-editor .editor-field.writing-field { margin-top:0 !important; }
+  body.qp-keyboard-open #screen-editor .rich-toolbar {
+    position:sticky !important; top:calc(env(safe-area-inset-top) + 4px) !important; z-index:50;
+    display:flex; flex-wrap:nowrap; overflow-x:auto; overscroll-behavior-x:contain; scrollbar-width:none;
+    margin:0 0 0 !important; padding:6px !important; gap:5px !important;
+    border-radius:13px 13px 0 0 !important; box-shadow:0 4px 14px rgba(40,65,52,.12);
+    scroll-padding-inline:8px; -webkit-overflow-scrolling:touch;
+  }
+  body.qp-keyboard-open #screen-editor .rich-toolbar::-webkit-scrollbar { display:none; }
+  body.qp-keyboard-open #screen-editor .rich-toolbar button,
+  body.qp-keyboard-open #screen-editor .rich-toolbar .highlight-picker,
+  body.qp-keyboard-open #screen-editor .rich-toolbar .text-color-picker { flex:0 0 auto; min-width:42px; min-height:42px; }
+  body.qp-keyboard-open #screen-editor .rich-toolbar select { flex:0 0 auto; min-height:42px; min-width:78px; }
+  body.qp-keyboard-open #screen-editor .rich-editor {
+    min-height:36vh !important; padding:16px 14px !important; border-radius:0 0 14px 14px !important;
+    font-size:18px; line-height:1.75; scroll-margin-top:62px;
+  }
+  body.qp-keyboard-open #screen-editor .hint { font-size:11px; margin:8px 2px; }
+}
+@media (max-width: 799px) {
+  #screen-editor .rich-toolbar { scroll-behavior:smooth; }
+  #screen-editor .rich-toolbar button:focus-visible,
+  #screen-editor .rich-toolbar select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+}
