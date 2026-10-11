@@ -79,8 +79,41 @@
     return new Intl.DateTimeFormat(undefined, options).format(parseDate(value));
   }
   function formatMonth(date) { return new Intl.DateTimeFormat(undefined, { month: 'long', year: 'numeric' }).format(date); }
+  function richTextPlain(value) {
+    const raw = String(value || '');
+    if (!/<\/?(?:p|div|br|strong|b|em|i|h[23]|blockquote|mark|span|img)\b/i.test(raw)) return raw;
+    const doc = new DOMParser().parseFromString(raw, 'text/html');
+    doc.querySelectorAll('img').forEach(img => img.replaceWith(doc.createTextNode(img.alt || '[image]')));
+    return (doc.body.textContent || '').replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+  function sanitizeRichHtml(value) {
+    const raw = String(value || '');
+    // Existing entries were stored as plain text. Escape them instead of interpreting old text as markup.
+    if (!/<\/?(?:p|div|br|strong|b|em|i|h[23]|blockquote|mark|span|img)\b/i.test(raw)) return escapeHTML(raw).replace(/\n/g, '<br>');
+    const doc = new DOMParser().parseFromString(raw, 'text/html');
+    const allowed = new Set(['P','DIV','BR','STRONG','B','EM','I','H2','H3','BLOCKQUOTE','MARK','SPAN','IMG']);
+    const walk = node => {
+      [...node.childNodes].forEach(child => {
+        if (child.nodeType === 1) {
+          if (!allowed.has(child.tagName)) { child.replaceWith(...child.childNodes); return; }
+          [...child.attributes].forEach(attr => {
+            if (child.tagName === 'IMG' && attr.name === 'src' && /^data:image\/(png|jpeg|webp|gif);base64,/i.test(attr.value)) return;
+            if (child.tagName === 'IMG' && attr.name === 'alt') return;
+            if (child.tagName === 'SPAN' && attr.name === 'style') {
+              const safe = attr.value.split(';').map(x=>x.trim()).filter(x=>/^(color|font-family|font-size):\s*[#(),.%\w -]+$/i.test(x)).join(';');
+              if (safe) { child.setAttribute('style', safe); return; }
+            }
+            child.removeAttribute(attr.name);
+          });
+          if (child.tagName === 'IMG' && !child.getAttribute('src')) child.remove(); else walk(child);
+        } else if (child.nodeType !== 3 && child.nodeType !== 8) child.remove();
+      });
+    };
+    walk(doc.body);
+    return doc.body.innerHTML;
+  }
   function excerpt(text, length = 155) {
-    const normalized = String(text || '').replace(/\s+/g, ' ').trim();
+    const normalized = richTextPlain(text).replace(/\s+/g, ' ').trim();
     return normalized.length > length ? `${normalized.slice(0, length).trimEnd()}…` : normalized;
   }
   function activeTheme() {
@@ -275,7 +308,7 @@
   function cardTheme(entry) { return THEMES.includes(entry.theme) ? entry.theme : activeTheme(); }
   function renderDiary() {
     const query = ($('#searchInput')?.value || '').trim().toLowerCase();
-    const list = sortedEntries().filter(entry => !query || `${entry.title} ${entry.body} ${entry.date} ${entry.mood}`.toLowerCase().includes(query));
+    const list = sortedEntries().filter(entry => !query || `${entry.title} ${richTextPlain(entry.body)} ${entry.date} ${entry.mood}`.toLowerCase().includes(query));
     $('#entryCount').textContent = `${list.length} ${list.length === 1 ? 'page' : 'pages'}`;
     $('#entriesHeading').textContent = query ? 'Search results' : 'Recent pages';
     $('#todayLabel').textContent = new Intl.DateTimeFormat(undefined, { weekday: 'long', month: 'long', day: 'numeric' }).format(new Date());
@@ -284,7 +317,7 @@
     $('#entryStack').innerHTML = list.map((entry, index) => {
       const cover = coverPhoto(entry);
       const mood = moodInfo(entry.mood);
-      const hasText = Boolean(entry.body.trim());
+      const hasText = Boolean(richTextPlain(entry.body).trim());
       const title = entry.title.trim() || 'An untitled page';
       const className = `entry-card theme-${cardTheme(entry)}${cover ? ' has-cover' : ''}`;
       const date = formatDate(entry.date, { month: 'short', day: 'numeric', year: 'numeric' });
@@ -442,7 +475,7 @@
     $('#screen-detail').innerHTML = `
       <div class="back-row"><button class="back-button" data-action="back-detail"><i class="bi bi-arrow-left"></i> Back to ${previousScreen === 'calendar' ? 'calendar' : 'your pages'}</button><div class="detail-actions"><button class="soft-icon-button" data-action="edit-entry" data-entry-id="${escapeHTML(entry.id)}" aria-label="Edit entry" title="Edit"><i class="bi bi-pencil"></i></button><button class="soft-icon-button" data-action="delete-entry" data-entry-id="${escapeHTML(entry.id)}" aria-label="Delete entry" title="Delete"><i class="bi bi-trash3"></i></button></div></div>
       <div class="detail-hero theme-${theme}${cover ? ' has-image' : ''}">${cover ? `<img src="${escapeHTML(cover.dataUrl)}" alt="Cover photo for ${escapeHTML(entry.title || 'diary entry')}">` : ''}<div class="detail-hero-copy"><div class="entry-meta">${escapeHTML(formatDate(entry.date))} · ${escapeHTML(THEME_INFO[theme].label)} theme</div><h1>${escapeHTML(entry.title || 'An untitled page')}</h1>${mood ? `<span class="detail-mood">${mood.emoji} ${escapeHTML(mood.label)}</span>` : ''}</div></div>
-      <article class="detail-content"><div class="detail-writing${entry.body.trim() ? '' : ' empty-writing'}">${escapeHTML(entry.body.trim() ? entry.body : 'This page is still waiting for its words.')}</div>
+      <article class="detail-content"><div class="detail-writing${richTextPlain(entry.body).trim() ? '' : ' empty-writing'}">${richTextPlain(entry.body).trim() ? sanitizeRichHtml(entry.body) : 'This page is still waiting for its words.'}</div>
       ${photos.length ? `<div class="detail-gallery" aria-label="Entry photos">${photos.map((photo, i) => `<button type="button" data-view-photo="${i}" aria-label="View photo ${i + 1}"><img src="${escapeHTML(photo.dataUrl)}" alt="Diary photo ${i + 1}" loading="lazy"></button>`).join('')}</div>` : ''}
       ${entry.reflection ? `<div class="reflection-card"><strong><i class="bi bi-stars"></i> A reflection</strong><p>${escapeHTML(entry.reflection)}</p></div>` : ''}
       <div class="detail-footer"><span>Saved ${escapeHTML(new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }).format(new Date(entry.updatedAt || entry.createdAt)))}</span><button class="text-button" data-action="reflect-entry" data-entry-id="${escapeHTML(entry.id)}"><i class="bi bi-stars"></i> Reflect with companion</button></div></article>`;
@@ -470,9 +503,20 @@
     const moods = MOODS.map(mood => `<button type="button" class="mood-option${data.mood === mood.value ? ' active' : ''}" data-mood="${mood.value}" aria-pressed="${data.mood === mood.value}"><span>${mood.emoji}</span>${escapeHTML(mood.label)}</button>`).join('');
     const photos = (data.photos || []).map((photo, index) => `<div class="photo-preview${photo.cover ? ' cover' : ''}"><img src="${escapeHTML(photo.dataUrl)}" alt="Selected diary photo ${index + 1}"><button type="button" class="photo-remove" data-remove-photo="${escapeHTML(photo.id)}" aria-label="Remove photo"><i class="bi bi-x"></i></button><button type="button" class="cover-select" data-cover-photo="${escapeHTML(photo.id)}">${photo.cover ? 'COVER' : 'MAKE COVER'}</button></div>`).join('');
     $('#screen-editor').innerHTML = `<div class="back-row"><button class="back-button" data-action="cancel-editor"><i class="bi bi-arrow-left"></i> Back</button><span class="subtle-count">${editorIsNew ? 'A NEW PAGE' : 'EDITING PAGE'}</span></div>
-      <div class="editor-card"><div class="eyebrow"><span class="eyebrow-dot"></span>A PAGE OF YOUR OWN</div><h1 class="editor-headline">Let it be<br><em>your words.</em></h1>
+      <div class="editor-card"><div class="eyebrow"><span class="eyebrow-dot"></span>A PAGE OF YOUR OWN</div><p class="editor-intro-note">A little space for whatever you want to keep.</p>
       <div class="editor-field"><label class="sr-only" for="editorTitle">Entry title</label><input id="editorTitle" class="title-input" maxlength="140" placeholder="Give this day a name…" value="${escapeHTML(data.title)}"></div>
-      <div class="editor-field"><label for="editorBody">What would you like to keep?</label><textarea id="editorBody" class="entry-writing-input" maxlength="50000" placeholder="Start anywhere. A moment, a thought, something you don't want to forget…">${escapeHTML(data.body)}</textarea><p class="hint">Your original words stay yours. The companion never silently rewrites an entry.</p></div>
+      <div class="editor-field writing-field"><label for="editorBody">What would you like to keep?</label>
+      <div class="rich-toolbar" role="toolbar" aria-label="Writing format tools">
+        <button type="button" data-format="bold" aria-label="Bold" title="Bold"><strong>B</strong></button><button type="button" data-format="italic" aria-label="Italic" title="Italic"><em>I</em></button><button type="button" data-format="underline" aria-label="Underline" title="Underline"><u>U</u></button>
+        <span class="toolbar-divider"></span><button type="button" data-block="h2" title="Heading">H1</button><button type="button" data-block="h3" title="Subheading">H2</button><button type="button" data-block="blockquote" title="Quote">❝</button>
+        <select id="editorFont" aria-label="Font family" title="Font family"><option value="Georgia">Serif</option><option value="Arial">Sans</option><option value="monospace">Mono</option></select><select id="editorFontSize" aria-label="Text size" title="Text size"><option value="3">Normal</option><option value="2">Small</option><option value="4">Large</option><option value="5">Larger</option></select>
+        <label class="highlight-picker" title="Highlight text">▰<input id="highlightColor" type="color" value="#fff09a" aria-label="Highlight colour"></label>
+        <label class="text-color-picker" title="Text colour">A<input id="textColor" type="color" value="#2c3b35" aria-label="Text colour"></label>
+        <button type="button" id="inlineImageButton" title="Insert image between paragraphs" aria-label="Insert image">▧</button><input id="inlineImageInput" class="hidden" type="file" accept="image/*">
+        <button type="button" data-format="removeFormat" title="Clear formatting">Tx</button>
+      </div>
+      <div id="editorBody" class="entry-writing-input rich-editor" contenteditable="true" role="textbox" aria-multiline="true" data-placeholder="Start anywhere. A moment, a thought, something you don't want to forget…">${sanitizeRichHtml(data.body)}</div>
+      <p class="hint">Your original words stay yours. Format them however you like. Changes save on this device.</p></div>
       <div class="editor-meta-grid"><div class="editor-field"><label for="editorDate">Date</label><input type="date" id="editorDate" value="${escapeHTML(data.date)}" required></div><div class="editor-field"><label for="editorTheme">Entry theme</label><select id="editorTheme"><option value="sky" ${data.theme === 'sky' ? 'selected' : ''}>Sky</option><option value="coral" ${data.theme === 'coral' ? 'selected' : ''}>Coral</option><option value="mint" ${data.theme === 'mint' ? 'selected' : ''}>Mint</option><option value="lavender" ${data.theme === 'lavender' ? 'selected' : ''}>Lavender</option></select></div></div>
       <div class="editor-field"><label>How did today feel? <span class="hint">(optional)</span></label><div class="mood-picker">${moods}</div></div>
       <div class="editor-field"><label>Photos <span class="hint">(optional, up to 12)</span></label><div class="photo-drop"><label for="photoInput"><i class="bi bi-images"></i> Choose from gallery</label><input id="photoInput" class="hidden" type="file" accept="image/*" multiple><p>Photos are resized for storage and remain in this browser. Choose one photo as the cover.</p></div><div id="photoPreviews" class="photo-previews">${photos}</div></div>
@@ -487,7 +531,7 @@
     const theme = $('#editorTheme');
     const track = () => {
       editorData.title = title.value;
-      editorData.body = body.value;
+      editorData.body = sanitizeRichHtml(body.innerHTML);
       editorData.date = date.value || TODAY;
       editorData.theme = THEMES.includes(theme.value) ? theme.value : activeTheme();
       editorData.updatedAt = new Date().toISOString();
@@ -498,6 +542,30 @@
     };
     title.addEventListener('input', track);
     body.addEventListener('input', track);
+    const keepEditorFocus = () => body.focus({preventScroll:true});
+    $$('.rich-toolbar [data-format]', $('#screen-editor')).forEach(button => button.addEventListener('mousedown', event => event.preventDefault()));
+    $$('.rich-toolbar [data-format]', $('#screen-editor')).forEach(button => button.addEventListener('click', () => {
+      keepEditorFocus(); document.execCommand(button.dataset.format, false, null); track();
+    }));
+    $$('.rich-toolbar [data-block]', $('#screen-editor')).forEach(button => button.addEventListener('mousedown', event => event.preventDefault()));
+    $$('.rich-toolbar [data-block]', $('#screen-editor')).forEach(button => button.addEventListener('click', () => {
+      keepEditorFocus(); document.execCommand('formatBlock', false, button.dataset.block); track();
+    }));
+    $('#editorFont').addEventListener('change', event => { keepEditorFocus(); document.execCommand('fontName', false, event.target.value); track(); });
+    $('#editorFontSize').addEventListener('change', event => { keepEditorFocus(); document.execCommand('fontSize', false, event.target.value); track(); });
+    $('#highlightColor').addEventListener('input', event => { keepEditorFocus(); document.execCommand('hiliteColor', false, event.target.value); track(); });
+    $('#textColor').addEventListener('input', event => { keepEditorFocus(); document.execCommand('foreColor', false, event.target.value); track(); });
+    $('#inlineImageButton').addEventListener('click', () => $('#inlineImageInput').click());
+    $('#inlineImageInput').addEventListener('change', async event => {
+      const file = event.target.files?.[0]; if (!file) return;
+      try {
+        const dataUrl = await resizeImage(file);
+        keepEditorFocus();
+        document.execCommand('insertHTML', false, `<p><img class="inline-entry-image" src="${dataUrl}" alt="Diary image"><br></p><p><br></p>`);
+        track();
+      } catch (error) { toast('That image could not be inserted.', 'error'); }
+      event.target.value = '';
+    });
     date.addEventListener('change', track);
     theme.addEventListener('change', track);
     $$('.mood-option', $('#screen-editor')).forEach(button => button.addEventListener('click', () => {
@@ -550,7 +618,7 @@
   async function flushEditorSave() {
     clearTimeout(editorSaveTimer);
     if (!editorData || !editorDirty) return;
-    const meaningful = editorData.title.trim() || editorData.body.trim() || editorData.photos.length;
+    const meaningful = editorData.title.trim() || richTextPlain(editorData.body).trim() || editorData.photos.length;
     if (!meaningful) { $('#autosaveStatus') && ($('#autosaveStatus').textContent = 'Your page is not saved until you start writing.'); return; }
     if (!state.entries.some(entry => entry.id === editorData.id)) state.entries.push(editorData);
     else state.entries = state.entries.map(entry => entry.id === editorData.id ? editorData : entry);
@@ -569,10 +637,10 @@
   async function saveEditorAndClose() {
     if (!editorData) return;
     editorData.title = $('#editorTitle').value.trim();
-    editorData.body = $('#editorBody').value;
+    editorData.body = sanitizeRichHtml($('#editorBody').innerHTML);
     editorData.date = $('#editorDate').value || TODAY;
     editorData.theme = $('#editorTheme').value;
-    const meaningful = editorData.title || editorData.body.trim() || editorData.photos.length;
+    const meaningful = editorData.title || richTextPlain(editorData.body).trim() || editorData.photos.length;
     if (!meaningful) return toast('Write something or add a photo before saving this page.');
     if (!editorData.photos.some(photo => photo.cover) && editorData.photos.length) editorData.photos[0].cover = true;
     editorData.updatedAt = new Date().toISOString();
@@ -640,7 +708,7 @@
     allWords.forEach(word => frequency.set(word, (frequency.get(word) || 0) + 1));
     const recurring = [...frequency.entries()].filter(([, count]) => count >= 2).sort((a, b) => b[1] - a[1]).slice(0, 6).map(([word]) => word);
     const recent = sortedEntries().slice(0, 3);
-    const dated = entries.map(entry => `• ${formatDate(entry.date, { month: 'short', day: 'numeric' })} — ${entry.title || 'An untitled page'}${entry.body.trim() ? `: ${excerpt(entry.body, 125)}` : ''}`).join('\n');
+    const dated = entries.map(entry => `• ${formatDate(entry.date, { month: 'short', day: 'numeric' })} — ${entry.title || 'An untitled page'}${richTextPlain(entry.body).trim() ? `: ${excerpt(entry.body, 125)}` : ''}`).join('\n');
 
     if (/(goal|goals|intend|intention|working toward|working towards|plan)/.test(q)) {
       if (state.memories.length) return `Here are the things you've deliberately put on your memory shelf:\n\n${state.memories.map(m => `• ${m.text}`).join('\n')}\n\nI can only treat these as saved intentions, not proof that you've completed them. If something has changed, update the memory shelf.`;
@@ -652,7 +720,7 @@
       const inMonth = state.entries.filter(entry => { const d = parseDate(entry.date); return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth(); });
       const target = /(month|weekly|week|this month)/.test(q) && inMonth.length ? inMonth : recent;
       const common = recurring.length ? `\n\nWords that appear more than once in your saved writing include: ${recurring.join(', ')}. This is only a word-frequency clue, not a psychological conclusion.` : '';
-      return `Here's a grounded starting point, based on ${target.length} ${target.length === 1 ? 'page' : 'pages'} from your journal:\n\n${target.map(entry => `• ${formatDate(entry.date, { month:'short', day:'numeric' })} — ${entry.title || 'Untitled'}${entry.body.trim() ? `\n  ${excerpt(entry.body, 160)}` : ''}`).join('\n\n')}${common}\n\nWhat stands out to you from these pages? I’m using your saved words here, not guessing what you must be feeling.`;
+      return `Here's a grounded starting point, based on ${target.length} ${target.length === 1 ? 'page' : 'pages'} from your journal:\n\n${target.map(entry => `• ${formatDate(entry.date, { month:'short', day:'numeric' })} — ${entry.title || 'Untitled'}${richTextPlain(entry.body).trim() ? `\n  ${excerpt(entry.body, 160)}` : ''}`).join('\n\n')}${common}\n\nWhat stands out to you from these pages? I’m using your saved words here, not guessing what you must be feeling.`;
     }
     if (/(memory|remember|saved|preferences|important date)/.test(q) && memories.length) return `I found these saved memories that seem relevant:\n\n${memories.map(m => `• ${m.text}`).join('\n')}\n\nYou can edit or remove any of these from your memory shelf.`;
     if (/(what happened|what did i write|find|look for|when did|where did|past entry|old entr|last time)/.test(q)) {
@@ -994,7 +1062,7 @@
   $('#confirmDialog').addEventListener('cancel', event => { event.preventDefault(); finishConfirmation(false); });
   window.addEventListener('beforeunload', () => {
     if (editorDirty && editorData) {
-      const meaningful = editorData.title.trim() || editorData.body.trim() || editorData.photos.length;
+      const meaningful = editorData.title.trim() || richTextPlain(editorData.body).trim() || editorData.photos.length;
       if (meaningful) {
         if (!state.entries.some(entry => entry.id === editorData.id)) state.entries.push(editorData);
         else state.entries = state.entries.map(entry => entry.id === editorData.id ? editorData : entry);
