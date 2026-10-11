@@ -1570,68 +1570,111 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
 
   // Let the interface appear immediately, then hydrate saved data. If storage fails, the app remains usable.
   applySettings();
-  // Keyboard-aware writing layout for iOS Safari/PWA. Use VisualViewport because
-  // iOS may resize the visual viewport without resizing the layout viewport.
+  // Keyboard-aware writing layout for iOS Safari/PWA.
+  // Keep this delegated (not MutationObserver-bound) so typing in contenteditable
+  // cannot repeatedly attach focus handlers. Anchor the toolbar from the bottom
+  // of the visual viewport; reset the inset whenever the keyboard is not open.
   (() => {
-    let editorFocused = false;
-    let baselineHeight = window.visualViewport?.height || window.innerHeight;
-    let closeTimer = 0;
+    const root = document.documentElement;
+    const bodyClass = document.body.classList;
+    let lastEditorField = null; // 'title' or 'body'
+    let baselineHeight = Math.max(window.visualViewport?.height || 0, window.innerHeight || 0);
+    let blurTimer = 0;
+    let frame = 0;
+    let followupTimers = [];
+
+    const activeEditorField = () => {
+      const active = document.activeElement;
+      if (active?.id === 'editorTitle') return 'title';
+      if (active?.id === 'editorBody') return 'body';
+      return null;
+    };
+
     const refreshKeyboardLayout = () => {
+      frame = 0;
       const vv = window.visualViewport;
-      const visibleHeight = vv?.height || window.innerHeight;
-      const keyboardLikelyOpen = editorFocused && (baselineHeight - visibleHeight > 120);
-      // Anchor the toolbar to the *visible viewport's* bottom edge, not the
-      // document's bottom. On iOS Safari the layout viewport can remain tall
-      // while the visual viewport shrinks above the keyboard.
-      const toolbar = document.querySelector('#screen-editor .rich-toolbar');
-      if (vv && toolbar && keyboardLikelyOpen) {
-        const toolbarHeight = toolbar.getBoundingClientRect().height || 58;
-        const visibleBottom = (vv.offsetTop || 0) + vv.height;
-        const top = Math.max((vv.offsetTop || 0) + 6, visibleBottom - toolbarHeight - 8);
-        document.documentElement.style.setProperty('--qp-toolbar-top', `${top}px`);
+      const layoutHeight = window.innerHeight || root.clientHeight || 0;
+      const visibleHeight = vv?.height || layoutHeight;
+      const focusedField = activeEditorField();
+      if (focusedField) lastEditorField = focusedField;
+
+      // While a toolbar control is focused/tapped, retain the previous body focus
+      // so the keyboard and toolbar do not disappear between a tap and command.
+      const active = document.activeElement;
+      const activeInToolbar = !!active?.closest?.('#screen-editor .rich-toolbar');
+      if (!focusedField && !activeInToolbar) {
+        lastEditorField = null;
       }
-      document.body.classList.toggle('qp-keyboard-open', keyboardLikelyOpen);
-      if (!editorFocused && visibleHeight > baselineHeight - 80) baselineHeight = visibleHeight;
+
+      const keyboardDifference = Math.max(baselineHeight - visibleHeight, layoutHeight - visibleHeight);
+      const keyboardOpen = !!lastEditorField && keyboardDifference > 120;
+      const bodyFocused = keyboardOpen && lastEditorField === 'body';
+      const titleFocused = keyboardOpen && lastEditorField === 'title';
+
+      bodyClass.toggle('qp-keyboard-open', keyboardOpen);
+      bodyClass.toggle('qp-body-focused', bodyFocused);
+      bodyClass.toggle('qp-title-focused', titleFocused);
+
+      if (keyboardOpen) {
+        // For a screen-fixed accessory, use the hidden portion of the layout
+        // viewport as the keyboard inset. Do not include visualViewport.offsetTop:
+        // iOS Safari can leave that value stale after dismissal or change it while
+        // panning the document to keep the caret visible. Height-only anchoring keeps
+        // the toolbar at the keyboard's top edge during long-entry scrolling.
+        const keyboardInset = Math.max(0, layoutHeight - visibleHeight);
+        root.style.setProperty('--qp-keyboard-inset', `${keyboardInset}px`);
+      } else {
+        // Also clears stale iOS 26 visualViewport offsets after keyboard dismissal.
+        root.style.setProperty('--qp-keyboard-inset', '0px');
+        if (!lastEditorField) {
+          bodyClass.remove('qp-keyboard-open', 'qp-body-focused', 'qp-title-focused');
+          baselineHeight = Math.max(visibleHeight, layoutHeight);
+        }
+      }
     };
-    const bindEditorFocus = () => {
-      const editor = document.querySelector('#editorBody');
-      const title = document.querySelector('#editorTitle');
-      [editor, title].filter(Boolean).forEach(el => {
-        el.addEventListener('focus', () => {
-          editorFocused = true;
-          clearTimeout(closeTimer);
-          setTimeout(refreshKeyboardLayout, 80);
-          setTimeout(refreshKeyboardLayout, 320);
-        });
-        el.addEventListener('blur', () => {
-          closeTimer = setTimeout(() => {
-            editorFocused = !!document.querySelector('#screen-editor :is(#editorBody,#editorTitle):focus');
-            if (!editorFocused) document.body.classList.remove('qp-keyboard-open');
-            refreshKeyboardLayout();
-          }, 220);
-        });
-      });
+
+    const scheduleRefresh = () => {
+      if (!frame) frame = requestAnimationFrame(refreshKeyboardLayout);
     };
-    const observer = new MutationObserver(bindEditorFocus);
-    observer.observe(document.querySelector('#screen-editor') || document.body, { childList:true, subtree:true });
-    window.visualViewport?.addEventListener('resize', refreshKeyboardLayout, { passive: true });
-    window.visualViewport?.addEventListener('scroll', refreshKeyboardLayout, { passive: true });
-    // iOS Safari may scroll the layout viewport while the keyboard remains open.
-    // VisualViewport events alone are not consistently fired during document scroll,
-    // so also recalculate the toolbar position on page scroll and orientation changes.
-    window.addEventListener('scroll', refreshKeyboardLayout, { passive: true, capture: true });
-    window.addEventListener('resize', refreshKeyboardLayout, { passive: true });
-    window.addEventListener('orientationchange', () => {
-      setTimeout(refreshKeyboardLayout, 120);
-      setTimeout(refreshKeyboardLayout, 420);
-    }, { passive: true });
+
+    const scheduleSettledRefresh = () => {
+      scheduleRefresh();
+      followupTimers.forEach(clearTimeout);
+      followupTimers = [90, 260, 520].map(delay => setTimeout(scheduleRefresh, delay));
+    };
+
     document.addEventListener('focusin', event => {
-      if (event.target.matches('#editorBody,#editorTitle')) { editorFocused = true; refreshKeyboardLayout(); }
+      if (event.target?.id === 'editorTitle' || event.target?.id === 'editorBody') {
+        lastEditorField = event.target.id === 'editorBody' ? 'body' : 'title';
+        clearTimeout(blurTimer);
+        scheduleSettledRefresh();
+      } else if (event.target?.closest?.('#screen-editor .rich-toolbar') && lastEditorField === 'body') {
+        clearTimeout(blurTimer);
+        scheduleSettledRefresh();
+      }
     });
+
     document.addEventListener('focusout', event => {
-      if (event.target.matches('#editorBody,#editorTitle')) setTimeout(refreshKeyboardLayout, 250);
+      if (event.target?.id !== 'editorTitle' && event.target?.id !== 'editorBody') return;
+      clearTimeout(blurTimer);
+      blurTimer = setTimeout(() => {
+        const next = activeEditorField();
+        if (next) {
+          lastEditorField = next;
+        } else if (!document.activeElement?.closest?.('#screen-editor .rich-toolbar')) {
+          lastEditorField = null;
+        }
+        scheduleSettledRefresh();
+      }, 140);
     });
-    bindEditorFocus();
+
+    window.visualViewport?.addEventListener('resize', scheduleRefresh, { passive: true });
+    window.visualViewport?.addEventListener('scroll', scheduleRefresh, { passive: true });
+    window.addEventListener('resize', scheduleRefresh, { passive: true });
+    window.addEventListener('scroll', scheduleRefresh, { passive: true });
+    window.addEventListener('orientationchange', scheduleSettledRefresh, { passive: true });
+    window.addEventListener('pageshow', scheduleSettledRefresh, { passive: true });
+    scheduleSettledRefresh();
   })();
 
   initializeStorage();

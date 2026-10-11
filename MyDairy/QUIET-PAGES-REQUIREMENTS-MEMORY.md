@@ -1,46 +1,28 @@
-# Quiet Pages: persistent project requirements
+# Quiet Pages requirements register
 
-This file records the requirements discussed across Quiet Pages work so later updates don't silently drop features. Preserve it with the project.
+This file records the product constraints shared in the project conversation. Keep it with the project when handing work between sessions. It does not itself create persistent runtime memory.
 
-## Product and design constraints
-- Existing app is a static PWA hosted through GitHub Pages / Nithan.in; relative paths must work when hosted under a repository subpath.
-- Preserve the established visual design unless the user explicitly asks for a redesign: calm Apple-inspired spacing, pastel gradients, organic/layered scrapbook diary cards, per-entry colours, text on the left and photo frame on the right only when a photo exists.
-- Fixed bottom navigation: Diary, Companion, Calendar, Settings; floating + button positioned sensibly; safe-area spacing; 44px+ touch targets; adequate bottom content padding.
-- Do not make unsolicited visual changes while improving AI/model behaviour.
+## Preserve existing experience
+- Quiet Pages is a local-first diary PWA currently hosted using GitHub Pages / Nithan.in.
+- Do not redesign the existing scrapbook-card look, pastel/dynamic card colours, spacing, glassy navigation, diary/card layout, or overall visual theme when changing behaviour unless explicitly asked.
+- Preserve existing entries, the real “Hello World” entry, date/theme/mood, photos, editor formatting, autosave, Save page, gallery, calendar, settings, bottom navigation and floating add button. Never clear local storage/IndexedDB as part of an update. Export a backup before deployments.
+- The diary editor supports rich text, headings, bold/italic/underline, quotes, fonts/sizes, highlighting/text colour, inline image insertion and captions where currently implemented.
 
-## Diary/editor/data integrity
-- Keep all existing diary data; never clear localStorage/IndexedDB as an update strategy.
-- “Hello World” is a real entry, not disposable demo content.
-- Preserve dates, theme/mood, gallery/photos, captions, autosave, Save page, calendar, and rich-text editing.
-- Editor supports bold, italic, underline, headings, quotes, font families/sizes, highlights/text colours, inserting images between paragraphs and captions.
-- Preserve export/import backup; restoring a backup may replace current data, so warn the user and encourage exporting first.
-- No empty image column when an entry has no photo.
+## Mobile writing UX
+- While the keyboard is open, hide the Diary/Companion/Calendar/Settings navigation, floating add button and top navigation to free space. Restore them on dismiss.
+- On iPhone, keep formatting controls within easy reach immediately above the software keyboard. Controls should scroll horizontally rather than requiring the user to scroll to the top of a long entry.
+- Keep the title/heading input visible and typeable when it has focus. Hide its row only while the body editor is focused, if needed for space.
+- Keep the toolbar in the visible viewport during long body scrolling and keyboard viewport changes; reset positioning when the keyboard closes. Account for iOS Safari VisualViewport quirks.
+- Do not break body selection/range when tapping toolbar controls. Use touch-friendly targets and safe-area-aware styling.
 
-## Companion and memory
-- Natural, chatty, supportive voice; avoid generic robotic answers. Answer general questions normally and use diary context when relevant, without dumping unrelated private entries.
-- Companion knows Quiet Pages features, its creator Nithan, and hosting at Nithan.in.
-- Welcome on entry, refresh appropriately based on time/recent entries/approved memories without accumulating duplicate welcome messages.
-- Automatically capture useful, durable, non-sensitive memories where possible; let user edit/delete memories. The full diary remains the source of truth and should be searchable, not replaced by a tiny memory shelf.
-- Do not show hidden reasoning or `<think>`, `<analysis>`, or similar tokens. Suppress reasoning while streaming, sanitize complete and incomplete blocks, sanitize stored/history messages, retry a malformed response once, then use a safe fallback.
-- For Qwen3, use supported non-thinking generation settings when possible; do not assume prompt-only filtering fixes model behaviour.
-- Serialize model requests so chat, greeting, and background memory extraction do not collide.
+## AI companion and models
+- Natural, supportive, chatty companion; answer general questions generally and use diary context when helpful, without forcing every answer to be diary-related. Know app facts accurately (created by Nithan, hosted at Nithan.in).
+- Never expose reasoning or `<think>` blocks. Sanitize both final/streamed output and history; retry/fallback safely if the model returns reasoning only.
+- Store diary and memory data locally; do not claim encryption unless implemented. Be accurate about model downloads/runtime provider requests and where diary context is processed.
+- Diary remains the source of truth; memory shelf supplements it. Search diary entries when relevant; do not claim semantic/complete retrieval unless actually implemented and tested. Useful memory capture should be safe and controllable.
+- PWA model options should only offer model IDs supported by the active runtime. Investigate Qwen/Phi/Gemma/Llama/SmolLM/Mistral only where runtime catalogue confirms them. Lightweight, balanced and larger options are recommendations, not guarantees across devices.
+- Apple Foundation Models requires a native iOS integration; do not show it as a PWA model option that Safari cannot call directly. Keep a native iOS project separate from the PWA deployment ZIP.
 
-## AI model compatibility
-- Discover actual models from the installed WebLLM runtime catalogue; do not invent support for a model merely because it exists on Hugging Face.
-- Group supported compact models into Lite, Balanced and Advanced by approximate parameter size, while clearly stating these labels do not guarantee speed or fit.
-- Candidate families: Qwen, Phi, Gemma, Llama, SmolLM, StableLM and Mistral, only if the active runtime catalogue supports them.
-- Use WebGPU capability checks; retain diary functionality if AI is unavailable. Explain that model/runtime files are downloaded and first-time downloads can be large.
-- Apple Foundation Models is a native Swift API and cannot be directly called by Safari JavaScript. Keep Apple integration in a separate native iOS project, never inside the PWA-only deployment archive. The user has separately chosen to explore a native iOS app for personal installation on iPhone 16, with Windows-only development constraints; building/signing requires a Mac/Xcode route or a cloud Mac.
-- Transformers.js is an alternative web inference runtime, not a drop-in model catalogue for WebLLM. Any future runtime switch needs compatible model artifacts and testing.
-
-## Privacy and honest claims
-- Diary content, photos, chat and memories are stored in browser-local IndexedDB with localStorage fallback.
-- Local storage is not encryption. Never claim the diary is encrypted unless actual encryption is implemented and verified.
-- When a local model is loaded, inference happens in-browser; model/runtime assets are fetched from providers and the page may load fonts/icons.
-- Be honest about what has been syntax-checked versus what has been tested on real iPhone Safari/Android hardware.
-
-## Deployment and quality assurance
-- Keep service worker cache version in sync with each relevant update and ensure stale JavaScript/CSS can refresh.
-- Preserve static no-build workflow and relative URLs.
-- Before deployment, export backup; syntax-check JavaScript; inspect ZIP contents; test entries/photos/editor/calendar/backup/companion/model loading on actual devices.
-- User wants the complete prior requirements carried forward; don't omit established features to make a narrow fix easier.
+## Delivery discipline
+- Package PWA overlays without a native iOS project. Preserve unrelated files/assets. Use a new service-worker cache version when deployed JS/CSS changes.
+- Say what was actually syntax/package tested; do not claim physical iPhone/Android testing unless it happened.
