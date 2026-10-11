@@ -45,6 +45,8 @@
   let state = freshState();
   let greetingRequestKey = '';
   let greetingRequestInFlight = false;
+  let savedEditorRange = null;
+  let editorSelectionListener = null;
 
   function freshState() {
     return {
@@ -79,38 +81,113 @@
     return new Intl.DateTimeFormat(undefined, options).format(parseDate(value));
   }
   function formatMonth(date) { return new Intl.DateTimeFormat(undefined, { month: 'long', year: 'numeric' }).format(date); }
+  function decodeLegacyEntities(value) {
+    let current = String(value ?? '');
+    // Old entries can contain entities escaped more than once. Decode only text, never inject it as HTML.
+    for (let i = 0; i < 5 && /&(?:amp;)*(?:nbsp|lt|gt|quot|apos|#39|#x[\da-f]+|#\d+);/i.test(current); i++) {
+      const next = new DOMParser().parseFromString(current, 'text/html').body.textContent ?? current;
+      if (next === current) break;
+      current = next;
+    }
+    return current;
+  }
   function richTextPlain(value) {
-    const raw = String(value || '');
-    if (!/<\/?(?:p|div|br|strong|b|em|i|h[23]|blockquote|mark|span|img)\b/i.test(raw)) return raw;
+    const raw = String(value ?? '');
+    const markup = /<\/?(?:p|div|br|strong|b|em|i|u|h1|h2|h3|blockquote|mark|span|font|ul|ol|li|img)\b/i.test(raw);
+    if (!markup) return decodeLegacyEntities(raw).replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim();
     const doc = new DOMParser().parseFromString(raw, 'text/html');
-    doc.querySelectorAll('img').forEach(img => img.replaceWith(doc.createTextNode(img.alt || '[image]')));
-    return (doc.body.textContent || '').replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim();
+    doc.querySelectorAll('br').forEach(node => node.replaceWith(doc.createTextNode(' ')));
+    doc.querySelectorAll('img').forEach(node => node.replaceWith(doc.createTextNode(' ')));
+    const text = decodeLegacyEntities(doc.body.textContent || '');
+    return text.replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim();
   }
   function sanitizeRichHtml(value) {
-    const raw = String(value || '');
-    // Existing entries were stored as plain text. Escape them instead of interpreting old text as markup.
-    if (!/<\/?(?:p|div|br|strong|b|em|i|h[23]|blockquote|mark|span|img)\b/i.test(raw)) return escapeHTML(raw).replace(/\n/g, '<br>');
+    let raw = String(value ?? '');
+    const markupPattern = /<\/?(?:p|div|br|strong|b|em|i|u|h1|h2|h3|blockquote|mark|span|font|ul|ol|li|img)\b/i;
+    if (!markupPattern.test(raw)) {
+      raw = decodeLegacyEntities(raw);
+      // If a legacy encoded HTML string decodes into actual formatting markup, sanitize it as markup.
+      if (!markupPattern.test(raw)) return escapeHTML(raw).replace(/\r\n?/g, '\n').replace(/\n/g, '<br>');
+    }
     const doc = new DOMParser().parseFromString(raw, 'text/html');
-    const allowed = new Set(['P','DIV','BR','STRONG','B','EM','I','H2','H3','BLOCKQUOTE','MARK','SPAN','IMG']);
-    const walk = node => {
-      [...node.childNodes].forEach(child => {
-        if (child.nodeType === 1) {
-          if (!allowed.has(child.tagName)) { child.replaceWith(...child.childNodes); return; }
-          [...child.attributes].forEach(attr => {
-            if (child.tagName === 'IMG' && attr.name === 'src' && /^data:image\/(png|jpeg|webp|gif);base64,/i.test(attr.value)) return;
-            if (child.tagName === 'IMG' && attr.name === 'alt') return;
-            if (child.tagName === 'SPAN' && attr.name === 'style') {
-              const safe = attr.value.split(';').map(x=>x.trim()).filter(x=>/^(color|font-family|font-size):\s*[#(),.%\w -]+$/i.test(x)).join(';');
-              if (safe) { child.setAttribute('style', safe); return; }
-            }
-            child.removeAttribute(attr.name);
-          });
-          if (child.tagName === 'IMG' && !child.getAttribute('src')) child.remove(); else walk(child);
-        } else if (child.nodeType !== 3 && child.nodeType !== 8) child.remove();
-      });
+    const allowed = new Set(['P', 'DIV', 'BR', 'STRONG', 'B', 'EM', 'I', 'U', 'H2', 'H3', 'BLOCKQUOTE', 'MARK', 'SPAN', 'IMG', 'UL', 'OL', 'LI']);
+    const blocked = new Set(['SCRIPT', 'STYLE', 'IFRAME', 'OBJECT', 'EMBED', 'SVG', 'MATH', 'VIDEO', 'AUDIO', 'FORM', 'INPUT', 'BUTTON', 'TEXTAREA', 'SELECT', 'META', 'LINK']);
+    const colorPattern = /^(?:#[\da-f]{3,8}|rgba?\(\s*[\d.%\s,]+\)|hsla?\(\s*[-\d.%\s,]+\)|[a-z]{3,20})$/i;
+    const familyPattern = /^[a-z\d\s"'(),-]{1,100}$/i;
+    const sizePattern = /^(?:\d{1,3}(?:\.\d+)?(?:px|pt|em|rem|%)|xx-small|x-small|small|medium|large|x-large|xx-large|xxx-large|smaller|larger)$/i;
+    const safeStyle = (styleText) => {
+      const styles = [];
+      for (const declaration of String(styleText || '').split(';')) {
+        const colon = declaration.indexOf(':');
+        if (colon < 1) continue;
+        const prop = declaration.slice(0, colon).trim().toLowerCase();
+        const val = declaration.slice(colon + 1).trim();
+        if (!val || /url\s*\(|expression\s*\(|[<>{}]/i.test(val)) continue;
+        if ((prop === 'color' || prop === 'background-color') && colorPattern.test(val)) styles.push(`${prop}: ${val}`);
+        else if (prop === 'font-family' && familyPattern.test(val) && !/url|expression/i.test(val)) styles.push(`${prop}: ${val}`);
+        else if (prop === 'font-size' && sizePattern.test(val)) styles.push(`${prop}: ${val}`);
+        else if (prop === 'font-weight' && /^(normal|bold|bolder|lighter|[1-9]00)$/i.test(val)) styles.push(`${prop}: ${val.toLowerCase()}`);
+        else if (prop === 'font-style' && /^(normal|italic|oblique)$/i.test(val)) styles.push(`${prop}: ${val.toLowerCase()}`);
+        else if ((prop === 'text-decoration' || prop === 'text-decoration-line') && /^(none|underline|line-through|overline)$/i.test(val)) styles.push(`text-decoration: ${val.toLowerCase()}`);
+        else if (prop === 'text-align' && /^(left|right|center|justify)$/i.test(val)) styles.push(`${prop}: ${val.toLowerCase()}`);
+      }
+      return styles.join('; ');
     };
-    walk(doc.body);
+    const fontSizeMap = { '1': '10px', '2': '13px', '3': '16px', '4': '18px', '5': '24px', '6': '32px', '7': '48px' };
+    const cleanNode = node => {
+      if (node.nodeType === Node.TEXT_NODE) return;
+      if (node.nodeType !== Node.ELEMENT_NODE) { node.remove(); return; }
+      let tag = node.tagName;
+      if (blocked.has(tag)) { node.remove(); return; }
+      if (tag === 'FONT') {
+        const span = doc.createElement('span');
+        const face = node.getAttribute('face');
+        const color = node.getAttribute('color');
+        const size = node.getAttribute('size');
+        const mapped = [];
+        if (face && familyPattern.test(face)) mapped.push(`font-family: ${face}`);
+        if (color && colorPattern.test(color)) mapped.push(`color: ${color}`);
+        if (fontSizeMap[size]) mapped.push(`font-size: ${fontSizeMap[size]}`);
+        if (mapped.length) span.setAttribute('style', mapped.join('; '));
+        while (node.firstChild) span.appendChild(node.firstChild);
+        node.replaceWith(span);
+        node = span;
+        tag = 'SPAN';
+      }
+      [...node.childNodes].forEach(cleanNode);
+      if (!allowed.has(tag)) {
+        node.replaceWith(...node.childNodes);
+        return;
+      }
+      const originalStyle = tag === 'SPAN' ? safeStyle(node.getAttribute('style')) : '';
+      const imageSrc = tag === 'IMG' ? node.getAttribute('src') || '' : '';
+      const imageAlt = tag === 'IMG' ? (node.getAttribute('alt') || 'Diary image').slice(0, 160) : '';
+      [...node.attributes].forEach(attr => node.removeAttribute(attr.name));
+      if (tag === 'SPAN' && originalStyle) node.setAttribute('style', originalStyle);
+      if (tag === 'IMG') {
+        if (!/^data:image\/(?:png|jpeg|webp|gif);base64,[a-z\d+/=\r\n]+$/i.test(imageSrc)) { node.remove(); return; }
+        node.setAttribute('src', imageSrc);
+        node.setAttribute('alt', imageAlt);
+        node.setAttribute('class', 'inline-entry-image');
+        node.setAttribute('loading', 'lazy');
+      }
+    };
+    doc.querySelectorAll('h1').forEach(node => {
+      const replacement = doc.createElement('h2');
+      while (node.firstChild) replacement.appendChild(node.firstChild);
+      node.replaceWith(replacement);
+    });
+    doc.querySelectorAll('h4, h5, h6').forEach(node => {
+      const replacement = doc.createElement('h3');
+      while (node.firstChild) replacement.appendChild(node.firstChild);
+      node.replaceWith(replacement);
+    });
+    [...doc.body.childNodes].forEach(cleanNode);
     return doc.body.innerHTML;
+  }
+  function richTextHasContent(value) {
+    const raw = String(value ?? '');
+    return Boolean(richTextPlain(raw).trim() || /<img\b/i.test(raw));
   }
   function excerpt(text, length = 155) {
     const normalized = richTextPlain(text).replace(/\s+/g, ' ').trim();
@@ -318,13 +395,14 @@
       const cover = coverPhoto(entry);
       const mood = moodInfo(entry.mood);
       const hasText = Boolean(richTextPlain(entry.body).trim());
+      const hasInlineImage = /<img\b/i.test(String(entry.body || ''));
       const title = entry.title.trim() || 'An untitled page';
       const className = `entry-card theme-${cardTheme(entry)}${cover ? ' has-cover' : ''}`;
       const date = formatDate(entry.date, { month: 'short', day: 'numeric', year: 'numeric' });
       const photoMarkup = cover
         ? `<img class="entry-cover-photo" src="${escapeHTML(cover.dataUrl)}" alt="" loading="lazy">`
         : `<div class="entry-art" aria-hidden="true"><span class="entry-art-orb"></span><i class="bi bi-journal-richtext"></i></div>`;
-      const excerptText = hasText ? excerpt(entry.body) : 'A blank page, ready for another thought.';
+      const excerptText = hasText ? excerpt(entry.body) : (hasInlineImage ? 'A moment, kept between the words.' : 'A blank page, ready for another thought.');
       return `<article class="${className}" data-open-entry="${escapeHTML(entry.id)}" tabindex="0" role="button" aria-label="Open ${escapeHTML(title)}">
         <div class="entry-copy">
           <div class="card-topline"><span>${escapeHTML(date)}</span>${mood ? `<span class="entry-pill">${mood.emoji} ${escapeHTML(mood.label)}</span>` : `<span class="entry-pill"><i class="bi bi-bookmark-heart"></i> Kept</span>`}</div>
@@ -349,8 +427,16 @@
     if (hour >= 17 && hour < 22) return 'evening';
     return 'night';
   }
+  function greetingContextFingerprint() {
+    const entries = sortedEntries().slice(0, 3).map(entry => [entry.id, entry.updatedAt, entry.title, excerpt(entry.body, 450), entry.mood || '']);
+    const memories = state.memories.slice(0, 8).map(memory => [memory.id, memory.updatedAt, memory.text]);
+    const input = JSON.stringify({ entries, memories });
+    let hash = 2166136261;
+    for (let i = 0; i < input.length; i++) { hash ^= input.charCodeAt(i); hash = Math.imul(hash, 16777619); }
+    return (hash >>> 0).toString(36);
+  }
   function greetingCacheKey() {
-    return `quiet-pages-greeting-v1:${dateKey(new Date())}:${greetingPeriod()}`;
+    return `quiet-pages-greeting-v2:${dateKey(new Date())}:${greetingPeriod()}:${greetingContextFingerprint()}`;
   }
   function getGreetingFallback() {
     const defaults = {
@@ -409,6 +495,8 @@
       if (currentScreen === 'diary' && greetingCacheKey() === key) $('#homeSubheading').textContent = fallback;
     } finally {
       greetingRequestInFlight = false;
+      // If the diary or memory context changed while generation was in flight, generate for the new context.
+      if (currentScreen === 'diary' && !$('#searchInput')?.value?.trim() && greetingCacheKey() !== key) refreshGreeting();
     }
   }
 
@@ -475,7 +563,7 @@
     $('#screen-detail').innerHTML = `
       <div class="back-row"><button class="back-button" data-action="back-detail"><i class="bi bi-arrow-left"></i> Back to ${previousScreen === 'calendar' ? 'calendar' : 'your pages'}</button><div class="detail-actions"><button class="soft-icon-button" data-action="edit-entry" data-entry-id="${escapeHTML(entry.id)}" aria-label="Edit entry" title="Edit"><i class="bi bi-pencil"></i></button><button class="soft-icon-button" data-action="delete-entry" data-entry-id="${escapeHTML(entry.id)}" aria-label="Delete entry" title="Delete"><i class="bi bi-trash3"></i></button></div></div>
       <div class="detail-hero theme-${theme}${cover ? ' has-image' : ''}">${cover ? `<img src="${escapeHTML(cover.dataUrl)}" alt="Cover photo for ${escapeHTML(entry.title || 'diary entry')}">` : ''}<div class="detail-hero-copy"><div class="entry-meta">${escapeHTML(formatDate(entry.date))} · ${escapeHTML(THEME_INFO[theme].label)} theme</div><h1>${escapeHTML(entry.title || 'An untitled page')}</h1>${mood ? `<span class="detail-mood">${mood.emoji} ${escapeHTML(mood.label)}</span>` : ''}</div></div>
-      <article class="detail-content"><div class="detail-writing${richTextPlain(entry.body).trim() ? '' : ' empty-writing'}">${richTextPlain(entry.body).trim() ? sanitizeRichHtml(entry.body) : 'This page is still waiting for its words.'}</div>
+      <article class="detail-content"><div class="detail-writing${richTextHasContent(entry.body) ? '' : ' empty-writing'}">${richTextHasContent(entry.body) ? sanitizeRichHtml(entry.body) : 'This page is still waiting for its words.'}</div>
       ${photos.length ? `<div class="detail-gallery" aria-label="Entry photos">${photos.map((photo, i) => `<button type="button" data-view-photo="${i}" aria-label="View photo ${i + 1}"><img src="${escapeHTML(photo.dataUrl)}" alt="Diary photo ${i + 1}" loading="lazy"></button>`).join('')}</div>` : ''}
       ${entry.reflection ? `<div class="reflection-card"><strong><i class="bi bi-stars"></i> A reflection</strong><p>${escapeHTML(entry.reflection)}</p></div>` : ''}
       <div class="detail-footer"><span>Saved ${escapeHTML(new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }).format(new Date(entry.updatedAt || entry.createdAt)))}</span><button class="text-button" data-action="reflect-entry" data-entry-id="${escapeHTML(entry.id)}"><i class="bi bi-stars"></i> Reflect with companion</button></div></article>`;
@@ -499,6 +587,7 @@
     setTimeout(() => $('#editorTitle')?.focus({ preventScroll: true }), 120);
   }
   function renderEditor() {
+    savedEditorRange = null;
     const data = editorData;
     const moods = MOODS.map(mood => `<button type="button" class="mood-option${data.mood === mood.value ? ' active' : ''}" data-mood="${mood.value}" aria-pressed="${data.mood === mood.value}"><span>${mood.emoji}</span>${escapeHTML(mood.label)}</button>`).join('');
     const photos = (data.photos || []).map((photo, index) => `<div class="photo-preview${photo.cover ? ' cover' : ''}"><img src="${escapeHTML(photo.dataUrl)}" alt="Selected diary photo ${index + 1}"><button type="button" class="photo-remove" data-remove-photo="${escapeHTML(photo.id)}" aria-label="Remove photo"><i class="bi bi-x"></i></button><button type="button" class="cover-select" data-cover-photo="${escapeHTML(photo.id)}">${photo.cover ? 'COVER' : 'MAKE COVER'}</button></div>`).join('');
@@ -507,13 +596,13 @@
       <div class="editor-field"><label class="sr-only" for="editorTitle">Entry title</label><input id="editorTitle" class="title-input" maxlength="140" placeholder="Give this day a name…" value="${escapeHTML(data.title)}"></div>
       <div class="editor-field writing-field"><label for="editorBody">What would you like to keep?</label>
       <div class="rich-toolbar" role="toolbar" aria-label="Writing format tools">
-        <button type="button" data-format="bold" aria-label="Bold" title="Bold"><strong>B</strong></button><button type="button" data-format="italic" aria-label="Italic" title="Italic"><em>I</em></button><button type="button" data-format="underline" aria-label="Underline" title="Underline"><u>U</u></button>
-        <span class="toolbar-divider"></span><button type="button" data-block="h2" title="Heading">H1</button><button type="button" data-block="h3" title="Subheading">H2</button><button type="button" data-block="blockquote" title="Quote">❝</button>
+        <button type="button" data-format="bold" aria-label="Bold" title="Bold"><i class="bi bi-type-bold" aria-hidden="true"></i></button><button type="button" data-format="italic" aria-label="Italic" title="Italic"><i class="bi bi-type-italic" aria-hidden="true"></i></button><button type="button" data-format="underline" aria-label="Underline" title="Underline"><i class="bi bi-type-underline" aria-hidden="true"></i></button>
+        <span class="toolbar-divider"></span><button type="button" data-block="h2" title="Heading" aria-label="Heading"><i class="bi bi-type-h1" aria-hidden="true"></i></button><button type="button" data-block="h3" title="Subheading" aria-label="Subheading"><i class="bi bi-type-h2" aria-hidden="true"></i></button><button type="button" data-block="blockquote" title="Quote" aria-label="Quote"><i class="bi bi-quote" aria-hidden="true"></i></button>
         <select id="editorFont" aria-label="Font family" title="Font family"><option value="Georgia">Serif</option><option value="Arial">Sans</option><option value="monospace">Mono</option></select><select id="editorFontSize" aria-label="Text size" title="Text size"><option value="3">Normal</option><option value="2">Small</option><option value="4">Large</option><option value="5">Larger</option></select>
-        <label class="highlight-picker" title="Highlight text">▰<input id="highlightColor" type="color" value="#fff09a" aria-label="Highlight colour"></label>
-        <label class="text-color-picker" title="Text colour">A<input id="textColor" type="color" value="#2c3b35" aria-label="Text colour"></label>
-        <button type="button" id="inlineImageButton" title="Insert image between paragraphs" aria-label="Insert image">▧</button><input id="inlineImageInput" class="hidden" type="file" accept="image/*">
-        <button type="button" data-format="removeFormat" title="Clear formatting">Tx</button>
+        <label class="highlight-picker" title="Highlight text" aria-label="Highlight text"><i class="bi bi-highlighter" aria-hidden="true"></i><input id="highlightColor" type="color" value="#fff09a" aria-label="Highlight colour"></label>
+        <label class="text-color-picker" title="Text colour" aria-label="Text colour"><i class="bi bi-palette" aria-hidden="true"></i><input id="textColor" type="color" value="#2c3b35" aria-label="Text colour"></label>
+        <button type="button" id="inlineImageButton" title="Insert image between paragraphs" aria-label="Insert image"><i class="bi bi-image" aria-hidden="true"></i></button><input id="inlineImageInput" class="hidden" type="file" accept="image/*">
+        <button type="button" data-format="removeFormat" title="Clear formatting" aria-label="Clear formatting"><i class="bi bi-eraser" aria-hidden="true"></i></button>
       </div>
       <div id="editorBody" class="entry-writing-input rich-editor" contenteditable="true" role="textbox" aria-multiline="true" data-placeholder="Start anywhere. A moment, a thought, something you don't want to forget…">${sanitizeRichHtml(data.body)}</div>
       <p class="hint">Your original words stay yours. Format them however you like. Changes save on this device.</p></div>
@@ -529,6 +618,32 @@
     const body = $('#editorBody');
     const date = $('#editorDate');
     const theme = $('#editorTheme');
+    savedEditorRange = null;
+    if (editorSelectionListener) document.removeEventListener('selectionchange', editorSelectionListener);
+    const rememberSelection = () => {
+      const selection = window.getSelection();
+      if (!selection || !selection.rangeCount || !selection.anchorNode || !selection.focusNode) return;
+      if (body.contains(selection.anchorNode) && body.contains(selection.focusNode)) savedEditorRange = selection.getRangeAt(0).cloneRange();
+    };
+    editorSelectionListener = rememberSelection;
+    document.addEventListener('selectionchange', editorSelectionListener);
+    body.addEventListener('keyup', rememberSelection);
+    body.addEventListener('mouseup', rememberSelection);
+    body.addEventListener('input', rememberSelection);
+    body.addEventListener('touchend', () => setTimeout(rememberSelection, 0), { passive: true });
+    const restoreSelection = () => {
+      body.focus({ preventScroll: true });
+      const selection = window.getSelection();
+      if (!selection) return;
+      selection.removeAllRanges();
+      if (savedEditorRange && body.contains(savedEditorRange.commonAncestorContainer)) {
+        try { selection.addRange(savedEditorRange); return; } catch (_) { savedEditorRange = null; }
+      }
+      const range = document.createRange();
+      range.selectNodeContents(body);
+      range.collapse(false);
+      selection.addRange(range);
+    };
     const track = () => {
       editorData.title = title.value;
       editorData.body = sanitizeRichHtml(body.innerHTML);
@@ -539,30 +654,68 @@
       $('#autosaveStatus').textContent = 'Saving changes…';
       clearTimeout(editorSaveTimer);
       editorSaveTimer = setTimeout(() => flushEditorSave(), 600);
+      rememberSelection();
     };
     title.addEventListener('input', track);
     body.addEventListener('input', track);
-    const keepEditorFocus = () => body.focus({preventScroll:true});
-    $$('.rich-toolbar [data-format]', $('#screen-editor')).forEach(button => button.addEventListener('mousedown', event => event.preventDefault()));
+    // Prevent mouse-down from discarding the selected range before a toolbar command runs.
+    $$('.rich-toolbar button', $('#screen-editor')).forEach(button => button.addEventListener('mousedown', event => event.preventDefault()));
     $$('.rich-toolbar [data-format]', $('#screen-editor')).forEach(button => button.addEventListener('click', () => {
-      keepEditorFocus(); document.execCommand(button.dataset.format, false, null); track();
+      restoreSelection();
+      document.execCommand('styleWithCSS', false, true);
+      document.execCommand(button.dataset.format, false, null);
+      track();
+      rememberSelection();
     }));
-    $$('.rich-toolbar [data-block]', $('#screen-editor')).forEach(button => button.addEventListener('mousedown', event => event.preventDefault()));
     $$('.rich-toolbar [data-block]', $('#screen-editor')).forEach(button => button.addEventListener('click', () => {
-      keepEditorFocus(); document.execCommand('formatBlock', false, button.dataset.block); track();
+      restoreSelection();
+      document.execCommand('formatBlock', false, `<${button.dataset.block}>`);
+      track();
+      rememberSelection();
     }));
-    $('#editorFont').addEventListener('change', event => { keepEditorFocus(); document.execCommand('fontName', false, event.target.value); track(); });
-    $('#editorFontSize').addEventListener('change', event => { keepEditorFocus(); document.execCommand('fontSize', false, event.target.value); track(); });
-    $('#highlightColor').addEventListener('input', event => { keepEditorFocus(); document.execCommand('hiliteColor', false, event.target.value); track(); });
-    $('#textColor').addEventListener('input', event => { keepEditorFocus(); document.execCommand('foreColor', false, event.target.value); track(); });
-    $('#inlineImageButton').addEventListener('click', () => $('#inlineImageInput').click());
+    $('#editorFont').addEventListener('change', event => {
+      restoreSelection();
+      document.execCommand('styleWithCSS', false, true);
+      document.execCommand('fontName', false, event.target.value);
+      track();
+      rememberSelection();
+    });
+    $('#editorFontSize').addEventListener('change', event => {
+      restoreSelection();
+      document.execCommand('styleWithCSS', false, true);
+      document.execCommand('fontSize', false, event.target.value);
+      track();
+      rememberSelection();
+    });
+    $('#highlightColor').addEventListener('change', event => {
+      restoreSelection();
+      document.execCommand('styleWithCSS', false, true);
+      const applied = document.execCommand('hiliteColor', false, event.target.value);
+      if (!applied) document.execCommand('backColor', false, event.target.value);
+      track();
+      rememberSelection();
+    });
+    $('#textColor').addEventListener('change', event => {
+      restoreSelection();
+      document.execCommand('styleWithCSS', false, true);
+      document.execCommand('foreColor', false, event.target.value);
+      track();
+      rememberSelection();
+    });
+    $('#inlineImageButton').addEventListener('mousedown', rememberSelection);
+    $('#inlineImageButton').addEventListener('click', () => {
+      rememberSelection();
+      $('#inlineImageInput').click();
+    });
     $('#inlineImageInput').addEventListener('change', async event => {
-      const file = event.target.files?.[0]; if (!file) return;
+      const file = event.target.files?.[0];
+      if (!file) return;
       try {
         const dataUrl = await resizeImage(file);
-        keepEditorFocus();
-        document.execCommand('insertHTML', false, `<p><img class="inline-entry-image" src="${dataUrl}" alt="Diary image"><br></p><p><br></p>`);
+        restoreSelection();
+        document.execCommand('insertHTML', false, `<p><img class="inline-entry-image" src="${dataUrl}" alt="Diary image" loading="lazy"></p><p><br></p>`);
         track();
+        rememberSelection();
       } catch (error) { toast('That image could not be inserted.', 'error'); }
       event.target.value = '';
     });
@@ -588,6 +741,7 @@
         } catch (error) { toast(`Could not add ${file.name}: ${error.message || 'unsupported image'}`, 'error'); }
       }
       editorData.updatedAt = new Date().toISOString(); editorDirty = true; renderEditor(); scheduleEditorSave();
+      event.target.value = '';
     });
     $('#saveEntryButton').addEventListener('click', () => saveEditorAndClose());
   }
@@ -618,7 +772,7 @@
   async function flushEditorSave() {
     clearTimeout(editorSaveTimer);
     if (!editorData || !editorDirty) return;
-    const meaningful = editorData.title.trim() || richTextPlain(editorData.body).trim() || editorData.photos.length;
+    const meaningful = editorData.title.trim() || richTextHasContent(editorData.body) || editorData.photos.length;
     if (!meaningful) { $('#autosaveStatus') && ($('#autosaveStatus').textContent = 'Your page is not saved until you start writing.'); return; }
     if (!state.entries.some(entry => entry.id === editorData.id)) state.entries.push(editorData);
     else state.entries = state.entries.map(entry => entry.id === editorData.id ? editorData : entry);
@@ -640,7 +794,7 @@
     editorData.body = sanitizeRichHtml($('#editorBody').innerHTML);
     editorData.date = $('#editorDate').value || TODAY;
     editorData.theme = $('#editorTheme').value;
-    const meaningful = editorData.title || richTextPlain(editorData.body).trim() || editorData.photos.length;
+    const meaningful = editorData.title || richTextHasContent(editorData.body) || editorData.photos.length;
     if (!meaningful) return toast('Write something or add a photo before saving this page.');
     if (!editorData.photos.some(photo => photo.cover) && editorData.photos.length) editorData.photos[0].cover = true;
     editorData.updatedAt = new Date().toISOString();
@@ -1062,7 +1216,7 @@
   $('#confirmDialog').addEventListener('cancel', event => { event.preventDefault(); finishConfirmation(false); });
   window.addEventListener('beforeunload', () => {
     if (editorDirty && editorData) {
-      const meaningful = editorData.title.trim() || richTextPlain(editorData.body).trim() || editorData.photos.length;
+      const meaningful = editorData.title.trim() || richTextHasContent(editorData.body) || editorData.photos.length;
       if (meaningful) {
         if (!state.entries.some(entry => entry.id === editorData.id)) state.entries.push(editorData);
         else state.entries = state.entries.map(entry => entry.id === editorData.id ? editorData : entry);
