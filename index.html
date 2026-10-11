@@ -1,481 +1,167 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="en" data-theme="sky">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#000000">
-<title>Nithan Najeeb | Portfolio</title>
-<meta name="description" content="Portfolio of Nithan Najeeb: Mind Atlas, Forenexa, Ollama Uplink and creative web experiments.">
-<meta property="og:title" content="Nithan Najeeb | Portfolio">
-<meta property="og:url" content="https://nithan.in/">
-<script>document.documentElement.className+=" js"</script>
-<link rel="icon" type="image/png" href="/favicon.PNG">
-<link rel="apple-touch-icon" href="/favicon.PNG">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Inter:wght@300;400&family=Shippori+Mincho:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{
-  --red:#b3282d;--ink:#161616;
-  /* half the visible height of the divider (mobile Line.PNG) */
-  --branch-half:calc(min(95vw,650px)*.15);
-}
-html,body{background:#000}
-html{scroll-behavior:smooth}
-body{overflow-x:hidden;color:#111;-webkit-font-smoothing:antialiased}
-a{color:inherit}
-:focus-visible{outline:2px solid var(--red);outline-offset:4px}
-
-/* =====================================================
-   NAV
-===================================================== */
-.nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:calc(env(safe-area-inset-top,0px) + 22px) 5vw 22px;color:#fff;mix-blend-mode:difference;font-family:"Inter",sans-serif;font-size:.62rem;letter-spacing:.4em}
-.brand{font-family:"Cinzel",serif;font-size:.95rem;letter-spacing:.3em;text-decoration:none}
-.nav-links{display:flex;gap:2.6rem}
-.nav-links a,.m-link{text-decoration:none;position:relative;text-transform:uppercase}
-.nav-links a::after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:1px;background:currentColor;transform:scaleX(0);transform-origin:right;transition:transform .5s cubic-bezier(.77,0,.18,1)}
-.nav-links a:hover::after{transform:scaleX(1);transform-origin:left}
-.menu-btn{display:none;background:none;border:0;color:inherit;width:34px;height:20px;position:relative;cursor:pointer}
-.menu-btn i{position:absolute;left:0;right:0;height:1px;background:currentColor;transition:transform .5s,top .5s}
-.menu-btn i:nth-child(1){top:4px}.menu-btn i:nth-child(2){top:14px}
-.menu-open .menu-btn i:nth-child(1){top:9px;transform:rotate(45deg)}
-.menu-open .menu-btn i:nth-child(2){top:9px;transform:rotate(-45deg)}
-.m-menu{position:fixed;inset:0;z-index:90;background:#050505;display:flex;flex-direction:column;justify-content:center;gap:2rem;padding:0 10vw;clip-path:circle(0 at 92% 6%);transition:clip-path .9s cubic-bezier(.77,0,.18,1);pointer-events:none}
-.menu-open .m-menu{clip-path:circle(150% at 92% 6%);pointer-events:auto}
-.m-link{color:#fff;font-family:"Cinzel",serif;font-size:2.2rem;letter-spacing:.1em}
-.m-link small{display:block;color:rgba(255,255,255,.35);font-family:"Shippori Mincho",serif;font-size:.8rem;letter-spacing:.4em;margin-bottom:4px}
-
-/* PROGRESS + PETALS + CURSOR */
-.progress{position:fixed;right:0;top:0;width:2px;height:100%;background:var(--red);transform-origin:top;transform:scaleY(0);z-index:110;opacity:.8}
-#petals{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:60}
-#slashes{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:120}
-.cursor{position:fixed;left:0;top:0;width:34px;height:34px;margin:-17px 0 0 -17px;border:1px solid rgba(255,255,255,.9);border-radius:50%;pointer-events:none;z-index:200;mix-blend-mode:difference;opacity:0;transition:width .4s cubic-bezier(.16,1,.3,1),height .4s cubic-bezier(.16,1,.3,1),margin .4s cubic-bezier(.16,1,.3,1),background .4s,opacity .4s}
-.cursor.on{opacity:1}
-.cursor.big{width:72px;height:72px;margin:-36px 0 0 -36px;background:#fff}
-@media(hover:none),(pointer:coarse){.cursor{display:none}}
-
-/* =====================================================
-   HERO
-===================================================== */
-.hero{
-  --sw:122vw;      /* sword width (phones use Swords.PNG) */
-  --crop:.22;      /* share of the sword that sits off-screen to the right: larger = less hand visible */
-  --rot:-6deg;     /* final tilt of the blade (negative = tip lower). Phones: nearly level so it sits in the gap between the two name lines */
-  --dy:-5.3vw;     /* nudges the sword up/down relative to the name (negative = up) */
-  position:relative;width:100%;height:100dvh;min-height:600px;background:#000;overflow:hidden;display:flex;align-items:center;justify-content:center;isolation:isolate}
-.video-canvas{position:absolute;left:50%;top:50%;width:max(100vw,177.7778vh);height:max(56.25vw,100dvh);transform:translate(-50%,-50%);z-index:-3;background:#000}
-.hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:grayscale(1) brightness(.35) contrast(1.2);pointer-events:none}
-video::-webkit-media-controls{display:none!important}
-.video-darkness{position:absolute;inset:0;z-index:-2;background:linear-gradient(to bottom,rgba(0,0,0,.4),rgba(0,0,0,.1) 40%,#000);pointer-events:none}
-.video-grain{position:absolute;inset:0;z-index:-1;opacity:.12;mix-blend-mode:screen;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.45'/%3E%3C/svg%3E")}
-.vignette{position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at 50% 50%,transparent 42%,rgba(0,0,0,.72) 100%)}
-.frame,.corner{display:none}
-.hero-content{position:relative;z-index:5;display:flex;flex-direction:column;align-items:center;text-align:center;width:100%}
-.hero-label,.hero-subtitle{color:rgba(255,255,255,.6);font-family:"Inter",sans-serif;font-weight:300;text-transform:uppercase;opacity:0;animation:fadeIn 1s ease forwards .2s}
-.hero-label{font-size:.65rem;letter-spacing:.6em;margin-bottom:3vh}
-.hero-subtitle{position:relative;z-index:15;font-size:.6rem;letter-spacing:.5em;margin-top:4vh;animation-delay:1.8s}
-.title-wrapper{position:relative;width:100%;display:flex;justify-content:center;align-items:center}
-.name{position:relative;z-index:10;color:#fff;font-family:"Cinzel",serif;font-weight:500;font-size:clamp(4rem,9.5vw,10.5rem);line-height:.9;letter-spacing:-.02em;text-shadow:0 10px 30px rgba(0,0,0,.55);display:flex;justify-content:center;flex-wrap:wrap;column-gap:2.5vw;transform:translate3d(calc(var(--mx,0px)*-.4),calc(var(--my,0px)*-.4),0)}
-.word{display:inline-block;white-space:nowrap}
-.char{display:inline-block;opacity:0;transform:translateY(40px);animation:letterIn .9s cubic-bezier(.16,1,.3,1) forwards}
-
-/* SWORD: anchored to the right edge so the hand is cropped by the screen, only the wrist and a few fingers stay visible */
-.sword-wrap{position:absolute;z-index:5;right:calc(var(--sw)*var(--crop)*-1);top:calc(50% + var(--dy,0px));width:var(--sw);pointer-events:none;transform:translate3d(var(--mx,0px),calc(-50% + var(--my,0px)),0)}
-.sword-wrap picture{display:block}
-.sword{display:block;width:100%;height:auto;opacity:0;transform-origin:85% 55%;transform:translate3d(16%,0,0) rotate(var(--rot));will-change:transform,opacity}
-.sword.active{animation:swordDraw 1.7s cubic-bezier(.16,1,.3,1) forwards}
-.jp-mark{position:absolute;right:4vw;top:50%;transform:translateY(-50%);z-index:5;color:rgba(255,255,255,.25);font-family:"Shippori Mincho",serif;writing-mode:vertical-rl;font-size:.85rem;letter-spacing:.6em}
-.scroll{position:absolute;left:50%;bottom:30px;transform:translateX(-50%);z-index:30;display:flex;flex-direction:column;align-items:center;gap:12px;color:rgba(255,255,255,.6);text-decoration:none;font-family:"Inter",sans-serif;font-size:.55rem;font-weight:300;letter-spacing:.45em}
-.scroll-line{width:1px;height:40px;background:rgba(255,255,255,.6);animation:scrollPulse 2s ease-in-out infinite}
-
-/* =====================================================
-   PAGE
-===================================================== */
-.page{position:relative;z-index:10;background:#f5f4ef;color:#161616}
-.section{position:relative;padding:10vw 8vw;overflow:hidden}
-.about-section{background:#f5f4ef}.work-section{background:#ecebe5}.philosophy-section{background:#e3e2db}.contact-section{background:#ecebe5}
-.about-section,.work-section,.philosophy-section{padding-bottom:calc(var(--branch-half) + 36px)}
-.work-section,.philosophy-section,.contact-section{padding-top:calc(var(--branch-half) + 72px)}
-.section-inner{width:min(1280px,100%);margin:auto;position:relative}
-.section-number{position:absolute;top:calc(var(--branch-half) + 28px);left:8vw;color:#8b8983;font-family:"Shippori Mincho",serif;font-size:.65rem;letter-spacing:.25em}
-.about-section .section-number{top:40px}
-.eyebrow{color:#77746e;font-family:"Shippori Mincho",serif;font-size:.65rem;letter-spacing:.35em;margin-bottom:30px}
-.section h2{position:relative;color:#171717;font-family:"Cinzel",serif;font-size:clamp(3rem,7vw,6.5rem);font-weight:400;line-height:1;letter-spacing:-.02em;margin-bottom:80px}
-.section h2::after{content:"";position:absolute;left:0;top:52%;width:min(100%,540px);height:2px;background:linear-gradient(90deg,transparent,var(--red) 40%,#161616 60%,transparent);transform:rotate(-3deg) scaleX(0);transform-origin:left;opacity:0;pointer-events:none}
-.section h2.in::after{animation:hslash 1.1s cubic-bezier(.77,0,.18,1) .9s forwards}
-.section h2 em{font-family:"Shippori Mincho",serif;color:#777;font-style:italic}
-.mark{position:absolute;right:4vw;top:8vw;font-family:"Shippori Mincho",serif;font-size:clamp(9rem,26vw,24rem);line-height:1;color:rgba(0,0,0,.04);writing-mode:vertical-rl;pointer-events:none;transform:translateY(var(--py,0px))}
-
-/* BRANCH DIVIDER: Line.PNG on phones, Flower.PNG on desktop (set in the <picture> tags) */
-.color-boundary{position:relative;width:100%;height:0}
-.color-boundary img{position:absolute;left:50%;top:0;z-index:20;width:min(95vw,650px);height:auto;transform:translate(-50%,-50%);mix-blend-mode:multiply;opacity:.85;pointer-events:none}
-.js .color-boundary img{-webkit-clip-path:inset(0 100% 0 0);clip-path:inset(0 100% 0 0);transition:clip-path 2.2s cubic-bezier(.77,0,.18,1) .1s,-webkit-clip-path 2.2s cubic-bezier(.77,0,.18,1) .1s}
-.js .color-boundary img.in{-webkit-clip-path:inset(0 0 0 0);clip-path:inset(0 0 0 0)}
-
-/* ABOUT */
-.about-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:8vw}
-.about-lead{font-family:"Shippori Mincho",serif;font-size:clamp(1.4rem,2.5vw,2.1rem);line-height:1.6}
-.about-copy{color:#555;font-family:"Inter",sans-serif;font-size:.95rem;line-height:2;margin-top:2rem;max-width:62ch}
-.about-copy p+p{margin-top:1.4rem}
-.profile{position:relative;border-top:1px solid rgba(0,0,0,.15)}
-.profile div{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;padding:16px 0;border-bottom:1px solid rgba(0,0,0,.08);font-family:"Inter",sans-serif;font-size:.85rem;color:#444}
-.profile span{font-family:"Shippori Mincho",serif;color:#8b8983;font-size:.8rem;letter-spacing:.2em}
-.hanko{position:absolute;right:-6px;top:-62px;width:58px;height:58px;display:grid;place-items:center;background:var(--red);color:#f5f4ef;font-family:"Shippori Mincho",serif;font-size:1.7rem;border-radius:4px;transform:rotate(6deg);opacity:0;box-shadow:inset 0 0 0 2px rgba(255,255,255,.25)}
-.hanko.in{animation:stamp .7s cubic-bezier(.3,1.6,.5,1) .5s forwards}
-.tech{display:flex;flex-wrap:wrap;gap:12px 28px;margin-top:2.5rem;font-family:"Inter",sans-serif;font-size:.7rem;letter-spacing:.2em;color:#666}
-.tech b{font-family:"Shippori Mincho",serif;font-weight:500;color:#161616;margin-right:8px;letter-spacing:.1em}
-
-/* WORK: number | title | description | arrow on desktop */
-.work-list{margin-top:20px}
-.work{position:relative;overflow:hidden;display:grid;grid-template-columns:90px minmax(0,1.1fr) minmax(0,1fr) 40px;grid-template-areas:"n t d a";align-items:center;column-gap:1rem;padding:44px 0;text-decoration:none;color:inherit;border-top:1px solid rgba(0,0,0,.08);transition:padding-left .5s cubic-bezier(.16,1,.3,1)}
-.work:last-child{border-bottom:1px solid rgba(0,0,0,.08)}
-.work::before{content:"";position:absolute;top:-10%;bottom:-10%;left:-4%;width:2px;background:var(--red);transform:skewX(-28deg);opacity:0;pointer-events:none}
-.work:hover::before{animation:rowcut .8s cubic-bezier(.7,0,.2,1)}
-.work::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--ink);transform:scaleX(0);transform-origin:left;transition:transform .8s cubic-bezier(.77,0,.18,1)}
-.work:hover{padding-left:20px}.work:hover::after{transform:scaleX(1)}
-.work-number{grid-area:n;color:#999;font-size:.75rem;font-family:"Inter",sans-serif}
-.work h3{grid-area:t;font-family:"Shippori Mincho",serif;font-size:clamp(1.5rem,3vw,2.6rem);font-weight:400}
-.work p{grid-area:d;color:#777;font-family:"Inter",sans-serif;font-size:.85rem;line-height:1.7}
-.arrow{grid-area:a;justify-self:end;font-size:1.2rem;color:#888;transition:transform .5s,color .5s}
-.work:hover .arrow{transform:translate(4px,-4px);color:var(--red)}
-
-/* PHILOSOPHY */
-.philosophy-grid{display:grid;grid-template-columns:1fr 1fr;gap:10vw;align-items:center}
-.philosophy-copy{color:#444;font-family:"Shippori Mincho",serif;font-size:clamp(1rem,2vw,1.35rem);line-height:2.2}
-
-/* CONTACT */
-.socials{display:flex;flex-wrap:wrap;gap:1.2rem 2.4rem}
-.contact{color:#111;font-family:"Shippori Mincho",serif;font-size:1.2rem;text-decoration:none;position:relative;padding-bottom:8px}
-.contact::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:#333;transform-origin:right;transition:transform .6s cubic-bezier(.77,0,.18,1)}
-.contact:hover::after{transform:scaleX(0)}
-.status{margin-top:5rem;font-family:"Inter",sans-serif;font-size:.6rem;letter-spacing:.3em;color:#8b8983}
-footer{display:flex;justify-content:space-between;padding:30px 8vw;background:#ecebe5;color:#888;font-family:"Inter",sans-serif;font-size:.6rem;letter-spacing:.3em}
-
-/* REVEALS */
-.rv{transition:opacity 1s ease calc(var(--d,0)*1ms),transform 1s cubic-bezier(.16,1,.3,1) calc(var(--d,0)*1ms)}
-.js .rv{opacity:0;transform:translateY(24px)}
-.js .rv.in{opacity:1;transform:none}
-.section h2.ink{padding:.06em .08em .14em;margin-left:-.08em}
-.js .ink{-webkit-clip-path:inset(0 100% 0 0);clip-path:inset(0 100% 0 0);transition:clip-path 1.4s cubic-bezier(.77,0,.18,1),-webkit-clip-path 1.4s cubic-bezier(.77,0,.18,1)}
-.js .ink.in{-webkit-clip-path:inset(0 0 0 0);clip-path:inset(0 0 0 0)}
-
-/* KEYFRAMES */
-@keyframes letterIn{to{opacity:1;transform:none}}
-@keyframes fadeIn{to{opacity:1}}
-@keyframes stamp{0%{opacity:0;transform:scale(1.8) rotate(-8deg)}60%{opacity:1;transform:scale(.94) rotate(6deg)}100%{opacity:.92;transform:scale(1) rotate(6deg)}}
-@keyframes hslash{0%{opacity:0;transform:rotate(-3deg) scaleX(0)}25%{opacity:1}100%{opacity:0;transform:rotate(-3deg) scaleX(1)}}
-@keyframes rowcut{0%{left:-4%;opacity:.9}100%{left:104%;opacity:0}}
-@keyframes swordDraw{
-  0%{opacity:0;transform:translate3d(16%,0,0) rotate(calc(var(--rot) - 36deg))}
-  40%{opacity:1}
-  100%{opacity:1;transform:translate3d(0,0,0) rotate(var(--rot))}
-}
-@keyframes scrollPulse{0%,100%{height:30px;opacity:.4}50%{height:60px;opacity:1}}
-
-@media(prefers-reduced-motion:reduce){
-  html{scroll-behavior:auto}
-  .js .rv,.js .ink{opacity:1;transform:none;-webkit-clip-path:none;clip-path:none;transition:none}
-  .js .color-boundary img{-webkit-clip-path:none;clip-path:none;transition:none}
-  .char,.hero-label,.hero-subtitle{animation-duration:.01s;animation-delay:0s!important}
-  .sword.active{animation-duration:.01s}
-  .scroll-line{animation:none}.hanko{opacity:.92}
-  .section h2::after,.work::before,#slashes,.cursor{display:none}
-}
-
-/* =====================================================
-   DESKTOP (769px and up)
-===================================================== */
-@media(min-width:769px){
-  :root{--branch-half:calc(min(92vw,1500px)*.08)}
-  .hero{--sw:min(118vw,2100px);--crop:.2;--rot:-2deg}
-  .sword-wrap{top:54%}
-  .color-boundary img{width:min(92vw,1500px)}
-  .jp-mark{right:auto;left:3.5vw;top:17%;transform:none}
-  .frame{display:block;position:absolute;inset:22px;border:1px solid rgba(255,255,255,.08);z-index:4;pointer-events:none}
-  .frame::before,.frame::after{content:"";position:absolute;width:26px;height:26px;border:1px solid rgba(255,255,255,.4)}
-  .frame::before{top:-1px;left:-1px;border-right:0;border-bottom:0}
-  .frame::after{bottom:-1px;right:-1px;border-left:0;border-top:0}
-  .corner{display:block;position:absolute;z-index:30;bottom:42px;color:rgba(255,255,255,.4);font-family:"Inter",sans-serif;font-size:.55rem;font-weight:300;letter-spacing:.45em}
-  .corner.l{left:5vw}.corner.r{right:5vw}
-  .about-grid{gap:10vw}
-  .work-list{margin-top:30px}
-}
-
-/* =====================================================
-   MOBILE (768px and down)
-===================================================== */
-@media(max-width:768px){
-  .nav-links{display:none}.menu-btn{display:block}
-  .name{flex-direction:column;font-size:clamp(4.5rem,16vw,8rem);line-height:.85;row-gap:16px}
-  .space,.jp-mark{display:none}
-  .about-grid,.philosophy-grid{grid-template-columns:1fr;gap:40px}
-  .work{grid-template-columns:44px minmax(0,1fr) 28px;grid-template-areas:"n t a" ". d .";padding:25px 0}
-  .work p{margin-top:8px}
-  .section{padding-left:8vw;padding-right:8vw}
-  .about-section{padding-top:25vw}.contact-section{padding-bottom:25vw}
-  .hanko{top:-70px}
-  .section h2{margin-bottom:48px}
-  .philosophy-grid{gap:0}
-  .philosophy-grid h2{margin-bottom:28px}
-  .philosophy-copy{line-height:2}
-}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#e8f2fa">
+  <meta name="description" content="A quiet, private diary with a thoughtful on-device AI companion.">
+  <meta name="color-scheme" content="light">
+  <title>Quiet Pages — A little room for you</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.2/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="./styles.css">
 </head>
 <body>
+  <div class="app-shell" id="appShell">
+    <header class="topbar">
+      <a class="brand" href="#diary" aria-label="Quiet Pages home" data-nav="diary">
+        <span class="brand-mark">q.</span>
+        <span class="brand-name">quiet pages</span>
+      </a>
+      <div class="topbar-actions">
+        <button class="icon-button" id="searchToggle" aria-label="Search diary" title="Search diary"><i class="bi bi-search"></i></button>
+        <button class="avatar-button" id="settingsShortcut" aria-label="Open settings" title="Settings"><i class="bi bi-sliders2"></i></button>
+      </div>
+    </header>
 
-<div class="cursor" id="cursor" aria-hidden="true"></div>
+    <main id="mainContent" tabindex="-1">
+      <section class="screen active" id="screen-diary" data-screen="diary">
+        <div class="home-intro">
+          <div class="eyebrow"><span class="eyebrow-dot"></span><span id="todayLabel">A little note for today</span></div>
+          <h1 class="ai-greeting" id="homeSubheading" aria-live="polite">A little room for whatever is on your mind.</h1>
+        </div>
+        <div class="search-panel hidden" id="searchPanel">
+          <label class="sr-only" for="searchInput">Search entries</label>
+          <i class="bi bi-search"></i><input type="search" id="searchInput" placeholder="Search your memories…" autocomplete="off">
+          <button class="icon-button compact" id="closeSearch" aria-label="Close search"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <div class="section-heading">
+          <div><span class="section-kicker">YOUR JOURNAL</span><h2 id="entriesHeading">Recent pages</h2></div>
+          <span class="subtle-count" id="entryCount">0 pages</span>
+        </div>
+        <div id="entryStack" class="entry-stack"></div>
+        <div id="emptyState" class="empty-state hidden">
+          <div class="empty-art"><span></span><i class="bi bi-feather"></i></div>
+          <h3>Your first page is waiting.</h3>
+          <p>Start with one small thing: what stayed with you today?</p>
+          <button class="primary-button" data-action="new-entry"><i class="bi bi-plus-lg"></i> Write your first entry</button>
+        </div>
+        <div class="bottom-note"><i class="bi bi-shield-lock"></i><span>Your pages stay on this device by default.</span></div>
+      </section>
 
-<nav class="nav" id="nav">
-  <a class="brand" href="index.html">NITHAN.</a>
-  <div class="nav-links">
-    <a href="blog.html">Logs</a><a href="game.html">Game</a><a href="gallery.html">Gallery</a>
-  </div>
-  <button class="menu-btn" id="menuBtn" aria-label="Toggle menu" aria-expanded="false"><i></i><i></i></button>
-</nav>
-<div class="m-menu" id="mMenu" aria-hidden="true">
-  <a class="m-link" href="index.html"><small>家</small>Home</a>
-  <a class="m-link" href="blog.html"><small>記</small>Logs</a>
-  <a class="m-link" href="game.html"><small>遊</small>Game</a>
-  <a class="m-link" href="gallery.html"><small>絵</small>Gallery</a>
-</div>
-<div class="progress" id="progress" aria-hidden="true"></div>
-<canvas id="petals" aria-hidden="true"></canvas>
-<canvas id="slashes" aria-hidden="true"></canvas>
-
-<!-- HERO -->
-<section class="hero" id="home">
-  <div class="video-canvas">
-    <video id="backgroundVideo" class="hero-video" autoplay muted loop playsinline webkit-playsinline preload="auto" tabindex="-1"><source src="./Leafs.MP4" type="video/mp4"></video>
-    <div class="video-darkness"></div><div class="video-grain"></div>
-  </div>
-  <div class="vignette"></div>
-  <div class="frame" aria-hidden="true"></div>
-
-  <div class="hero-content">
-    <div class="hero-label">NITHAN · 2026</div>
-    <div class="title-wrapper">
-      <h1 class="name" id="name" aria-label="Nithan Najeeb"></h1>
-      <div class="sword-wrap"><picture><source media="(max-width:768px)" srcset="./Swords.PNG"><img class="sword" id="sword" src="./Sword.PNG" alt=""></picture></div>
-    </div>
-    <div class="hero-subtitle">STUDENT · CREATOR · BUILDER</div>
-  </div>
-
-  <div class="jp-mark">静 · 創 · 夢</div>
-  <span class="corner l">KERALA · INDIA</span>
-  <span class="corner r">PORTFOLIO · VOL. 01</span>
-  <a class="scroll" href="#about"><span>SCROLL</span><span class="scroll-line"></span></a>
-</section>
-
-<main class="page">
-
-  <section class="section about-section" id="about">
-    <span class="mark" data-speed="-.06" aria-hidden="true">私</span>
-    <span class="section-number">一 / ABOUT</span>
-    <div class="section-inner">
-      <div class="eyebrow rv">WHO I AM · 私について</div>
-      <h2 class="ink">Who is<br><em>Nithan?</em></h2>
-      <div class="about-grid">
-        <div>
-          <p class="about-lead rv">I build and experiment with intelligent systems, web infrastructure and emerging technologies, and I'm studying B.Com in Kerala, India.</p>
-          <div class="about-copy rv" style="--d:150">
-            <p>I'm a curious student who enjoys understanding how things work and turning ideas into practical, useful things: from AI-powered tools to structured knowledge systems.</p>
-            <p>I believe growth comes from asking questions and staying open to new perspectives. The goal is simple: build useful things, document progress, and evolve.</p>
+      <section class="screen" id="screen-companion" data-screen="companion">
+        <div class="page-intro compact-intro">
+          <div class="eyebrow"><span class="eyebrow-dot"></span>YOUR QUIET COMPANION</div>
+          <h1>A little space<br><em>to untangle.</em></h1>
+          <p>Ask about your past pages, collect important things, or think out loud. No judgement, no rush.</p>
+        </div>
+        <div class="companion-status" id="companionStatus"><span class="status-dot"></span><span>Local journal memory is ready · AI model not loaded</span></div>
+        <div class="chat-card">
+          <div class="chat-header"><div class="assistant-avatar"><i class="bi bi-stars"></i></div><div><strong>Little by little</strong><span>Your private companion</span></div><span class="local-pill"><i class="bi bi-lock"></i> Local</span></div>
+          <div id="chatMessages" class="chat-messages" aria-live="polite"></div>
+          <div class="prompt-chips" id="promptChips">
+            <button class="prompt-chip" data-prompt="What have I been thinking about lately?">What’s on my mind?</button>
+            <button class="prompt-chip" data-prompt="Help me reflect on this month using my diary entries.">Reflect on this month</button>
+            <button class="prompt-chip" data-prompt="What goals or intentions have I mentioned?">My goals</button>
           </div>
-          <div class="tech rv" style="--d:250">
-            <span><b>Core</b>HTML5 · CSS3 · Vanilla JS</span>
-            <span><b>Motion</b>GSAP · Lottie · Canvas</span>
-            <span><b>R&amp;D</b>Ollama (local LLMs)</span>
+          <form id="chatForm" class="chat-form">
+            <label class="sr-only" for="chatInput">Write a message</label>
+            <textarea id="chatInput" rows="1" maxlength="3000" placeholder="Write what’s on your mind…"></textarea>
+            <button class="send-button" type="submit" aria-label="Send message"><i class="bi bi-arrow-up"></i></button>
+          </form>
+          <p class="privacy-hint"><i class="bi bi-shield-check"></i> Your diary context is processed in this browser. The optional model runtime and model files are downloaded from their providers.</p>
+        </div>
+        <section class="memory-section">
+          <div class="section-heading"><div><span class="section-kicker">THINGS TO REMEMBER</span><h2>Your memory shelf</h2></div><button class="text-button" id="addMemoryButton"><i class="bi bi-plus-lg"></i> Add</button></div>
+          <p class="section-description">Keep the facts you want your companion to remember. You can edit or delete them anytime.</p>
+          <form id="memoryForm" class="memory-form hidden">
+            <label for="memoryText">A detail worth keeping</label>
+            <textarea id="memoryText" maxlength="800" rows="3" placeholder="A goal, preference, important date, or something you want to remember…" required></textarea>
+            <div class="form-row end"><button type="button" class="secondary-button" id="cancelMemory">Cancel</button><button type="submit" class="primary-button small-button">Save memory</button></div>
+          </form>
+          <div id="memoryList" class="memory-list"></div>
+          <div id="memoryEmpty" class="mini-empty">Your memory shelf is empty. Add something you would like to keep in mind.</div>
+        </section>
+      </section>
+
+      <section class="screen" id="screen-calendar" data-screen="calendar">
+        <div class="page-intro compact-intro">
+          <div class="eyebrow"><span class="eyebrow-dot"></span>YOUR DAYS, KEPT</div>
+          <h1>Time, in little<br><em>pieces.</em></h1>
+          <p>Every dot is a page you chose to keep.</p>
+        </div>
+        <div class="calendar-card">
+          <div class="calendar-toolbar"><button class="icon-button" id="prevMonth" aria-label="Previous month"><i class="bi bi-chevron-left"></i></button><div><h2 id="calendarMonth">October 2026</h2><button class="text-button today-button" id="goToday">Today</button></div><button class="icon-button" id="nextMonth" aria-label="Next month"><i class="bi bi-chevron-right"></i></button></div>
+          <div class="calendar-weekdays" aria-hidden="true"><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span><span>SUN</span></div>
+          <div class="calendar-grid" id="calendarGrid" role="grid" aria-label="Diary calendar"></div>
+          <div class="calendar-legend"><span><i class="legend-dot"></i> A page was written</span><span><i class="legend-today"></i> Today</span></div>
+        </div>
+        <div class="calendar-day-section"><div class="section-heading"><div><span class="section-kicker" id="selectedDateLabel">SELECTED DAY</span><h2 id="selectedDateHeading">Choose a day</h2></div><button class="text-button" id="newForSelectedDate"><i class="bi bi-plus-lg"></i> Write</button></div><div id="selectedDayEntries" class="day-entries"></div></div>
+      </section>
+
+      <section class="screen" id="screen-settings" data-screen="settings">
+        <div class="page-intro compact-intro">
+          <div class="eyebrow"><span class="eyebrow-dot"></span>MAKE IT YOURS</div>
+          <h1>Your space,<br><em>your rules.</em></h1>
+          <p>Small adjustments that make this place feel like yours.</p>
+        </div>
+        <section class="settings-group">
+          <div class="settings-heading"><span class="setting-icon"><i class="bi bi-palette2"></i></span><div><h2>Appearance</h2><p>Colors and the feeling of each page.</p></div></div>
+          <div class="theme-grid" id="themeGrid">
+            <button class="theme-choice active" data-theme-choice="sky"><span class="theme-swatch sky-swatch"></span><strong>Sky</strong><small>Calm & clear</small></button>
+            <button class="theme-choice" data-theme-choice="coral"><span class="theme-swatch coral-swatch"></span><strong>Coral</strong><small>Warm & open</small></button>
+            <button class="theme-choice" data-theme-choice="mint"><span class="theme-swatch mint-swatch"></span><strong>Mint</strong><small>Fresh & bright</small></button>
+            <button class="theme-choice" data-theme-choice="lavender"><span class="theme-swatch lavender-swatch"></span><strong>Lavender</strong><small>Soft & dreamy</small></button>
+            <button class="theme-choice dynamic-choice" data-theme-choice="dynamic"><span class="theme-swatch dynamic-swatch"><i class="bi bi-stars"></i></span><strong>Dynamic</strong><small>Changes each day</small></button>
           </div>
-        </div>
-        <div class="profile rv" style="--d:200">
-          <span class="hanko" id="hanko" aria-hidden="true">夢</span>
-          <div><span>名 NAME</span>Nithan Najeeb</div>
-          <div><span>号 ALIAS</span>Rubin Stellar</div>
-          <div><span>学 STUDY</span>B.Com</div>
-          <div><span>校 COLLEGE</span>MES College</div>
-          <div><span>地 FROM</span>Kerala, India</div>
-          <div><span>生 BORN</span>2004</div>
-          <div><span>作 PROJECT</span>Mind Atlas</div>
-        </div>
-      </div>
-    </div>
-  </section>
+          <div class="setting-row"><div><strong>Comfortable text</strong><p>Increase the text size across the app.</p></div><select id="textScale" aria-label="Text size"><option value="normal">Standard</option><option value="large">Large</option><option value="xlarge">Extra large</option></select></div>
+          <label class="setting-row"><div><strong>Reduce motion</strong><p>Use fewer transitions and animations.</p></div><input type="checkbox" id="reduceMotion" class="toggle-input"></label>
+        </section>
+        <section class="settings-group">
+          <div class="settings-heading"><span class="setting-icon"><i class="bi bi-cpu"></i></span><div><h2>Your local companion</h2><p>Download a compatible model to generate responses on this device.</p></div></div>
+          <div class="model-panel">
+            <div class="model-status-line"><span class="model-orb"><i class="bi bi-stars"></i></span><div class="model-status-copy"><strong id="modelStatusTitle">AI model not loaded</strong><p id="modelStatusText">The diary works without AI. Loading a model requires WebGPU, memory, and a model download.</p></div></div>
+            <div class="model-controls"><button class="secondary-button" id="checkModelsButton"><i class="bi bi-cloud-download"></i> Find compatible models</button><select id="modelSelect" aria-label="Select AI model" class="hidden"><option value="">Choose a supported model</option></select><button class="primary-button hidden" id="loadModelButton"><i class="bi bi-download"></i> Download &amp; load</button><button class="secondary-button hidden" id="unloadModelButton"><i class="bi bi-eject"></i> Unload</button></div>
+            <div class="model-progress hidden" id="modelProgressWrap"><div class="progress-track"><span id="modelProgressBar"></span></div><p id="modelProgressText">Preparing the local model…</p></div>
+            <p class="model-disclaimer"><i class="bi bi-info-circle"></i> We check the runtime's actual built-in model catalogue. Qwen3 1.7B is not guaranteed to be supported; unsupported models are not offered. The first download can be large.</p>
+          </div>
+        </section>
+        <section class="settings-group">
+          <div class="settings-heading"><span class="setting-icon"><i class="bi bi-database-lock"></i></span><div><h2>Privacy &amp; your data</h2><p>Your pages are saved in browser storage on this device.</p></div></div>
+          <div class="privacy-card"><i class="bi bi-shield-lock"></i><div><strong>No account. No diary server.</strong><p>Quiet Pages does not send your entries to a diary backend. Export backups regularly because browser storage can be cleared by the operating system or browser.</p></div></div>
+          <div class="settings-actions"><button class="action-row" id="exportButton"><span><i class="bi bi-box-arrow-up-right"></i></span><div><strong>Export a backup</strong><small>Save entries, memories, settings and photos.</small></div><i class="bi bi-chevron-right"></i></button><button class="action-row" id="importButton"><span><i class="bi bi-box-arrow-in-down-left"></i></span><div><strong>Restore a backup</strong><small>Import a previously exported JSON file.</small></div><i class="bi bi-chevron-right"></i></button><input type="file" id="importFile" accept="application/json,.json" class="hidden">
+            <button class="action-row danger-row" id="clearDataButton"><span><i class="bi bi-trash3"></i></span><div><strong>Delete all local data</strong><small>Remove diary entries and memories from this browser.</small></div><i class="bi bi-chevron-right"></i></button></div>
+        </section>
+        <footer class="settings-footer"><span class="brand-mark mini-mark">q.</span><p>Quiet Pages · A little room for you</p><small>Private by default, imperfect by design. Please keep a backup.</small></footer>
+      </section>
 
-  <div class="color-boundary"><picture><source media="(min-width:769px)" srcset="./Flower.PNG"><img src="./Line.PNG" alt=""></picture></div>
+      <section class="screen" id="screen-detail" data-screen="detail"></section>
+      <section class="screen" id="screen-editor" data-screen="editor"></section>
+    </main>
 
-  <section class="section work-section" id="work">
-    <span class="mark" data-speed="-.06" aria-hidden="true">作</span>
-    <span class="section-number">二 / WORK</span>
-    <div class="section-inner">
-      <div class="eyebrow rv">SELECTED WORK · 制作</div>
-      <h2 class="ink">Things I<br><em>create.</em></h2>
-      <div class="work-list">
-        <a href="#" class="work rv"><span class="work-number">01</span><h3>Mind Atlas</h3><p>A personal knowledge node tracking science and code logic.</p><span class="arrow">↗</span></a>
-        <a href="#" class="work rv" style="--d:100"><span class="work-number">02</span><h3>Forenexa</h3><p>Storefront architecture built for physical hardware.</p><span class="arrow">↗</span></a>
-        <a href="#" class="work rv" style="--d:200"><span class="work-number">03</span><h3>Ollama Uplink</h3><p>Connecting local AI models to clean, fast frontends.</p><span class="arrow">↗</span></a>
-      </div>
-    </div>
-  </section>
+    <button class="floating-add" id="floatingAdd" aria-label="Write a new diary entry" title="Write a new entry"><i class="bi bi-plus-lg"></i></button>
 
-  <div class="color-boundary"><picture><source media="(min-width:769px)" srcset="./Flower.PNG"><img src="./Line.PNG" alt=""></picture></div>
+    <nav class="bottom-nav" aria-label="Main navigation">
+      <button class="nav-item active" data-nav="diary" aria-label="Diary"><i class="bi bi-journal-bookmark"></i><span>Diary</span></button>
+      <button class="nav-item" data-nav="companion" aria-label="Companion"><i class="bi bi-chat-heart"></i><span>Companion</span></button>
+      <button class="nav-item" data-nav="calendar" aria-label="Calendar"><i class="bi bi-calendar3"></i><span>Calendar</span></button>
+      <button class="nav-item" data-nav="settings" aria-label="Settings"><i class="bi bi-sliders"></i><span>Settings</span></button>
+    </nav>
+  </div>
 
-  <section class="section philosophy-section">
-    <span class="mark" data-speed="-.06" aria-hidden="true">静</span>
-    <span class="section-number">三 / PHILOSOPHY</span>
-    <div class="section-inner">
-      <div class="philosophy-grid">
-        <div>
-          <div class="eyebrow rv">思想</div>
-          <h2 class="ink">Less noise.<br><em>More meaning.</em></h2>
-        </div>
-        <div class="philosophy-copy rv" style="--d:200">
-          Good design doesn't need to scream.<br><br>
-          It can be quiet. It can breathe.<br><br>
-          The goal isn't to fill every pixel. It's to make every element matter.
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <div class="color-boundary"><picture><source media="(min-width:769px)" srcset="./Flower.PNG"><img src="./Line.PNG" alt=""></picture></div>
-
-  <section class="section contact-section" id="contact">
-    <span class="mark" data-speed="-.06" aria-hidden="true">縁</span>
-    <span class="section-number">四 / CONTACT</span>
-    <div class="section-inner">
-      <div class="eyebrow rv">CONTACT · 連絡</div>
-      <h2 class="ink">Let's create<br><em>something.</em></h2>
-      <div class="socials rv" style="--d:200">
-        <a class="contact" href="https://instagram.com/nithannajeeb_" target="_blank" rel="noopener">Instagram ↗</a>
-        <a class="contact" href="https://www.threads.net/@nithannajeeb_" target="_blank" rel="noopener">Threads ↗</a>
-        <a class="contact" href="https://www.linkedin.com/in/nithannajeeb" target="_blank" rel="noopener">LinkedIn ↗</a>
-        <a class="contact" href="https://www.facebook.com/nithan.najeeb" target="_blank" rel="noopener">Facebook ↗</a>
-      </div>
-      <p class="status rv">HOSTED AT NITHAN.IN</p>
-    </div>
-  </section>
-</main>
-
-<footer><span>NITHAN NAJEEB</span><span>© <time id="year">2026</time></span></footer>
-
-<script>
-const reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-/* NAME */
-const nameEl=document.getElementById("name");let n=0;
-"Nithan Najeeb".split(" ").forEach((w,i,a)=>{
-  const ws=document.createElement("span");ws.className="word";ws.setAttribute("aria-hidden","true");
-  [...w].forEach(c=>{const s=document.createElement("span");s.className="char";s.textContent=c;s.style.animationDelay=n*60+"ms";ws.appendChild(s);n++});
-  nameEl.appendChild(ws);
-  if(i<a.length-1){const sp=document.createElement("span");sp.className="space";sp.textContent=" ";nameEl.appendChild(sp)}
-});
-
-/* SWORD + SLASH */
-const sword=document.getElementById("sword"),t=n*60+700;
-setTimeout(()=>sword.classList.add("active"),t);
-
-/* VIDEO */
-const v=document.getElementById("backgroundVideo");
-const sv=()=>{v.muted=true;v.play().catch(()=>{})};
-sv();addEventListener("load",sv);v.addEventListener("loadedmetadata",sv);
-
-/* SCROLL LINK */
-document.querySelector(".scroll").addEventListener("click",e=>{e.preventDefault();document.getElementById("about").scrollIntoView({behavior:"smooth"})});
-
-/* MENU */
-const mb=document.getElementById("menuBtn"),mm=document.getElementById("mMenu");
-function tog(o){document.body.classList.toggle("menu-open",o);mb.setAttribute("aria-expanded",o);mm.setAttribute("aria-hidden",!o);document.body.style.overflow=o?"hidden":""}
-mb.addEventListener("click",()=>tog(!document.body.classList.contains("menu-open")));
-mm.querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>tog(false)));
-
-/* REVEALS (headings, text, hanko, and the branch dividers draw in left to right) */
-const revealEls=[...document.querySelectorAll(".rv,.ink,.color-boundary img"),document.getElementById("hanko")];
-if("IntersectionObserver" in window){
-  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}}),{threshold:0,rootMargin:"0px 0px -6% 0px"});
-  revealEls.forEach(el=>io.observe(el));
-}else revealEls.forEach(el=>el.classList.add("in"));
-
-/* SCROLL: progress line + kanji drift */
-const pg=document.getElementById("progress"),marks=[...document.querySelectorAll(".mark")];let tick=false;
-function onScroll(){
-  const h=document.documentElement.scrollHeight-innerHeight;
-  pg.style.transform="scaleY("+(h>0?scrollY/h:0)+")";
-  marks.forEach(m=>{const r=m.parentElement.getBoundingClientRect();m.style.setProperty("--py",(r.top*parseFloat(m.dataset.speed))+"px")});
-  tick=false;
-}
-addEventListener("scroll",()=>{if(!tick){tick=true;requestAnimationFrame(onScroll)}},{passive:true});onScroll();
-
-/* DESKTOP ONLY: hero mouse parallax + trailing cursor ring */
-const fine=matchMedia("(hover:hover) and (pointer:fine)").matches;
-if(fine&&!reduced){
-  const hero=document.getElementById("home"),cur=document.getElementById("cursor");
-  let tx=0,ty=0,cx=0,cy=0,mx=-100,my=-100,rx=-100,ry=-100;
-  addEventListener("mousemove",e=>{
-    tx=e.clientX/innerWidth-.5;ty=e.clientY/innerHeight-.5;mx=e.clientX;my=e.clientY;cur.classList.add("on");
-    cur.classList.toggle("big",!!e.target.closest("a,button"));
-  });
-  document.addEventListener("mouseleave",()=>cur.classList.remove("on"));
-  (function loop(){
-    if(hero.getBoundingClientRect().bottom>0){
-      cx+=(tx-cx)*.06;cy+=(ty-cy)*.06;
-      hero.style.setProperty("--mx",(cx*-26)+"px");
-      hero.style.setProperty("--my",(cy*-16)+"px");
+  <div class="toast-region" id="toastRegion" aria-live="polite" aria-atomic="true"></div>
+  <dialog class="confirm-dialog" id="confirmDialog"><div class="dialog-icon"><i class="bi bi-question-lg"></i></div><h2 id="dialogTitle">Are you sure?</h2><p id="dialogMessage">This action cannot be undone.</p><div class="dialog-actions"><button class="secondary-button" id="dialogCancel">Cancel</button><button class="primary-button danger-button" id="dialogConfirm">Continue</button></div></dialog>
+  <script src="./app.js" defer></script>
+  <script>
+    // Register offline support only on HTTPS or localhost. Relative path works in GitHub Pages subdirectories.
+    if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+      window.addEventListener('load', () => navigator.serviceWorker.register(new URL('./sw.js', document.baseURI)).catch(() => {}));
     }
-    rx+=(mx-rx)*.18;ry+=(my-ry)*.18;
-    cur.style.transform="translate3d("+rx+"px,"+ry+"px,0)";
-    requestAnimationFrame(loop);
-  })();
-}
-
-/* SAKURA PETALS (only over the cream sections) */
-if(!reduced){
-  const c=document.getElementById("petals"),x=c.getContext("2d");let W,H;
-  const rs=()=>{W=c.width=innerWidth;H=c.height=innerHeight};rs();addEventListener("resize",rs);
-  const P=Array.from({length:innerWidth<768?12:30},()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:4+Math.random()*5,v:.3+Math.random()*.6,s:Math.random()*6,a:Math.random()*6,w:.01+Math.random()*.02}));
-  (function d(){
-    x.clearRect(0,0,W,H);
-    const hb=document.getElementById("home").getBoundingClientRect().bottom;
-    x.save();x.beginPath();x.rect(0,Math.max(0,hb),W,H);x.clip();
-    P.forEach(p=>{
-      p.y+=p.v;p.s+=p.w;p.x+=Math.sin(p.s)*.6+.25;p.a+=.015;
-      if(p.y>H+10||p.x>W+10){p.y=-10;p.x=Math.random()*W}
-      x.save();x.translate(p.x,p.y);x.rotate(p.a);x.scale(1,Math.abs(Math.cos(p.a*.7))*.6+.4);
-      x.beginPath();x.ellipse(0,0,p.r,p.r*.55,0,0,7);x.fillStyle="rgba(214,140,156,.5)";x.fill();x.restore();
-    });
-    x.restore();
-    requestAnimationFrame(d);
-  })();
-}
-
-/* CLICK / TAP KATANA SLASH */
-if(!reduced){
-  const sc=document.getElementById("slashes"),sx=sc.getContext("2d");let S=[],run=false;
-  const rs2=()=>{sc.width=innerWidth;sc.height=innerHeight};rs2();addEventListener("resize",rs2);
-  addEventListener("click",e=>{
-    const a=Math.PI*(.6+Math.random()*.2),hb=document.getElementById("home").getBoundingClientRect().bottom;
-    S.push({x:e.clientX,y:e.clientY,dx:Math.cos(a),dy:Math.sin(a),L:170+Math.random()*130,t:0,light:e.clientY<hb});
-    if(!run){run=true;requestAnimationFrame(f)}
-  });
-  function f(){
-    sx.clearRect(0,0,sc.width,sc.height);
-    S=S.filter(o=>(o.t+=.05)<1);
-    S.forEach(o=>{
-      const p=1-Math.pow(1-Math.min(1,o.t*2.4),3),tail=Math.max(0,p-.6),N=16;
-      for(let i=0;i<N;i++){
-        const a=tail+(p-tail)*i/N,b=tail+(p-tail)*(i+1)/N,k=Math.sin((i+.5)/N*Math.PI);
-        sx.beginPath();sx.moveTo(o.x-o.dx*o.L/2+o.dx*o.L*a,o.y-o.dy*o.L/2+o.dy*o.L*a);
-        sx.lineTo(o.x-o.dx*o.L/2+o.dx*o.L*b,o.y-o.dy*o.L/2+o.dy*o.L*b);
-        sx.lineWidth=.6+k*3.2;sx.lineCap="round";
-        sx.strokeStyle=(o.light?"rgba(255,255,255,":"rgba(22,22,22,")+(1-o.t)+")";sx.stroke();
-      }
-      sx.beginPath();sx.arc(o.x-o.dx*o.L/2+o.dx*o.L*p,o.y-o.dy*o.L/2+o.dy*o.L*p,2.2*(1-o.t),0,7);
-      sx.fillStyle="rgba(179,40,45,"+(1-o.t)+")";sx.fill();
-    });
-    if(S.length)requestAnimationFrame(f);else{run=false;sx.clearRect(0,0,sc.width,sc.height)}
-  }
-}
-document.getElementById("year").textContent=new Date().getFullYear();
-</script>
+  </script>
 </body>
 </html>
