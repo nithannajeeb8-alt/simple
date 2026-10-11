@@ -179,3 +179,64 @@ html.large-text{--font-scale:1.08} html.xlarge-text{--font-scale:1.16}
  .entry-photo-frame{border-radius:22px}
  .entry-art>i{font-size:32px}
 }
+
+/* Seven individual entry palettes. These override the selected app theme
+   for diary cards only, while leaving the rest of the interface themed. */
+.entry-card:nth-child(7n + 1) {
+  background: linear-gradient(140deg, #ffad91 0%, #ffe09a 100%);
+  color: #4e2928;
+}
+.entry-card:nth-child(7n + 2) {
+  background: linear-gradient(140deg, #9fc5f8 0%, #c6b5f0 100%);
+  color: #203452;
+}
+.entry-card:nth-child(7n + 3) {
+  background: linear-gradient(140deg, #ff83ac 0%, #ffd18b 100%);
+  color: #552638;
+}
+.entry-card:nth-child(7n + 4) {
+  background: linear-gradient(140deg, #a8e6cf 0%, #d5f3b5 100%);
+  color: #234e42;
+}
+.entry-card:nth-child(7n + 5) {
+  background: linear-gradient(140deg, #c4b5fd 0%, #fbcfe8 100%);
+  color: #453254;
+}
+.entry-card:nth-child(7n + 6) {
+  background: linear-gradient(140deg, #fde68a 0%, #fdba74 100%);
+  color: #593a20;
+}
+.entry-card:nth-child(7n + 7) {
+  background: linear-gradient(140deg, #a5d8f3 0%, #b8e0d2 100%);
+  color: #214652;
+}
+
+/* Keep the photo frame and controls readable against every palette. */
+.entry-card:nth-child(7n) .entry-pill,
+.entry-card:nth-child(7n) .arrow-circle,
+.entry-card:nth-child(7n + 1) .entry-pill,
+.entry-card:nth-child(7n + 1) .arrow-circle,
+.entry-card:nth-child(7n + 2) .entry-pill,
+.entry-card:nth-child(7n + 2) .arrow-circle,
+.entry-card:nth-child(7n + 3) .entry-pill,
+.entry-card:nth-child(7n + 3) .arrow-circle,
+.entry-card:nth-child(7n + 4) .entry-pill,
+.entry-card:nth-child(7n + 4) .arrow-circle,
+.entry-card:nth-child(7n + 5) .entry-pill,
+.entry-card:nth-child(7n + 5) .arrow-circle,
+.entry-card:nth-child(7n + 6) .entry-pill,
+.entry-card:nth-child(7n + 6) .arrow-circle {
+  background: rgba(255, 255, 255, 0.48);
+  color: inherit;
+}
+
+/* Give no-photo art a soft white inset that suits all seven palettes. */
+.entry-card:nth-child(7n + 1) .entry-photo-frame,
+.entry-card:nth-child(7n + 2) .entry-photo-frame,
+.entry-card:nth-child(7n + 3) .entry-photo-frame,
+.entry-card:nth-child(7n + 4) .entry-photo-frame,
+.entry-card:nth-child(7n + 5) .entry-photo-frame,
+.entry-card:nth-child(7n + 6) .entry-photo-frame,
+.entry-card:nth-child(7n) .entry-photo-frame {
+  background: rgba(255, 255, 255, 0.32);
+}
