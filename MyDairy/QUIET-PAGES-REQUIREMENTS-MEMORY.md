@@ -39,3 +39,26 @@ This file records the product constraints shared in the project conversation. Ke
 - Toolbar clicks reveal/retain it during formatting; a subsequent downward scroll hides it.
 - Toolbar position is not continuously recalculated from keyboard viewport geometry.
 - Verification is limited to source syntax and ZIP integrity; physical iPhone testing remains required.
+
+## v18 editor and palette implementation
+- Added Rose, Peach, Sand and Ocean while preserving Sky, Coral, Mint, Lavender and Dynamic.
+- Added entry tags, caption fields for photos, mood emojis in calendar days, readable HTML export, and scrapbook divider/sparkle blocks.
+- Android rich-text toolbar changes preserve selection before control interaction and do not dismiss toolbar on transient focus loss from native font/color controls.
+- Five diary fonts use a first-online Cache Storage download workflow; font binaries are cached after successful fetch but are not physically embedded in the source archive. If offline on first launch before caching, system fallback fonts are used.
+- Deploy only PWA files; no native iOS project is included. Do not clear local data or change IndexedDB/localStorage identifiers.
+
+
+## v19 additions
+- Print/Save as PDF via browser print dialog; never claim automatic PDF file save.
+- Tap tag chips on cards to search by tag.
+- More scrapbook sticker variants; bundled original local SVG theme/sticker resources.
+- Paper-grain background texture and service worker precache entries.
+- Bootstrap Icons and Google Fonts still have CDN first-use dependencies; fully bundled binary resources remain a follow-up because the build environment could not download external binaries.
+
+
+## v19 additions
+- Print/Save as PDF via browser print dialog; never claim automatic PDF file save.
+- Tap tag chips on cards to search by tag.
+- More scrapbook sticker variants; bundled original local SVG theme/sticker resources.
+- Paper-grain background texture and service worker precache entries.
+- Bootstrap Icons and Google Fonts still have CDN first-use dependencies; fully bundled binary resources remain a follow-up because the build environment could not download external binaries.

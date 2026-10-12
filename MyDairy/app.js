@@ -4,12 +4,16 @@
 
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
-  const THEMES = ['sky', 'coral', 'mint', 'lavender'];
+  const THEMES = ['sky', 'coral', 'mint', 'lavender', 'rose', 'peach', 'sand', 'ocean'];
   const THEME_INFO = {
     sky: { label: 'Sky', hello: 'A clear little space for your thoughts.' },
     coral: { label: 'Coral', hello: 'Keep the things that made you feel.' },
     mint: { label: 'Mint', hello: 'There is room to begin again.' },
-    lavender: { label: 'Lavender', hello: 'Let the day settle gently.' }
+    lavender: { label: 'Lavender', hello: 'Let the day settle gently.' },
+    rose: { label: 'Rose', hello: 'A soft place for the things you feel.' },
+    peach: { label: 'Peach', hello: 'Keep a little warmth from today.' },
+    sand: { label: 'Sand', hello: 'Slow down and leave a little room.' },
+    ocean: { label: 'Ocean', hello: 'Let your thoughts find their own tide.' }
   };
   const MOODS = [
     { value: 'calm', label: 'Calm', emoji: '☁️' },
@@ -104,7 +108,7 @@
   }
   function richTextPlain(value) {
     const raw = String(value ?? '');
-    const markup = /<\/?(?:p|div|br|strong|b|em|i|u|h1|h2|h3|blockquote|mark|span|font|ul|ol|li|img)\b/i.test(raw);
+    const markup = /<\/?(?:p|div|br|strong|b|em|i|u|h1|h2|h3|blockquote|mark|span|font|ul|ol|li|img|hr)\b/i.test(raw);
     if (!markup) return decodeLegacyEntities(raw).replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim();
     const doc = new DOMParser().parseFromString(raw, 'text/html');
     doc.querySelectorAll('br').forEach(node => node.replaceWith(doc.createTextNode(' ')));
@@ -114,14 +118,14 @@
   }
   function sanitizeRichHtml(value) {
     let raw = String(value ?? '');
-    const markupPattern = /<\/?(?:p|div|br|strong|b|em|i|u|h1|h2|h3|blockquote|mark|span|font|ul|ol|li|img)\b/i;
+    const markupPattern = /<\/?(?:p|div|br|strong|b|em|i|u|h1|h2|h3|blockquote|mark|span|font|ul|ol|li|img|hr)\b/i;
     if (!markupPattern.test(raw)) {
       raw = decodeLegacyEntities(raw);
       // If a legacy encoded HTML string decodes into actual formatting markup, sanitize it as markup.
       if (!markupPattern.test(raw)) return escapeHTML(raw).replace(/\r\n?/g, '\n').replace(/\n/g, '<br>');
     }
     const doc = new DOMParser().parseFromString(raw, 'text/html');
-    const allowed = new Set(['P', 'DIV', 'BR', 'STRONG', 'B', 'EM', 'I', 'U', 'H2', 'H3', 'BLOCKQUOTE', 'MARK', 'SPAN', 'IMG', 'UL', 'OL', 'LI']);
+    const allowed = new Set(['P', 'DIV', 'BR', 'STRONG', 'B', 'EM', 'I', 'U', 'H2', 'H3', 'BLOCKQUOTE', 'MARK', 'SPAN', 'IMG', 'UL', 'OL', 'LI', 'HR']);
     const blocked = new Set(['SCRIPT', 'STYLE', 'IFRAME', 'OBJECT', 'EMBED', 'SVG', 'MATH', 'VIDEO', 'AUDIO', 'FORM', 'INPUT', 'BUTTON', 'TEXTAREA', 'SELECT', 'META', 'LINK']);
     const colorPattern = /^(?:#[\da-f]{3,8}|rgba?\(\s*[\d.%\s,]+\)|hsla?\(\s*[-\d.%\s,]+\)|[a-z]{3,20})$/i;
     const familyPattern = /^[a-z\d\s"'(),-]{1,100}$/i;
@@ -173,8 +177,15 @@
       const originalStyle = tag === 'SPAN' ? safeStyle(node.getAttribute('style')) : '';
       const imageSrc = tag === 'IMG' ? node.getAttribute('src') || '' : '';
       const imageAlt = tag === 'IMG' ? (node.getAttribute('alt') || 'Diary image').slice(0, 160) : '';
+      const dividerClass = tag === 'HR' ? 'scrapbook-divider' : '';
+      const sticker = tag === 'P' && node.classList.contains('scrapbook-sticker') ? 'scrapbook-sticker' : '';
+      const allowedStickers = ['sparkle','flower','moon','leaf','heart','butterfly','star'];
+      const stickerValue = tag === 'P' ? node.getAttribute('data-sticker') : '';
+      const stickerData = allowedStickers.includes(stickerValue) ? stickerValue : '';
       [...node.attributes].forEach(attr => node.removeAttribute(attr.name));
       if (tag === 'SPAN' && originalStyle) node.setAttribute('style', originalStyle);
+      if (dividerClass) node.setAttribute('class', dividerClass);
+      if (sticker) { node.setAttribute('class', sticker); node.setAttribute('contenteditable', 'false'); if (stickerData) node.setAttribute('data-sticker', stickerData); }
       if (tag === 'IMG') {
         if (!/^data:image\/(?:png|jpeg|webp|gif);base64,[a-z\d+/=\r\n]+$/i.test(imageSrc)) { node.remove(); return; }
         node.setAttribute('src', imageSrc);
@@ -227,7 +238,8 @@
     base.entries = entries.map(e => ({
       id: String(e.id), title: String(e.title || ''), body: String(e.body || ''), date: /^\d{4}-\d{2}-\d{2}$/.test(e.date) ? e.date : TODAY,
       mood: MOODS.some(m => m.value === e.mood) ? e.mood : '', theme: THEMES.includes(e.theme) ? e.theme : 'sky',
-      photos: Array.isArray(e.photos) ? e.photos.filter(p => p && typeof p.dataUrl === 'string' && p.dataUrl.startsWith('data:image/')).map(p => ({ id: String(p.id || id()), dataUrl: p.dataUrl, cover: Boolean(p.cover) })).slice(0, 12) : [],
+      photos: Array.isArray(e.photos) ? e.photos.filter(p => p && typeof p.dataUrl === 'string' && p.dataUrl.startsWith('data:image/')).map(p => ({ id: String(p.id || id()), dataUrl: p.dataUrl, cover: Boolean(p.cover), caption: String(p.caption || '').slice(0, 300) })).slice(0, 12) : [],
+      tags: Array.isArray(e.tags) ? [...new Set(e.tags.map(tag => String(tag).trim().replace(/^#/, '').slice(0, 32)).filter(Boolean))].slice(0, 20) : [],
       createdAt: e.createdAt || new Date().toISOString(), updatedAt: e.updatedAt || e.createdAt || new Date().toISOString(), reflection: String(e.reflection || ''), memoryScanSignature: String(e.memoryScanSignature || '')
     }));
     base.memories = memories.map(m => ({ id: String(m.id), text: String(m.text).slice(0, 800), createdAt: m.createdAt || new Date().toISOString(), updatedAt: m.updatedAt || m.createdAt || new Date().toISOString(), source: String(m.source || 'manual'), sourceEntryId: String(m.sourceEntryId || '') })).slice(0, 160);
@@ -240,7 +252,7 @@
     if (!safeMessages.some(m => m.source === 'welcome')) safeMessages.unshift(base.messages[0]);
     base.messages = safeMessages.slice(-100);
     base.settings = {
-      theme: ['sky', 'coral', 'mint', 'lavender', 'dynamic'].includes(settings.theme) ? settings.theme : 'sky',
+      theme: [...THEMES, 'dynamic'].includes(settings.theme) ? settings.theme : 'sky',
       activeThemeDate: typeof settings.activeThemeDate === 'string' ? settings.activeThemeDate : TODAY,
       activeTheme: THEMES.includes(settings.activeTheme) ? settings.activeTheme : 'sky',
       textScale: ['normal', 'large', 'xlarge'].includes(settings.textScale) ? settings.textScale : 'normal',
@@ -309,6 +321,50 @@
     });
     return saveChain;
   }
+
+  const FONT_NAMES = ['Caveat', 'Lora', 'Patrick Hand', 'DM Sans', 'EB Garamond'];
+  const FONT_ASSET_NAMES = [...FONT_NAMES, 'Manrope', 'Playfair Display'];
+  const FONT_CACHE_NAME = 'quiet-pages-font-binaries-v1';
+  const FONT_CSS_URL = 'https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=DM+Sans:wght@400;500;600&family=EB+Garamond:wght@400;500;600&family=Lora:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&family=Patrick+Hand&family=Playfair+Display:wght@500;600;700&display=swap';
+  const fontReady = new Map();
+  async function ensureDiaryFont(family) {
+    if (!FONT_ASSET_NAMES.includes(family)) return true;
+    if (fontReady.has(family)) return fontReady.get(family);
+    const task = (async () => {
+      if (!('caches' in window) || !('FontFace' in window)) return document.fonts.check(`16px \"${family}\"`);
+      const cache = await caches.open(FONT_CACHE_NAME);
+      let css = '';
+      try {
+        const cssResponse = await fetch(FONT_CSS_URL, { mode: 'cors', cache: 'force-cache' });
+        if (cssResponse.ok) { css = await cssResponse.text(); await cache.put(FONT_CSS_URL, new Response(css, { headers: { 'Content-Type': 'text/css' } })); }
+      } catch (_) {}
+      if (!css) { const cachedCss = await cache.match(FONT_CSS_URL); if (cachedCss) css = await cachedCss.text(); }
+      if (!css) return false;
+      // Google Fonts returns multiple unicode subsets. Choose the latin face for each family/weight.
+      const blocks = css.split('/*').map(part => ({ latin: /^\s*(?:latin|latin-ext)\s*\*\//i.test(part), text: part }));
+      let loaded = false;
+      for (const item of blocks) {
+        if (!item.latin) continue;
+        const familyMatch = item.text.match(/font-family:\s*['"]?([^;'"]+)/i);
+        if (!familyMatch || familyMatch[1].trim().toLowerCase() !== family.toLowerCase()) continue;
+        const weight = (item.text.match(/font-weight:\s*([^;]+)/i) || [,'400'])[1].trim();
+        const srcMatch = item.text.match(/src:\s*url\((https:\/\/fonts\.gstatic\.com\/[^)]+\.woff2)\)/i);
+        if (!srcMatch) continue;
+        const url = srcMatch[1]; let response = await cache.match(url);
+        if (!response) {
+          try { const fetched = await fetch(url, { mode: 'cors' }); if (fetched.ok) { await cache.put(url, fetched.clone()); response = fetched; } } catch (_) {}
+        }
+        if (!response) continue;
+        try { const face = new FontFace(family, await response.arrayBuffer(), { weight }); await face.load(); document.fonts.add(face); loaded = true; } catch (_) {}
+      }
+      return loaded || document.fonts.check(`16px "${family}"`);
+    })().catch(() => false);
+    fontReady.set(family, task); return task;
+  }
+  async function warmFontCache() {
+    for (const family of FONT_ASSET_NAMES) { try { await ensureDiaryFont(family); } catch (_) {} }
+  }
+
   async function initializeStorage() {
     try {
       await openDB();
@@ -374,14 +430,14 @@
     document.documentElement.classList.remove('large-text', 'xlarge-text');
     if (state.settings.textScale === 'large') document.documentElement.classList.add('large-text');
     if (state.settings.textScale === 'xlarge') document.documentElement.classList.add('xlarge-text');
-    const themeColors = { sky:'#e8f2fa', coral:'#fbebe5', mint:'#eaf4eb', lavender:'#f0e8f8' };
+    const themeColors = { sky:'#e8f2fa', coral:'#fbebe5', mint:'#eaf4eb', lavender:'#f0e8f8', rose:'#f7e8ed', peach:'#fff0e4', sand:'#f1eadb', ocean:'#e4eff4' };
     $('meta[name="theme-color"]').content = themeColors[activeTheme()] || themeColors.sky;
     $$('[data-theme-choice]').forEach(button => button.classList.toggle('active', button.dataset.themeChoice === state.settings.theme));
     $('#textScale').value = state.settings.textScale;
     $('#reduceMotion').checked = state.settings.reduceMotion;
   }
   function setTheme(theme) {
-    if (!['sky', 'coral', 'mint', 'lavender', 'dynamic'].includes(theme)) return;
+    if (![...THEMES, 'dynamic'].includes(theme)) return;
     state.settings.theme = theme;
     if (theme === 'dynamic') {
       state.settings.activeThemeDate = '';
@@ -423,7 +479,13 @@
   function cardTheme(entry) { return THEMES.includes(entry.theme) ? entry.theme : activeTheme(); }
   function renderDiary() {
     const query = ($('#searchInput')?.value || '').trim().toLowerCase();
-    const list = sortedEntries().filter(entry => !query || `${entry.title} ${richTextPlain(entry.body)} ${entry.date} ${entry.mood}`.toLowerCase().includes(query));
+    const allTags = [...new Set(state.entries.flatMap(entry => entry.tags || []))].sort((a,b) => a.localeCompare(b));
+    const tagHost = $('#tagFilterChips');
+    if (tagHost) {
+      tagHost.innerHTML = allTags.length ? allTags.slice(0,12).map(tag => `<button type="button" data-filter-tag="${escapeHTML(tag)}" class="${query === tag.toLowerCase() ? 'active' : ''}">#${escapeHTML(tag)}</button>`).join('') : '';
+      tagHost.classList.toggle('hidden', !allTags.length || $('#searchPanel')?.classList.contains('hidden'));
+    }
+    const list = sortedEntries().filter(entry => !query || `${entry.title} ${richTextPlain(entry.body)} ${entry.date} ${entry.mood} ${(entry.tags || []).join(' ')} ${(entry.photos || []).map(p => p.caption || '').join(' ')}`.toLowerCase().includes(query));
     $('#entryCount').textContent = `${list.length} ${list.length === 1 ? 'page' : 'pages'}`;
     $('#entriesHeading').textContent = query ? 'Search results' : 'Recent pages';
     $('#todayLabel').textContent = new Intl.DateTimeFormat(undefined, { weekday: 'long', month: 'long', day: 'numeric' }).format(new Date());
@@ -436,7 +498,7 @@
       const hasInlineImage = /<img\b/i.test(String(entry.body || ''));
       const title = entry.title.trim() || 'An untitled page';
       // Rotate the scrapbook palette per visible card so adjacent entries never all inherit one theme.
-      const cardPalette = ['sky', 'mint', 'coral', 'lavender'];
+      const cardPalette = ['sky', 'mint', 'coral', 'lavender', 'rose', 'peach', 'sand', 'ocean'];
       const visualTheme = cardPalette[index % cardPalette.length];
       const className = `entry-card theme-${visualTheme}${cover ? ' has-cover' : ' no-cover'}`;
       const date = formatDate(entry.date, { month: 'short', day: 'numeric', year: 'numeric' });
@@ -447,7 +509,7 @@
       return `<article class="${className}" data-open-entry="${escapeHTML(entry.id)}" tabindex="0" role="button" aria-label="Open ${escapeHTML(title)}">
         <div class="entry-copy">
           <div class="card-topline"><span>${escapeHTML(date)}</span>${mood ? `<span class="entry-pill">${mood.emoji} ${escapeHTML(mood.label)}</span>` : `<span class="entry-pill"><i class="bi bi-bookmark-heart"></i> Kept</span>`}</div>
-          <h3>${escapeHTML(title)}</h3><p class="entry-excerpt">${escapeHTML(excerptText)}</p>
+          <h3>${escapeHTML(title)}</h3><p class="entry-excerpt">${escapeHTML(excerptText)}</p>${entry.tags?.length ? `<div class="entry-tags">${entry.tags.slice(0,3).map(tag => `<span data-filter-tag="${escapeHTML(tag)}" role="button" tabindex="0" title="Search this tag">#${escapeHTML(tag)}</span>`).join('')}</div>` : ''}
           <div class="card-bottom"><span>${entry.photos?.length ? `<i class="bi bi-images"></i> ${entry.photos.length} ${entry.photos.length === 1 ? 'photo' : 'photos'}` : 'A page of your own'}</span><span class="arrow-circle"><i class="bi bi-arrow-up-right"></i></span></div>
         </div>
         ${photoMarkup}
@@ -607,7 +669,8 @@
     const first = new Date(year, month, 1);
     const mondayOffset = (first.getDay() + 6) % 7;
     const start = new Date(year, month, 1 - mondayOffset);
-    const entryDates = new Set(state.entries.map(entry => entry.date));
+    const entriesByDate = new Map();
+    state.entries.forEach(entry => { if (!entriesByDate.has(entry.date)) entriesByDate.set(entry.date, entry); });
     const cells = [];
     for (let i = 0; i < 42; i++) {
       const date = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
@@ -615,8 +678,10 @@
       const outside = date.getMonth() !== month;
       const isToday = key === TODAY;
       const isSelected = key === selectedCalendarDate;
-      const hasEntry = entryDates.has(key);
-      cells.push(`<button class="calendar-day${outside ? ' outside' : ''}${isToday ? ' today' : ''}${isSelected ? ' selected' : ''}" role="gridcell" aria-label="${escapeHTML(formatDate(key))}${hasEntry ? ', has diary entries' : ''}" aria-pressed="${isSelected}" data-calendar-date="${key}"><span>${date.getDate()}</span>${hasEntry ? '<i class="day-dot"></i>' : ''}</button>`);
+      const entryForDay = entriesByDate.get(key);
+      const hasEntry = Boolean(entryForDay);
+      const dayMood = entryForDay ? moodInfo(entryForDay.mood) : null;
+      cells.push(`<button class="calendar-day${outside ? ' outside' : ''}${isToday ? ' today' : ''}${isSelected ? ' selected' : ''}" role="gridcell" aria-label="${escapeHTML(formatDate(key))}${hasEntry ? ', has diary entries' : ''}${dayMood ? `, mood ${escapeHTML(dayMood.label)}` : ''}" aria-pressed="${isSelected}" data-calendar-date="${key}"><span>${date.getDate()}</span>${hasEntry ? (dayMood ? `<i class="day-mood" aria-hidden="true">${dayMood.emoji}</i>` : '<i class="day-dot"></i>') : ''}</button>`);
     }
     $('#calendarGrid').innerHTML = cells.join('');
     $('#selectedDateLabel').textContent = formatDate(selectedCalendarDate, { weekday: 'long' }).toUpperCase();
@@ -654,9 +719,9 @@
     const photos = entry.photos || [];
     $('#screen-detail').innerHTML = `
       <div class="back-row"><button class="back-button" data-action="back-detail"><i class="bi bi-arrow-left"></i> Back to ${previousScreen === 'calendar' ? 'calendar' : 'your pages'}</button><div class="detail-actions"><button class="soft-icon-button" data-action="edit-entry" data-entry-id="${escapeHTML(entry.id)}" aria-label="Edit entry" title="Edit"><i class="bi bi-pencil"></i></button><button class="soft-icon-button" data-action="delete-entry" data-entry-id="${escapeHTML(entry.id)}" aria-label="Delete entry" title="Delete"><i class="bi bi-trash3"></i></button></div></div>
-      <div class="detail-hero theme-${theme}${cover ? ' has-image' : ''}">${cover ? `<img src="${escapeHTML(cover.dataUrl)}" alt="Cover photo for ${escapeHTML(entry.title || 'diary entry')}">` : ''}<div class="detail-hero-copy"><div class="entry-meta">${escapeHTML(formatDate(entry.date))} · ${escapeHTML(THEME_INFO[theme].label)} theme</div><h1>${escapeHTML(entry.title || 'An untitled page')}</h1>${mood ? `<span class="detail-mood">${mood.emoji} ${escapeHTML(mood.label)}</span>` : ''}</div></div>
+      <div class="detail-hero theme-${theme}${cover ? ' has-image' : ''}">${cover ? `<img src="${escapeHTML(cover.dataUrl)}" alt="Cover photo for ${escapeHTML(entry.title || 'diary entry')}">` : ''}<div class="detail-hero-copy"><div class="entry-meta">${escapeHTML(formatDate(entry.date))} · ${escapeHTML(THEME_INFO[theme].label)} theme</div><h1>${escapeHTML(entry.title || 'An untitled page')}</h1>${mood ? `<span class="detail-mood">${mood.emoji} ${escapeHTML(mood.label)}</span>` : ''}${entry.tags?.length ? `<div class="detail-tags">${entry.tags.map(tag => `<span>#${escapeHTML(tag)}</span>`).join('')}</div>` : ''}</div></div>
       <article class="detail-content"><div class="detail-writing${richTextHasContent(entry.body) ? '' : ' empty-writing'}">${richTextHasContent(entry.body) ? sanitizeRichHtml(entry.body) : 'This page is still waiting for its words.'}</div>
-      ${photos.length ? `<div class="detail-gallery" aria-label="Entry photos">${photos.map((photo, i) => `<button type="button" data-view-photo="${i}" aria-label="View photo ${i + 1}"><img src="${escapeHTML(photo.dataUrl)}" alt="Diary photo ${i + 1}" loading="lazy"></button>`).join('')}</div>` : ''}
+      ${photos.length ? `<div class="detail-gallery" aria-label="Entry photos">${photos.map((photo, i) => `<figure class="detail-photo-figure"><button type="button" data-view-photo="${i}" aria-label="View photo ${i + 1}"><img src="${escapeHTML(photo.dataUrl)}" alt="${escapeHTML(photo.caption || `Diary photo ${i + 1}`)}" loading="lazy"></button>${photo.caption ? `<figcaption>${escapeHTML(photo.caption)}</figcaption>` : ''}</figure>`).join('')}</div>` : ''}
       ${entry.reflection ? `<div class="reflection-card"><strong><i class="bi bi-stars"></i> A reflection</strong><p>${escapeHTML(entry.reflection)}</p></div>` : ''}
       <div class="detail-footer"><span>Saved ${escapeHTML(new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }).format(new Date(entry.updatedAt || entry.createdAt)))}</span><button class="text-button" data-action="reflect-entry" data-entry-id="${escapeHTML(entry.id)}"><i class="bi bi-stars"></i> Reflect with companion</button></div></article>`;
     navTo('detail');
@@ -670,7 +735,7 @@
     editorIsNew = !existing;
     currentEditId = existing ? existing.id : id();
     editorData = existing ? JSON.parse(JSON.stringify(existing)) : {
-      id: currentEditId, title: '', body: '', date, mood: '', theme: activeTheme(), photos: [], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), reflection: ''
+      id: currentEditId, title: '', body: '', date, mood: '', theme: activeTheme(), photos: [], tags: [], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), reflection: ''
     };
     editorDirty = false;
     previousScreen = currentScreen === 'calendar' ? 'calendar' : (currentScreen === 'detail' ? previousScreen : 'diary');
@@ -683,7 +748,7 @@
     savedEditorRange = null;
     const data = editorData;
     const moods = MOODS.map(mood => `<button type="button" class="mood-option${data.mood === mood.value ? ' active' : ''}" data-mood="${mood.value}" aria-pressed="${data.mood === mood.value}"><span>${mood.emoji}</span>${escapeHTML(mood.label)}</button>`).join('');
-    const photos = (data.photos || []).map((photo, index) => `<div class="photo-preview${photo.cover ? ' cover' : ''}"><img src="${escapeHTML(photo.dataUrl)}" alt="Selected diary photo ${index + 1}"><button type="button" class="photo-remove" data-remove-photo="${escapeHTML(photo.id)}" aria-label="Remove photo"><i class="bi bi-x"></i></button><button type="button" class="cover-select" data-cover-photo="${escapeHTML(photo.id)}">${photo.cover ? 'COVER' : 'MAKE COVER'}</button></div>`).join('');
+    const photos = (data.photos || []).map((photo, index) => `<div class="photo-preview${photo.cover ? ' cover' : ''}"><img src="${escapeHTML(photo.dataUrl)}" alt="Selected diary photo ${index + 1}"><button type="button" class="photo-remove" data-remove-photo="${escapeHTML(photo.id)}" aria-label="Remove photo"><i class="bi bi-x"></i></button><button type="button" class="cover-select" data-cover-photo="${escapeHTML(photo.id)}">${photo.cover ? 'COVER' : 'MAKE COVER'}</button><label class="photo-caption-label"><span class="sr-only">Photo caption</span><input class="photo-caption" data-photo-caption="${escapeHTML(photo.id)}" maxlength="300" placeholder="Add a caption…" value="${escapeHTML(photo.caption || '')}"></label></div>`).join('');
     $('#screen-editor').innerHTML = `<div class="back-row"><button class="back-button" data-action="cancel-editor"><i class="bi bi-arrow-left"></i> Back</button><span class="subtle-count">${editorIsNew ? 'A NEW PAGE' : 'EDITING PAGE'}</span></div>
       <div class="editor-card"><div class="eyebrow"><span class="eyebrow-dot"></span>A PAGE OF YOUR OWN</div><p class="editor-intro-note">A little space for whatever you want to keep.</p>
       <div class="editor-field"><label class="sr-only" for="editorTitle">Entry title</label><input id="editorTitle" class="title-input" maxlength="140" placeholder="Give this day a name…" value="${escapeHTML(data.title)}"></div>
@@ -691,16 +756,17 @@
       <div class="rich-toolbar" role="toolbar" aria-label="Writing format tools">
         <button type="button" data-format="bold" aria-label="Bold" title="Bold"><i class="bi bi-type-bold" aria-hidden="true"></i></button><button type="button" data-format="italic" aria-label="Italic" title="Italic"><i class="bi bi-type-italic" aria-hidden="true"></i></button><button type="button" data-format="underline" aria-label="Underline" title="Underline"><i class="bi bi-type-underline" aria-hidden="true"></i></button>
         <span class="toolbar-divider"></span><button type="button" data-block="h2" title="Heading" aria-label="Heading"><i class="bi bi-type-h1" aria-hidden="true"></i></button><button type="button" data-block="h3" title="Subheading" aria-label="Subheading"><i class="bi bi-type-h2" aria-hidden="true"></i></button><button type="button" data-block="blockquote" title="Quote" aria-label="Quote"><i class="bi bi-quote" aria-hidden="true"></i></button>
-        <select id="editorFont" aria-label="Font family" title="Font family"><option value="Georgia">Serif</option><option value="Arial">Sans</option><option value="monospace">Mono</option></select><select id="editorFontSize" aria-label="Text size" title="Text size"><option value="3">Normal</option><option value="2">Small</option><option value="4">Large</option><option value="5">Larger</option></select>
+        <select id="editorFont" aria-label="Font family" title="Font family"><option value="Georgia">System serif</option><option value="Caveat">Caveat</option><option value="Lora">Lora</option><option value="Patrick Hand">Patrick Hand</option><option value="DM Sans">DM Sans</option><option value="EB Garamond">EB Garamond</option><option value="Arial">System sans</option><option value="monospace">Mono</option></select><select id="editorFontSize" aria-label="Text size" title="Text size"><option value="3">Normal</option><option value="2">Small</option><option value="4">Large</option><option value="5">Larger</option></select>
         <label class="highlight-picker" title="Highlight text" aria-label="Highlight text"><i class="bi bi-highlighter" aria-hidden="true"></i><input id="highlightColor" type="color" value="#fff09a" aria-label="Highlight colour"></label>
         <label class="text-color-picker" title="Text colour" aria-label="Text colour"><i class="bi bi-palette" aria-hidden="true"></i><input id="textColor" type="color" value="#2c3b35" aria-label="Text colour"></label>
-        <button type="button" id="inlineImageButton" title="Insert image between paragraphs" aria-label="Insert image"><i class="bi bi-image" aria-hidden="true"></i></button><input id="inlineImageInput" class="hidden" type="file" accept="image/*">
+        <button type="button" data-insert-block="divider" title="Insert divider" aria-label="Insert divider"><i class="bi bi-three-dots" aria-hidden="true"></i></button><button type="button" data-insert-block="sticker" title="Insert decorative sticker" aria-label="Insert sticker"><i class="bi bi-stars" aria-hidden="true"></i></button><button type="button" id="inlineImageButton" title="Insert image between paragraphs" aria-label="Insert image"><i class="bi bi-image" aria-hidden="true"></i></button><input id="inlineImageInput" class="hidden" type="file" accept="image/*">
         <button type="button" data-format="removeFormat" title="Clear formatting" aria-label="Clear formatting"><i class="bi bi-eraser" aria-hidden="true"></i></button>
       </div>
       <div id="editorBody" class="entry-writing-input rich-editor" contenteditable="true" role="textbox" aria-multiline="true" data-placeholder="Start anywhere. A moment, a thought, something you don't want to forget…">${sanitizeRichHtml(data.body)}</div>
       <p class="hint">Your original words stay yours. Format them however you like. Changes save on this device.</p></div>
-      <div class="editor-meta-grid"><div class="editor-field"><label for="editorDate">Date</label><input type="date" id="editorDate" value="${escapeHTML(data.date)}" required></div><div class="editor-field"><label for="editorTheme">Entry theme</label><select id="editorTheme"><option value="sky" ${data.theme === 'sky' ? 'selected' : ''}>Sky</option><option value="coral" ${data.theme === 'coral' ? 'selected' : ''}>Coral</option><option value="mint" ${data.theme === 'mint' ? 'selected' : ''}>Mint</option><option value="lavender" ${data.theme === 'lavender' ? 'selected' : ''}>Lavender</option></select></div></div>
+      <div class="editor-meta-grid"><div class="editor-field"><label for="editorDate">Date</label><input type="date" id="editorDate" value="${escapeHTML(data.date)}" required></div><div class="editor-field"><label for="editorTheme">Entry theme</label><select id="editorTheme"><option value="sky" ${data.theme === 'sky' ? 'selected' : ''}>Sky</option><option value="coral" ${data.theme === 'coral' ? 'selected' : ''}>Coral</option><option value="mint" ${data.theme === 'mint' ? 'selected' : ''}>Mint</option><option value="lavender" ${data.theme === 'lavender' ? 'selected' : ''}>Lavender</option><option value="rose" ${data.theme === 'rose' ? 'selected' : ''}>Rose</option><option value="peach" ${data.theme === 'peach' ? 'selected' : ''}>Peach</option><option value="sand" ${data.theme === 'sand' ? 'selected' : ''}>Sand</option><option value="ocean" ${data.theme === 'ocean' ? 'selected' : ''}>Ocean</option></select></div></div>
       <div class="editor-field"><label>How did today feel? <span class="hint">(optional)</span></label><div class="mood-picker">${moods}</div></div>
+      <div class="editor-field"><label for="editorTags">Tags <span class="hint">(optional, comma-separated)</span></label><input id="editorTags" type="text" maxlength="300" placeholder="college, ideas, travel" value="${escapeHTML((data.tags || []).join(", "))}"><p class="hint">Tags stay on this device and are included in search and backups.</p></div>
       <div class="editor-field"><label>Photos <span class="hint">(optional, up to 12)</span></label><div class="photo-drop"><label for="photoInput"><i class="bi bi-images"></i> Choose from gallery</label><input id="photoInput" class="hidden" type="file" accept="image/*" multiple><p>Photos are resized for storage and remain in this browser. Choose one photo as the cover.</p></div><div id="photoPreviews" class="photo-previews">${photos}</div></div>
       <div class="autosave-status" id="autosaveStatus">${editorIsNew ? 'Your page is not saved until you start writing.' : 'All changes are saved on this device.'}</div>
       <div class="editor-footer"><div class="left">${editorIsNew ? '' : `<button class="secondary-button editor-delete" data-action="delete-entry" data-entry-id="${escapeHTML(data.id)}"><i class="bi bi-trash3"></i> Delete</button>`}</div><button type="button" class="primary-button" id="saveEntryButton"><i class="bi bi-check2"></i> Save page</button></div></div>`;
@@ -741,23 +807,29 @@
     body.addEventListener('input', rememberSelection);
     body.addEventListener('touchend', () => setTimeout(rememberSelection, 0), { passive: true });
     const restoreSelection = () => {
-      body.focus({ preventScroll: true });
       const selection = window.getSelection();
-      if (!selection) return;
-      selection.removeAllRanges();
+      if (!body.contains(selection?.anchorNode) && savedEditorRange && body.contains(savedEditorRange.commonAncestorContainer)) {
+        try { selection?.removeAllRanges(); selection?.addRange(savedEditorRange); } catch (_) { savedEditorRange = null; }
+      }
+      body.focus({ preventScroll: true });
+      const activeSelection = window.getSelection();
+      if (!activeSelection) return;
+      activeSelection.removeAllRanges();
       if (savedEditorRange && body.contains(savedEditorRange.commonAncestorContainer)) {
-        try { selection.addRange(savedEditorRange); return; } catch (_) { savedEditorRange = null; }
+        try { activeSelection.addRange(savedEditorRange); return; } catch (_) { savedEditorRange = null; }
       }
       const range = document.createRange();
       range.selectNodeContents(body);
       range.collapse(false);
-      selection.addRange(range);
+      activeSelection.addRange(range);
     };
     const track = () => {
       editorData.title = title.value;
       editorData.body = sanitizeRichHtml(body.innerHTML);
       editorData.date = date.value || TODAY;
       editorData.theme = THEMES.includes(theme.value) ? theme.value : activeTheme();
+      const tagsInput = $('#editorTags');
+      editorData.tags = tagsInput ? [...new Set(tagsInput.value.split(',').map(tag => tag.trim().replace(/^#/, '').slice(0, 32)).filter(Boolean))].slice(0, 20) : (editorData.tags || []);
       editorData.updatedAt = new Date().toISOString();
       editorDirty = true;
       $('#autosaveStatus').textContent = 'Saving changes…';
@@ -767,8 +839,14 @@
     };
     title.addEventListener('input', track);
     body.addEventListener('input', track);
-    // Prevent mouse-down from discarding the selected range before a toolbar command runs.
-    $$('.rich-toolbar button', document).forEach(button => button.addEventListener('mousedown', event => event.preventDefault()));
+    $('#editorTags').addEventListener('input', track);
+    // Save the editor range before any toolbar interaction. Prevent focus loss for action buttons,
+    // but leave native selects and colour inputs operable on Android/iOS.
+    $$('.rich-toolbar', document).forEach(toolbar => {
+      toolbar.addEventListener('pointerdown', event => { if (body.contains(document.activeElement) || body.contains(window.getSelection()?.anchorNode)) rememberSelection(); }, true);
+      toolbar.addEventListener('mousedown', event => { if (event.target.closest('button,[data-insert-block]')) event.preventDefault(); }, true);
+    });
+    $$('.rich-toolbar button', document).forEach(button => button.addEventListener('pointerdown', event => { rememberSelection(); if (!event.target.closest('input,select')) event.preventDefault(); }));
     $$('.rich-toolbar [data-format]', document).forEach(button => button.addEventListener('click', () => {
       restoreSelection();
       document.execCommand('styleWithCSS', false, true);
@@ -782,12 +860,17 @@
       track();
       rememberSelection();
     }));
-    $('#editorFont').addEventListener('change', event => {
+    $('#editorFont').addEventListener('change', async event => {
+      const family = event.target.value;
+      restoreSelection();
+      const fontLoaded = FONT_NAMES.includes(family) ? await ensureDiaryFont(family) : true;
       restoreSelection();
       document.execCommand('styleWithCSS', false, true);
-      document.execCommand('fontName', false, event.target.value);
+      document.execCommand('fontName', false, family);
       track();
       rememberSelection();
+      document.body.classList.add('qp-toolbar-formatting');
+      toast(fontLoaded ? `${family} applied.` : `${family} selected; connect once to download its font for offline use.`, fontLoaded ? '' : 'error');
     });
     $('#editorFontSize').addEventListener('change', event => {
       restoreSelection();
@@ -828,6 +911,30 @@
       } catch (error) { toast('That image could not be inserted.', 'error'); }
       event.target.value = '';
     });
+    $$('.rich-toolbar [data-insert-block]', document).forEach(button => button.addEventListener('click', () => {
+      restoreSelection();
+      const kind = button.dataset.insertBlock;
+      const stickerSet = [{id:'sparkle',text:'✦ ✧ ✦'},{id:'flower',text:'✿ ❀ ✿'},{id:'moon',text:'☾ ✧ ☽'},{id:'leaf',text:'❧ ❦ ❧'},{id:'heart',text:'♡ ♥ ♡'},{id:'butterfly',text:'🦋 ✧ 🦋'},{id:'star',text:'☆ ★ ☆'}];
+      window.qpStickerIndex = (window.qpStickerIndex || 0) % stickerSet.length;
+      const sticker = stickerSet[window.qpStickerIndex++];
+      const markup = kind === 'divider' ? '<hr class="scrapbook-divider"><p><br></p>' : `<p class="scrapbook-sticker" contenteditable="false" data-sticker="${sticker.id}">${sticker.text}</p><p><br></p>`;
+      document.execCommand('insertHTML', false, markup);
+      track(); rememberSelection();
+    }));
+    $$('.photo-caption', $('#screen-editor')).forEach(input => input.addEventListener('input', () => {
+      const photo = editorData.photos.find(item => item.id === input.dataset.photoCaption);
+      if (photo) photo.caption = input.value.slice(0, 300);
+      editorData.updatedAt = new Date().toISOString(); editorDirty = true; scheduleEditorSave();
+    }));
+    $$('.photo-remove', $('#screen-editor')).forEach(button => button.addEventListener('click', () => {
+      editorData.photos = editorData.photos.filter(photo => photo.id !== button.dataset.removePhoto);
+      if (editorData.photos.length && !editorData.photos.some(photo => photo.cover)) editorData.photos[0].cover = true;
+      editorDirty = true; renderEditor(); scheduleEditorSave();
+    }));
+    $$('.cover-select', $('#screen-editor')).forEach(button => button.addEventListener('click', () => {
+      editorData.photos.forEach(photo => photo.cover = photo.id === button.dataset.coverPhoto);
+      editorDirty = true; renderEditor(); scheduleEditorSave();
+    }));
     date.addEventListener('change', track);
     theme.addEventListener('change', track);
     $$('.mood-option', $('#screen-editor')).forEach(button => button.addEventListener('click', () => {
@@ -845,7 +952,7 @@
         try {
           $('#autosaveStatus').textContent = 'Preparing photos…';
           const dataUrl = await resizeImage(file);
-          const photo = { id: id(), dataUrl, cover: editorData.photos.length === 0 };
+          const photo = { id: id(), dataUrl, cover: editorData.photos.length === 0, caption: '' };
           editorData.photos.push(photo);
         } catch (error) { toast(`Could not add ${file.name}: ${error.message || 'unsupported image'}`, 'error'); }
       }
@@ -903,6 +1010,8 @@
     editorData.body = sanitizeRichHtml($('#editorBody').innerHTML);
     editorData.date = $('#editorDate').value || TODAY;
     editorData.theme = $('#editorTheme').value;
+    const tagsInput = $('#editorTags');
+    editorData.tags = tagsInput ? [...new Set(tagsInput.value.split(',').map(tag => tag.trim().replace(/^#/, '').slice(0, 32)).filter(Boolean))].slice(0, 20) : (editorData.tags || []);
     const meaningful = editorData.title || richTextHasContent(editorData.body) || editorData.photos.length;
     if (!meaningful) return toast('Write something or add a photo before saving this page.');
     if (!editorData.photos.some(photo => photo.cover) && editorData.photos.length) editorData.photos[0].cover = true;
@@ -1451,6 +1560,43 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
       toast('Backup prepared. On iPhone, choose Save to Files if prompted.');
     } catch (error) { toast(error.message || 'Could not create backup.', 'error'); }
   }
+  async function exportReadableHtml() {
+    try {
+      await saveNow();
+      const entries = sortedEntries();
+      const pages = entries.map(entry => {
+        const tags = (entry.tags || []).map(tag => `<span class="tag">#${escapeHTML(tag)}</span>`).join(' ');
+        const photos = (entry.photos || []).map(photo => `<figure><img src="${escapeHTML(photo.dataUrl)}" alt="${escapeHTML(photo.caption || 'Diary photo')}">${photo.caption ? `<figcaption>${escapeHTML(photo.caption)}</figcaption>` : ''}</figure>`).join('');
+        return `<article><header><p>${escapeHTML(formatDate(entry.date))} · ${escapeHTML(THEME_INFO[entry.theme]?.label || 'Sky')}</p><h1>${escapeHTML(entry.title || 'Untitled page')}</h1>${tags}</header><section>${sanitizeRichHtml(entry.body)}</section><div class="photos">${photos}</div></article>`;
+      }).join('<hr>');
+      const documentHtml = `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Quiet Pages archive</title><style>body{max-width:760px;margin:40px auto;padding:0 20px;font:17px/1.8 Georgia,serif;color:#2c3b35;background:#f7f5ef}article{margin:0 0 48px;padding:28px;background:#fffdf8;border-radius:22px}header p{font:12px system-ui;color:#718078}h1{font-size:2rem;line-height:1.2}.tag{font:12px system-ui;color:#37654f;background:#eaf4eb;border-radius:20px;padding:4px 8px}img{max-width:100%;height:auto;border-radius:12px}figure{margin:18px 0}figcaption{font:13px system-ui;color:#68746e}blockquote{border-left:3px solid #aacbb6;padding-left:18px;color:#4f6659}.scrapbook-divider{border:0;border-top:1px solid #d6e4d9;margin:24px 0}</style><body><h1>Quiet Pages</h1>${pages || '<p>No entries to export.</p>'}</body></html>`;
+      const blob = new Blob([documentHtml], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob); const anchor = document.createElement('a');
+      anchor.href = url; anchor.download = `quiet-pages-archive-${TODAY}.html`; anchor.style.display = 'none'; document.body.append(anchor); anchor.click(); anchor.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 30000); toast('Readable HTML archive prepared.');
+    } catch (error) { toast(error.message || 'Could not export HTML.', 'error'); }
+  }
+
+  async function exportPrintPdf() {
+    try {
+      await saveNow();
+      const root = $('#printRoot');
+      const pages = sortedEntries().map(entry => {
+        const tags = (entry.tags || []).map(tag => `#${escapeHTML(tag)}`).join(' · ');
+        const photos = (entry.photos || []).map(photo => `<figure><img src="${escapeHTML(photo.dataUrl)}" alt="${escapeHTML(photo.caption || 'Diary photo')}">${photo.caption ? `<figcaption>${escapeHTML(photo.caption)}</figcaption>` : ''}</figure>`).join('');
+        return `<article class="print-page"><h1>${escapeHTML(entry.title || 'Untitled page')}</h1><div class="print-meta">${escapeHTML(formatDate(entry.date))} · ${escapeHTML(THEME_INFO[entry.theme]?.label || 'Sky')}${entry.mood ? ` · ${escapeHTML(moodInfo(entry.mood)?.label || entry.mood)}` : ''}</div>${tags ? `<div class="print-tags">${tags}</div>` : ''}<section>${sanitizeRichHtml(entry.body)}</section>${photos}</article>`;
+      }).join('');
+      if (!pages) return toast('There are no entries to print yet.');
+      root.innerHTML = `<h1>Quiet Pages</h1><p class="print-meta">Private diary archive · ${escapeHTML(formatDate(TODAY))}</p>${pages}`;
+      root.setAttribute('aria-hidden','false');
+      const cleanup = () => { root.innerHTML = ''; root.setAttribute('aria-hidden','true'); window.removeEventListener('afterprint', cleanup); };
+      window.addEventListener('afterprint', cleanup, { once:true });
+      toast('Choose Save as PDF in your device print dialog.');
+      setTimeout(() => window.print(), 120);
+      setTimeout(cleanup, 120000);
+    } catch (error) { toast(error.message || 'Could not prepare the PDF print view.', 'error'); }
+  }
+
   async function importBackup(file) {
     if (!file) return;
     if (file.size > 250 * 1024 * 1024) return toast('This backup is over 250 MB and cannot be imported by this app.', 'error');
@@ -1459,8 +1605,10 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
       const payload = parsed?.data ? parsed.data : parsed;
       if (!payload || !Array.isArray(payload.entries) || !Array.isArray(payload.memories)) throw new Error('This file does not look like a Quiet Pages backup.');
       const imported = normalizeState(payload);
-      const ok = await askConfirm('Restore this backup?', `This will replace the current ${state.entries.length} entries and ${state.memories.length} memories with ${imported.entries.length} entries and ${imported.memories.length} memories from the selected file. Export a backup first if needed.`, 'Restore backup');
+      const ok = await askConfirm('Restore this backup?', `This will replace the current ${state.entries.length} entries and ${state.memories.length} memories with ${imported.entries.length} entries and ${imported.memories.length} memories from the selected file. A recovery backup will be downloaded first.`, 'Restore backup');
       if (!ok) return;
+      // Best-effort recovery export before destructive replacement.
+      try { const recovery = new Blob([JSON.stringify({ app: 'Quiet Pages', formatVersion: 1, exportedAt: new Date().toISOString(), data: state }, null, 2)], { type: 'application/json' }); const recoveryUrl = URL.createObjectURL(recovery); const a = document.createElement('a'); a.href = recoveryUrl; a.download = `quiet-pages-before-restore-${TODAY}.json`; a.click(); setTimeout(() => URL.revokeObjectURL(recoveryUrl), 30000); } catch (_) {}
       state = imported;
       const persisted = await saveNow();
       applySettings(); renderAll(); navTo('diary');
@@ -1479,6 +1627,13 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
   document.addEventListener('click', async event => {
     const nav = event.target.closest('[data-nav]');
     if (nav) { event.preventDefault(); navTo(nav.dataset.nav); return; }
+    const tagFilter = event.target.closest('[data-filter-tag]');
+    if (tagFilter) {
+      event.preventDefault(); event.stopPropagation();
+      const panel = $('#searchPanel'); panel?.classList.remove('hidden');
+      $('#searchInput').value = tagFilter.dataset.filterTag;
+      renderDiary(); return;
+    }
     const entryOpen = event.target.closest('[data-open-entry]');
     if (entryOpen) { openDetail(entryOpen.dataset.openEntry); return; }
     const themeButton = event.target.closest('[data-theme-choice]');
@@ -1539,7 +1694,7 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
 
   $('#floatingAdd').addEventListener('click', () => openEditor(null, currentScreen === 'calendar' ? selectedCalendarDate : TODAY));
   $('#settingsShortcut').addEventListener('click', () => navTo('settings'));
-  $('#searchToggle').addEventListener('click', () => { $('#searchPanel').classList.remove('hidden'); $('#searchInput').focus(); });
+  $('#searchToggle').addEventListener('click', () => { $('#searchPanel').classList.remove('hidden'); renderDiary(); $('#searchInput').focus(); });
   $('#closeSearch').addEventListener('click', () => { $('#searchInput').value = ''; $('#searchPanel').classList.add('hidden'); renderDiary(); });
   $('#searchInput').addEventListener('input', renderDiary);
   $('#prevMonth').addEventListener('click', () => { calendarCursor = new Date(calendarCursor.getFullYear(), calendarCursor.getMonth() - 1, 1); renderCalendar(); });
@@ -1573,6 +1728,8 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
   $('#loadModelButton').addEventListener('click', loadSelectedModel);
   $('#unloadModelButton').addEventListener('click', unloadModel);
   $('#exportButton').addEventListener('click', exportBackup);
+  $('#exportPdfButton')?.addEventListener('click', exportPrintPdf);
+  $('#exportHtmlButton')?.addEventListener('click', exportReadableHtml);
   $('#importButton').addEventListener('click', () => $('#importFile').click());
   $('#importFile').addEventListener('change', async event => { if (!importBusy) { importBusy = true; await importBackup(event.target.files?.[0]); importBusy = false; } });
   $('#clearDataButton').addEventListener('click', clearAllData);
@@ -1738,11 +1895,18 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
       if (event.target?.id !== 'editorTitle' && event.target?.id !== 'editorBody') return;
       clearTimeout(blurTimer);
       blurTimer = setTimeout(() => {
+        const active = document.activeElement;
+        const toolbarOwnsFocus = !!active?.closest?.('.rich-toolbar');
         const next = activeEditorField();
         if (next) lastEditorField = next;
-        else if (!document.activeElement?.closest?.('.rich-toolbar')) lastEditorField = null;
+        else if (toolbarOwnsFocus || (formattingMode && currentScreen === 'editor')) {
+          // Android native select/color pickers can temporarily blur contenteditable. Do not
+          // treat that transient focus move as a request to remove the toolbar.
+          lastEditorField = 'body';
+          setToolbarVisible(true);
+        } else lastEditorField = null;
         scheduleSettledRefresh();
-      }, 140);
+      }, 220);
     });
 
     window.addEventListener('scroll', handleUserScroll, { passive: true });
@@ -1754,4 +1918,6 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
   })();
 
   initializeStorage();
+  // Font assets are downloaded and cached on first online use, then loaded from Cache Storage when offline.
+  warmFontCache();
 })();

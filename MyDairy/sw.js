@@ -1,7 +1,7 @@
 /* Best-effort app-shell cache. User data is stored by the page in IndexedDB, not in this cache. */
-const CACHE_NAME = 'quiet-pages-shell-v17-scroll-direction-toolbar';
+const CACHE_NAME = 'quiet-pages-shell-v19-resource-pack-pdf-tags';
 const BASE = self.registration.scope;
-const SHELL = ['./', './index.html', './styles.css', './app.js', './manifest.webmanifest', './icons/icon.svg', './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png'];
+const SHELL = ['./', './index.html', './styles.css', './app.js', './manifest.webmanifest', './icons/icon.svg', './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png', './assets/themes/paper-grain.svg', './assets/themes/rose.svg', './assets/themes/peach.svg', './assets/themes/sand.svg', './assets/themes/ocean.svg', './assets/stickers/flower.svg', './assets/stickers/leaf.svg', './assets/stickers/moon.svg', './assets/stickers/star.svg', './assets/stickers/heart.svg', './assets/stickers/butterfly.svg'];
 
 self.addEventListener('install', event => {
   event.waitUntil((async () => {
