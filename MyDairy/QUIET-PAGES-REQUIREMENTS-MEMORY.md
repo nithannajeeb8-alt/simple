@@ -62,3 +62,29 @@ This file records the product constraints shared in the project conversation. Ke
 - More scrapbook sticker variants; bundled original local SVG theme/sticker resources.
 - Paper-grain background texture and service worker precache entries.
 - Bootstrap Icons and Google Fonts still have CDN first-use dependencies; fully bundled binary resources remain a follow-up because the build environment could not download external binaries.
+
+
+## Notifications (v21)
+- Opt-in daily diary reminder with configurable local time.
+- Test notification and permission status.
+- Generic lock-screen-safe text, no diary details.
+- Service-worker notification click returns to the app.
+- Reminder checks run while app is open; closed-app scheduled delivery is not implemented because that requires push infrastructure.
+
+
+## v22 completion notes
+- Added first-entry privacy explainer. Accurate limitations: local storage is not encryption; runtime/model/fonts/icons can download from external providers; browser storage may be cleared.
+- Added 50 original rotating motivational notification quotes. Notification body is generic and never includes diary text.
+- Added editable scrapbook sticky notes (five pastel variants) in the rich editor, preserved by sanitization and autosave.
+- PWA shell cache version: quiet-pages-shell-v22-privacy-quotes-sticky-notes.
+- Reminder runtime remains foreground/open-app polling only; closed-app scheduled delivery needs server-backed Web Push.
+
+## v23 final polish update (2026-10-13)
+- PWA-only release; no native iOS project bundled.
+- Replaced Bootstrap Icons CDN dependency with `assets/local-icons.js`, a local SVG icon renderer that supports existing `bi-*` icon classes and dynamically inserted icons.
+- Removed Google Fonts stylesheet and runtime font binary downloads. System font stacks and local fallbacks now work offline; exact third-party typefaces are not bundled.
+- Apple HIG-inspired accessibility/layout polish: 44pt minimum coarse-pointer buttons, safe area padding, visible focus, 16px form-control sizing, reduced motion, and high contrast support.
+- Updated service worker cache name to v23 and precaches local icon renderer.
+- Existing features preserved: diary CRUD, rich editor, photos/captions, stickers, editable sticky notes, themes, calendar, memory shelf, local companion, JSON backup/restore, HTML/PDF export, privacy welcome, 50 motivational quotes and foreground-checked notifications.
+- Notification reminder limitations are disclosed: no reliable wake after fully closing PWA without push service/server. Do not claim closed-app reminders.
+- Do not claim physical iPhone/Android testing unless performed.

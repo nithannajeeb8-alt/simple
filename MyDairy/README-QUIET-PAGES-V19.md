@@ -35,3 +35,20 @@ Settings → Print / Save as PDF opens the system print dialog. On Android choos
 
 ## Validation
 Run `node --check app.js`; validate the web manifest as JSON; confirm the ZIP integrity. Physical Android and laptop testing remains necessary for toolbar, font picker, print layout, offline assets and data migration.
+
+
+## Notifications (v21 update)
+- Settings includes an opt-in daily diary reminder, local time selector, notification permission control, and test notification.
+- Reminder notification text never includes diary entry content.
+- This PWA-only implementation checks reminders while the app is open/visible. It does not promise scheduled notifications after the app is fully closed. Reliable closed-app delivery requires a push server/service and subscription flow.
+- On iPhone, install Quiet Pages to the Home Screen and open it there for the best notification support; grant permission when prompted. Browser/OS support and permission settings still apply.
+
+
+## v22 additions (privacy, motivational notifications, scrapbook notes)
+- First-run privacy notice explains local browser storage, local-model processing, third-party runtime/font/icon downloads, backup caveats, and that local storage is not encryption. It appears once per browser profile and can be acknowledged before using the app.
+- Daily notifications now rotate through 50 original motivational quotes. They do not include diary content. Notification permission remains user-controlled.
+- Reminder delivery is checked while the app is open; this build does not claim reliable scheduled delivery while fully closed. Closed-app delivery needs a push service/server.
+- Added an editable sticky-note block to the diary editor, with five pastel colours and persistence through the rich-text sanitizer.
+- Cache version bumped to v22. Existing local storage/database keys are unchanged.
+
+Validation performed: JavaScript syntax, JSON/manifest parsing, HTML structure checks and ZIP integrity. Physical iPhone/Android testing has not been performed.

@@ -72,7 +72,7 @@
         id: id(), role: 'assistant', text: 'Hey, I’m glad you’re here. This is your space to think out loud, talk things through, and return to whatever matters to you. I can use the pages and memories you keep here when they help, and we can just chat when they don’t.', createdAt: new Date().toISOString(), source: 'welcome'
       }],
       settings: {
-        theme: 'sky', activeThemeDate: TODAY, activeTheme: 'sky', textScale: 'normal', reduceMotion: false, modelId: ''
+        theme: 'sky', activeThemeDate: TODAY, activeTheme: 'sky', textScale: 'normal', reduceMotion: false, modelId: '', reminders: { enabled: false, time: '20:30', lastReminderDate: '' }
       }
     };
   }
@@ -179,6 +179,9 @@
       const imageAlt = tag === 'IMG' ? (node.getAttribute('alt') || 'Diary image').slice(0, 160) : '';
       const dividerClass = tag === 'HR' ? 'scrapbook-divider' : '';
       const sticker = tag === 'P' && node.classList.contains('scrapbook-sticker') ? 'scrapbook-sticker' : '';
+      const stickyNote = tag === 'DIV' && node.classList.contains('scrapbook-sticky-note') ? 'scrapbook-sticky-note' : '';
+      const noteColors = ['butter','rose','mint','lavender','sky'];
+      const noteColor = tag === 'DIV' && noteColors.includes(node.getAttribute('data-note-color')) ? node.getAttribute('data-note-color') : 'butter';
       const allowedStickers = ['sparkle','flower','moon','leaf','heart','butterfly','star'];
       const stickerValue = tag === 'P' ? node.getAttribute('data-sticker') : '';
       const stickerData = allowedStickers.includes(stickerValue) ? stickerValue : '';
@@ -186,6 +189,7 @@
       if (tag === 'SPAN' && originalStyle) node.setAttribute('style', originalStyle);
       if (dividerClass) node.setAttribute('class', dividerClass);
       if (sticker) { node.setAttribute('class', sticker); node.setAttribute('contenteditable', 'false'); if (stickerData) node.setAttribute('data-sticker', stickerData); }
+      if (stickyNote) { node.setAttribute('class', stickyNote); node.setAttribute('contenteditable', 'true'); node.setAttribute('data-note-color', noteColor); node.setAttribute('role', 'textbox'); node.setAttribute('aria-label', 'Editable sticky note'); }
       if (tag === 'IMG') {
         if (!/^data:image\/(?:png|jpeg|webp|gif);base64,[a-z\d+/=\r\n]+$/i.test(imageSrc)) { node.remove(); return; }
         node.setAttribute('src', imageSrc);
@@ -256,7 +260,12 @@
       activeThemeDate: typeof settings.activeThemeDate === 'string' ? settings.activeThemeDate : TODAY,
       activeTheme: THEMES.includes(settings.activeTheme) ? settings.activeTheme : 'sky',
       textScale: ['normal', 'large', 'xlarge'].includes(settings.textScale) ? settings.textScale : 'normal',
-      reduceMotion: Boolean(settings.reduceMotion), modelId: typeof settings.modelId === 'string' ? settings.modelId : ''
+      reduceMotion: Boolean(settings.reduceMotion), modelId: typeof settings.modelId === 'string' ? settings.modelId : '',
+      reminders: {
+        enabled: Boolean(settings.reminders && settings.reminders.enabled),
+        time: /^([01]\d|2[0-3]):[0-5]\d$/.test(settings.reminders?.time || '') ? settings.reminders.time : '20:30',
+        lastReminderDate: typeof settings.reminders?.lastReminderDate === 'string' ? settings.reminders.lastReminderDate : ''
+      }
     };
     return base;
   }
@@ -322,48 +331,10 @@
     return saveChain;
   }
 
+  // Font choices use local system stacks and never fetch font binaries from a third party.
   const FONT_NAMES = ['Caveat', 'Lora', 'Patrick Hand', 'DM Sans', 'EB Garamond'];
   const FONT_ASSET_NAMES = [...FONT_NAMES, 'Manrope', 'Playfair Display'];
-  const FONT_CACHE_NAME = 'quiet-pages-font-binaries-v1';
-  const FONT_CSS_URL = 'https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=DM+Sans:wght@400;500;600&family=EB+Garamond:wght@400;500;600&family=Lora:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&family=Patrick+Hand&family=Playfair+Display:wght@500;600;700&display=swap';
-  const fontReady = new Map();
-  async function ensureDiaryFont(family) {
-    if (!FONT_ASSET_NAMES.includes(family)) return true;
-    if (fontReady.has(family)) return fontReady.get(family);
-    const task = (async () => {
-      if (!('caches' in window) || !('FontFace' in window)) return document.fonts.check(`16px \"${family}\"`);
-      const cache = await caches.open(FONT_CACHE_NAME);
-      let css = '';
-      try {
-        const cssResponse = await fetch(FONT_CSS_URL, { mode: 'cors', cache: 'force-cache' });
-        if (cssResponse.ok) { css = await cssResponse.text(); await cache.put(FONT_CSS_URL, new Response(css, { headers: { 'Content-Type': 'text/css' } })); }
-      } catch (_) {}
-      if (!css) { const cachedCss = await cache.match(FONT_CSS_URL); if (cachedCss) css = await cachedCss.text(); }
-      if (!css) return false;
-      // Google Fonts returns multiple unicode subsets. Choose the latin face for each family/weight.
-      const blocks = css.split('/*').map(part => ({ latin: /^\s*(?:latin|latin-ext)\s*\*\//i.test(part), text: part }));
-      let loaded = false;
-      for (const item of blocks) {
-        if (!item.latin) continue;
-        const familyMatch = item.text.match(/font-family:\s*['"]?([^;'"]+)/i);
-        if (!familyMatch || familyMatch[1].trim().toLowerCase() !== family.toLowerCase()) continue;
-        const weight = (item.text.match(/font-weight:\s*([^;]+)/i) || [,'400'])[1].trim();
-        const srcMatch = item.text.match(/src:\s*url\((https:\/\/fonts\.gstatic\.com\/[^)]+\.woff2)\)/i);
-        if (!srcMatch) continue;
-        const url = srcMatch[1]; let response = await cache.match(url);
-        if (!response) {
-          try { const fetched = await fetch(url, { mode: 'cors' }); if (fetched.ok) { await cache.put(url, fetched.clone()); response = fetched; } } catch (_) {}
-        }
-        if (!response) continue;
-        try { const face = new FontFace(family, await response.arrayBuffer(), { weight }); await face.load(); document.fonts.add(face); loaded = true; } catch (_) {}
-      }
-      return loaded || document.fonts.check(`16px "${family}"`);
-    })().catch(() => false);
-    fontReady.set(family, task); return task;
-  }
-  async function warmFontCache() {
-    for (const family of FONT_ASSET_NAMES) { try { await ensureDiaryFont(family); } catch (_) {} }
-  }
+  async function ensureDiaryFont(family) { return true; }
 
   async function initializeStorage() {
     try {
@@ -387,7 +358,19 @@
     applySettings();
     await saveNow();
     renderAll();
+    showPrivacyWelcomeIfNeeded();
   }
+
+  function showPrivacyWelcomeIfNeeded() {
+    const dialog = $('#privacyWelcomeDialog');
+    if (!dialog) return;
+    let acknowledged = false; try { acknowledged = localStorage.getItem('quietPagesPrivacyWelcomeV1') === 'accepted'; } catch (_) {}
+    if (!acknowledged && !dialog.open) { try { dialog.showModal(); } catch (_) { dialog.setAttribute('open', ''); } }
+  }
+  $('#privacyWelcomeContinue')?.addEventListener('click', () => {
+    try { localStorage.setItem('quietPagesPrivacyWelcomeV1', 'accepted'); } catch (_) {}
+    const dialog = $('#privacyWelcomeDialog'); if (dialog?.open) dialog.close(); else dialog?.removeAttribute('open');
+  });
 
   function refreshCompanionWelcome() {
     const welcome = state.messages.find(message => message.source === 'welcome');
@@ -435,6 +418,9 @@
     $$('[data-theme-choice]').forEach(button => button.classList.toggle('active', button.dataset.themeChoice === state.settings.theme));
     $('#textScale').value = state.settings.textScale;
     $('#reduceMotion').checked = state.settings.reduceMotion;
+    if ($('#remindersEnabled')) $('#remindersEnabled').checked = Boolean(state.settings.reminders?.enabled);
+    if ($('#reminderTime')) $('#reminderTime').value = state.settings.reminders?.time || '20:30';
+    updateNotificationStatus();
   }
   function setTheme(theme) {
     if (![...THEMES, 'dynamic'].includes(theme)) return;
@@ -759,7 +745,7 @@
         <select id="editorFont" aria-label="Font family" title="Font family"><option value="Georgia">System serif</option><option value="Caveat">Caveat</option><option value="Lora">Lora</option><option value="Patrick Hand">Patrick Hand</option><option value="DM Sans">DM Sans</option><option value="EB Garamond">EB Garamond</option><option value="Arial">System sans</option><option value="monospace">Mono</option></select><select id="editorFontSize" aria-label="Text size" title="Text size"><option value="3">Normal</option><option value="2">Small</option><option value="4">Large</option><option value="5">Larger</option></select>
         <label class="highlight-picker" title="Highlight text" aria-label="Highlight text"><i class="bi bi-highlighter" aria-hidden="true"></i><input id="highlightColor" type="color" value="#fff09a" aria-label="Highlight colour"></label>
         <label class="text-color-picker" title="Text colour" aria-label="Text colour"><i class="bi bi-palette" aria-hidden="true"></i><input id="textColor" type="color" value="#2c3b35" aria-label="Text colour"></label>
-        <button type="button" data-insert-block="divider" title="Insert divider" aria-label="Insert divider"><i class="bi bi-three-dots" aria-hidden="true"></i></button><button type="button" data-insert-block="sticker" title="Insert decorative sticker" aria-label="Insert sticker"><i class="bi bi-stars" aria-hidden="true"></i></button><button type="button" id="inlineImageButton" title="Insert image between paragraphs" aria-label="Insert image"><i class="bi bi-image" aria-hidden="true"></i></button><input id="inlineImageInput" class="hidden" type="file" accept="image/*">
+        <button type="button" data-insert-block="divider" title="Insert divider" aria-label="Insert divider"><i class="bi bi-three-dots" aria-hidden="true"></i></button><button type="button" data-insert-block="sticker" title="Insert decorative sticker" aria-label="Insert sticker"><i class="bi bi-stars" aria-hidden="true"></i></button><button type="button" data-insert-block="sticky-note" title="Insert editable sticky note" aria-label="Insert sticky note"><i class="bi bi-sticky" aria-hidden="true"></i></button><button type="button" id="inlineImageButton" title="Insert image between paragraphs" aria-label="Insert image"><i class="bi bi-image" aria-hidden="true"></i></button><input id="inlineImageInput" class="hidden" type="file" accept="image/*">
         <button type="button" data-format="removeFormat" title="Clear formatting" aria-label="Clear formatting"><i class="bi bi-eraser" aria-hidden="true"></i></button>
       </div>
       <div id="editorBody" class="entry-writing-input rich-editor" contenteditable="true" role="textbox" aria-multiline="true" data-placeholder="Start anywhere. A moment, a thought, something you don't want to forget…">${sanitizeRichHtml(data.body)}</div>
@@ -916,8 +902,10 @@
       const kind = button.dataset.insertBlock;
       const stickerSet = [{id:'sparkle',text:'✦ ✧ ✦'},{id:'flower',text:'✿ ❀ ✿'},{id:'moon',text:'☾ ✧ ☽'},{id:'leaf',text:'❧ ❦ ❧'},{id:'heart',text:'♡ ♥ ♡'},{id:'butterfly',text:'🦋 ✧ 🦋'},{id:'star',text:'☆ ★ ☆'}];
       window.qpStickerIndex = (window.qpStickerIndex || 0) % stickerSet.length;
+      window.qpNoteIndex = (window.qpNoteIndex || 0) % 5;
       const sticker = stickerSet[window.qpStickerIndex++];
-      const markup = kind === 'divider' ? '<hr class="scrapbook-divider"><p><br></p>' : `<p class="scrapbook-sticker" contenteditable="false" data-sticker="${sticker.id}">${sticker.text}</p><p><br></p>`;
+      const noteColor = ['butter','rose','mint','lavender','sky'][window.qpNoteIndex++];
+      const markup = kind === 'divider' ? '<hr class="scrapbook-divider"><p><br></p>' : kind === 'sticky-note' ? `<div class="scrapbook-sticky-note" contenteditable="true" role="textbox" aria-label="Editable sticky note" data-note-color="${noteColor}">Write your note here…</div><p><br></p>` : `<p class="scrapbook-sticker" contenteditable="false" data-sticker="${sticker.id}">${sticker.text}</p><p><br></p>`;
       document.execCommand('insertHTML', false, markup);
       track(); rememberSelection();
     }));
@@ -1721,6 +1709,139 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
       state.memories = state.memories.filter(item => item.id !== memory.id); await saveNow(); renderCompanion(); toast('Memory deleted.');
     }
   });
+  const MOTIVATIONAL_QUOTES = [
+    'Remember who you are, even on the days you forget.',
+    'This time shall pass, too.',
+    'You have survived days you once thought you could not.',
+    'You do not have to solve your whole life today.',
+    'Rest is part of the journey, not a failure of it.',
+    'Your worth is not measured by your productivity.',
+    'A difficult chapter is not the whole story.',
+    'You are allowed to begin again, as many times as needed.',
+    'Small steps still move you forward.',
+    'Speak to yourself like someone you love.',
+    'You can be a work in progress and still be worthy.',
+    'Not every thought deserves to become a belief.',
+    'You have permission to outgrow old versions of yourself.',
+    "You do not need to bloom on anyone else's schedule.",
+    'One quiet breath is a place to start.',
+    'You are more than the worst thing you have felt.',
+    'Let today be a day, not a verdict on your life.',
+    'Progress can be invisible and still be real.',
+    'You can pause without giving up.',
+    'Your future is not limited to how today feels.',
+    'You deserve the kindness you keep giving away.',
+    'It is okay to take the long way back to yourself.',
+    'You do not need every answer to take one good step.',
+    'Some days, getting through is enough.',
+    'You are still becoming. Give yourself room.',
+    'Let the moment be temporary, not your identity.',
+    'You can change direction without calling the past a waste.',
+    'There is courage in asking for help.',
+    'You are not behind in a life only you are living.',
+    'Be patient with the person you are learning to be.',
+    'A softer day is still a meaningful day.',
+    'You can release what no longer fits your life.',
+    'You are allowed to protect your peace.',
+    'The way forward can begin with one small choice.',
+    'You do not have to earn the right to rest.',
+    'Your feelings are real, but they are not the entire horizon.',
+    'Give yourself the same chance you give other people.',
+    'You can be grateful and still want things to change.',
+    'Even slow healing is movement.',
+    'There is no shame in starting from where you are.',
+    'Your story has room for better days.',
+    'You are not required to be strong every minute.',
+    'Let one mistake be an event, not a definition.',
+    'You can miss what was and still welcome what comes next.',
+    'Keep a little hope for the version of you that comes after this.',
+    'You matter outside of what you achieve.',
+    'You are allowed to make your life feel like yours.',
+    'Take the next step, not every step at once.',
+    'A hard day does not erase all the good you carry.',
+    'Be here for yourself, especially when it is difficult.',
+    'You can move gently and still move forward.'
+  ];
+  function pickMotivationalQuote() {
+    let previous = -1; try { previous = Number(localStorage.getItem("qpMotivationalQuoteIndex") || -1); } catch (_) {}
+    let index = Math.floor(Math.random() * MOTIVATIONAL_QUOTES.length);
+    if (MOTIVATIONAL_QUOTES.length > 1 && index === previous) index = (index + 1 + Math.floor(Math.random() * (MOTIVATIONAL_QUOTES.length - 1))) % MOTIVATIONAL_QUOTES.length;
+    try { localStorage.setItem("qpMotivationalQuoteIndex", String(index)); } catch (_) {}
+    return MOTIVATIONAL_QUOTES[index];
+  }
+
+  function updateNotificationStatus(message = '') {
+    const el = $('#notificationStatus');
+    if (!el) return;
+    if (message) { el.textContent = message; return; }
+    if (!('Notification' in window)) { el.textContent = 'This browser does not support notifications.'; return; }
+    const permission = Notification.permission;
+    if (permission === 'denied') { el.textContent = 'Notifications are blocked in browser or device settings. Change permission there to enable them.'; return; }
+    if (state.settings.reminders?.enabled && permission === 'granted') { el.textContent = `Daily motivational quote is set for ${state.settings.reminders.time}. It is checked while Quiet Pages is open. ${MOTIVATIONAL_QUOTES.length} original quotes rotate; private diary text is never included.`; return; }
+    if (state.settings.reminders?.enabled) { el.textContent = 'Reminder is selected, but notification permission is not granted yet. Tap Enable notifications.'; return; }
+    el.textContent = permission === 'granted' ? 'Notifications are allowed. Turn on the daily reminder when you want it.' : 'Notifications are off. Choose a time and enable them when ready.';
+  }
+
+  async function showQuietNotification(title, body, tag = 'quiet-pages') {
+    if (!('Notification' in window)) { updateNotificationStatus('This browser does not support notifications.'); return false; }
+    if (Notification.permission !== 'granted') { updateNotificationStatus('Allow notifications first, using the Enable notifications button.'); return false; }
+    try {
+      if ('serviceWorker' in navigator) {
+        const registration = await navigator.serviceWorker.ready;
+        await registration.showNotification(title, { body, icon: new URL('./icons/icon-192.png', document.baseURI).href, badge: new URL('./icons/icon.svg', document.baseURI).href, tag, renotify: false, data: { url: new URL('./', document.baseURI).href } });
+      } else { new Notification(title, { body, tag }); }
+      return true;
+    } catch (error) { updateNotificationStatus('Could not show a notification in this browser. Check site permissions.'); return false; }
+  }
+
+  async function enableNotifications() {
+    if (!('Notification' in window)) { updateNotificationStatus('This browser does not support notifications.'); return; }
+    if (!window.isSecureContext) { updateNotificationStatus('Notifications require HTTPS. Open the secure Quiet Pages website.'); return; }
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission !== 'granted') { updateNotificationStatus(permission === 'denied' ? 'Permission was denied. Enable it in browser or device settings.' : 'Permission was not granted.'); return; }
+      state.settings.reminders.enabled = Boolean($('#remindersEnabled').checked);
+      state.settings.reminders.time = $('#reminderTime').value || '20:30';
+      await saveNow();
+      updateNotificationStatus('Notifications are enabled. Send a test to confirm they appear on this device.');
+      await showQuietNotification('A note for you', pickMotivationalQuote(), 'quiet-pages-test');
+    } catch (_) { updateNotificationStatus('Could not request notification permission. Try opening Quiet Pages from its secure website or Home Screen.'); }
+  }
+
+  async function checkDiaryReminder() {
+    const reminder = state.settings.reminders;
+    if (!reminder?.enabled || !('Notification' in window) || Notification.permission !== 'granted' || document.visibilityState !== 'visible') return;
+    const now = new Date();
+    const today = dateKey(now);
+    const time = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    if (time < reminder.time || reminder.lastReminderDate === today) return;
+    reminder.lastReminderDate = today;
+    await saveNow();
+    await showQuietNotification('A note for you', pickMotivationalQuote(), `quiet-pages-diary-${today}`);
+    updateNotificationStatus(`Today's reminder was sent. Next reminder: ${reminder.time}.`);
+  }
+
+  $('#enableNotificationsButton')?.addEventListener('click', enableNotifications);
+  $('#testNotificationButton')?.addEventListener('click', async () => {
+    if (!('Notification' in window)) { updateNotificationStatus('This browser does not support notifications.'); return; }
+    if (Notification.permission !== 'granted') { await enableNotifications(); return; }
+    const shown = await showQuietNotification('A note for you', pickMotivationalQuote(), 'quiet-pages-test');
+    if (shown) updateNotificationStatus('Test notification sent.');
+  });
+  $('#remindersEnabled')?.addEventListener('change', async () => {
+    state.settings.reminders.enabled = $('#remindersEnabled').checked;
+    if (state.settings.reminders.enabled && (!('Notification' in window) || Notification.permission !== 'granted')) {
+      updateNotificationStatus('Tap Enable notifications to grant permission.');
+    } else { updateNotificationStatus(); }
+    await saveNow();
+  });
+  $('#reminderTime')?.addEventListener('change', async () => {
+    state.settings.reminders.time = $('#reminderTime').value || '20:30';
+    await saveNow(); updateNotificationStatus();
+  });
+  window.setInterval(() => { checkDiaryReminder().catch(() => {}); }, 20000);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') checkDiaryReminder().catch(() => {}); });
+
   $('#textScale').addEventListener('change', () => { state.settings.textScale = $('#textScale').value; applySettings(); scheduleSave(); });
   $('#reduceMotion').addEventListener('change', () => { state.settings.reduceMotion = $('#reduceMotion').checked; applySettings(); scheduleSave(); });
   $('#checkModelsButton').addEventListener('click', discoverModels);
@@ -1830,9 +1951,13 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
       if (!focusedField && !activeInToolbar) lastEditorField = null;
 
       const keyboardDifference = Math.max(baselineHeight - visibleHeight, layoutHeight - visibleHeight);
-      const keyboardOpen = !!lastEditorField && keyboardDifference > 120;
-      const bodyFocused = keyboardOpen && lastEditorField === 'body';
-      const titleFocused = keyboardOpen && lastEditorField === 'title';
+      // Native iOS/Android select menus can temporarily resize the visual viewport or
+      // dismiss the software keyboard. Keep the editor accessory mounted while a toolbar
+      // control owns focus; otherwise the layout refresh hides the select while its menu is open.
+      const toolbarControlActive = activeInToolbar && currentScreen === 'editor' && formattingMode;
+      const keyboardOpen = (!!lastEditorField && keyboardDifference > 120) || toolbarControlActive;
+      const bodyFocused = (keyboardOpen && lastEditorField === 'body') || toolbarControlActive;
+      const titleFocused = keyboardOpen && lastEditorField === 'title' && !toolbarControlActive;
       const wasBodyFocused = bodyClass.contains('qp-body-focused');
       bodyClass.toggle('qp-keyboard-open', keyboardOpen);
       bodyClass.toggle('qp-body-focused', bodyFocused);
@@ -1846,7 +1971,7 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
         setToolbarVisible(true);
         lastScrollY = window.scrollY || 0;
       }
-      if (!bodyFocused) resetToolbarState();
+      if (!bodyFocused && !toolbarControlActive) resetToolbarState();
 
       // Retained only for existing editor layout compatibility. It does not position the toolbar.
       if (keyboardOpen) {
@@ -1919,5 +2044,4 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
 
   initializeStorage();
   // Font assets are downloaded and cached on first online use, then loaded from Cache Storage when offline.
-  warmFontCache();
 })();

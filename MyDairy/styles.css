@@ -2,7 +2,7 @@
   --page: #f8f8f4; --surface: #fffefa; --surface-2: #f0f1ec; --ink: #1f2d37; --muted: #72808a;
   --line: rgba(39,57,68,.10); --accent: #4c7594; --accent-strong: #2e5877; --accent-soft: #e6f0f8; --tint: #e7f0f7;
   --card-front: #d9eaf5; --card-front-ink: #254a66; --shadow: 0 18px 50px rgba(49,74,91,.09); --font-scale: 1; --radius-lg: 28px; --radius-md: 18px;
-  --serif: "Playfair Display", Georgia, serif; --sans: "DM Sans", system-ui, -apple-system, sans-serif;
+  --serif: ui-serif, Georgia, "Times New Roman", serif; --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
 }
 html[data-theme="coral"] { --page:#fbf5ef; --surface:#fffaf4; --surface-2:#f5e9e0; --ink:#3d2928; --muted:#8b716d; --accent:#b96658; --accent-strong:#8e443b; --accent-soft:#fbe8e1; --tint:#f9e4dc; --card-front:#f3c9bd; --card-front-ink:#6e3832; --shadow:0 18px 50px rgba(122,73,60,.10); }
 html[data-theme="mint"] { --page:#f3f8f2; --surface:#fcfff9; --surface-2:#e8f1e7; --ink:#24382f; --muted:#6e8378; --accent:#4f8c70; --accent-strong:#2d654d; --accent-soft:#e4f3e9; --tint:#e0f0e3; --card-front:#cbe6d5; --card-front-ink:#2d5943; --shadow:0 18px 50px rgba(47,99,73,.09); }
@@ -421,7 +421,7 @@ html[data-theme="ocean"] { --page:#f1f7f9; --surface:#fcffff; --surface-2:#e3eef
 
 #qpEditorAccessory .rich-toolbar { position:relative; top:auto; } body.qp-toolbar-formatting #qpEditorAccessory .rich-toolbar { display:flex; }
 
-.rich-editor [style*="Caveat"]{font-family:"Caveat",cursive!important}.rich-editor [style*="Lora"]{font-family:"Lora",Georgia,serif!important}.rich-editor [style*="Patrick Hand"]{font-family:"Patrick Hand",cursive!important}.rich-editor [style*="DM Sans"]{font-family:"DM Sans",system-ui,sans-serif!important}.rich-editor [style*="EB Garamond"]{font-family:"EB Garamond",Georgia,serif!important}
+.rich-editor [style*="Caveat"],.rich-editor [style*="Patrick Hand"]{font-family:ui-rounded,"Comic Sans MS",cursive!important}.rich-editor [style*="Lora"],.rich-editor [style*="EB Garamond"],.rich-editor [style*="Playfair Display"]{font-family:ui-serif,Georgia,serif!important}.rich-editor [style*="DM Sans"],.rich-editor [style*="Manrope"]{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif!important}
 
 .entry-tags,.detail-tags{display:flex;gap:5px;flex-wrap:wrap;margin:8px 0}.entry-tags span,.detail-tags span{font-size:9px;line-height:1.4;padding:4px 7px;border-radius:999px;background:var(--accent-soft);color:var(--accent-strong)}.detail-photo-figure{min-width:0;margin:0}.detail-photo-figure figcaption{font-size:11px;color:var(--muted);padding:5px 2px 0;line-height:1.45}.detail-photo-figure .detail-photo{width:100%}
 
@@ -482,3 +482,34 @@ body { background-image: url('./assets/themes/paper-grain.svg'); background-repe
   #printRoot .print-tags { font:9pt Arial,sans-serif; color:#567463; margin-bottom:14pt; }
   #printRoot .scrapbook-sticker { background:#f5f2ea !important; color:#354d40 !important; print-color-adjust:exact; -webkit-print-color-adjust:exact; }
 }
+
+/* Quiet Pages v22: editable scrapbook sticky notes and first-run privacy welcome. */
+.rich-editor .scrapbook-sticky-note { display:block; box-sizing:border-box; width:min(100%, 430px); min-height:112px; margin:22px auto; padding:18px 20px 20px; border:0; border-radius:3px 3px 14px 3px; color:#423d31; font:500 17px/1.65 "Caveat", "Patrick Hand", cursive; white-space:pre-wrap; overflow-wrap:anywhere; outline:0; box-shadow:0 7px 16px rgba(45,45,35,.12); transform:rotate(-.5deg); position:relative; }
+.rich-editor .scrapbook-sticky-note:focus { box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 35%,transparent),0 7px 16px rgba(45,45,35,.12); }
+.rich-editor .scrapbook-sticky-note[data-note-color="butter"] { background:#fff2a8; }
+.rich-editor .scrapbook-sticky-note[data-note-color="rose"] { background:#ffdce5; transform:rotate(.45deg); }
+.rich-editor .scrapbook-sticky-note[data-note-color="mint"] { background:#d9f3df; }
+.rich-editor .scrapbook-sticky-note[data-note-color="lavender"] { background:#e9e0ff; transform:rotate(.4deg); }
+.rich-editor .scrapbook-sticky-note[data-note-color="sky"] { background:#dceeff; }
+.privacy-welcome { max-height:min(88dvh, 760px); overflow-y:auto; }
+.privacy-welcome .privacy-welcome-points { margin:0 0 20px; }
+.privacy-welcome .privacy-welcome-points p { display:flex; align-items:flex-start; gap:9px; margin:10px 0; font-size:12px; line-height:1.6; }
+.privacy-welcome .privacy-welcome-points i { color:var(--accent-strong); flex:0 0 auto; margin-top:2px; }
+.privacy-welcome .dialog-actions .primary-button { min-height:44px; }
+@media print { .rich-editor .scrapbook-sticky-note { print-color-adjust:exact; -webkit-print-color-adjust:exact; } }
+
+
+/* Final polish: offline iconography and Apple-platform touch/accessibility guidance. */
+.qp-icon-svg { display:inline-block; width:1.15em; height:1.15em; flex:0 0 auto; vertical-align:-.16em; overflow:visible; }
+button .qp-icon-svg, a .qp-icon-svg { pointer-events:none; }
+@media (pointer:coarse) {
+  .icon-button,.avatar-button { width:44px; height:44px; }
+  .nav-item { min-height:48px; }
+  .primary-button,.secondary-button { min-height:44px; }
+  .rich-toolbar button,.rich-toolbar select,.highlight-picker,.text-color-picker { min-height:44px; }
+  .rich-toolbar button { min-width:44px; }
+}
+input,textarea,select { font-size:max(16px, 1em); }
+:focus-visible { scroll-margin-block: 100px; }
+@media (prefers-contrast: more) { :root { --line:rgba(20,30,36,.28); --muted:#4c5961; } }
+@media (max-width:560px) { .app-shell { padding-left:max(17px,env(safe-area-inset-left)); padding-right:max(17px,env(safe-area-inset-right)); } .bottom-nav { padding-bottom:max(8px,env(safe-area-inset-bottom)); } }
