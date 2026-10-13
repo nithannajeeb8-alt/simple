@@ -1565,9 +1565,11 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
     } catch (error) { toast(error.message || 'Could not export HTML.', 'error'); }
   }
 
-  async function exportPrintPdf() {
+  function exportPrintPdf() {
     try {
-      await saveNow();
+      // Start persistence, but do not await it: iOS Safari may discard the
+      // user-activation needed by window.print() after an async boundary.
+      saveNow().catch(() => {});
       const root = $('#printRoot');
       const pages = sortedEntries().map(entry => {
         const tags = (entry.tags || []).map(tag => `#${escapeHTML(tag)}`).join(' · ');
@@ -1579,8 +1581,10 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
       root.setAttribute('aria-hidden','false');
       const cleanup = () => { root.innerHTML = ''; root.setAttribute('aria-hidden','true'); window.removeEventListener('afterprint', cleanup); };
       window.addEventListener('afterprint', cleanup, { once:true });
-      toast('Choose Save as PDF in your device print dialog.');
-      setTimeout(() => window.print(), 120);
+      // Invoke print synchronously in the original button gesture.
+      // Some iOS standalone PWA contexts still do not expose a print UI;
+      // in that case use Export readable HTML and Share > Print from Safari.
+      window.print();
       setTimeout(cleanup, 120000);
     } catch (error) { toast(error.message || 'Could not prepare the PDF print view.', 'error'); }
   }
