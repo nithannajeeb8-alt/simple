@@ -10,12 +10,12 @@ A responsive, local-first life companion prototype built with plain HTML, CSS an
 - Discover sections for books, food, exercise, openly licensed imagery, prayer times, Quran text, hobbies and open resources. Public endpoints are used where appropriate; USDA FoodData Central and Quran Foundation credentials are not embedded in the client.
 - Daily routine alerts for breakfast, lunch, dinner, skill practice, and family/friend time; optional motivation and water reminders; medication notes, theme selection, text-size settings, Reduce Motion, local export/restore/delete.
 - First-run introduction asking for preferred name, optional date of birth and optional religion/spiritual preference, with an explicit privacy explanation.
-- Seven themes: Sky, Coral, Mint, Lavender, Dynamic, Midnight and Plum.
+- Nine palettes: Sky, Coral, Mint, Lavender, Dynamic, Midnight, Plum, Mulberry and Sage Forest. Every palette supports System, Light and Dark appearance modes.
 - PWA manifest, service worker and a simple sunrise app icon in SVG, PNG and Apple Touch Icon formats, with a separate maskable PWA asset.
 
 ## Design notes
 
-The layout system uses a consistent spacing scale, semantic theme tokens, responsive content widths, iPhone safe-area padding, and shared form/card rules. Midnight and Plum share the same component system as the light themes; they do not invert only the page background. See `DESIGN-SYSTEM.md` for the rules and Apple HIG references.
+The layout system uses a consistent spacing scale, semantic theme tokens, responsive content widths, iPhone safe-area padding, and shared form/card rules. All nine palettes share the same component system and have coordinated light and dark surfaces, text, controls, focus rings, borders and accents. See `DESIGN-SYSTEM.md` for the rules and Apple HIG references.
 
 ## Privacy
 
@@ -75,3 +75,8 @@ The Discover faith-and-prayer tab, prayer tracker, prayer-specific mood reason, 
 
 ### Muslim prayer check-ins and perfect days
 When the profile faith preference is set to Islam, the Today screen displays a five-prayer check-in (Fajr, Dhuhr, Asr, Maghrib, Isha) directly beneath Today's essentials. A perfect day requires all essential habits and all five prayer check-ins to be completed. Prayer check-ins are stored locally; for other faith preferences the Today prayer card is hidden and perfect-day scoring uses essentials only. Perfect-week counts follow the same rule for the currently selected faith preference.
+
+
+## Appearance themes
+
+Choose one of nine palettes independently from System, Light, or Dark appearance. System follows the device setting and updates when the device appearance changes; Light and Dark are explicit overrides. The palette colour remains visible in backgrounds, active controls, buttons, progress indicators, borders, and icons in both modes.

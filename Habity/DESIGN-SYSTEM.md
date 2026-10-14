@@ -32,7 +32,7 @@ All components use these variables instead of individual hand-coded theme colour
 - `--accent`, `--accent-strong`, `--accent-soft`, `--accent-on`: action and selection colours
 - `--focus`: keyboard focus indicator
 
-Themes: Sky, Coral, Mint, Lavender, Dynamic, Midnight and Plum. Every component, including Discover cards, native form controls, selection states, the bottom bar, prayer cards, dialogs and onboarding, inherits the same semantic surface variables. Feature categories may affect small icon accents, but not change the card body to a pale background with low-contrast lettering.
+Themes: Sky, Coral, Mint, Lavender, Dynamic, Midnight, Plum, Mulberry and Sage Forest. Every component, including Discover cards, native form controls, selection states, the bottom bar, prayer cards, dialogs and onboarding, inherits the same semantic surface variables. Feature categories may affect small icon accents, but not change the card body to a pale background with low-contrast lettering.
 
 ## App icon
 
@@ -48,9 +48,9 @@ The PWA icon is a small original SVG illustration: a single sunrise arc and thre
 
 ## Release/cache behavior
 
-CSS and JavaScript are versioned in `index.html`; service-worker cache v6 removes the old cached shell on activation. Navigation is network-first with an offline fallback, while versioned app assets are cached for offline use.
+CSS and JavaScript are versioned in `index.html`; the theme-system release increments the service-worker cache to v12 to replace the old cached shell on activation. Navigation is network-first with an offline fallback, while versioned app assets are cached for offline use.
 
 
 ## Appearance themes
 
-The theme selector includes Sky, Coral, Mint, Lavender, Dynamic, Midnight, Plum, Mulberry, and Sage Forest. Mulberry is a rich dark berry palette; Sage Forest is a light botanical green palette. Dynamic rotates through the light and botanical palettes over time.
+The theme selector includes Sky, Coral, Mint, Lavender, Dynamic, Midnight, Plum, Mulberry, and Sage Forest. Palette and appearance mode are independent. System follows the device preference; Light and Dark override it. Every palette has tuned light and dark surface, text, border, control, and accent tokens. Mulberry keeps a rich berry identity in both modes, and Sage Forest remains botanical in both modes. Dynamic rotates across all palettes while respecting the chosen appearance mode.
