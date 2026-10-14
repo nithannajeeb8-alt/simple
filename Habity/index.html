@@ -14,7 +14,30 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body>\n<div class="welcome-overlay" id="welcomeOverlay" hidden>
+  <section class="welcome-panel" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
+    <div class="welcome-mark"><i class="bi bi-flower1"></i></div>
+    <p class="eyebrow">A LITTLE SPACE, JUST FOR YOU</p>
+    <h1 id="welcomeTitle">Welcome to <em>little days.</em></h1>
+    <p class="welcome-copy">A gentle place to make room for what matters. Personalize only what you feel comfortable sharing.</p>
+    <form id="welcomeForm">
+      <label for="welcomeName">What should we call you?</label>
+      <input id="welcomeName" name="name" autocomplete="nickname" placeholder="Your preferred name" maxlength="60">
+      <label for="welcomeDob">Date of birth <span>Optional</span></label>
+      <input id="welcomeDob" name="dob" type="date">
+      <small>Used only to personalize your life-in-weeks view. Leave blank if you prefer.</small>
+      <label for="welcomeFaith">Faith or spiritual preference <span>Optional</span></label>
+      <select id="welcomeFaith" name="faith">
+        <option value="none">Prefer not to say</option><option value="Islam">Islam</option><option value="Christianity">Christianity</option><option value="Hinduism">Hinduism</option><option value="Buddhism">Buddhism</option><option value="Other">Another tradition</option><option value="spiritual">Spiritual, not religious</option>
+      </select>
+      <div class="privacy-explainer"><i class="bi bi-shield-lock"></i><div><strong>Your privacy, in plain language</strong><p>Your profile, habits, moods and memories are saved in this browser on this device. They are not sent to a Little Days account because there is no account system. If you use online features, your search or location may be sent to the relevant service. Browser storage is not encrypted, and anyone with access to this device/browser may be able to see it. Exported backups are ordinary files, so keep them private. You can change your details or delete local data in Settings.</p></div></div>
+      <label class="welcome-consent"><input id="welcomePrivacy" type="checkbox" required> <span>I understand how local storage and optional online features work.</span></label>
+      <button class="primary-button welcome-submit" type="submit">Make this space mine</button>
+      <button class="welcome-skip" id="welcomeSkip" type="button">Continue without a profile</button>
+    </form>
+  </section>
+</div>
+
 <div class="app-shell">
   <aside class="rail">
     <a class="brand" href="#" aria-label="Little Days home"><span class="brand-mark"><i class="bi bi-flower1"></i></span><span>little days</span></a>

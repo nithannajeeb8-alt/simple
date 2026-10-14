@@ -97,3 +97,66 @@ html[data-theme="midnight"] .theme-choice.active,html[data-theme="plum"] .theme-
 @media(max-width:800px){.main{padding:0 16px calc(88px + env(safe-area-inset-bottom))}.topbar{padding-top:calc(6px + env(safe-area-inset-top));margin-bottom:18px}.page-heading{margin-bottom:18px}.content-grid{gap:18px}.section-block{margin-bottom:22px}.settings-group{padding:16px}.bottom-nav{padding:7px 9px calc(7px + env(safe-area-inset-bottom))}.bottom-nav .nav-item{min-height:56px}}
 @media(max-width:420px){.main{padding-inline:14px;padding-bottom:calc(84px + env(safe-area-inset-bottom))}.page-heading h1{font-size:clamp(29px,8vw,33px);letter-spacing:-.8px}.week-card{padding:15px 12px 12px}.settings-group{padding:14px}.settings-heading{margin-bottom:10px}.setting-row select,.setting-row input[type=time]{width:min(42vw,150px)}.form-grid{gap:10px}.memory-prompt{grid-template-columns:1fr}.memory-art{min-height:76px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+
+
+/* Little Days visual repair: one semantic surface system for every section and theme. */
+:root{--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-8:32px;--control-height:48px;--radius-control:16px;--page-gutter:clamp(16px,3vw,32px)}
+.main{padding-inline:var(--page-gutter);padding-bottom:calc(104px + env(safe-area-inset-bottom))}
+.section-block{margin-bottom:26px}
+.section-heading{margin-bottom:14px}
+.glass-card,.week-card,.settings-group,.side-card,.progress-card,.habit-row,.mood-card,.api-tool,.resource-row,.memory-write,.prayer-tracker{min-width:0;max-width:100%;overflow-wrap:anywhere}
+input,select,textarea{max-width:100%;min-width:0}
+.settings-group input[type=time],.settings-group input[type=date],.settings-group select,.setting-row input,.setting-row select{width:100%;min-width:0;max-width:100%}
+.setting-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,220px);align-items:center;gap:14px}
+.setting-row>*{min-width:0}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+.faith-banner,.api-tool,.prayer-tracker{color:var(--ink)!important;background:var(--paper-2)!important;border:1px solid var(--line)!important;box-shadow:var(--shadow)!important}
+.faith-banner h1,.faith-banner h2,.faith-banner h3,.faith-banner p,.faith-banner .eyebrow,.faith-banner a,.api-tool h2,.api-tool h3,.api-tool p,.api-tool label,.prayer-tracker h2,.prayer-tracker h3,.prayer-tracker p{color:inherit}
+.faith-banner h2,.api-tool h2{color:var(--ink)!important}
+.faith-banner .eyebrow,.api-tool .eyebrow{color:var(--muted)!important}
+.faith-banner .primary-button,.api-tool .primary-button{background:var(--accent)!important;color:var(--button-ink,var(--paper))!important}
+.prayer-checks button,.prayer-checks .prayer-check{min-width:0;max-width:100%;background:var(--paper)!important;color:var(--ink)!important;border:1px solid var(--line)!important}
+.prayer-checks button[aria-pressed=true],.prayer-checks button.active{background:var(--accent-soft)!important;color:var(--accent-ink)!important;border-color:var(--accent)!important}
+.theme-choice{min-width:0;overflow:hidden}
+.theme-choice .theme-swatch{display:block;width:100%;height:48px;border-radius:12px}
+.theme-choice[data-theme="midnight"] .theme-swatch{background:#171923!important;border:1px solid #53566b}
+.theme-choice[data-theme="plum"] .theme-swatch{background:#241a2a!important;border:1px solid #654b6d}
+.theme-choice[data-theme="midnight"],.theme-choice[data-theme="plum"]{display:flex!important;flex-direction:column;align-items:stretch;min-height:110px}
+.theme-choice[data-theme="midnight"]::before,.theme-choice[data-theme="plum"]::before{content:"";display:block;height:38px;border-radius:10px;margin-bottom:8px}
+.theme-choice[data-theme="midnight"]::before{background:#171923;border:1px solid #53566b}
+.theme-choice[data-theme="plum"]::before{background:#241a2a;border:1px solid #654b6d}
+html[data-theme="midnight"]{--paper:#151620;--paper-2:#202230;--ink:#f3f1f8;--muted:#b8b8c8;--line:rgba(229,225,246,.16);--accent:#b9a2f4;--accent-ink:#eee6ff;--accent-soft:#38334e;--glass:#222432;--shadow:0 8px 28px rgba(0,0,0,.12);--button-ink:#211a30;color-scheme:dark}
+html[data-theme="plum"]{--paper:#19151f;--paper-2:#28202f;--ink:#f7eef9;--muted:#c5b7ce;--line:rgba(241,222,248,.17);--accent:#d7a5e0;--accent-ink:#f9e8fc;--accent-soft:#44334d;--glass:#2a2232;--shadow:0 8px 28px rgba(0,0,0,.14);--button-ink:#281b2e;color-scheme:dark}
+html[data-theme="midnight"] body,html[data-theme="plum"] body{background:var(--paper)!important;color:var(--ink)!important}
+html[data-theme="midnight"] .rail,html[data-theme="plum"] .rail,html[data-theme="midnight"] .bottom-nav,html[data-theme="plum"] .bottom-nav,html[data-theme="midnight"] .topbar,html[data-theme="plum"] .topbar{background:var(--paper-2)!important;color:var(--ink)!important;border-color:var(--line)!important}
+html[data-theme="midnight"] .glass-card,html[data-theme="plum"] .glass-card,html[data-theme="midnight"] .week-card,html[data-theme="plum"] .week-card,html[data-theme="midnight"] .settings-group,html[data-theme="plum"] .settings-group,html[data-theme="midnight"] .side-card,html[data-theme="plum"] .side-card,html[data-theme="midnight"] .progress-card,html[data-theme="plum"] .progress-card,html[data-theme="midnight"] .habit-row,html[data-theme="plum"] .habit-row,html[data-theme="midnight"] .mood-card,html[data-theme="plum"] .mood-card,html[data-theme="midnight"] .api-tool,html[data-theme="plum"] .api-tool,html[data-theme="midnight"] .resource-row,html[data-theme="plum"] .resource-row,html[data-theme="midnight"] .memory-write,html[data-theme="plum"] .memory-write,html[data-theme="midnight"] .faith-banner,html[data-theme="plum"] .faith-banner,html[data-theme="midnight"] .prayer-tracker,html[data-theme="plum"] .prayer-tracker{background:var(--paper-2)!important;color:var(--ink)!important;border-color:var(--line)!important;box-shadow:none!important;backdrop-filter:none!important}
+html[data-theme="midnight"] .faith-banner *,html[data-theme="plum"] .faith-banner *,html[data-theme="midnight"] .api-tool *,html[data-theme="plum"] .api-tool *,html[data-theme="midnight"] .prayer-tracker *,html[data-theme="plum"] .prayer-tracker *{color:inherit}
+html[data-theme="midnight"] .week-day,html[data-theme="plum"] .week-day,html[data-theme="midnight"] .section-label,html[data-theme="plum"] .section-label,html[data-theme="midnight"] .eyebrow,html[data-theme="plum"] .eyebrow,html[data-theme="midnight"] .topbar-date,html[data-theme="plum"] .topbar-date{color:var(--muted)!important}
+html[data-theme="midnight"] input:not([type=checkbox]):not([type=range]),html[data-theme="midnight"] textarea,html[data-theme="midnight"] select,html[data-theme="plum"] input:not([type=checkbox]):not([type=range]),html[data-theme="plum"] textarea,html[data-theme="plum"] select{color:var(--ink)!important;background:var(--paper)!important;border:1px solid var(--line)!important;color-scheme:dark}
+html[data-theme="midnight"] input::placeholder,html[data-theme="midnight"] textarea::placeholder,html[data-theme="plum"] input::placeholder,html[data-theme="plum"] textarea::placeholder{color:var(--muted)!important;opacity:1}
+html[data-theme="midnight"] .primary-button,html[data-theme="plum"] .primary-button{background:var(--accent)!important;color:var(--button-ink)!important}
+html[data-theme="midnight"] .outline-button,html[data-theme="plum"] .outline-button{color:var(--accent-ink)!important;border-color:var(--line)!important;background:transparent!important}
+html[data-theme="midnight"] .nav-item,html[data-theme="plum"] .nav-item{color:var(--muted)!important}
+html[data-theme="midnight"] .nav-item.active,html[data-theme="plum"] .nav-item.active{color:var(--accent-ink)!important;background:var(--accent-soft)!important}
+html[data-theme="midnight"] .theme-choice,html[data-theme="plum"] .theme-choice{background:var(--paper-2)!important;color:var(--ink)!important;border-color:var(--line)!important}
+html[data-theme="midnight"] .theme-choice.active,html[data-theme="plum"] .theme-choice.active{background:var(--accent-soft)!important;color:var(--accent-ink)!important;border-color:var(--accent)!important}
+.welcome-overlay[hidden]{display:none!important}
+.welcome-overlay{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:18px;background:rgba(20,22,27,.58);backdrop-filter:blur(14px);overflow-y:auto}
+.welcome-panel{width:min(100%,560px);max-height:min(92dvh,900px);overflow:auto;padding:clamp(22px,5vw,38px);border:1px solid var(--line);border-radius:28px;background:var(--paper-2);color:var(--ink);box-shadow:0 28px 90px rgba(0,0,0,.25)}
+.welcome-mark{width:48px;height:48px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent-ink);border-radius:17px;font-size:24px;margin-bottom:22px}
+.welcome-panel h1{font:500 clamp(32px,7vw,46px)/1.08 var(--serif);letter-spacing:-1px;margin:0 0 12px}
+.welcome-panel h1 em{color:var(--accent)}
+.welcome-copy{color:var(--muted);margin:0 0 24px}
+.welcome-panel form{display:grid;gap:10px}
+.welcome-panel label{font-weight:600;font-size:14px;margin-top:7px}
+.welcome-panel label span,.welcome-panel small{font-size:12px;color:var(--muted);font-weight:400}
+.welcome-panel input:not([type=checkbox]),.welcome-panel select{width:100%;min-width:0;min-height:48px;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:var(--paper);color:var(--ink)}
+.privacy-explainer{display:grid;grid-template-columns:22px minmax(0,1fr);gap:12px;margin-top:14px;padding:15px;border-radius:17px;background:var(--accent-soft);color:var(--accent-ink)}
+.privacy-explainer p{font-size:12px;line-height:1.55;margin:6px 0 0}
+.welcome-consent{display:flex;align-items:flex-start;gap:10px!important;font-weight:400!important}
+.welcome-consent input{margin-top:4px;flex:0 0 auto}
+.welcome-submit{width:100%;margin-top:8px}
+.welcome-skip{border:0;background:transparent;color:var(--muted);padding:10px}
+body.welcome-open{overflow:hidden}
+@media(max-width:800px){.main{padding:0 16px calc(108px + env(safe-area-inset-bottom))}.setting-row{grid-template-columns:minmax(0,1fr);gap:7px}.settings-group input[type=time],.settings-group input[type=date],.settings-group select,.setting-row input,.setting-row select{width:100%}.form-grid{grid-template-columns:minmax(0,1fr)}.section-block{margin-bottom:22px}.section-heading{margin-bottom:12px}}
+@media(max-width:420px){.main{padding-inline:14px;padding-bottom:calc(108px + env(safe-area-inset-bottom))}.welcome-panel{border-radius:22px}.week-card{padding:15px 12px 12px}.settings-group{padding:14px}}
