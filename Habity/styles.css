@@ -96,6 +96,21 @@ html[data-theme="dynamic"] {
   --accent: #796398; --accent-strong: #5b477b; --accent-soft: #e7e0f2; --accent-on: #ffffff; --focus: #79649d;
   --highlight-bg: #f4e7b7; --highlight-text: #72592c;
 }
+html[data-theme="mulberry"] {
+  color-scheme: dark;
+  --canvas: #1b141d; --surface: #281d2b; --surface-raised: #35263a; --surface-soft: #443149;
+  --text: #fbf2fa; --text-secondary: #dfcddd; --text-tertiary: #c0a9bd; --line: #59435a;
+  --accent: #c77eaa; --accent-strong: #f0c1df; --accent-soft: #493047; --accent-on: #251624; --focus: #e3a8cd;
+  --highlight-bg: #453044; --highlight-text: #f5dfb6;
+  --shadow-card: 0 8px 24px rgba(0, 0, 0, .20); --shadow-float: 0 22px 64px rgba(0, 0, 0, .50);
+}
+html[data-theme="sage"] {
+  color-scheme: light;
+  --canvas: #f3f6f0; --surface: #fcfdf9; --surface-raised: #f8faf4; --surface-soft: #e5ebdf;
+  --text: #29362e; --text-secondary: #526357; --text-tertiary: #68786c; --line: #d6e0d3;
+  --accent: #718b72; --accent-strong: #426348; --accent-soft: #dce8d8; --accent-on: #ffffff; --focus: #648567;
+  --highlight-bg: #f1e5b9; --highlight-text: #67562c;
+}
 
 *, *::before, *::after { box-sizing: border-box; }
 html { min-width: 320px; font-size: calc(16px * var(--font-scale)); scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
@@ -379,7 +394,8 @@ img, svg { max-width: 100%; }
 .dynamic-swatch { background: linear-gradient(120deg, #bdd8ec, #f3c8bf 42%, #c4e3ce 70%, #d6c5e9); color: #fff; font-size: 1.3rem; }
 .midnight-swatch { background: linear-gradient(135deg, #151720, #34354b); border-color: #555972; }
 .plum-swatch { background: linear-gradient(135deg, #19151f, #48324f); border-color: #654d6d; }
-.theme-choice[data-theme="plum"] { grid-column: 2; }
+.mulberry-swatch { background: linear-gradient(135deg, #3a233d, #9c527e); border-color: #76516f; }
+.sage-swatch { background: linear-gradient(135deg, #e6eee0, #78957a); border-color: #b6c8b1; }
 
 .setting-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 240px); align-items: center; gap: 14px; padding: 14px 0; border-top: 1px solid var(--line); }
 .setting-row > div { min-width: 0; }

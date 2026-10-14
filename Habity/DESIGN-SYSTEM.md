@@ -49,3 +49,8 @@ The PWA icon is a small original SVG illustration: a single sunrise arc and thre
 ## Release/cache behavior
 
 CSS and JavaScript are versioned in `index.html`; service-worker cache v6 removes the old cached shell on activation. Navigation is network-first with an offline fallback, while versioned app assets are cached for offline use.
+
+
+## Appearance themes
+
+The theme selector includes Sky, Coral, Mint, Lavender, Dynamic, Midnight, Plum, Mulberry, and Sage Forest. Mulberry is a rich dark berry palette; Sage Forest is a light botanical green palette. Dynamic rotates through the light and botanical palettes over time.
