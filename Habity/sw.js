@@ -1,9 +1,9 @@
-const CACHE_NAME = "little-days-shell-v9";
+const CACHE_NAME = "little-days-shell-v10";
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./styles.css?v=9",
-  "./app.js?v=9",
+  "./styles.css?v=10",
+  "./app.js?v=10",
   "./manifest.webmanifest",
   "./icons/icon.svg",
   "./icons/brand-mark.svg",
@@ -52,13 +52,21 @@ self.addEventListener("fetch", event => {
 
 
 self.addEventListener("notificationclick", event => {
+  const data = event.notification?.data || {};
+  const action = event.action;
+  const outcomeId = data.outcomeId || event.notification?.tag || "";
   event.notification.close();
   event.waitUntil((async () => {
-    const target = new URL("./", self.location.href).href;
-    const clientsList = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
-    for (const client of clientsList) {
-      if ("focus" in client) { await client.focus(); if ("navigate" in client) await client.navigate(target); return; }
+    let target = new URL(data.url || "./", self.registration.scope);
+    if (outcomeId && outcomeId.includes("|")) {
+      target.searchParams.set("routineCheckin", outcomeId);
+      if (action === "done") target.searchParams.set("routineStatus", "completed");
+      else if (action === "missed") target.searchParams.set("routineStatus", "missed");
     }
-    if (self.clients.openWindow) await self.clients.openWindow(target);
+    const windows = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+    for (const client of windows) {
+      if ("focus" in client) { await client.navigate(target.href); return client.focus(); }
+    }
+    if (self.clients.openWindow) return self.clients.openWindow(target.href);
   })());
 });
