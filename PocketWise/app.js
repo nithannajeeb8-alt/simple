@@ -65,35 +65,11 @@
   ];
   const daysAgo = n => { const d = new Date(); d.setDate(d.getDate()-n); return localDate(d); };
   const initialState = () => ({
-    version:1, sample:true,
+    version:2, sample:false,
     settings:{theme:'light',hideBalances:false,alertThreshold:90,notifyBudget:true,notifyPositive:true,notifyBills:true,notifyDebts:true,notifyWeekly:true,quietStart:'21:00',quietEnd:'08:00',lastBackup:null,lastPositiveMonth:null,seenAlerts:[],notifications:[],categoryChart:'doughnut'},
-    accounts:[{id:'cash',name:'Cash',type:'cash',openingBalance:1800},{id:'bank',name:'Bank / UPI',type:'bank',openingBalance:8200},{id:'card',name:'Card',type:'card',openingBalance:0}],
+    accounts:[{id:'cash',name:'Cash',type:'cash',openingBalance:0},{id:'bank',name:'Bank / UPI',type:'bank',openingBalance:0},{id:'card',name:'Card',type:'card',openingBalance:0}],
     activities: activityDefaults.map(a=>({...a})),
-    budgets:{total:8000,categories:{food:3000,transport:1200,shopping:1500,education:1200}},
-    goals:[{id:'goal-phone',name:'New phone',target:30000,saved:9500,due:null},{id:'goal-trip',name:'Trip fund',target:12000,saved:3400,due:null}],
-    reminders:[{id:'rem-sub',name:'Music subscription',amount:299,date:daysAgo(-1),accountId:'bank',repeat:'monthly',active:true,note:'Streaming renewal'}],
-    debts:[{id:'debt-a',person:'Akhil',direction:'lent',amount:1500,date:daysAgo(12),due:daysAgo(-8),note:'Shared trip booking',accountId:'bank'},{id:'debt-b',person:'Maya',direction:'borrowed',amount:2000,date:daysAgo(8),due:daysAgo(-12),note:'Books and class materials',accountId:'bank'}],
-    transactions:[
-      {id:'tx-1',type:'income',amount:4500,activityId:'salary',accountId:'bank',date:daysAgo(1),note:'Monthly pocket money'},
-      {id:'tx-2',type:'expense',amount:120,activityId:'food',accountId:'cash',date:daysAgo(0),note:'Lunch at college'},
-      {id:'tx-3',type:'expense',amount:45,activityId:'transport',accountId:'cash',date:daysAgo(0),note:'Bus fare'},
-      {id:'tx-4',type:'expense',amount:299,activityId:'subscriptions',accountId:'bank',date:daysAgo(2),note:'Music plan'},
-      {id:'tx-5',type:'expense',amount:680,activityId:'shopping',accountId:'bank',date:daysAgo(3),note:'Headphones case'},
-      {id:'tx-6',type:'expense',amount:90,activityId:'food',accountId:'cash',date:daysAgo(4),note:'Tea and snacks'},
-      {id:'tx-7',type:'income',amount:1200,activityId:'freelance',accountId:'bank',date:daysAgo(6),note:'Poster design'},
-      {id:'tx-8',type:'expense',amount:260,activityId:'education',accountId:'bank',date:daysAgo(7),note:'Notes and photocopies'},
-      {id:'tx-9',type:'lent',amount:1500,activityId:'other',accountId:'bank',date:daysAgo(12),note:'Shared trip booking',debtId:'debt-a'},
-      {id:'tx-10',type:'borrowed',amount:2000,activityId:'other',accountId:'bank',date:daysAgo(8),note:'Books and class materials',debtId:'debt-b'},
-      {id:'tx-11',type:'expense',amount:350,activityId:'transport',accountId:'bank',date:daysAgo(9),note:'Auto after class'},
-      {id:'tx-12',type:'expense',amount:210,activityId:'food',accountId:'cash',date:daysAgo(10),note:'Dinner with friends'},
-      {id:'tx-13',type:'refund',amount:180,activityId:'shopping',accountId:'bank',date:daysAgo(11),note:'Order refund'},
-      {id:'tx-14',type:'expense',amount:450,activityId:'education',accountId:'bank',date:daysAgo(14),note:'Lab materials'},
-      {id:'tx-15',type:'expense',amount:180,activityId:'entertainment',accountId:'cash',date:daysAgo(16),note:'Movie ticket'},
-      {id:'tx-16',type:'income',amount:650,activityId:'freelance',accountId:'bank',date:daysAgo(19),note:'Logo revision'},
-      {id:'tx-17',type:'expense',amount:399,activityId:'subscriptions',accountId:'bank',date:daysAgo(21),note:'Cloud storage'},
-      {id:'tx-18',type:'expense',amount:140,activityId:'food',accountId:'cash',date:daysAgo(24),note:'College lunch'},
-      {id:'tx-19',type:'expense',amount:500,activityId:'shopping',accountId:'bank',date:daysAgo(28),note:'Backpack'}
-    ]
+    budgets:{total:0,categories:{},note:''}, goals:[], reminders:[], debts:[], transactions:[]
   });
   let state = initialState();
   let db = null;
@@ -131,7 +107,15 @@
     db=await openDB();
     let saved=await dbLoad();
     if(!saved){try{saved=JSON.parse(localStorage.getItem(STORE_KEY)||'null')}catch{saved=null}}
-    if(saved&&typeof saved==='object'&&Array.isArray(saved.transactions)){state={...initialState(),...saved,settings:{...initialState().settings,...(saved.settings||{})}};}
+    if(saved&&typeof saved==='object'&&Array.isArray(saved.transactions)){
+      state={...initialState(),...saved,settings:{...initialState().settings,...(saved.settings||{})}};
+      // Earlier builds shipped with fabricated demo finances. Remove those once, so users start clean.
+      if(saved.sample===true){
+        const fresh=initialState();
+        state={...fresh,settings:{...fresh.settings,theme:saved.settings?.theme||'light',hideBalances:!!saved.settings?.hideBalances}};
+      }
+      state.sample=false;
+    }
     await persist();
     applyTheme();
     bindEvents();
@@ -348,6 +332,7 @@
       const reminderToggle=event.target.closest('[data-reminder-toggle]');if(reminderToggle){const r=state.reminders.find(x=>x.id===reminderToggle.dataset.reminderToggle);if(r)r.active=!r.active;await persist();remindersManager();renderAll();return;}
       const reminderRemove=event.target.closest('[data-reminder-remove]');if(reminderRemove){if(confirm('Delete this reminder?')){state.reminders=state.reminders.filter(r=>r.id!==reminderRemove.dataset.reminderRemove);await persist();remindersManager();renderAll();}return;}
       if(event.target.closest('#manage-reminders')){remindersManager();return;}
+      if(event.target.closest('#goals-jump')){const target=$('.goal-card');if(target){target.scrollIntoView({behavior:'auto',block:'start'});target.setAttribute('tabindex','-1');target.focus({preventScroll:true});}return;}
       if(event.target.closest('#add-goal')||event.target.closest('#goal-empty-add')){goalForm();return;}
       const goalEditBtn=event.target.closest('[data-goal-edit]');if(goalEditBtn){const g=state.goals.find(x=>x.id===goalEditBtn.dataset.goalEdit);if(g)goalForm(g);return;}
       const goalAddBtn=event.target.closest('[data-goal-add]');if(goalAddBtn){goalContributionForm(goalAddBtn.dataset.goalAdd);return;}

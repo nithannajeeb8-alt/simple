@@ -21,3 +21,114 @@ html[data-theme="dark"]{color-scheme:dark;--bg:#111411;--surface:#191e19;--surfa
 /* Added refinements: stacked radial periods and long-term financial archive */
 .sample-banner[hidden]{display:none}.days-block{margin-top:24px;padding-top:17px;border-top:1px solid var(--line)}.days-block-label{display:flex;align-items:center;justify-content:space-between;gap:8px}.days-key{display:flex;align-items:center;gap:6px;font-size:9px;color:var(--muted)}.days-key i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--blue)}.days-block .period-arc-wrap{margin:8px auto 0;max-width:285px}.days-block .centered{margin:0 0 4px}.period-card{display:flex;flex-direction:column;height:100%}.period-card>.soft-button{margin-top:auto}.spendable-summary{padding:22px 0 19px;border-bottom:1px solid var(--line);margin-bottom:17px}.spendable-summary>span{display:block;font-size:9px;letter-spacing:.13em;font-weight:700;color:var(--muted)}.spendable-summary>strong{display:block;font-family:var(--display);font-size:31px;font-weight:800;letter-spacing:-1.2px;margin:5px 0 5px}.spendable-summary>small{display:block;color:var(--muted);font-size:10px;line-height:1.5}.category-budget-preview{margin:19px 0 17px}.category-budget-heading{display:flex;justify-content:space-between;align-items:center;font-size:9px;font-weight:800;letter-spacing:.11em;color:var(--muted);margin-bottom:14px}.category-budget-heading span{font-size:8px;font-weight:600;letter-spacing:.04em}.category-budget-row{margin-bottom:13px}.category-budget-row:last-child{margin-bottom:0}.category-budget-row .row-between{margin-bottom:6px}.category-budget-row .row-between>span{font-size:10px;color:var(--ink)}.category-budget-row .row-between small{font-size:9px;color:var(--muted)}.category-budget-row .progress-track{height:5px}.category-budget-empty{padding:15px 12px;border-radius:12px;background:var(--surface-2);font-size:10px;color:var(--muted);line-height:1.5}.yearly-table-wrap{overflow-x:auto}.yearly-row{display:grid;grid-template-columns:.7fr 1.15fr 1.15fr 1.1fr .65fr 48px;align-items:center;gap:10px;padding:12px 2px;border-bottom:1px solid var(--line);font-size:10px;min-width:510px}.yearly-row:last-child{border-bottom:0}.yearly-row strong{font-size:11px}.yearly-header{padding-top:6px;padding-bottom:10px;color:var(--muted);font-size:9px;font-weight:700;letter-spacing:.04em}.yearly-positive{color:var(--green)}.yearly-negative{color:var(--red)}.yearly-row .inline-link{justify-self:end}.yearly-archive .fine-print{margin-top:13px}
 @media(max-width:720px){.days-block{margin-top:22px;padding-top:15px}.days-block .period-arc-wrap{max-width:275px}.spendable-summary{padding:18px 0 16px}.spendable-summary>strong{font-size:29px}.category-budget-preview{margin:17px 0}.yearly-row{min-width:500px}}
+
+/* Pocketwise responsive repair: accessible type, no clipped panels, and reliable mobile layout. */
+html{scroll-behavior:auto;scroll-padding-top:18px;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{font-size:16px;overflow-x:hidden;min-width:0}
+button,input,select,textarea{font-size:16px;max-width:100%}
+button{min-height:44px;touch-action:manipulation}
+input,select,textarea{min-height:44px}
+.page{animation:none;min-width:0}
+.page.active{min-width:0}
+.card,.hero-grid>*,.insights-grid>*,.settings-layout>*{min-width:0;max-width:100%}
+img,svg,canvas{max-width:100%}
+.main-content{width:100%;min-width:0}
+.insights-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#sample-banner[hidden]{display:none!important}
+.goal-card{scroll-margin-top:20px}
+.goal-row{min-width:0;gap:12px}
+.goal-line{min-width:0;flex-wrap:wrap;gap:10px}
+.goal-line>div{min-width:0;overflow-wrap:anywhere}
+.goal-amount{white-space:nowrap}
+
+@media(max-width:720px){
+  body{font-size:16px;line-height:1.5}
+  .main-content{padding:0 16px calc(104px + env(safe-area-inset-bottom));}
+  .topbar{margin:0 -16px 18px;padding:18px 16px 20px;}
+  .mobile-brand{font-size:16px;margin-bottom:20px}
+  .page-heading h1{font-size:clamp(27px,7vw,34px);line-height:1.15;letter-spacing:-.9px;overflow-wrap:anywhere}
+  .page-heading p{font-size:15px;line-height:1.45;max-width:42rem}
+  .eyebrow,.section-kicker{font-size:11px;letter-spacing:.12em}
+  .card{padding:18px;border-radius:22px}
+  .money-card{padding:20px 18px 18px}
+  .balance-number{font-size:clamp(34px,9vw,44px);letter-spacing:-1.4px}
+  .balance-context{font-size:14px;line-height:1.4}
+  .arc-legend{gap:14px;margin-top:0}
+  .arc-legend>span{font-size:13px;gap:7px;flex-wrap:wrap}
+  .arc-legend strong{font-size:14px}
+  .money-stats span,.period-card .centered{font-size:13px}
+  .money-stats strong{font-size:21px}
+  .days-block{margin-top:22px;padding-top:18px}
+  .days-block-label{gap:10px;flex-wrap:wrap}
+  .days-key{font-size:13px}
+  .days-center strong{font-size:30px}
+  .days-center span{font-size:14px}
+  .quick-actions-row{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .quick-action{min-height:68px;padding:12px;gap:10px}
+  .quick-action strong{font-size:14px}
+  .quick-action small{font-size:12px}
+  .section-header h2,.insights-controls h2{font-size:22px;line-height:1.25}
+  .section-header p,.muted{font-size:14px}
+  .metric-card>strong{font-size:clamp(20px,5vw,26px)}
+  .metric-label,.metric-foot{font-size:13px}
+  .page-tools{display:flex;gap:10px}
+  .search-box{width:100%;min-width:0}
+  .search-box input{width:100%;min-width:0;font-size:16px}
+  .filter-row{display:flex;flex-wrap:wrap;gap:8px}
+  .filter-pill{font-size:13px;padding:9px 12px;min-height:42px}
+  .compact-select{font-size:16px;min-height:44px;max-width:100%}
+  .insights-controls{display:flex;align-items:stretch;flex-direction:column;gap:14px}
+  .insights-actions{width:100%;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+  .insights-actions>*{width:100%;min-width:0;white-space:normal}
+  .insight-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .insights-grid{grid-template-columns:minmax(0,1fr)}
+  .insight-wide{grid-column:auto}
+  .chart-canvas{display:block;width:100%;height:220px;max-height:240px}
+  .settings-card{padding:18px 16px}
+  .setting-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:14px 0}
+  .setting-row>div:first-child{flex:1 1 170px;min-width:0}
+  .setting-row strong{font-size:14px;line-height:1.35}
+  .setting-row small{font-size:12px;line-height:1.45;max-width:none}
+  .segmented button{font-size:14px;padding:8px 12px;min-height:40px}
+  .quiet-hours{max-width:100%;flex-wrap:wrap}
+  .quiet-hours input{font-size:16px;min-height:44px;width:100px}
+  .backup-buttons{display:grid;grid-template-columns:1fr;gap:9px}
+  .backup-buttons>*{width:100%;white-space:normal}
+  .fine-print{font-size:12px}
+  .mobile-tabbar{padding:8px 8px calc(8px + env(safe-area-inset-bottom));min-height:72px;gap:2px}
+  .mobile-tab{flex:1;min-width:0;min-height:50px;gap:5px;padding:4px 2px}
+  .mobile-tab .icon-wrap{width:25px;height:25px}
+  .mobile-tab small{font-size:12px;line-height:1.1}
+  .mobile-add{flex:0 0 52px;width:52px;height:52px;min-height:52px;border-radius:18px}
+  .app-modal{width:calc(100% - 20px);max-width:560px;max-height:calc(100dvh - 24px - env(safe-area-inset-bottom));margin:auto;overscroll-behavior:contain}
+  .app-modal[open]{margin:auto}
+  .modal-head{padding:18px 18px 14px}
+  .modal-head h2{font-size:23px}
+  .modal-body{padding:18px;}
+  .form-grid{grid-template-columns:minmax(0,1fr);gap:15px}
+  .form-field.full{grid-column:auto}
+  .form-field label{font-size:12px}
+  .form-field input,.form-field select,.form-field textarea{font-size:16px;min-height:48px;padding:12px}
+  .amount-input{font-size:32px!important;min-height:58px!important}
+  .type-switch button{font-size:14px;min-height:46px}
+  .form-actions{display:flex;flex-wrap:wrap;gap:8px}
+  .form-actions>*{flex:1 1 130px;min-height:48px;white-space:normal}
+  .empty-state h3{font-size:18px}
+  .empty-state p{font-size:14px}
+  .app-footer{font-size:12px}
+}
+@media(max-width:390px){
+  .main-content{padding-left:12px;padding-right:12px}
+  .topbar{margin-left:-12px;margin-right:-12px;padding-left:12px;padding-right:12px}
+  .card{padding:15px}
+  .money-card{padding:18px 14px 16px}
+  .arc-legend{gap:10px}
+  .arc-legend>span{font-size:12px}
+  .insight-metrics{gap:8px}
+  .insights-actions{grid-template-columns:1fr}
+  .mobile-tab small{font-size:11px}
+}
+@media(min-width:721px){
+  .goal-card{grid-column:span 1}
+  .main-content{padding-bottom:48px}
+}
