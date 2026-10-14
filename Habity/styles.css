@@ -832,3 +832,40 @@ html[data-mode="dark"][data-theme="sage"] { color-scheme:dark; --canvas:#111A14;
 .icon-button:disabled { opacity: .35; cursor: not-allowed; }
 .icon-button.danger-icon { color: var(--danger); }
 @media (max-width: 560px) { .essential-manager-row { grid-template-columns: 36px minmax(0,1fr); align-items: start; } .essential-manager-icon { width: 36px; height: 36px; } .essential-manager-actions { grid-column: 2; } }
+
+
+/* Settings redesign: calmer hierarchy, generous spacing, and mobile-first controls. */
+.settings-main { gap: 20px; }
+.settings-group { padding: clamp(20px, 2.8vw, 30px); }
+.settings-heading { gap: 16px; margin-bottom: 24px; align-items: flex-start; }
+.settings-heading h2 { font-size: clamp(1.35rem, 2vw, 1.7rem); line-height: 1.16; }
+.settings-heading p { max-width: 42ch; margin-top: 7px; line-height: 1.55; }
+.settings-heading .setting-icon { flex: 0 0 48px; }
+.settings-group > .primary-button, .settings-group > .outline-button, .settings-group > .danger-button { margin-top: 12px; white-space: normal; }
+.settings-group .small-text { line-height: 1.65; max-width: 66ch; margin-top: 18px; }
+.settings-group .form-grid { gap: 16px; margin: 20px 0; }
+.settings-group .setting-row { padding: 16px 0; gap: 18px; }
+.settings-group .setting-row + .setting-row { border-top: 1px solid var(--line); }
+.essentials-settings-summary { max-width: 48ch; margin: 0 0 16px; color: var(--text-secondary); line-height: 1.6; }
+.data-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 18px; }
+.data-actions > :last-child { grid-column: 1 / -1; }
+.data-actions > * { min-width: 0; white-space: normal; }
+@media (max-width: 760px) {
+  .settings-main { gap: 16px; }
+  .settings-group { padding: 20px 18px; border-radius: 22px; }
+  .settings-heading { gap: 13px; margin-bottom: 22px; }
+  .settings-heading h2 { font-size: 1.42rem; }
+  .settings-heading p { font-size: .92rem; line-height: 1.55; }
+  .settings-heading .setting-icon { flex-basis: 44px; width: 44px; height: 44px; }
+  .settings-group > .primary-button, .settings-group > .outline-button, .settings-group > .danger-button { width: 100%; min-height: 50px; padding: 13px 16px; }
+  .settings-group .setting-row { padding: 15px 0; gap: 10px; }
+  .settings-group .form-grid { gap: 14px; margin: 18px 0; }
+  .data-actions { grid-template-columns: minmax(0, 1fr); }
+  .data-actions > :last-child { grid-column: auto; }
+}
+@media (max-width: 390px) {
+  .settings-group { padding: 17px 15px; }
+  .settings-heading { gap: 10px; }
+  .settings-heading h2 { font-size: 1.3rem; }
+  .settings-heading .setting-icon { flex-basis: 40px; width: 40px; height: 40px; }
+}
