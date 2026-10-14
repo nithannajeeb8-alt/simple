@@ -164,10 +164,23 @@
     const bal=totalBalance(),t=totalsFor(periodTransactions('month')),dt=debtTotals(),budget=budgetAmount(),spent=spentForMonth(),daysTotal=new Date(new Date().getFullYear(),new Date().getMonth()+1,0).getDate(),day=new Date().getDate(),daysLeft=daysTotal-day;
     $$('[data-money="balance"]').forEach(el=>el.textContent=fmtHidden(bal));$$('[data-money="income"]').forEach(el=>el.textContent=fmtHidden(t.income));$$('[data-money="expense"]').forEach(el=>el.textContent=fmtHidden(t.expenses));$$('[data-money="net"]').forEach(el=>el.textContent=fmtHidden(t.net));$$('[data-money="safe"]').forEach(el=>el.textContent=fmtHidden(safeToSpend()));$$('[data-money="receivable"]').forEach(el=>el.textContent=fmtHidden(dt.receivable));$$('[data-money="payable"]').forEach(el=>el.textContent=fmtHidden(dt.payable));
     const percent=budget?Math.min(spent/budget*100,100):0;$('#budget-progress').style.width=`${percent}%`;$('#budget-progress').style.background=budget&&spent>budget?'var(--red)':'var(--green)';$('#budget-percent').textContent=budget?`${Math.round(spent/budget*100)}% used`:'Set a limit';$('[data-money="budget"]').textContent=budget?fmtHidden(budget):'Not set';$('#budget-spent-text').textContent=budget?`${money(spent)} spent`:'Set a budget to begin';$('#budget-left-text').textContent=budget?`${money(Math.max(0,budget-spent))} left`:'';$('#days-left').textContent=daysLeft;$('#period-caption').textContent=`${day} of ${daysTotal} days elapsed`;
-    const total=t.income+t.expenses, incomeLen=total?Math.max(0,t.income/total*90):0, expenseLen=total?Math.max(0,t.expenses/total*90):0;
-    $('.arc-income').style.strokeDasharray=`${incomeLen} 100`;
-    $('.arc-income').style.strokeDashoffset='0';$('.arc-expense').style.strokeDasharray=`${expenseLen} 100`;$('.arc-expense').style.strokeDashoffset=`-${incomeLen+2}`;
-    $('.days-progress').style.strokeDasharray=`${day/daysTotal*100} 100`;
+    // The money arc is one shared 180-degree track. Keep 2 units of visual
+    // separation between the income and expense segments and leave the rest neutral.
+    // SVG round linecaps render a zero-length dash as a dot, so hide zero segments.
+    const total=Math.max(0,Number(t.income)||0)+Math.max(0,Number(t.expenses)||0);
+    const availableArc=88, segmentGap=2;
+    const incomeLen=total>0?Math.max(0,(Math.max(0,Number(t.income)||0)/total)*availableArc):0;
+    const expenseLen=total>0?Math.max(0,(Math.max(0,Number(t.expenses)||0)/total)*availableArc):0;
+    const incomeArc=$('.arc-income'), expenseArc=$('.arc-expense');
+    incomeArc.style.strokeDasharray=incomeLen>0.05?`${incomeLen} 100`:'0 100';
+    incomeArc.style.strokeDashoffset='0';
+    incomeArc.style.opacity=incomeLen>0.05?'1':'0';
+    incomeArc.style.visibility=incomeLen>0.05?'visible':'hidden';
+    expenseArc.style.strokeDasharray=expenseLen>0.05?`${expenseLen} 100`:'0 100';
+    expenseArc.style.strokeDashoffset=`-${incomeLen+(incomeLen>0&&expenseLen>0?segmentGap:0)}`;
+    expenseArc.style.opacity=expenseLen>0.05?'1':'0';
+    expenseArc.style.visibility=expenseLen>0.05?'visible':'hidden';
+    $('.days-progress').style.strokeDasharray=`${Math.max(0,Math.min(100,day/daysTotal*100))} 100`;
     if(t.net<0) $('[data-money="net"]').forEach(el=>el.style.color='var(--red)');else $('[data-money="net"]').forEach(el=>el.style.color='var(--green)');
     $('#activity-count').textContent=state.transactions.length;
     renderBudgetCategoryPreview();

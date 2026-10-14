@@ -132,3 +132,10 @@ img,svg,canvas{max-width:100%}
   .goal-card{grid-column:span 1}
   .main-content{padding-bottom:48px}
 }
+
+/* Refined radial chart behavior: never show round-cap dots for empty data. */
+.arc-income,.arc-expense{stroke-linecap:round;vector-effect:non-scaling-stroke;will-change:stroke-dasharray,stroke-dashoffset;transition:stroke-dasharray .55s cubic-bezier(.2,.7,.2,1),stroke-dashoffset .55s cubic-bezier(.2,.7,.2,1),opacity .2s ease;}
+.arc-track{stroke-linecap:round;vector-effect:non-scaling-stroke;}
+.radial-area{isolation:isolate;}
+.radial-area svg{overflow:visible;touch-action:pan-y;}
+@media(prefers-reduced-motion:reduce){.arc-income,.arc-expense,.days-progress{transition:none!important}.page{animation:none!important;}}
