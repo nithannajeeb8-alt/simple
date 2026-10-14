@@ -3,48 +3,79 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#e8f2fa">
+<meta name="theme-color" content="#f4f8fb">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=7">
 <meta name="description" content="A private, customizable life companion for habits, memories, wellbeing and faith.">
 <title>Little Days · Life Companion</title>
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="icon" href="icons/icon.svg?v=7" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles.css?v=7">
 </head>
-<body>\n<div class="welcome-overlay" id="welcomeOverlay" hidden>
+<body>
+<div class="welcome-overlay" id="welcomeOverlay" hidden>
   <section class="welcome-panel" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
-    <div class="welcome-mark"><i class="bi bi-flower1"></i></div>
-    <p class="eyebrow">A LITTLE SPACE, JUST FOR YOU</p>
-    <h1 id="welcomeTitle">Welcome to <em>little days.</em></h1>
-    <p class="welcome-copy">A gentle place to make room for what matters. Personalize only what you feel comfortable sharing.</p>
-    <form id="welcomeForm">
-      <label for="welcomeName">What should we call you?</label>
-      <input id="welcomeName" name="name" autocomplete="nickname" placeholder="Your preferred name" maxlength="60">
-      <label for="welcomeDob">Date of birth <span>Optional</span></label>
-      <input id="welcomeDob" name="dob" type="date">
-      <small>Used only to personalize your life-in-weeks view. Leave blank if you prefer.</small>
-      <label for="welcomeFaith">Faith or spiritual preference <span>Optional</span></label>
-      <select id="welcomeFaith" name="faith">
-        <option value="none">Prefer not to say</option><option value="Islam">Islam</option><option value="Christianity">Christianity</option><option value="Hinduism">Hinduism</option><option value="Buddhism">Buddhism</option><option value="Other">Another tradition</option><option value="spiritual">Spiritual, not religious</option>
-      </select>
-      <div class="privacy-explainer"><i class="bi bi-shield-lock"></i><div><strong>Your privacy, in plain language</strong><p>Your profile, habits, moods and memories are saved in this browser on this device. They are not sent to a Little Days account because there is no account system. If you use online features, your search or location may be sent to the relevant service. Browser storage is not encrypted, and anyone with access to this device/browser may be able to see it. Exported backups are ordinary files, so keep them private. You can change your details or delete local data in Settings.</p></div></div>
-      <label class="welcome-consent"><input id="welcomePrivacy" type="checkbox" required> <span>I understand how local storage and optional online features work.</span></label>
-      <button class="primary-button welcome-submit" type="submit">Make this space mine</button>
-      <button class="welcome-skip" id="welcomeSkip" type="button">Continue without a profile</button>
+    <div class="welcome-mark"><img src="icons/brand-mark.svg" alt="" width="28" height="28"></div>
+    <form id="welcomeForm" class="welcome-form" novalidate>
+    <div class="welcome-step" id="welcomeStepProfile">
+      <p class="eyebrow">A LITTLE SPACE, JUST FOR YOU</p>
+      <h1 id="welcomeTitle" tabindex="-1">Welcome to <em>little days.</em></h1>
+      <p class="welcome-copy">A gentle place to make room for what matters. Personalize only what feels comfortable; every personal field can be skipped.</p>
+      <div class="welcome-fields">
+        <label for="welcomeName">What should we call you?</label>
+        <input id="welcomeName" name="name" autocomplete="nickname" placeholder="Your preferred name" maxlength="60">
+        <label for="welcomeDob">Date of birth (optional)</label>
+        <input id="welcomeDob" name="dob" type="date">
+        <small>Used only to personalize your life-in-weeks view. Leave blank if you prefer.</small>
+        <label for="welcomeFaith">Religion or spiritual preference (optional)</label>
+        <select id="welcomeFaith" name="faith">
+          <option value="none">Prefer not to say</option><option value="islam">Islam</option><option value="christianity">Christianity</option><option value="hinduism">Hinduism</option><option value="buddhism">Buddhism</option><option value="other">Another tradition</option><option value="spiritual">Spiritual, not religious</option><option value="custom">Custom spiritual habits</option>
+        </select>
+      </div>
+      <div class="welcome-actions">
+        <button class="primary-button welcome-submit" type="button" id="welcomeContinue">Continue to privacy</button>
+        <button class="welcome-skip" id="welcomeSkip" type="button">Skip profile details</button>
+      </div>
+    </div>
+    <div class="welcome-step" id="welcomeStepPrivacy" hidden>
+      <p class="eyebrow">BEFORE YOU BEGIN</p>
+      <h1 id="privacyTitle" tabindex="-1">Privacy, <em>plainly.</em></h1>
+      <p class="welcome-copy">Your profile and daily records stay in this browser by default. External lookups work differently; here is the distinction.</p>
+      <div class="privacy-explainer">
+        <i class="bi bi-shield-lock" aria-hidden="true"></i>
+        <div>
+          <strong>Your data and your choices</strong>
+          <ul>
+            <li><strong>Stored in this browser:</strong> your profile, habits, moods, memories and preferences stay on this device. Little Days has no account or automatic sync.</li>
+            <li><strong>Not encrypted:</strong> browser storage is not a secure vault. Anyone who can access this browser may be able to see your records, so be careful on shared devices.</li>
+            <li><strong>Online lookups share queries:</strong> book, food, exercise and image searches send the terms you enter to that provider. Prayer-time lookup sends the city you choose. Each provider has its own privacy policy.</li>
+            <li><strong>Backups are not protected:</strong> exported JSON files are unencrypted. Store them privately. Deleting browser data does not delete exported files or data already held by external services.</li>
+            <li><strong>You stay in control:</strong> edit your profile, export or restore a backup, and delete local records in Settings. Daily tracking can work offline after loading; online lookups need internet access.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="welcome-actions secondary-actions">
+        <button class="welcome-skip" id="welcomePrivacyBack" type="button">Back to profile</button>
+      </div>
+      <div class="welcome-privacy-footer">
+        <label class="welcome-consent"><input id="welcomePrivacy" type="checkbox" required> <span>I have read and understand these privacy notes.</span></label>
+        <button class="primary-button welcome-submit" type="submit">Make this space mine</button>
+      </div>
+    </div>
     </form>
   </section>
 </div>
 
 <div class="app-shell">
   <aside class="rail">
-    <a class="brand" href="#" aria-label="Little Days home"><span class="brand-mark"><i class="bi bi-flower1"></i></span><span>little days</span></a>
+    <a class="brand" href="#" aria-label="Little Days home"><span class="brand-mark"><img src="icons/brand-mark.svg" alt="" width="24" height="24"></span><span>little days</span></a>
     <nav class="side-nav" aria-label="Main navigation">
       <button class="nav-item active" data-view="home"><i class="bi bi-circle-half"></i><span>Today</span></button>
       <button class="nav-item" data-view="calendar"><i class="bi bi-calendar3"></i><span>Calendar</span></button>
-      <button class="nav-item" data-view="discover"><i class="bi bi-book-half"></i><span>Faith / Discover</span></button>
+      <button class="nav-item" data-view="discover"><i class="bi bi-book-half"></i><span>Discover</span></button>
       <button class="nav-item" data-view="settings"><i class="bi bi-sliders2"></i><span>Settings</span></button>
     </nav>
     <div class="rail-note"><span class="tiny-spark">✳</span><p>Small steps.<br><em>A life that's yours.</em></p></div>
@@ -53,9 +84,9 @@
 
   <main class="main">
     <header class="topbar">
-      <div class="mobile-brand"><span class="brand-mark"><i class="bi bi-flower1"></i></span><span>little days</span></div>
+      <div class="mobile-brand"><span class="brand-mark"><img src="icons/brand-mark.svg" alt="" width="24" height="24"></span><span>little days</span></div>
       <div class="topbar-date" id="topDate">YOUR DAY, AT YOUR PACE</div>
-      <div class="topbar-actions"><button class="icon-button" id="quickMood" title="Mood check-in" aria-label="Mood check-in"><i class="bi bi-emoji-smile"></i></button><button class="avatar-button" id="profileBtn" title="Profile">S</button></div>
+      <div class="topbar-actions"><button class="icon-button" id="quickMood" title="Mood check-in" aria-label="Mood check-in"><i class="bi bi-emoji-smile"></i></button><button class="avatar-button" id="profileBtn" title="Your profile" aria-label="Open your profile"><i class="bi bi-person-plus" aria-hidden="true"></i></button></div>
     </header>
 
     <section class="view active" id="view-home">
@@ -151,7 +182,7 @@
         <div class="settings-main">
           <section class="settings-group"><div class="settings-heading"><span class="setting-icon"><i class="bi bi-palette2"></i></span><div><h2>Appearance</h2><p>Colors and the feeling of each page.</p></div></div><div class="theme-grid"><button class="theme-choice active" data-theme="sky"><span class="theme-swatch sky-swatch"></span><strong>Sky</strong><small>Calm & clear</small></button><button class="theme-choice" data-theme="coral"><span class="theme-swatch coral-swatch"></span><strong>Coral</strong><small>Warm & open</small></button><button class="theme-choice" data-theme="mint"><span class="theme-swatch mint-swatch"></span><strong>Mint</strong><small>Fresh & bright</small></button><button class="theme-choice" data-theme="lavender"><span class="theme-swatch lavender-swatch"></span><strong>Lavender</strong><small>Soft & dreamy</small></button><button class="theme-choice dynamic-choice" data-theme="dynamic"><span class="theme-swatch dynamic-swatch"><i class="bi bi-stars"></i></span><strong>Dynamic</strong><small>Changes each day</small></button><button class="theme-choice" data-theme="midnight"><span class="theme-swatch midnight-swatch"></span><strong>Midnight</strong><small>Quiet & deep</small></button><button class="theme-choice" data-theme="plum"><span class="theme-swatch plum-swatch"></span><strong>Plum</strong><small>Soft & dark</small></button></div>
             <div class="setting-row"><div><strong>Comfortable text</strong><small>Make reading easier.</small></div><select id="textScale"><option value="normal">Default</option><option value="large">Large</option><option value="xlarge">Extra large</option></select></div><div class="setting-row"><div><strong>Reduce motion</strong><small>Limit animations and movement.</small></div><input type="checkbox" id="reduceMotion" class="toggle"></div></section>
-          <section class="settings-group"><div class="settings-heading"><span class="setting-icon"><i class="bi bi-person-heart"></i></span><div><h2>Your profile</h2><p>Personalize your life map and faith features.</p></div></div><div class="form-grid"><label>Display name<input id="displayName" placeholder="What should we call you?"></label><label>Age<input id="profileAge" type="number" min="1" max="110" value="21"></label><label>Life expectancy baseline<select id="lifeExpectancy"><option value="74">74 years</option><option value="80">80 years</option><option value="85">85 years</option><option value="90">90 years</option></select></label><label>Faith preferences<select id="faithPreference"><option value="none">No faith features</option><option value="islam">Islamic features</option><option value="custom">Custom spiritual habits</option></select></label></div><button class="primary-button" id="saveProfile">Save profile</button></section>
+          <section class="settings-group"><div class="settings-heading"><span class="setting-icon"><i class="bi bi-person-heart"></i></span><div><h2>Your profile</h2><p>Personalize your life map and faith features.</p></div></div><div class="form-grid"><label>Preferred name<input id="displayName" autocomplete="nickname" maxlength="60" placeholder="What should we call you?"></label><label>Date of birth (optional)<input id="profileDob" type="date"></label><label>Age<input id="profileAge" type="number" min="1" max="110" value="21"></label><label>Life expectancy baseline<select id="lifeExpectancy"><option value="74">74 years</option><option value="80">80 years</option><option value="85">85 years</option><option value="90">90 years</option></select></label><label>Religion or spiritual preference (optional)<select id="faithPreference"><option value="none">Prefer not to say</option><option value="islam">Islam</option><option value="christianity">Christianity</option><option value="hinduism">Hinduism</option><option value="buddhism">Buddhism</option><option value="other">Another tradition</option><option value="spiritual">Spiritual, not religious</option><option value="custom">Custom spiritual habits</option></select></label></div><button class="primary-button" id="saveProfile">Save profile</button></section>
           <section class="settings-group"><div class="settings-heading"><span class="setting-icon"><i class="bi bi-bell"></i></span><div><h2>Routines & reminders</h2><p>Your time, your choice. No notification overload.</p></div></div><div class="setting-row"><div><strong>Daily motivation</strong><small>One optional gentle message.</small></div><input type="checkbox" class="toggle" id="motivationEnabled"></div><div class="setting-row"><div><strong>Motivation time</strong><small>When should it arrive?</small></div><input type="time" id="motivationTime" value="09:00"></div><div class="setting-row"><div><strong>Water reminders</strong><small>Only if you enable them.</small></div><input type="checkbox" class="toggle" id="waterEnabled"></div><div class="setting-row"><div><strong>Water reminder interval</strong><small>Spaced reminders while awake.</small></div><select id="waterInterval"><option value="120">Every 2 hours</option><option value="180">Every 3 hours</option><option value="240">Every 4 hours</option></select></div><div class="setting-row"><div><strong>Quiet hours start</strong></div><input type="time" id="quietStart" value="22:00"></div><div class="setting-row"><div><strong>Quiet hours end</strong></div><input type="time" id="quietEnd" value="07:00"></div><div class="setting-row"><div><strong>Browser notifications</strong><small>Permission only; reliable scheduling needs a complete notification service.</small></div><button class="outline-button" id="requestNotifications">Enable</button></div><div id="notificationStatus" class="muted small-text"></div><div class="form-grid"><label>Meal time · Breakfast<input type="time" id="breakfastTime" value="08:00"></label><label>Meal time · Lunch<input type="time" id="lunchTime" value="13:00"></label><label>Meal time · Dinner<input type="time" id="dinnerTime" value="19:30"></label><label>Skill practice time<input type="time" id="skillTime" value="18:00"></label><label>Family / friend time<input type="time" id="familyTime" value="20:00"></label></div><button class="primary-button" id="saveSchedule">Save schedule</button></section>
           <section class="settings-group"><div class="settings-heading"><span class="setting-icon"><i class="bi bi-capsule"></i></span><div><h2>Medication reminders</h2><p>Enter the schedule from your prescription or clinician.</p></div></div><div class="form-grid"><label>Medicine name<input id="medName" placeholder="Medicine name"></label><label>Prescribed dose text<input id="medDose" placeholder="As written on label"></label><label>Reminder time<input id="medTime" type="time" value="08:00"></label><label>Frequency<input id="medFrequency" placeholder="e.g. twice daily"></label><label class="full-span">Precautions / label instructions<textarea id="medPrecautions" rows="2" placeholder="Enter instructions from your pharmacist or medicine label"></textarea></label></div><button class="primary-button" id="addMedication">Save medication record</button><div id="medicationList" class="medication-list"></div><p class="small-text muted">This prototype stores a reminder record only. It does not verify medicines or schedule notifications. Follow professional instructions; never change a dose based on an app suggestion.</p></section>
           <section class="settings-group"><div class="settings-heading"><span class="setting-icon"><i class="bi bi-heart-pulse"></i></span><div><h2>Wellbeing & privacy</h2><p>Your personal records stay in this browser by default.</p></div></div><div class="setting-row"><div><strong>Save mood check-ins</strong><small>Optional private history.</small></div><input type="checkbox" id="moodEnabled" class="toggle" checked></div><div class="setting-row"><div><strong>Daily memory prompt</strong><small>You can always skip it.</small></div><input type="checkbox" id="memoryEnabled" class="toggle" checked></div><div class="setting-row"><div><strong>Essential habits</strong><small>These determine streak scoring.</small></div><button class="outline-button" id="editEssentials">Choose habits</button></div><div class="data-actions"><button class="outline-button" id="exportData"><i class="bi bi-download"></i> Export backup</button><label class="outline-button file-label"><i class="bi bi-upload"></i> Restore backup<input type="file" id="importData" accept="application/json" hidden></label><button class="danger-button" id="deleteData"><i class="bi bi-trash3"></i> Delete local data</button></div></section>
@@ -169,6 +200,6 @@
 
 <div class="modal-backdrop hidden" id="modalBackdrop"><section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-head"><div><span class="section-label">MAKE IT YOURS</span><h2 id="modalTitle">Add a habit</h2></div><button class="icon-button" id="closeModal" aria-label="Close"><i class="bi bi-x-lg"></i></button></div><div id="modalBody"></div></section></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script src="app.js"></script>
+<script src="app.js?v=7"></script>
 </body>
 </html>

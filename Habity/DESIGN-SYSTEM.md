@@ -1,22 +1,51 @@
-# Little Days responsive layout and spacing system
+# Little Days — Design system
 
-This project uses Apple Human Interface Guidelines as a reference for principles, not as a claim that a website is a native iOS app.
+This is a web implementation informed by Apple's Human Interface Guidelines, not a native iOS interface. The principles are adapted to responsive HTML/CSS: clear grouping, consistent alignment, safe-area support, compact progressive disclosure, readable controls, and semantic colour tokens.
 
-## Principles applied
-- Adapt content to viewport size; don't lock layout to a single screenshot.
-- Respect safe-area insets around top and bottom browser/system UI.
-- Use readable text, aligned content edges, consistent spacing and familiar controls.
-- Use appearance-specific dark palettes for surfaces, text, inputs, selected states, and navigation; do not merely recolour the page background.
-- Keep touch controls at least 44 CSS px high as a practical mobile target.
-- Reduce nonessential motion when the operating system requests reduced motion.
+## References
 
-## Project spacing tokens
-The CSS uses a compact 4/8-point-inspired scale: 4, 8, 12, 16, 20, 24, 32, and 40 CSS pixels. This is a project convention, not a prescribed Apple spacing scale. Main content gutters are responsive, and the reading column is capped on wide screens to avoid overly long lines.
+- Apple HIG — Layout: https://developer.apple.com/design/human-interface-guidelines/layout
+- Apple HIG — Dark Mode: https://developer.apple.com/design/human-interface-guidelines/dark-mode
+- Apple HIG — Accessibility: https://developer.apple.com/design/human-interface-guidelines/accessibility
+- Apple HIG — Text fields: https://developer.apple.com/design/human-interface-guidelines/text-fields
+- Apple HIG — App icons: https://developer.apple.com/design/human-interface-guidelines/app-icons
 
-## Official references
-- Apple Human Interface Guidelines — Layout: https://developer.apple.com/design/human-interface-guidelines/layout
-- Apple Human Interface Guidelines — Dark Mode: https://developer.apple.com/design/human-interface-guidelines/dark-mode
-- Apple SwiftUI — Layout adjustments, padding, margins, and safe areas: https://developer.apple.com/documentation/swiftui/layout-adjustments
+## Layout rules
 
-## Scope
-These are responsive HTML/CSS adaptations of Apple’s general layout principles. SwiftUI/Auto Layout APIs themselves are native-platform APIs and are not used in this browser-based project. Check layouts in Safari at multiple viewport sizes and with text zoom before production deployment.
+- One spacing scale: 4, 8, 12, 16, 20, 24, 32 and 40 CSS pixels. This is a project choice inspired by consistency, not an Apple-mandated scale.
+- Content is capped at 1180 CSS pixels on wide screens; phone layouts use 12–16 CSS pixel page gutters.
+- Sidebar navigation becomes a four-item bottom bar on narrow screens.
+- Main content and bottom navigation account for `env(safe-area-inset-*)`.
+- Grid children, labels, cards and form fields use `min-width: 0`; form controls use `width: 100%` and `box-sizing: border-box` to prevent iOS time fields and long text from escaping their columns.
+- Touch controls aim for at least 44 CSS pixels in their primary dimension where practical.
+- Mobile inputs use 16px text to avoid Safari's automatic zoom-on-focus behaviour.
+- The welcome experience is a full-screen first-run page with its own scroll container. It is not a translucent modal showing a zoomed background page underneath.
+
+## Semantic colour system
+
+All components use these variables instead of individual hand-coded theme colours:
+
+- `--canvas`: page background
+- `--surface`, `--surface-raised`, `--surface-soft`: stacked surface levels
+- `--text`, `--text-secondary`, `--text-tertiary`: text hierarchy
+- `--line`: borders and separators
+- `--accent`, `--accent-strong`, `--accent-soft`, `--accent-on`: action and selection colours
+- `--focus`: keyboard focus indicator
+
+Themes: Sky, Coral, Mint, Lavender, Dynamic, Midnight and Plum. Every component, including Discover cards, native form controls, selection states, the bottom bar, prayer cards, dialogs and onboarding, inherits the same semantic surface variables. Feature categories may affect small icon accents, but not change the card body to a pale background with low-contrast lettering.
+
+## App icon
+
+The PWA icon is a small original SVG illustration: a single sunrise arc and three rays above a horizon. The same simple mark is exported to square PNG and Apple Touch Icon sizes. It uses large filled shapes, a solid background, centered content and no text, matching Apple's general advice to keep app icons simple and legible at small sizes. PNG files are generated locally from the same SVG so the site does not depend on an unrelated third-party icon asset.
+
+## Accessibility and privacy
+
+- Visible focus indicators, semantic labels, and responsive text-size controls are included.
+- `prefers-reduced-motion` and the app's own Reduce Motion setting reduce animation.
+- Contrast is intended to meet readable UI expectations, but this project has not had a full WCAG contrast audit or assistive-technology audit. Review all combinations before production.
+- Profile details are optional and kept in this browser's localStorage. This is not encrypted storage. Online API features send relevant queries or location strings to their respective providers.
+
+
+## Release/cache behavior
+
+CSS and JavaScript are versioned in `index.html`; service-worker cache v6 removes the old cached shell on activation. Navigation is network-first with an offline fallback, while versioned app assets are cached for offline use.
