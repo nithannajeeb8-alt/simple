@@ -1,9 +1,9 @@
-const CACHE_NAME = "little-days-shell-v8";
+const CACHE_NAME = "little-days-shell-v9";
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./styles.css?v=8",
-  "./app.js?v=8",
+  "./styles.css?v=9",
+  "./app.js?v=9",
   "./manifest.webmanifest",
   "./icons/icon.svg",
   "./icons/brand-mark.svg",
@@ -48,4 +48,17 @@ self.addEventListener("fetch", event => {
     if (response.ok) caches.open(CACHE_NAME).then(cache => cache.put(event.request, response.clone()));
     return response;
   })));
+});
+
+
+self.addEventListener("notificationclick", event => {
+  event.notification.close();
+  event.waitUntil((async () => {
+    const target = new URL("./", self.location.href).href;
+    const clientsList = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+    for (const client of clientsList) {
+      if ("focus" in client) { await client.focus(); if ("navigate" in client) await client.navigate(target); return; }
+    }
+    if (self.clients.openWindow) await self.clients.openWindow(target);
+  })());
 });

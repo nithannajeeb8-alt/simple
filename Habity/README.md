@@ -38,7 +38,8 @@ Profile data, habits, mood entries, memories and preferences are saved in this b
 ## Prototype limitations
 
 - Data storage currently uses `localStorage`, not IndexedDB. Export backups regularly if the records matter to you.
-- Reminder preferences are saved, but reliable scheduled notifications are not implemented. Browser permission alone does not schedule reminders.
+- Calendar reminders can be created for a specific date with a task time and a separate alert time. They are stored locally, shown in the selected-day panel, and can trigger a system notification while the app is open and the page scheduler is running. Notification permission is requested only after the user taps Enable.
+- Important limitation: this static, local-first PWA cannot guarantee alarms while fully closed or suspended. Reliable background alerts require a push backend (VAPID keys, push subscription storage, and a server/edge function that sends scheduled pushes). On iPhone, install the website to the Home Screen and use a supported iOS version for Web Push; a permission prompt alone is not enough.
 - API availability, provider CORS rules, rate limits and service terms can change. Test live requests on the hosted site; no private API keys are included.
 - Medication entries are notes only and do not verify medicines or schedules. Follow the prescription/clinician instructions.
 - The life-in-weeks view uses a configurable baseline as an illustration, not a prediction.
@@ -50,3 +51,10 @@ Profile data, habits, mood entries, memories and preferences are saved in this b
 - The 52-column life-week grid resets native button padding and border sizing so its cells stay inside the card.
 - Life-map totals show estimated elapsed, remaining and total days alongside weeks represented. Date of birth is used when supplied; otherwise the estimate uses the entered age.
 - Perfect days are highlighted in gold in the monthly calendar; a life-week tile is also highlighted if it contains a recorded perfect day. A perfect day means every currently selected essential habit was completed.
+
+
+### Calendar reminders (v9)
+- Select a date in Calendar → Month and use **Add** under Plans & reminders.
+- Each reminder stores a title, date, task time, independent alert time, and optional note. Edit/delete are supported; calendar dates with reminders show a marker.
+- The page checks due reminders every 15 seconds while open and displays a system notification if permission is granted, with an in-app toast fallback. Due alerts are deduplicated locally.
+- This is a foreground-capable reminder implementation, not a guaranteed background alarm. For alerts after the browser/app is closed, deploy a real Web Push backend and persist subscriptions securely on a server. Apple documents Home Screen Web Push for iOS/iPadOS 16.4+; notifications must be user-visible and permission must be requested from a user gesture.

@@ -620,7 +620,43 @@ input[type="time"], input[type="date"], input[type="number"] { width: 100%; min-
 .setting-row { grid-template-columns: minmax(0, 1fr) minmax(0, min(240px, 100%)); }
 .setting-row > input:not([type="checkbox"]), .setting-row > select, .setting-row > button { justify-self: stretch; inline-size: 100%; min-inline-size: 0; max-inline-size: 100%; }
 input[type="time"], input[type="date"], input[type="number"] { box-sizing: border-box !important; inline-size: 100% !important; min-inline-size: 0 !important; max-inline-size: 100% !important; }
-input[type="time"] { -webkit-appearance: none; appearance: none; }
+input[type="time"], input[type="date"] { -webkit-appearance: none; appearance: none; }
+/* iOS Safari gives date inputs an intrinsic internal width unless the WebKit
+   date editor is constrained as well as the outer input. Keep the DOB field
+   inside its label/card without changing the native date picker behaviour. */
+input[type="date"] {
+  display: block;
+  inline-size: 100% !important;
+  width: 100% !important;
+  min-inline-size: 0 !important;
+  max-inline-size: 100% !important;
+  box-sizing: border-box !important;
+  overflow: hidden;
+  padding-inline: 11px !important;
+  text-overflow: clip;
+}
+input[type="date"]::-webkit-date-and-time-value {
+  display: block;
+  inline-size: 100%;
+  width: 100%;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  margin: 0;
+  text-align: start;
+}
+input[type="date"]::-webkit-datetime-edit,
+input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+  min-inline-size: 0;
+  min-width: 0;
+  max-inline-size: 100%;
+  padding: 0;
+}
+input[type="date"]::-webkit-calendar-picker-indicator {
+  flex: 0 0 auto;
+  max-inline-size: 1.1em;
+  margin-inline-start: 4px;
+  padding: 0;
+}
 input[type="time"]::-webkit-date-and-time-value { display: block; min-width: 0; max-width: 100%; }
 .life-grid { display: grid; width: 100%; min-width: 0; max-width: 100%; box-sizing: border-box; grid-template-columns: repeat(52, minmax(0, 1fr)); align-items: stretch; gap: clamp(1px, .35vw, 3px); overflow: hidden; }
 .life-week { display: block; width: 100%; min-width: 0; max-width: 100%; aspect-ratio: 1 / 1; padding: 0 !important; margin: 0; border: 1px solid color-mix(in srgb, var(--line) 78%, transparent); border-radius: 2px; box-sizing: border-box; appearance: none; -webkit-appearance: none; background: var(--surface-soft); }
@@ -643,3 +679,25 @@ input[type="time"]::-webkit-date-and-time-value { display: block; min-width: 0; 
   .life-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .life-grid { gap: 1px; }
 }
+
+
+/* Calendar plans and custom reminders */
+.calendar-day.has-events { position: relative; }
+.calendar-event-mark { position: absolute; bottom: 4px; left: 50%; width: 5px; height: 5px; border-radius: 50%; transform: translateX(-50%); background: var(--accent-strong); }
+.calendar-day.perfect .calendar-event-mark { background: currentColor; }
+.day-reminders { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
+.day-reminders-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+.day-reminders-heading p { margin: 4px 0 0; font-size: .82rem; }
+.compact-button { min-height: 36px; padding: 7px 11px; white-space: nowrap; font-size: .84rem; }
+.calendar-event { display: grid; grid-template-columns: auto minmax(0,1fr) auto; align-items: start; gap: 9px; padding: 11px 0; border-top: 1px solid var(--line); }
+.event-time { display: grid; justify-items: start; gap: 4px; color: var(--accent-strong); font-size: .78rem; font-weight: 700; white-space: nowrap; }
+.event-main { min-width: 0; display: grid; gap: 4px; }
+.event-main strong { overflow-wrap: anywhere; color: var(--text); font-size: .9rem; }
+.event-main small { color: var(--text-secondary); line-height: 1.45; overflow-wrap: anywhere; }
+.event-actions { display: flex; gap: 2px; }
+.small-icon-button { width: 32px; height: 32px; min-width: 32px; padding: 0; }
+.empty-reminders { font-size: .85rem; padding: 6px 0; }
+.reminder-form .form-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+.reminder-form input, .reminder-form textarea { min-width: 0; width: 100%; max-width: 100%; box-sizing: border-box; }
+.modal-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+@media (max-width: 420px) { .reminder-form .form-grid { grid-template-columns: minmax(0,1fr); } .calendar-event { grid-template-columns: minmax(0,1fr) auto; } .event-time { grid-column: 1 / -1; display: flex; align-items: center; } }
