@@ -198,3 +198,31 @@ img,svg,canvas{max-width:100%}
   .arc-legend>span{font-size:11px;gap:6px}
   .arc-legend strong{font-size:11px}
 }
+
+
+/* v1.3.1 reliability, legibility and receipt controls */
+:root{font-synthesis:none}
+[data-money],.transaction-amount strong,.entity-value,.balance-number,.mobile-arc-center strong,.money-stats strong,.budget-numbers strong{font-variant-numeric:tabular-nums lining-nums;font-feature-settings:"tnum" 1,"lnum" 1}
+.transaction-row{min-width:0}
+.transaction-main{min-width:0;flex:1}
+.transaction-main strong,.transaction-main small{overflow-wrap:anywhere}
+.transaction-amount{display:flex;flex:0 0 auto;min-width:84px;flex-direction:column;align-items:flex-end;text-align:right;font-variant-numeric:tabular-nums}
+.transaction-amount strong{white-space:nowrap;letter-spacing:-.2px}
+.type-switch{grid-template-columns:repeat(4,minmax(0,1fr))}
+.type-switch button{min-width:0;padding-left:5px;padding-right:5px;white-space:nowrap}
+.amount-input{box-sizing:border-box;width:100%;min-width:0;font-variant-numeric:tabular-nums;letter-spacing:-.65px;line-height:1.2}
+.field-error{color:var(--red);font-size:12px;margin:-4px 0 0;line-height:1.4}
+.field-error[hidden]{display:none}
+.form-actions button:disabled{opacity:.62;cursor:wait;transform:none}
+.receipt-paper{max-width:450px;margin:8px auto 18px;padding:24px;background:#fff;color:#202820;border:1px solid #e3e9e2;border-radius:18px;box-shadow:0 8px 28px rgba(18,35,22,.06);font-family:Inter,"DM Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.receipt-brand{display:flex;align-items:center;gap:10px;min-width:0}
+.receipt-mark{display:grid;place-items:center;width:38px;height:38px;flex:none;border-radius:12px;background:#e2f2e8;color:#258456;font-size:22px;font-weight:800}
+.receipt-brand>div{min-width:0}.receipt-brand strong,.receipt-brand small{display:block}.receipt-brand strong{font-size:18px;color:#202820}.receipt-brand small{font-size:9px;letter-spacing:1.05px;color:#78837b;margin-top:2px}
+.receipt-status{margin-left:auto;border-radius:30px;padding:5px 9px;background:#e7f5eb;color:#258456;font-size:9px;font-weight:800;letter-spacing:.9px}
+.receipt-rule{height:1px;background:#e5eae4;margin:18px 0}.receipt-rule-dashed{height:1px;background:repeating-linear-gradient(to right,#cbd4cc 0 5px,transparent 5px 10px)}
+.receipt-kicker{margin:0;color:#77837a;font-size:10px;font-weight:800;letter-spacing:1.5px}.receipt-title{margin:6px 0 0;color:#202820;font-size:22px;line-height:1.25;overflow-wrap:anywhere}
+.receipt-amount{font-size:36px;line-height:1.2;font-weight:800;letter-spacing:-1px;font-variant-numeric:tabular-nums;margin:18px 0 5px;color:#202820}.receipt-in{color:#258456}.receipt-out{color:#c84e48}.receipt-subtitle{color:#77837a;font-size:12px;margin:0}
+.receipt-fields{display:grid;gap:0;margin:0}.receipt-fields>div{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;padding:9px 0;border-bottom:1px solid #edf0ec}.receipt-fields dt{color:#78827a;font-size:12px;flex:0 0 38%}.receipt-fields dd{margin:0;max-width:62%;text-align:right;font-size:12px;font-weight:650;overflow-wrap:anywhere;word-break:break-word}
+.receipt-note{margin-top:15px;padding:12px;background:#f6f8f5;border-radius:10px}.receipt-note small{font-size:9px;font-weight:800;letter-spacing:1px;color:#77837a}.receipt-note p{margin:4px 0 0;overflow-wrap:anywhere}.receipt-footnote{font-size:10px;color:#768078;line-height:1.55}.receipt-footer{display:flex;justify-content:space-between;gap:10px;color:#8b948d;font-size:9px;letter-spacing:.25px;flex-wrap:wrap}.receipt-actions{display:flex;justify-content:flex-end;gap:8px;padding:0 22px 22px;max-width:500px;margin:auto}.receipt-actions .primary-button{min-width:160px}.receipt-actions .icon-wrap{width:16px;height:16px}
+@media(max-width:720px){.transaction-amount{min-width:80px}.receipt-paper{padding:20px;margin:4px 14px 16px}.receipt-actions{padding:0 18px 18px;flex-wrap:wrap}.receipt-actions>*{flex:1 1 140px}.receipt-fields dt,.receipt-fields dd{font-size:11px}.receipt-amount{font-size:33px}}
+@media print{body *{visibility:hidden!important}#receipt-paper,#receipt-paper *{visibility:visible!important}#receipt-paper{position:absolute!important;left:0!important;top:0!important;width:100%!important;max-width:100%!important;margin:0!important;padding:0!important;border:0!important;box-shadow:none!important;border-radius:0!important}.receipt-actions,.modal-head,.form-actions{display:none!important}@page{margin:12mm}}

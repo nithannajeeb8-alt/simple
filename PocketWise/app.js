@@ -3,8 +3,17 @@
   'use strict';
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
-  const currency = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
-  const money = n => currency.format(Math.round(Number(n) || 0));
+  const money = n => {
+    const value = Number.isFinite(Number(n)) ? Number(n) : 0;
+    const fractional = Math.abs(value % 1) > 0.0000001;
+    return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: fractional ? 2 : 0, minimumFractionDigits: fractional ? 2 : 0 }).format(value);
+  };
+  const parseAmount = value => {
+    const raw = String(value ?? '').trim().replace(/[₹,\s]/g, '');
+    if (!raw || !/^(?:\d+(?:\.\d{0,2})?|\.\d{1,2})$/.test(raw)) return NaN;
+    const valueNumber = Number(raw);
+    return Number.isFinite(valueNumber) ? valueNumber : NaN;
+  };
   const uid = prefix => `${prefix || 'id'}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
   const localDate = (date = new Date()) => { const d = new Date(date); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
   const dayStart = d => { const x = new Date(d); x.setHours(0,0,0,0); return x; };
@@ -100,13 +109,46 @@
     return new Promise(resolve=>{try{const req=db.transaction('app','readonly').objectStore('app').get(STORE_KEY);req.onsuccess=()=>resolve(req.result||null);req.onerror=()=>resolve(null);}catch{resolve(null)}});
   }
   async function persist(){
-    try { if(db) await new Promise(resolve=>{const tx=db.transaction('app','readwrite');tx.objectStore('app').put(state,STORE_KEY);tx.oncomplete=resolve;tx.onerror=resolve;}); else localStorage.setItem(STORE_KEY,JSON.stringify(state)); }
-    catch(e){try{localStorage.setItem(STORE_KEY,JSON.stringify(state));}catch{toast('Storage is full. Export a backup before continuing.', 'amber');}}
+    // Write both stores where possible. Most importantly, never report a save
+    // as successful just because an IndexedDB request failed without throwing.
+    state.updatedAt = new Date().toISOString();
+    const serialized = JSON.stringify(state);
+    let indexedSaved = false, localSaved = false, indexedError = null, localError = null;
+    if (db) {
+      try {
+        await new Promise((resolve, reject) => {
+          let tx;
+          try {
+            tx = db.transaction('app', 'readwrite');
+            tx.objectStore('app').put(state, STORE_KEY);
+          } catch (error) { reject(error); return; }
+          tx.oncomplete = () => resolve();
+          tx.onerror = () => reject(tx.error || new Error('IndexedDB write failed'));
+          tx.onabort = () => reject(tx.error || new Error('IndexedDB write was cancelled'));
+        });
+        indexedSaved = true;
+      } catch (error) {
+        indexedError = error;
+        try { db.close(); } catch {}
+        db = null;
+        console.error('Pocketwise IndexedDB save failed; falling back to browser storage.', error);
+      }
+    }
+    try { localStorage.setItem(STORE_KEY, serialized); localSaved = true; }
+    catch (error) { localError = error; console.error('Pocketwise localStorage save failed.', error); }
+    if (!indexedSaved && !localSaved) {
+      const error = new Error('Pocketwise could not save this record. Export a backup, check available browser storage, and try again.');
+      error.cause = indexedError || localError;
+      throw error;
+    }
+    return { indexedDB: indexedSaved, localStorage: localSaved };
   }
   async function initialise(){
     db=await openDB();
-    let saved=await dbLoad();
-    if(!saved){try{saved=JSON.parse(localStorage.getItem(STORE_KEY)||'null')}catch{saved=null}}
+    let indexedSaved=await dbLoad(), localSaved=null;
+    try{localSaved=JSON.parse(localStorage.getItem(STORE_KEY)||'null')}catch{localSaved=null}
+    const stamp = record => { const n = Date.parse(record?.updatedAt || ''); return Number.isFinite(n) ? n : 0; };
+    let saved = indexedSaved && localSaved ? (stamp(localSaved) > stamp(indexedSaved) ? localSaved : indexedSaved) : (indexedSaved || localSaved);
     if(saved&&typeof saved==='object'&&Array.isArray(saved.transactions)){
       state={...initialState(),...saved,settings:{...initialState().settings,...(saved.settings||{})}};
       // Earlier builds shipped with fabricated demo finances. Remove those once, so users start clean.
@@ -116,7 +158,7 @@
       }
       state.sample=false;
     }
-    await persist();
+    try { await persist(); } catch (error) { console.error(error); toast(error.message || 'Could not prepare local storage. Export backups before continuing.', 'error'); }
     applyTheme();
     bindEvents();
     updateDateHeader();
@@ -189,7 +231,7 @@
     $('.days-progress').style.strokeDasharray=`${elapsedPct} 100`;
     const mobileProgress=$('.mobile-inner-progress');
     if(mobileProgress){mobileProgress.style.strokeDasharray=elapsedPct>0.05?`${elapsedPct} 100`:'0 100';mobileProgress.style.strokeDashoffset='0';}
-    if(t.net<0) $('[data-money="net"]').forEach(el=>el.style.color='var(--red)');else $('[data-money="net"]').forEach(el=>el.style.color='var(--green)');
+    if(t.net<0) $$('[data-money="net"]').forEach(el=>el.style.color='var(--red)');else $$('[data-money="net"]').forEach(el=>el.style.color='var(--green)');
     $('#activity-count').textContent=state.transactions.length;
     renderBudgetCategoryPreview();
   }
@@ -275,11 +317,56 @@
   function closeModal(){if($('#app-modal').open)$('#app-modal').close();currentEditId=null;}
   function accountOptions(selected=''){return state.accounts.map(a=>`<option value="${escapeHTML(a.id)}" ${selected===a.id?'selected':''}>${escapeHTML(a.name)}</option>`).join('');}
   function activityOptions(kind='expense',selected='') {const list=state.activities.filter(a=>a.kind==='both'||a.kind===kind||(kind==='expense'&&a.kind==='refund'));list.sort((a,b)=>{const ca=state.transactions.filter(t=>t.activityId===a.id).length,cb=state.transactions.filter(t=>t.activityId===b.id).length;return cb-ca||a.name.localeCompare(b.name)});return list.map(a=>`<option value="${escapeHTML(a.id)}" ${selected===a.id?'selected':''}>${escapeHTML(a.name)}</option>`).join('');}
-  function transactionForm(tx=null,forceType=null){currentEditId=tx?.id||null;currentTxType=forceType||tx?.type||'expense';if(['borrowed','lent','repay_out','repay_in'].includes(currentTxType))currentTxType='expense';const existing=tx||{};const isTransfer=currentTxType==='transfer';const typeList=[['expense','Expense'],['income','Income'],['transfer','Transfer'],['refund','Refund']];const amount=existing.amount??'';const selectedActivity=existing.activityId|| (currentTxType==='income'?'salary':currentTxType==='refund'?'refunds':'food');openModal(tx?'Edit transaction':'Quick Add',`<form id="transaction-form" class="modal-body"><div class="type-switch">${typeList.map(([t,l])=>`<button type="button" data-type="${t}" class="${currentTxType===t?'selected':''}" ${currentTxType===t?'aria-pressed="true"':'aria-pressed="false"'}>${l}</button>`).join('')}</div><div class="form-field"><label for="tx-amount">AMOUNT · INR</label><input id="tx-amount" class="amount-input" name="amount" inputmode="decimal" type="number" min="0.01" step="0.01" placeholder="₹ 0" value="${escapeHTML(amount)}" required autofocus></div><p class="amount-helper">No bank connection required. Records stay on this device.</p><div class="form-grid" style="margin-top:18px"><div class="form-field"><label for="tx-activity">ACTIVITY</label><select id="tx-activity" name="activityId">${activityOptions(currentTxType==='refund'?'refund':currentTxType,selectedActivity)}</select></div><div class="form-field"><label for="tx-account">ACCOUNT</label><select id="tx-account" name="accountId">${accountOptions(existing.accountId||state.accounts[0]?.id)}</select></div>${isTransfer?`<div class="form-field full"><label for="tx-to-account">TO ACCOUNT</label><select id="tx-to-account" name="toAccountId">${accountOptions(existing.toAccountId||state.accounts.find(a=>a.id!==existing.accountId)?.id)}</select></div>`:''}<div class="form-field"><label for="tx-date">DATE</label><input type="date" id="tx-date" name="date" value="${escapeHTML(existing.date||today())}" required></div><div class="form-field"><label for="tx-repeat">REPEAT</label><select id="tx-repeat" name="repeat"><option value="none">Does not repeat</option><option value="weekly">Weekly reminder</option><option value="monthly">Monthly reminder</option></select></div><div class="form-field full"><label for="tx-note">NOTE · OPTIONAL</label><textarea id="tx-note" name="note" placeholder="What was it for?" rows="2">${escapeHTML(existing.note||'')}</textarea></div></div><div class="form-actions"><button class="secondary-button" type="button" data-cancel-modal>Cancel</button><button class="secondary-button" type="button" id="voice-entry">${icon('mic')} Voice draft</button><button class="primary-button" type="submit">${tx?'Save changes':'Save transaction'}</button></div><p class="form-note" id="tx-form-note">${currentTxType==='transfer'?'Transfers change account balances but do not count as income or spending.':currentTxType==='refund'?'Refunds reduce recorded spending, rather than inflate income.':'Tap an activity to keep your records organized. You can add a note after choosing it.'}</p></form>`);
+  function transactionForm(tx=null,forceType=null){currentEditId=tx?.id||null;currentTxType=forceType||tx?.type||'expense';if(['borrowed','lent','repay_out','repay_in'].includes(currentTxType))currentTxType='expense';const existing=tx||{};const isTransfer=currentTxType==='transfer';const typeList=[['expense','Expense'],['income','Income'],['transfer','Transfer'],['refund','Refund']];const amount=existing.amount??'';const selectedActivity=existing.activityId|| (currentTxType==='income'?'salary':currentTxType==='refund'?'refunds':'food');openModal(tx?'Edit transaction':'Quick Add',`<form id="transaction-form" class="modal-body"><div class="type-switch">${typeList.map(([t,l])=>`<button type="button" data-type="${t}" class="${currentTxType===t?'selected':''}" ${currentTxType===t?'aria-pressed="true"':'aria-pressed="false"'}>${l}</button>`).join('')}</div><div class="form-field"><label for="tx-amount">AMOUNT · INR</label><input id="tx-amount" class="amount-input" name="amount" inputmode="decimal" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="₹ 0" value="${escapeHTML(amount)}" aria-describedby="tx-amount-error" required autofocus></div><p class="amount-helper">Enter an amount, including decimals. Records stay on this device.</p><p class="field-error" id="tx-amount-error" role="alert" hidden></p><div class="form-grid" style="margin-top:18px"><div class="form-field"><label for="tx-activity">ACTIVITY</label><select id="tx-activity" name="activityId">${activityOptions(currentTxType==='refund'?'refund':currentTxType,selectedActivity)}</select></div><div class="form-field"><label for="tx-account">ACCOUNT</label><select id="tx-account" name="accountId">${accountOptions(existing.accountId||state.accounts[0]?.id)}</select></div><div class="form-field"><label for="tx-payment-method">PAYMENT METHOD</label><select id="tx-payment-method" name="paymentMethod">${['Cash','UPI','Bank transfer','Debit card','Credit card','Wallet','Other'].map(v=>`<option value="${v}" ${(existing.paymentMethod||'Cash')===v?'selected':''}>${v}</option>`).join('')}</select></div>${isTransfer?`<div class="form-field full" id="tx-to-account-wrap"><label for="tx-to-account">TO ACCOUNT</label><select id="tx-to-account" name="toAccountId">${accountOptions(existing.toAccountId||state.accounts.find(a=>a.id!==existing.accountId)?.id)}</select></div>`:''}<div class="form-field"><label for="tx-date">DATE</label><input type="date" id="tx-date" name="date" value="${escapeHTML(existing.date||today())}" required></div><div class="form-field"><label for="tx-repeat">REPEAT</label><select id="tx-repeat" name="repeat"><option value="none">Does not repeat</option><option value="weekly">Weekly reminder</option><option value="monthly">Monthly reminder</option></select></div><div class="form-field full"><label for="tx-note">NOTE · OPTIONAL</label><textarea id="tx-note" name="note" placeholder="What was it for?" rows="2">${escapeHTML(existing.note||'')}</textarea></div></div><div class="form-actions"><button class="secondary-button" type="button" data-cancel-modal>Cancel</button><button class="secondary-button" type="button" id="voice-entry">${icon('mic')} Voice draft</button><button class="primary-button" type="submit">${tx?'Save changes':'Save transaction'}</button></div><p class="form-note" id="tx-form-note">${currentTxType==='transfer'?'Transfers change account balances but do not count as income or spending.':currentTxType==='refund'?'Refunds reduce recorded spending, rather than inflate income.':'Tap an activity to keep your records organized. You can add a note after choosing it.'}</p></form>`);
     $('#transaction-form').dataset.type=currentTxType;$('#tx-amount').focus({preventScroll:true});
   }
-  function addTransaction(data){const tx={id:uid('tx'),type:data.type,amount:Number(data.amount),activityId:data.activityId||'other',accountId:data.accountId||state.accounts[0]?.id,date:data.date||today(),note:(data.note||'').trim()};if(data.type==='transfer'){tx.toAccountId=data.toAccountId;if(!tx.toAccountId||tx.toAccountId===tx.accountId){toast('Choose two different accounts.','error');return false;}}if(data.repeat&&data.repeat!=='none'){let due=dateFrom(data.date||today());const step=data.repeat==='weekly'?7:data.repeat==='monthly'?30:0;if(step){while(localDate(due)<=today())due.setDate(due.getDate()+step);}state.reminders.push({id:uid('rem'),name:data.note||activityById(data.activityId).name,amount:tx.amount,date:localDate(due),accountId:tx.accountId,repeat:data.repeat,active:true,note:'Reminder created from a transaction; confirm payment manually'});}state.transactions.push(tx);return tx;}
-  async function saveTransactionForm(form){const editing=!!currentEditId;const editId=currentEditId;const fd=new FormData(form),type=form.dataset.type||currentTxType;const amount=Number(fd.get('amount'));if(!Number.isFinite(amount)||amount<=0){toast('Enter an amount greater than zero.','error');return;}const data={type,amount,activityId:fd.get('activityId'),accountId:fd.get('accountId'),toAccountId:fd.get('toAccountId'),date:fd.get('date'),note:fd.get('note'),repeat:fd.get('repeat')};if(type==='transfer'&&data.accountId===data.toAccountId){toast('Choose two different accounts.','error');return;}if(state.sample&&editing){toast('Clear the preview records before editing one, so sample data does not become real financial history.','amber');return;}if(state.sample&&!editing)ensurePersonalWorkspace();if(editing){const idx=state.transactions.findIndex(t=>t.id===editId);if(idx>=0)state.transactions[idx]={...state.transactions[idx],...data};}else{addTransaction(data);}await persist();closeModal();renderAll();await evaluateBudgetAlerts();toast(editing?'Transaction updated.':'Transaction saved.');}
+  function addTransaction(data){const tx={id:uid('tx'),type:data.type,amount:Number(data.amount),activityId:data.activityId||'other',accountId:data.accountId||state.accounts[0]?.id,date:data.date||today(),note:(data.note||'').trim(),paymentMethod:data.paymentMethod||'Cash',createdAt:new Date().toISOString()};if(data.type==='transfer'){tx.toAccountId=data.toAccountId;if(!tx.toAccountId||tx.toAccountId===tx.accountId){toast('Choose two different accounts.','error');return false;}}if(data.repeat&&data.repeat!=='none'){let due=dateFrom(data.date||today());const step=data.repeat==='weekly'?7:data.repeat==='monthly'?30:0;if(step){while(localDate(due)<=today())due.setDate(due.getDate()+step);}state.reminders.push({id:uid('rem'),name:data.note||activityById(data.activityId).name,amount:tx.amount,date:localDate(due),accountId:tx.accountId,repeat:data.repeat,active:true,note:'Reminder created from a transaction; confirm payment manually'});}state.transactions.push(tx);return tx;}
+  async function saveTransactionForm(form){
+    const snapshot = JSON.stringify(state);
+    const editing = !!currentEditId;
+    const editId = currentEditId;
+    const fd = new FormData(form);
+    const type = form.dataset.type || currentTxType;
+    const amount = parseAmount(fd.get('amount'));
+    const errorEl = $('#tx-amount-error');
+    if (!Number.isFinite(amount) || amount <= 0) {
+      if (errorEl) { errorEl.hidden = false; errorEl.textContent = 'Enter a valid amount greater than ₹0. Use up to two decimal places.'; }
+      $('#tx-amount')?.focus({preventScroll:true});
+      toast('Check the amount. It must be greater than ₹0.', 'error');
+      return;
+    }
+    if (errorEl) { errorEl.hidden = true; errorEl.textContent = ''; }
+    const data = {type,amount,activityId:fd.get('activityId'),accountId:fd.get('accountId'),toAccountId:fd.get('toAccountId'),date:fd.get('date'),note:fd.get('note'),repeat:fd.get('repeat'),paymentMethod:fd.get('paymentMethod')||'Cash'};
+    if (!data.date) { toast('Choose a transaction date.', 'error'); return; }
+    if (type === 'transfer' && (!data.toAccountId || data.accountId === data.toAccountId)) { toast('Choose two different accounts.', 'error'); return; }
+    if (state.sample && editing) { toast('Clear the preview records before editing one, so sample data does not become real financial history.', 'amber'); return; }
+    try {
+      if (state.sample && !editing) ensurePersonalWorkspace();
+      let savedTx;
+      if (editing) {
+        const idx = state.transactions.findIndex(t => t.id === editId);
+        if (idx < 0) throw new Error('This transaction is no longer available. Close the form and try again.');
+        state.transactions[idx] = {...state.transactions[idx],...data,updatedAt:new Date().toISOString()};
+        savedTx = state.transactions[idx];
+      } else {
+        savedTx = addTransaction(data);
+        if (!savedTx) { state = JSON.parse(snapshot); renderAll(); return; }
+      }
+      await persist();
+      closeModal();
+      renderAll();
+      try { await evaluateBudgetAlerts(); } catch (alertError) { console.warn('Transaction saved, but alert refresh failed.', alertError); }
+      toast(editing ? 'Transaction updated. Receipt is ready.' : 'Transaction saved. Receipt is ready.');
+      // Show a real receipt preview immediately after a successful save. It can
+      // be printed or saved to PDF, and remains accessible from transaction details.
+      showTransactionReceipt(state.transactions.find(t => t.id === savedTx.id) || savedTx);
+    } catch (error) {
+      state = JSON.parse(snapshot);
+      renderAll();
+      console.error('Pocketwise transaction save failed.', error);
+      toast(error.message || 'Could not save this transaction. Your previous records were restored.', 'error');
+    }
+  }
 
   function budgetForm(){const cats=state.activities.filter(a=>a.kind==='expense'||a.kind==='both');openModal('Prepare your budget',`<form id="budget-form" class="modal-body"><div class="form-field"><label for="budget-total">TOTAL MONTHLY SPENDING LIMIT · INR</label><input class="amount-input" id="budget-total" name="total" type="number" min="0" step="100" placeholder="₹ 8,000" value="${state.budgets.total||''}" required><span class="amount-helper">This is the total spending limit you choose, not a judgement of what you should spend.</span></div><div class="modal-section-title">CATEGORY LIMITS · OPTIONAL</div><div class="form-grid">${cats.map(a=>`<div class="form-field"><label for="budget-${escapeHTML(a.id)}">${escapeHTML(a.name)}</label><input id="budget-${escapeHTML(a.id)}" name="cat-${escapeHTML(a.id)}" type="number" min="0" step="50" placeholder="No limit" value="${state.budgets.categories[a.id]??''}"></div>`).join('')}</div><div class="form-field full" style="margin-top:14px"><label for="budget-note">YOUR INTENTION · OPTIONAL</label><textarea id="budget-note" placeholder="E.g. keep food spending steady during exams" name="note">${escapeHTML(state.budgets.note||'')}</textarea></div><div class="form-actions"><button class="secondary-button" type="button" data-cancel-modal>Cancel</button><button class="primary-button" type="submit">Save budget</button></div></form>`,'YOUR PLAN');}
   async function saveBudget(form){const fd=new FormData(form);const total=Number(fd.get('total'));if(!Number.isFinite(total)||total<0){toast('Enter a valid budget.','error');return;}ensurePersonalWorkspace();const categories={};for(const a of state.activities){const v=fd.get(`cat-${a.id}`);if(v!==null&&v!==''&&Number(v)>=0)categories[a.id]=Number(v);}state.budgets={...state.budgets,total,categories,note:fd.get('note')||''};await persist();closeModal();renderAll();evaluateBudgetAlerts();toast('Budget updated. Your plan, your call.');}
@@ -293,7 +380,49 @@
   function ensurePersonalWorkspace(){if(!state.sample)return;state.transactions=[];state.debts=[];state.goals=[];state.reminders=[];state.accounts.forEach(a=>a.openingBalance=0);state.budgets={total:0,categories:{},note:''};state.settings.notifications=[];state.settings.sentAlerts=[];state.settings.seenAlerts=[];state.sample=false;toast('Sample records cleared. You are now using your own workspace.');}
   function showTransactionDetail(tx){const a=txActivity(tx),account=accountById(tx.accountId),debt=tx.debtId?debtById(tx.debtId):null;let title=tx.note||a.name;if(debt)title=tx.type==='borrowed'?`Borrowed from ${debt.person}`:tx.type==='lent'?`Lent to ${debt.person}`:tx.type==='repay_out'?`Repayment to ${debt.person}`:`Repayment from ${debt.person}`;if(tx.type==='transfer')title=`Transfer · ${account.name} to ${accountById(tx.toAccountId).name}`;
     const detailType=['expense','repay_out','lent'].includes(tx.type)?'out':'in';const editable=!tx.debtId;
-    openModal(title,`<div class="modal-body"><div class="detail-grid"><div class="detail-cell"><small>AMOUNT</small><strong class="${detailType==='in'?'amount-positive':''}">${['expense','repay_out','lent'].includes(tx.type)?'−':''}${money(tx.amount)}</strong></div><div class="detail-cell"><small>TYPE</small><strong>${escapeHTML(typeLabel(tx.type))}</strong></div><div class="detail-cell"><small>ACTIVITY</small><strong>${escapeHTML(a.name)}</strong></div><div class="detail-cell"><small>ACCOUNT</small><strong>${escapeHTML(account.name)}${tx.toAccountId?` → ${escapeHTML(accountById(tx.toAccountId).name)}`:''}</strong></div><div class="detail-cell"><small>DATE</small><strong>${niceDate(tx.date)}</strong></div><div class="detail-cell"><small>IDENTIFIER</small><strong style="font-size:9px;word-break:break-all">${escapeHTML(tx.id)}</strong></div></div><div class="note-box"><small>NOTE</small><p>${escapeHTML(tx.note||'No note added.')}</p></div>${debt?`<div class="form-note">Linked debt: ${escapeHTML(debt.person)} · ${money(debtRemaining(debt))} remains. Repayment history is preserved.</div>`:''}<div class="form-actions"><button class="secondary-button" data-cancel-modal>Close</button>${debt?`<button class="secondary-button" data-debt-detail="${debt.id}">Debt history</button>`:editable?`<button class="secondary-button" data-tx-edit="${tx.id}">${icon('edit')} Edit</button>`:''}<button class="danger-button" data-tx-delete="${tx.id}">Delete</button></div></div>`,'ACTIVITY DETAILS');}
+    openModal(title,`<div class="modal-body"><div class="detail-grid"><div class="detail-cell"><small>AMOUNT</small><strong class="${detailType==='in'?'amount-positive':''}">${['expense','repay_out','lent'].includes(tx.type)?'−':''}${money(tx.amount)}</strong></div><div class="detail-cell"><small>TYPE</small><strong>${escapeHTML(typeLabel(tx.type))}</strong></div><div class="detail-cell"><small>ACTIVITY</small><strong>${escapeHTML(a.name)}</strong></div><div class="detail-cell"><small>ACCOUNT</small><strong>${escapeHTML(account.name)}${tx.toAccountId?` → ${escapeHTML(accountById(tx.toAccountId).name)}`:''}</strong></div><div class="detail-cell"><small>DATE</small><strong>${niceDate(tx.date)}</strong></div><div class="detail-cell"><small>IDENTIFIER</small><strong style="font-size:9px;word-break:break-all">${escapeHTML(tx.id)}</strong></div></div><div class="note-box"><small>NOTE</small><p>${escapeHTML(tx.note||'No note added.')}</p></div>${debt?`<div class="form-note">Linked debt: ${escapeHTML(debt.person)} · ${money(debtRemaining(debt))} remains. Repayment history is preserved.</div>`:''}<div class="form-actions"><button class="secondary-button" data-cancel-modal>Close</button>${debt?`<button class="secondary-button" data-debt-detail="${debt.id}">Debt history</button>`:editable?`<button class="secondary-button" data-tx-edit="${tx.id}">${icon('edit')} Edit</button>`:''}<button class="secondary-button" data-tx-receipt="${tx.id}">${icon('receipt')} Receipt</button><button class="danger-button" data-tx-delete="${tx.id}">Delete</button></div></div>`,'ACTIVITY DETAILS');}
+  function receiptMarkup(tx){
+    const a=txActivity(tx), from=accountById(tx.accountId), to=tx.toAccountId?accountById(tx.toAccountId):null;
+    const isOut=['expense','lent','repay_out'].includes(tx.type);
+    const isIn=['income','refund','borrowed','repay_in'].includes(tx.type);
+    const title=tx.note?.trim() || (tx.type==='transfer'?'Account transfer':a.name);
+    const ref=String(tx.id||'').replace(/[^a-zA-Z0-9_-]/g,'');
+    return `<article class="receipt-paper" id="receipt-paper">
+      <header class="receipt-brand"><span class="receipt-mark">✓</span><div><strong>Pocketwise</strong><small>PERSONAL FINANCE RECORD</small></div><span class="receipt-status">SAVED</span></header>
+      <div class="receipt-rule"></div><p class="receipt-kicker">TRANSACTION RECEIPT</p><h3 class="receipt-title">${escapeHTML(title)}</h3>
+      <p class="receipt-amount ${isOut?'receipt-out':isIn?'receipt-in':''}">${isOut?'−':isIn?'+':''}${escapeHTML(money(tx.amount))}</p>
+      <p class="receipt-subtitle">${escapeHTML(typeLabel(tx.type))} · ${escapeHTML(tx.date?niceDate(tx.date):'Date not set')}</p>
+      <div class="receipt-rule receipt-rule-dashed"></div>
+      <dl class="receipt-fields">
+        <div><dt>Reference ID</dt><dd>${escapeHTML(ref || 'Not available')}</dd></div>
+        <div><dt>Activity</dt><dd>${escapeHTML(a.name)}</dd></div>
+        <div><dt>Account</dt><dd>${escapeHTML(from.name)}</dd></div>
+        ${to?`<div><dt>Transferred to</dt><dd>${escapeHTML(to.name)}</dd></div>`:''}
+        <div><dt>Payment method</dt><dd>${escapeHTML(tx.paymentMethod||'Not specified')}</dd></div>
+        <div><dt>Record status</dt><dd>Saved on this device</dd></div>
+        <div><dt>Saved on</dt><dd>${escapeHTML(tx.createdAt?new Date(tx.createdAt).toLocaleString():niceDate(tx.date))}</dd></div>
+      </dl>
+      ${tx.note?`<div class="receipt-note"><small>NOTE</small><p>${escapeHTML(tx.note)}</p></div>`:''}
+      <div class="receipt-rule receipt-rule-dashed"></div><p class="receipt-footnote">This is a Pocketwise personal record generated from information you entered. It is not a bank, card-network, or UPI-issued receipt and does not independently prove payment settlement.</p>
+      <footer class="receipt-footer"><span>Private by design</span><span>Receipt · ${escapeHTML(ref.slice(-8).toUpperCase()||'LOCAL')}</span></footer>
+    </article>`;
+  }
+  function showTransactionReceipt(tx){
+    openModal('Receipt preview',`${receiptMarkup(tx)}<div class="receipt-actions"><button class="secondary-button" data-cancel-modal>Close</button><button class="primary-button" id="print-receipt" data-print-receipt="${escapeHTML(tx.id)}">${icon('download')} Print / Save PDF</button></div>`,'SAVE OR PRINT');
+  }
+  function printTransactionReceipt(id){
+    const tx=state.transactions.find(item=>item.id===id); if(!tx){toast('This transaction could not be found.','error');return;}
+    // Build a self-contained print document. Financial records never leave this device.
+    const popup=window.open('','_blank','width=520,height=760');
+    if(!popup){toast('Allow pop-ups for this site to print or save the receipt as PDF.','amber');return;}
+    try { popup.opener = null; } catch {}
+    const markup=receiptMarkup(tx);
+    popup.document.open();
+    popup.document.write(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pocketwise receipt</title><style>
+      *{box-sizing:border-box}body{margin:0;padding:28px;background:#f3f5f2;color:#202820;font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.receipt-paper{max-width:440px;margin:0 auto;background:#fff;padding:28px;border:1px solid #e4e9e3;border-radius:18px;box-shadow:0 8px 28px #1e30200d}.receipt-brand{display:flex;gap:10px;align-items:center}.receipt-mark{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:#e2f2e8;color:#258456;font-size:22px;font-weight:800}.receipt-brand strong,.receipt-brand small{display:block}.receipt-brand strong{font-size:18px}.receipt-brand small{font-size:9px;letter-spacing:1.25px;color:#7a857d}.receipt-status{margin-left:auto;font-size:9px;letter-spacing:1px;font-weight:800;color:#258456;background:#e8f5ec;border-radius:30px;padding:5px 9px}.receipt-rule{height:1px;background:#e5e9e4;margin:20px 0}.receipt-rule-dashed{background:repeating-linear-gradient(to right,#c8d2c9 0 5px,transparent 5px 10px)}.receipt-kicker{margin:0;color:#77837a;font-size:10px;font-weight:800;letter-spacing:1.6px}.receipt-title{margin:6px 0 0;font-size:22px;line-height:1.25;overflow-wrap:anywhere}.receipt-amount{font-weight:800;font-size:36px;line-height:1.2;letter-spacing:-1px;margin:18px 0 5px;font-variant-numeric:tabular-nums}.receipt-in{color:#258456}.receipt-out{color:#c84e48}.receipt-subtitle{margin:0;color:#7a857d;font-size:12px}.receipt-fields{margin:0;display:grid;gap:0}.receipt-fields>div{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px solid #edf0ec}.receipt-fields dt{color:#78827a;font-size:12px}.receipt-fields dd{margin:0;text-align:right;max-width:62%;font-size:12px;font-weight:650;overflow-wrap:anywhere}.receipt-note{margin-top:17px;padding:12px;background:#f6f8f5;border-radius:10px}.receipt-note small{font-size:9px;font-weight:800;letter-spacing:1px;color:#77837a}.receipt-note p{margin:4px 0 0;overflow-wrap:anywhere}.receipt-footnote{font-size:10px;color:#768078;line-height:1.55}.receipt-footer{display:flex;justify-content:space-between;gap:10px;color:#8b948d;font-size:9px;letter-spacing:.3px}.receipt-actions{display:none}@page{size:auto;margin:12mm}@media print{body{background:#fff;padding:0}.receipt-paper{border:0;box-shadow:none;border-radius:0;padding:0;max-width:none}.receipt-actions{display:none}}
+      </style></head><body>${markup}<script>window.addEventListener('load',()=>setTimeout(()=>window.print(),250));</script></body></html>`);
+    popup.document.close();
+  }
   function confirmDeleteTransaction(id){const tx=state.transactions.find(t=>t.id===id);if(!tx)return;if(!confirm('Delete this transaction? Account balances and reports will be recalculated.'))return;if(tx.debtId&&['borrowed','lent'].includes(tx.type)){state.transactions=state.transactions.filter(t=>t.debtId!==tx.debtId);state.debts=state.debts.filter(d=>d.id!==tx.debtId);}else state.transactions=state.transactions.filter(t=>t.id!==id);persist().then(()=>{closeModal();renderAll();toast('Record deleted. Related balances updated.');});}
   function accountsManager(){openModal('Accounts',`<div class="modal-body"><div class="entity-list">${state.accounts.map(a=>`<div class="entity-row"><span class="transaction-icon blue">${icon(a.type==='cash'?'wallet':a.type==='card'?'receipt':'dollar')}</span><div class="entity-copy"><strong>${escapeHTML(a.name)}</strong><small>${escapeHTML(a.type)} · Opening balance ${money(a.openingBalance)}</small></div><div class="entity-value">${fmtHidden(balanceForAccount(a.id))}</div><div class="entity-actions"><button class="mini-button" data-account-edit="${a.id}" title="Edit account">${icon('edit')}</button>${state.accounts.length>1?`<button class="mini-button" data-account-remove="${a.id}" title="Remove account">${icon('trash')}</button>`:''}</div></div>`).join('')}</div><div class="modal-section-title">ADD AN ACCOUNT</div><form id="account-form"><div class="form-grid"><div class="form-field"><label for="account-name">ACCOUNT NAME</label><input id="account-name" name="name" placeholder="e.g. Scholarship account" required></div><div class="form-field"><label for="account-type">TYPE</label><select id="account-type" name="type"><option value="cash">Cash</option><option value="bank">Bank / UPI</option><option value="card">Card</option><option value="savings">Savings</option><option value="other">Other</option></select></div><div class="form-field full"><label for="account-opening">OPENING BALANCE · INR</label><input id="account-opening" name="openingBalance" type="number" step="0.01" value="0"></div></div><div class="form-actions"><button class="primary-button" type="submit">Add account</button></div></form><div class="form-actions"><button class="secondary-button" data-cancel-modal>Done</button></div></div>`,'ACCOUNTS');}
   async function addAccountForm(form){const fd=new FormData(form),name=String(fd.get('name')||'').trim();if(!name){toast('Give the account a name.','error');return;}ensurePersonalWorkspace();state.accounts.push({id:uid('acct'),name,type:fd.get('type'),openingBalance:Number(fd.get('openingBalance'))||0});await persist();accountsManager();renderAll();toast('Account added.');}
@@ -325,7 +454,7 @@
   function bindEvents(){
     document.addEventListener('click', async event=>{
       const pageBtn=event.target.closest('[data-page]');if(pageBtn){setPage(pageBtn.dataset.page);return;}
-      const typeBtn=event.target.closest('[data-type]');if(typeBtn&&typeBtn.closest('#transaction-form')){event.preventDefault();currentTxType=typeBtn.dataset.type;const form=$('#transaction-form');form.dataset.type=currentTxType;$$('.type-switch [data-type]',form).forEach(b=>b.classList.toggle('selected',b===typeBtn));const act=$('#tx-activity');const wanted=currentTxType==='income'?'salary':currentTxType==='refund'?'refunds':'food';act.innerHTML=activityOptions(currentTxType,wanted);const note=$('#tx-form-note');if(note)note.textContent=currentTxType==='transfer'?'Transfers change account balances but do not count as income or spending.':currentTxType==='refund'?'Refunds reduce recorded spending, rather than inflate income.':'Tap an activity to keep your records organized. You can add a note after choosing it.';if(currentTxType==='transfer'&&!$('#tx-to-account')){$('#tx-account').parentElement.insertAdjacentHTML('afterend',`<div class="form-field full" id="tx-to-account-wrap"><label for="tx-to-account">TO ACCOUNT</label><select id="tx-to-account" name="toAccountId">${accountOptions(state.accounts.find(a=>a.id!==$('#tx-account').value)?.id)}</select></div>`);}else if(currentTxType!=='transfer')$('#tx-to-account-wrap')?.remove();return;}
+      const typeBtn=event.target.closest('.type-switch button[data-type]');if(typeBtn&&typeBtn.closest('#transaction-form')){event.preventDefault();currentTxType=typeBtn.dataset.type;const form=$('#transaction-form');form.dataset.type=currentTxType;$$('.type-switch [data-type]',form).forEach(b=>{b.classList.toggle('selected',b===typeBtn);b.setAttribute('aria-pressed',b===typeBtn?'true':'false');});const act=$('#tx-activity');const wanted=currentTxType==='income'?'salary':currentTxType==='refund'?'refunds':'food';act.innerHTML=activityOptions(currentTxType,wanted);const note=$('#tx-form-note');if(note)note.textContent=currentTxType==='transfer'?'Transfers change account balances but do not count as income or spending.':currentTxType==='refund'?'Refunds reduce recorded spending, rather than inflate income.':'Tap an activity to keep your records organized. You can add a note after choosing it.';if(currentTxType==='transfer'&&!$('#tx-to-account')){$('#tx-account').parentElement.insertAdjacentHTML('afterend',`<div class="form-field full" id="tx-to-account-wrap"><label for="tx-to-account">TO ACCOUNT</label><select id="tx-to-account" name="toAccountId">${accountOptions(state.accounts.find(a=>a.id!==$('#tx-account').value)?.id)}</select></div>`);}else if(currentTxType!=='transfer')$('#tx-to-account-wrap')?.remove();return;}
       const debtDir=event.target.closest('[data-debt-direction]');if(debtDir){$('#debt-direction').value=debtDir.dataset.debtDirection;$$('[data-debt-direction]').forEach(b=>b.classList.toggle('selected',b===debtDir));return;}
       const closeBtn=event.target.closest('[data-cancel-modal]');if(closeBtn){closeModal();return;}
       if(event.target.closest('[data-close-notifications]')){$('#notifications-modal').close();return;}
@@ -334,13 +463,15 @@
       const addType=event.target.closest('[data-add-type]');if(addType){transactionForm(null,addType.dataset.addType);return;}
       const action=event.target.closest('[data-action]')?.dataset.action;if(action){if(action==='budget')budgetForm();else if(action==='debts')showDebts();else if(action==='new-debt')debtForm();else if(action==='accounts')accountsManager();return;}
       if(event.target.closest('#theme-toggle')){state.settings.theme=state.settings.theme==='dark'?'light':'dark';await persist();applyTheme();scheduleCharts();return;}
-      const themeBtn=event.target.closest('[data-theme]');if(themeBtn){state.settings.theme=themeBtn.dataset.theme;await persist();applyTheme();scheduleCharts();return;}
+      const themeBtn=event.target.closest('button[data-theme]');if(themeBtn){state.settings.theme=themeBtn.dataset.theme;await persist();applyTheme();scheduleCharts();return;}
       if(event.target.closest('#hide-balances')){if(state.settings.hideBalances){state.settings.hideBalances=false;hiddenAmounts=false;await persist();renderSettingsSummary();}else{hiddenAmounts=!hiddenAmounts;}applyHiddenAmounts();return;}
       if(event.target.closest('#open-notifications')||event.target.closest('#view-alerts')){openNotifications();return;}
       if(event.target.closest('#clear-sample')){if(confirm('Clear all preview records, sample balances, goals and reminders so you can start with a clean workspace?')){state.transactions=[];state.debts=[];state.goals=[];state.reminders=[];state.accounts.forEach(a=>a.openingBalance=0);state.budgets={total:0,categories:{},note:''};state.sample=false;state.settings.notifications=[];state.settings.sentAlerts=[];state.settings.seenAlerts=[];await persist();renderAll();toast('Clean workspace ready.');}return;}
       const debtRepay=event.target.closest('[data-debt-repay]');if(debtRepay){const d=debtById(debtRepay.dataset.debtRepay);if(d&&debtRemaining(d)>0)repaymentForm(d);return;}
       const debtDetails=event.target.closest('[data-debt-detail]');if(debtDetails){const d=debtById(debtDetails.dataset.debtDetail);if(d)debtDetail(d);return;}
       const txOpen=event.target.closest('[data-tx-open]');if(txOpen){const tx=state.transactions.find(t=>t.id===txOpen.dataset.txOpen);if(tx)showTransactionDetail(tx);return;}
+      const txReceipt=event.target.closest('[data-tx-receipt]');if(txReceipt){const tx=state.transactions.find(t=>t.id===txReceipt.dataset.txReceipt);if(tx)showTransactionReceipt(tx);return;}
+      const printReceipt=event.target.closest('[data-print-receipt]');if(printReceipt){printTransactionReceipt(printReceipt.dataset.printReceipt);return;}
       const txEdit=event.target.closest('[data-tx-edit]');if(txEdit){const tx=state.transactions.find(t=>t.id===txEdit.dataset.txEdit);if(tx)transactionForm(tx,tx.type);return;}
       const txDelete=event.target.closest('[data-tx-delete]');if(txDelete){confirmDeleteTransaction(txDelete.dataset.txDelete);return;}
       const activityQuick=event.target.closest('[data-activity-quick]');if(activityQuick){const chosen=activityById(activityQuick.dataset.activityQuick);transactionForm(null,chosen.kind==='income'?'income':chosen.kind==='refund'?'refund':'expense');$('#tx-activity').value=activityQuick.dataset.activityQuick;return;}
@@ -372,7 +503,15 @@
       if(event.target.closest('#mix-view-toggle')){mixView=mixView==='doughnut'?'pie':mixView==='pie'?'bar':'doughnut';const btn=$('#mix-view-toggle');btn.title=mixView==='doughnut'?'Switch to pie chart':mixView==='pie'?'Switch to category bars':'Switch to doughnut chart';scheduleCharts();return;}
       if(event.target.closest('#goal-empty-add')){goalForm();return;}
     });
-    document.addEventListener('submit', async e=>{const form=e.target;if(!(form instanceof HTMLFormElement))return;e.preventDefault();if(form.id==='transaction-form')await saveTransactionForm(form);else if(form.id==='budget-form')await saveBudget(form);else if(form.id==='debt-form')await saveDebt(form);else if(form.id==='repayment-form')await saveRepayment(form);else if(form.id==='account-form')await addAccountForm(form);else if(form.id==='account-edit-form')await saveAccountEdit(form);else if(form.id==='activity-form')await addActivityForm(form);else if(form.id==='activity-edit-form')await saveActivityEdit(form);else if(form.id==='goal-form')await saveGoal(form);else if(form.id==='goal-contribution-form')await saveGoalContribution(form);else if(form.id==='reminder-form')await saveReminder(form);});
+    document.addEventListener('submit', async e=>{
+      const form=e.target;if(!(form instanceof HTMLFormElement))return;e.preventDefault();
+      const submitButton=form.querySelector('button[type="submit"]');
+      if(submitButton){submitButton.disabled=true;submitButton.setAttribute('aria-busy','true');}
+      try {
+        if(form.id==='transaction-form')await saveTransactionForm(form);else if(form.id==='budget-form')await saveBudget(form);else if(form.id==='debt-form')await saveDebt(form);else if(form.id==='repayment-form')await saveRepayment(form);else if(form.id==='account-form')await addAccountForm(form);else if(form.id==='account-edit-form')await saveAccountEdit(form);else if(form.id==='activity-form')await addActivityForm(form);else if(form.id==='activity-edit-form')await saveActivityEdit(form);else if(form.id==='goal-form')await saveGoal(form);else if(form.id==='goal-contribution-form')await saveGoalContribution(form);else if(form.id==='reminder-form')await saveReminder(form);
+      } catch(error) { console.error('Pocketwise form action failed.',error); toast(error.message||'That change could not be saved. Please try again.','error'); }
+      finally { if(submitButton && submitButton.isConnected){submitButton.disabled=false;submitButton.removeAttribute('aria-busy');} }
+    });
     document.addEventListener('keydown',e=>{const tx=e.target.closest?.('[data-tx-open]');if(tx&&(e.key==='Enter'||e.key===' ')){e.preventDefault();tx.click();}});
     $('#activity-search').addEventListener('input',renderActivity);$('#activity-period').addEventListener('change',()=>{currentYearFilter=null;renderActivity()});$('#insights-period').addEventListener('change',()=>{renderInsights();scheduleCharts()});$('#home-chart-mode').addEventListener('change',scheduleCharts);$('#trend-type').addEventListener('change',scheduleCharts);$('#ranking-mode').addEventListener('change',()=>renderRankings(chartPeriod()));
     $('#activity-filters').addEventListener('click',e=>{const b=e.target.closest('[data-filter]');if(!b)return;currentFilter=b.dataset.filter;renderActivity();});
@@ -391,5 +530,7 @@
   /* Add small secondary controls to goal rows after their first render. */
   const _renderGoals = renderGoals;
   renderGoals = function(){_renderGoals();const list=$('#goals-list');if(!list)return;$$('.goal-row',list).forEach((row,i)=>{const goal=state.goals[i];if(!goal)return;const line=$('.goal-line',row);if(line&&!$('.goal-actions',row)){const actions=document.createElement('div');actions.className='goal-actions';actions.style.cssText='display:flex;gap:6px;align-items:center;justify-content:flex-end';actions.innerHTML=`<button class="mini-button" data-goal-add="${goal.id}" title="Add progress">${svgIcon('income')}</button><button class="mini-button" data-goal-edit="${goal.id}" title="Edit goal">${svgIcon('edit')}</button>`;line.append(actions);}});};
+  window.addEventListener('error', event => { console.error('Pocketwise runtime error:',event.error||event.message); });
+  window.addEventListener('unhandledrejection', event => { console.error('Pocketwise async error:',event.reason); toast(event.reason?.message||'A background action failed. Your existing records are unchanged.','error'); });
   initialise().then(()=>{const shortcut=new URLSearchParams(location.search).get('quickadd');if(shortcut)setTimeout(()=>{if(shortcut==='debt')showDebts();else transactionForm(null,['expense','income','transfer','refund'].includes(shortcut)?shortcut:'expense');},220);});
 })();
