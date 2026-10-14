@@ -25,3 +25,13 @@
 - The captured query is removed from the address bar with `history.replaceState` after reading. This reduces exposure but does not guarantee the URL was never recorded by browser/OS diagnostics.
 - Added `SHORTCUT_SETUP.md` with Back Tap setup instructions and a test checklist. The Shortcut itself must be created in Apple's Shortcuts app on the user's iPhone; a portable `.shortcut` file cannot be reliably authored/signature-verified from this web-only project.
 - `node --check app.js`, `node --check sw.js`, and `node tests/quickadd-shortcut.test.cjs` pass. A full Chromium end-to-end run was attempted but this environment blocks browser navigation to both local HTTP and file URLs (`ERR_BLOCKED_BY_ADMINISTRATOR`), so iOS Shortcut invocation and live IndexedDB save are not claimed as browser-verified.
+
+
+## v1.3.6 Shortcut handoff repair
+
+- Expanded the Quick Add receiver to read parameters from either the URL query string or URL fragment, which helps diagnose launchers that relocate parameters.
+- Normalized common shortcut labels including `Purchase / Expense` to Pocketwise's internal `expense` type.
+- Updated the Shortcut setup guide to call out the likely magic-variable mix-up visible in the provided screenshots: `amount=` must use the output of **Ask for Number**, not **Provided Input** from **Receive from Share Sheet**; `category=` must use the category prompt output, not the transaction-type menu result.
+- Bumped the service-worker cache to `pocketwise-shell-v1.3.6`.
+- Checks run for this package: `node --check app.js`, `node --check sw.js`, `node tests/quickadd-shortcut.test.cjs`, and ZIP integrity.
+- Not verified: running this on the user's physical iPhone or editing the already-shared iCloud Shortcut automatically. The Shortcut actions must be corrected in Apple Shortcuts.

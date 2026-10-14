@@ -215,15 +215,19 @@
     const total=income+expenses;
     const segmentGap=2;
     const availableArc=total>0?100-segmentGap:0;
-    const incomeLen=total>0?(income/total)*availableArc:0;
-    const expenseLen=total>0?(expenses/total)*availableArc:0;
+    const isMonthlyLoss=t.net<0;
+    // In a net-loss month, show the outer ring as red so the overall result
+    // cannot be mistaken for a positive month because of the income segment.
+    const incomeLen=!isMonthlyLoss&&total>0?(income/total)*availableArc:0;
+    const expenseLen=isMonthlyLoss&&total>0?availableArc:(total>0?(expenses/total)*availableArc:0);
     const incomeArc=$('.arc-income'), expenseArc=$('.arc-expense');
     incomeArc.style.strokeDasharray=incomeLen>0.05?`${incomeLen} 100`:'0 100';
     incomeArc.style.strokeDashoffset='0';
     incomeArc.style.opacity=incomeLen>0.05?'1':'0';
     incomeArc.style.visibility=incomeLen>0.05?'visible':'hidden';
     expenseArc.style.strokeDasharray=expenseLen>0.05?`${expenseLen} 100`:'0 100';
-    // Place the red segment against the right endpoint, rather than after green.
+    // Keep the red segment anchored to the right endpoint; for a loss it fills
+    // the entire outer arc (minus the small neutral end gap).
     expenseArc.style.strokeDashoffset=expenseLen>0.05?`${-(100-expenseLen)}`:'0';
     expenseArc.style.opacity=expenseLen>0.05?'1':'0';
     expenseArc.style.visibility=expenseLen>0.05?'visible':'hidden';
@@ -489,7 +493,7 @@
   function csvCell(v){const s=String(v??'');return `"${s.replace(/"/g,'""')}"`;}
   function exportCSV(){const headers=['id','date','type','amount_inr','activity','account','to_account','debt_person','note'];const rows=state.transactions.slice().sort((a,b)=>a.date.localeCompare(b.date)).map(t=>[t.id,t.date,typeLabel(t.type),t.amount,txActivity(t).name,accountById(t.accountId).name,t.toAccountId?accountById(t.toAccountId).name:'',t.debtId?debtById(t.debtId)?.person||'':'',t.note]);const csv=[headers,...rows].map(r=>r.map(csvCell).join(',')).join('\r\n');downloadBlob(`pocketwise-transactions-${today()}.csv`,new Blob(['\ufeff',csv],{type:'text/csv;charset=utf-8'}));toast('CSV ready for your spreadsheet.');}
   async function importBackup(file){if(!file)return;try{const text=await file.text(),raw=JSON.parse(text);const imported=raw?.data||raw;if(!imported||!Array.isArray(imported.transactions)||!Array.isArray(imported.accounts)||!Array.isArray(imported.activities))throw new Error('That file does not look like a Pocketwise backup.');if(!confirm(`Backup contains ${imported.transactions.length} transactions, ${imported.accounts.length} accounts, and ${imported.debts?.length||0} debt records.\n\nOK = Replace this workspace\nCancel = Keep current records`)){const merge=confirm('Merge records instead? Existing record identifiers will not be duplicated.');if(!merge)return;ensurePersonalWorkspace();const mergeItems=(key)=>{const list=state[key]||[],ids=new Set(list.map(x=>x.id));(imported[key]||[]).forEach(x=>{if(!ids.has(x.id)){list.push(x);ids.add(x.id);}});state[key]=list;};['accounts','activities','transactions','debts','goals','reminders'].forEach(mergeItems);state.budgets={...state.budgets,...(imported.budgets||{})};state.settings={...state.settings,...(imported.settings||{}),theme:state.settings.theme};state.sample=false;}else{if(!confirm('Replace all current Pocketwise records with this backup? Export the current data first if you need it.'))return;state={...initialState(),...imported,settings:{...initialState().settings,...imported.settings},sample:false};}await persist();closeModal();renderAll();toast('Backup restored. Records recalculated.');}catch(err){toast(err.message||'Could not read that backup.','error');}finally{$('#backup-file-input').value='';}}
-  function showBackTapGuide(){const url=`${location.origin}${location.pathname}?quickadd=shortcut`;openModal('Quick Add Shortcut',`<div class="modal-body"><p class="muted">Build a Shortcut that asks for the amount, transaction type, category and optional note, then passes everything into Pocketwise for one final review and save.</p><div class="detail-grid"><div class="detail-cell"><small>STEP 1</small><strong>Ask for Input · Number</strong></div><div class="detail-cell"><small>STEP 2</small><strong>Choose Income / Purchase / Refund</strong></div><div class="detail-cell"><small>STEP 3</small><strong>Ask for category and note</strong></div><div class="detail-cell"><small>STEP 4</small><strong>Open a URL with the answers</strong></div></div><div class="note-box"><small>POCKETWISE QUICK ADD BASE URL</small><p style="word-break:break-all">${escapeHTML(url)}</p><button class="text-button" id="copy-quickadd">Copy base URL</button></div><p class="muted small">Append these query fields to the URL: <code>&amp;amount=[amount]&amp;type=[income|expense|refund]&amp;category=[category]&amp;note=[note]</code>. URL-encode category and note before inserting them. When Pocketwise opens, it pre-fills the details and asks you to confirm/save. Then assign the Shortcut at Settings → Accessibility → Touch → Back Tap → Double Tap.</p><p class="muted small">iOS does not allow a PWA to display a custom interactive form inside Dynamic Island. This Shortcut is a practical capture flow, not native Dynamic Island integration.</p><div class="form-actions"><button class="secondary-button" data-cancel-modal>Close</button></div></div>`,'IPHONE SHORTCUT');}
+  function showBackTapGuide(){const url=`${location.origin}${location.pathname}?quickadd=shortcut`;openModal('Quick Add Shortcut',`<div class="modal-body"><p class="muted">Build a Shortcut that asks for the amount, transaction type, category and optional note, then passes everything into Pocketwise for one final review and save.</p><div class="detail-grid"><div class="detail-cell"><small>STEP 1</small><strong>Ask for Input · Number</strong></div><div class="detail-cell"><small>STEP 2</small><strong>Choose Income / Purchase / Refund</strong></div><div class="detail-cell"><small>STEP 3</small><strong>Ask for category and note</strong></div><div class="detail-cell"><small>STEP 4</small><strong>Open a URL with the answers</strong></div></div><div class="note-box"><small>POCKETWISE QUICK ADD BASE URL</small><p style="word-break:break-all">${escapeHTML(url)}</p><button class="text-button" id="copy-quickadd">Copy base URL</button></div><p class="muted small">Append these query fields to the URL: <code>&amp;amount=[amount]&amp;type=[income|expense|refund]&amp;category=[category]&amp;note=[note]</code>. URL-encode category and note before inserting them. When the URL opens in the same Pocketwise browser context, it pre-fills details for review. Important: iOS Shortcuts may open Safari, whose local storage can be separate from the Home Screen app. A website cannot force Shortcuts to launch the installed PWA or merge those separate records. Assign the Shortcut at Settings → Accessibility → Touch → Back Tap → Double Tap.</p><p class="muted small">iOS does not allow a PWA to display a custom interactive form inside Dynamic Island. This Shortcut is a practical capture flow, not native Dynamic Island integration.</p><div class="form-actions"><button class="secondary-button" data-cancel-modal>Close</button></div></div>`,'IPHONE SHORTCUT');}
   function voiceDraft(){const Speech=window.SpeechRecognition||window.webkitSpeechRecognition;if(!Speech){toast('Voice recognition is not available in this browser. You can use the keyboard microphone instead.','amber');$('#tx-note').focus();return;}const rec=new Speech();rec.lang='en-IN';rec.interimResults=false;rec.maxAlternatives=1;toast('Listening for a short transaction description…');rec.onresult=e=>{const phrase=e.results[0][0].transcript;$('#tx-note').value=phrase;const match=phrase.match(/(?:₹|rs\.?\s*)?(\d+(?:\.\d{1,2})?)/i);if(match)$('#tx-amount').value=match[1];const txt=phrase.toLowerCase();const choices=[['food',['lunch','dinner','breakfast','food','tea','coffee','snack','canteen']],['transport',['bus','auto','taxi','petrol','fuel','travel']],['shopping',['bought','shop','shopping','clothes','headphones']],['education',['book','college','exam','notes','photocopy','course']],['subscriptions',['subscription','recharge','data pack','streaming']]];for(const [id,words] of choices){if(words.some(w=>txt.includes(w))){const act=state.activities.find(a=>a.id===id);if(act)$('#tx-activity').value=act.id;break;}}toast('Draft created. Check the amount and category before saving.');};rec.onerror=()=>toast('Could not hear that clearly. Please enter the details manually.','amber');rec.start();}
 
   function bindEvents(){
@@ -576,17 +580,24 @@
   const _renderGoals = renderGoals;
   renderGoals = function(){_renderGoals();const list=$('#goals-list');if(!list)return;$$('.goal-row',list).forEach((row,i)=>{const goal=state.goals[i];if(!goal)return;const line=$('.goal-line',row);if(line&&!$('.goal-actions',row)){const actions=document.createElement('div');actions.className='goal-actions';actions.style.cssText='display:flex;gap:6px;align-items:center;justify-content:flex-end';actions.innerHTML=`<button class="mini-button" data-goal-add="${goal.id}" title="Add progress">${svgIcon('income')}</button><button class="mini-button" data-goal-edit="${goal.id}" title="Edit goal">${svgIcon('edit')}</button>`;line.append(actions);}});};
   function handleShortcutQuickAdd(){
-    const params=new URLSearchParams(location.search),mode=params.get('quickadd');
+    // Some installed-web-app launchers preserve query parameters; others expose
+    // them in the fragment. Accept both so the Shortcut handoff is resilient.
+    const queryParams=new URLSearchParams(location.search);
+    const hashText=location.hash.startsWith('#')?location.hash.slice(1):location.hash;
+    const hashParams=new URLSearchParams(hashText.includes('?')?hashText.split('?').pop():hashText);
+    const params=new URLSearchParams(queryParams);
+    for(const [key,value] of hashParams.entries())if(!params.has(key))params.set(key,value);
+    const mode=params.get('quickadd');
     if(!mode)return;
-    // Remove captured financial details from the address bar/history as soon as they are read.
-    try{history.replaceState(null,'',location.pathname+location.hash);}catch{}
+    // Remove captured financial details from the visible URL only after parsing.
+    try{history.replaceState(null,'',location.pathname);}catch{}
     setTimeout(()=>{
       if(mode==='debt'){showDebts();return;}
       if(mode==='shortcut'||mode==='capture'){
         const rawAmount=params.get('amount')||'';
         const amount=parseAmount(rawAmount);
-        const rawType=(params.get('type')||'').toLowerCase();
-        const typeMap={income:'income',expense:'expense',purchase:'expense',spending:'expense',refund:'refund'};
+        const rawType=(params.get('type')||'').trim().toLowerCase().replace(/[\s_-]+/g,' ');
+        const typeMap={'income':'income','money in':'income','expense':'expense','purchase':'expense','purchase / expense':'expense','purchase/expense':'expense','spending':'expense','refund':'refund','money back':'refund'};
         const type=typeMap[rawType]||'';
         const category=(params.get('category')||'').trim();
         const note=(params.get('note')||'').slice(0,240);
