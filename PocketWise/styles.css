@@ -139,3 +139,63 @@ img,svg,canvas{max-width:100%}
 .radial-area{isolation:isolate;}
 .radial-area svg{overflow:visible;touch-action:pan-y;}
 @media(prefers-reduced-motion:reduce){.arc-income,.arc-expense,.days-progress{transition:none!important}.page{animation:none!important;}}
+
+/* Pocketwise 1.2: compact, reference-led mobile overview with nested radial tracks. */
+.mobile-inner-arc,.mobile-arc-center,.mobile-days-legend{display:none}
+.days-color{background:#70afe9}.remaining-color{background:#141414}
+@media(max-width:720px){
+  .hero-grid{display:flex;flex-direction:column;gap:14px}
+  .money-card{padding:20px 18px 18px;border-radius:26px;box-shadow:0 8px 28px rgba(28,48,35,.045)}
+  .money-card>.balance-number,.money-card>.balance-context{display:none}
+  .money-card>.card-topline{margin-bottom:2px}
+  .money-card .card-topline .section-kicker{font-size:11px;letter-spacing:.12em}
+  .money-card .text-button{font-size:13px}
+  .radial-area{width:100%;max-width:500px;margin:4px auto 0;position:relative;padding-bottom:0}
+  .radial-area>svg#money-arc{width:100%;height:auto;display:block;position:relative;z-index:1}
+  .arc-track,.arc-income,.arc-expense,.arc-gap-mask{stroke-width:17}
+  .arc-track{stroke:var(--surface-3)}
+  .arc-income{stroke:#7ce879}
+  .arc-expense{stroke:#dc5055}
+  .mobile-inner-arc{display:block;position:absolute;z-index:2;left:13.2%;top:27%;width:73.6%;height:auto;overflow:visible;pointer-events:none}
+  .mobile-inner-track,.mobile-inner-progress{fill:none;stroke-width:10;stroke-linecap:round;vector-effect:non-scaling-stroke}
+  .mobile-inner-track{stroke:#151515}
+  .mobile-inner-progress{stroke:#70afe9;stroke-dasharray:0 100;transition:stroke-dasharray .55s cubic-bezier(.2,.7,.2,1)}
+  .mobile-arc-center{display:flex;position:absolute;z-index:3;left:0;right:0;top:59%;transform:translateY(-50%);align-items:center;flex-direction:column;pointer-events:none;text-align:center;line-height:1.15}
+  .mobile-arc-center>span{font-size:10px;letter-spacing:.13em;color:var(--muted);font-weight:600}
+  .mobile-arc-center>strong{font-size:clamp(26px,7vw,36px);letter-spacing:-1.1px;line-height:1.2;font-weight:800;font-family:var(--display);color:var(--ink);white-space:nowrap}
+  .mobile-arc-center>small{font-size:11px;color:var(--muted);margin-top:3px}
+  .arc-legend{display:grid;grid-template-columns:1fr 1fr;gap:9px 18px;margin:5px auto 8px;width:min(100%,320px);justify-items:start}
+  .arc-legend>span{font-size:12px;color:var(--ink);gap:7px;white-space:nowrap}
+  .arc-legend strong{font-size:12px}
+  .legend-dot{width:8px;height:8px;flex:none}
+  .mobile-days-legend{display:flex!important}
+  .card-separator{margin:15px 0 14px}
+  .money-stats{gap:12px}
+  .money-stats>div{gap:4px;padding:11px 0}
+  .money-stats>div+div{padding-left:15px}
+  .money-stats span{font-size:13px;line-height:1.35}
+  .money-stats strong{font-size:23px}
+  .days-block{display:none}
+  .period-card{border-radius:24px}
+  .period-card .spendable-summary{background:linear-gradient(135deg,var(--green-soft),color-mix(in srgb,var(--green-soft) 38%,var(--surface)));padding:18px;border-radius:18px;border:0;margin:15px 0}
+  .period-card .spendable-summary>span{font-size:10px}
+  .period-card .spendable-summary>strong{font-size:30px}
+  .quick-actions-row{gap:9px;margin:14px 0}
+  .quick-action{background:var(--surface);border-radius:17px;box-shadow:0 2px 9px rgba(28,48,35,.025)}
+  .home-lower-grid,.bottom-home-grid{grid-template-columns:minmax(0,1fr);gap:14px;margin-top:14px}
+  .chart-card{border-radius:24px;padding:20px 18px 14px}
+  .chart-card .section-header h2{font-size:21px;letter-spacing:-.6px}
+  .chart-summary{margin:0 0 3px}
+  .chart-summary strong{font-size:23px}
+  .chart-canvas{height:220px;min-height:200px}
+  .section-header{align-items:center}
+  .alerts-card,.recent-card,.debt-summary-card{border-radius:22px}
+}
+@media(max-width:390px){
+  .money-card{padding:18px 14px 16px}
+  .mobile-inner-arc{left:12.8%;width:74.4%;top:27.5%}
+  .mobile-arc-center{top:59.5%}
+  .arc-legend{column-gap:10px;width:100%}
+  .arc-legend>span{font-size:11px;gap:6px}
+  .arc-legend strong{font-size:11px}
+}

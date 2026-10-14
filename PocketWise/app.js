@@ -164,23 +164,31 @@
     const bal=totalBalance(),t=totalsFor(periodTransactions('month')),dt=debtTotals(),budget=budgetAmount(),spent=spentForMonth(),daysTotal=new Date(new Date().getFullYear(),new Date().getMonth()+1,0).getDate(),day=new Date().getDate(),daysLeft=daysTotal-day;
     $$('[data-money="balance"]').forEach(el=>el.textContent=fmtHidden(bal));$$('[data-money="income"]').forEach(el=>el.textContent=fmtHidden(t.income));$$('[data-money="expense"]').forEach(el=>el.textContent=fmtHidden(t.expenses));$$('[data-money="net"]').forEach(el=>el.textContent=fmtHidden(t.net));$$('[data-money="safe"]').forEach(el=>el.textContent=fmtHidden(safeToSpend()));$$('[data-money="receivable"]').forEach(el=>el.textContent=fmtHidden(dt.receivable));$$('[data-money="payable"]').forEach(el=>el.textContent=fmtHidden(dt.payable));
     const percent=budget?Math.min(spent/budget*100,100):0;$('#budget-progress').style.width=`${percent}%`;$('#budget-progress').style.background=budget&&spent>budget?'var(--red)':'var(--green)';$('#budget-percent').textContent=budget?`${Math.round(spent/budget*100)}% used`:'Set a limit';$('[data-money="budget"]').textContent=budget?fmtHidden(budget):'Not set';$('#budget-spent-text').textContent=budget?`${money(spent)} spent`:'Set a budget to begin';$('#budget-left-text').textContent=budget?`${money(Math.max(0,budget-spent))} left`:'';$('#days-left').textContent=daysLeft;$('#period-caption').textContent=`${day} of ${daysTotal} days elapsed`;
-    // The money arc is one shared 180-degree track. Keep 2 units of visual
-    // separation between the income and expense segments and leave the rest neutral.
-    // SVG round linecaps render a zero-length dash as a dot, so hide zero segments.
-    const total=Math.max(0,Number(t.income)||0)+Math.max(0,Number(t.expenses)||0);
-    const availableArc=88, segmentGap=2;
-    const incomeLen=total>0?Math.max(0,(Math.max(0,Number(t.income)||0)/total)*availableArc):0;
-    const expenseLen=total>0?Math.max(0,(Math.max(0,Number(t.expenses)||0)/total)*availableArc):0;
+    // Match the reference: income grows inward from the LEFT endpoint, while
+    // spending grows inward from the RIGHT endpoint on the SAME semicircle.
+    // A small neutral break separates the segments. Zero-length rounded SVG
+    // dashes can look like dots, so hide empty segments completely.
+    const income=Math.max(0,Number(t.income)||0);
+    const expenses=Math.max(0,Number(t.expenses)||0);
+    const total=income+expenses;
+    const segmentGap=2;
+    const availableArc=100-segmentGap;
+    const incomeLen=total>0?(income/total)*availableArc:0;
+    const expenseLen=total>0?(expenses/total)*availableArc:0;
     const incomeArc=$('.arc-income'), expenseArc=$('.arc-expense');
     incomeArc.style.strokeDasharray=incomeLen>0.05?`${incomeLen} 100`:'0 100';
     incomeArc.style.strokeDashoffset='0';
     incomeArc.style.opacity=incomeLen>0.05?'1':'0';
     incomeArc.style.visibility=incomeLen>0.05?'visible':'hidden';
     expenseArc.style.strokeDasharray=expenseLen>0.05?`${expenseLen} 100`:'0 100';
-    expenseArc.style.strokeDashoffset=`-${incomeLen+(incomeLen>0&&expenseLen>0?segmentGap:0)}`;
+    // Place the red segment against the right endpoint, rather than after green.
+    expenseArc.style.strokeDashoffset=expenseLen>0.05?`${-(100-expenseLen)}`:'0';
     expenseArc.style.opacity=expenseLen>0.05?'1':'0';
     expenseArc.style.visibility=expenseLen>0.05?'visible':'hidden';
     $('.days-progress').style.strokeDasharray=`${Math.max(0,Math.min(100,day/daysTotal*100))} 100`;
+    const elapsedPct=Math.max(0,Math.min(100,day/daysTotal*100));
+    const mobileProgress=$('.mobile-inner-progress');
+    if(mobileProgress)mobileProgress.style.strokeDasharray=`${elapsedPct>0.05?elapsedPct:0} 100`;
     if(t.net<0) $('[data-money="net"]').forEach(el=>el.style.color='var(--red)');else $('[data-money="net"]').forEach(el=>el.style.color='var(--green)');
     $('#activity-count').textContent=state.transactions.length;
     renderBudgetCategoryPreview();
@@ -260,7 +268,7 @@
     buckets.forEach(b=>b.expense=Math.max(0,b.expense));return buckets;
   }
   function chartPeriod(){const val=$('#insights-period')?.value||'month';return ['month','last-month','year','all'].includes(val)?val:'month';}
-  function scheduleCharts(){if(chartFrame)cancelAnimationFrame(chartFrame);chartFrame=requestAnimationFrame(()=>{if(currentPage==='home'||$('#page-home').classList.contains('active')){const mode=$('#home-chart-mode')?.value||'week';const buckets=bucketSeries(mode==='week'?'all':mode,true);const labels=buckets.map(b=>b.label),values=buckets.map(b=>b.expense);drawSingleBar($('#home-spending-chart'),labels,values);const current=totalsFor(periodTransactions(mode==='week'?'all':mode));$('#week-total').textContent=fmtHidden(mode==='week'?values.reduce((s,x)=>s+x,0):current.expenses);$('#week-comparison').textContent=mode==='week'?'Spend recorded across the last 7 days':mode==='month'?'Current month to date':'Year to date';}
+  function scheduleCharts(){if(chartFrame)cancelAnimationFrame(chartFrame);chartFrame=requestAnimationFrame(()=>{if(currentPage==='home'||$('#page-home').classList.contains('active')){const mode=$('#home-chart-mode')?.value||'week';const buckets=bucketSeries(mode==='week'?'all':mode,true);const labels=buckets.map(b=>b.label),values=buckets.map(b=>b.expense);drawLineChart($('#home-spending-chart'),labels,[{name:'Spending',values,color:cssVar('--green')}],'area');const current=totalsFor(periodTransactions(mode==='week'?'all':mode));$('#week-total').textContent=fmtHidden(mode==='week'?values.reduce((s,x)=>s+x,0):current.expenses);$('#week-comparison').textContent=mode==='week'?'Spend recorded across the last 7 days':mode==='month'?'Current month to date':'Year to date';}
     if($('#page-insights').classList.contains('active')){const period=chartPeriod();const b=bucketSeries(period,false);const labels=b.map(x=>x.label);const type=$('#trend-type')?.value||'line';if(type==='histogram')drawHistogram($('#trend-chart'),periodTransactions(period));else if(type==='scatter')drawScatter($('#trend-chart'),b);else drawLineChart($('#trend-chart'),labels,[{name:'Income',values:b.map(x=>x.income),color:cssVar('--green')},{name:'Expenses',values:b.map(x=>x.expense),color:cssVar('--red')}],type);const cats=expenseByCategory(period);const cc=$('#category-chart');if(mixView==='doughnut')drawDonut(cc,cats.slice(0,8));else if(mixView==='pie')drawDonut(cc,cats.slice(0,8),true);else drawHorizontal(cc,cats);const yrBuckets=bucketSeries('year');drawLineChart($('#comparison-chart'),yrBuckets.map(x=>x.label),[{name:'Income',values:yrBuckets.map(x=>x.income),color:cssVar('--green')},{name:'Expenses',values:yrBuckets.map(x=>x.expense),color:cssVar('--red')}],'bar');}
     });}
   function openModal(title,body,kicker='QUICK ACTION'){const dlg=$('#app-modal');if(dlg.open)dlg.close();$('#modal-title').textContent=title;$('#modal-kicker').textContent=kicker;$('#modal-content').innerHTML=body;dlg.showModal();}

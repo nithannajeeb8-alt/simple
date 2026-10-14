@@ -9,7 +9,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" onload="document.documentElement.classList.add('bi-loaded')" onerror="">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.2/font/bootstrap-icons.min.css" onload="document.documentElement.classList.add('bi-loaded')" onerror="">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -56,7 +56,12 @@
                 <path class="arc-expense" d="M 35 155 A 145 145 0 0 1 325 155" pathLength="100"/>
                 <path class="arc-gap-mask" d="M 35 155 A 145 145 0 0 1 325 155" pathLength="100"/>
               </svg>
-              <div class="arc-legend"><span><i class="legend-dot income-color"></i>Income <strong data-money="income">₹0</strong></span><span><i class="legend-dot expense-color"></i>Spent <strong data-money="expense">₹0</strong></span></div>
+              <svg class="mobile-inner-arc" viewBox="0 0 300 124" aria-hidden="true">
+                <path class="mobile-inner-track" d="M 44 108 A 106 106 0 0 1 256 108" pathLength="100"/>
+                <path class="mobile-inner-progress" d="M 44 108 A 106 106 0 0 1 256 108" pathLength="100"/>
+              </svg>
+              <div class="mobile-arc-center"><span>BALANCE LEFT</span><strong data-money="balance">₹0</strong><small>Available balance</small></div>
+              <div class="arc-legend"><span><i class="legend-dot income-color"></i>Income <strong data-money="income">₹0</strong></span><span><i class="legend-dot expense-color"></i>Expense <strong data-money="expense">₹0</strong></span><span class="mobile-days-legend"><i class="legend-dot days-color"></i>Days elapsed</span><span class="mobile-days-legend"><i class="legend-dot remaining-color"></i>Remaining</span></div>
             </div>
             <div class="days-block">
               <div class="days-block-label"><span class="section-kicker">DAYS IN THIS PERIOD</span><span class="days-key"><i></i>Elapsed</span></div>
