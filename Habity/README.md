@@ -44,12 +44,3 @@ A mobile-first, MyDairy-inspired life and habit companion prototype built with p
 
 ## Before production
 Move to IndexedDB, add schema migrations, implement a tested notification scheduler, connect API services through appropriate backend endpoints, verify licensing and medical-content sources, add robust date/timezone handling, and test on real iOS/Android devices.
-
-
-## Profile, privacy and themes update
-
-The first-visit welcome screen lets people choose a preferred name, date of birth and optional faith/spiritual preference. All fields are optional and the welcome screen can be skipped. The top-right profile control shows an add-profile icon until a preferred name exists; it then shows the user's initial and opens Settings. The profile can be edited later in Settings.
-
-Settings now includes Rose, Ocean, Forest, Midnight and Plum alongside Sky, Coral, Mint, Lavender and Dynamic. Midnight and Plum are dark palettes. The welcome screen and Settings include a plain-language explanation of local browser storage, third-party API queries, backups, shared-device risk, deletion and the prototype's security limitations.
-
-Privacy note: data is stored in browser localStorage and is not encrypted by this app. Avoid storing highly sensitive information on shared devices. The date of birth and faith preference are optional.
