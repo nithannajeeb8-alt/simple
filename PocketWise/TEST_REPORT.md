@@ -35,3 +35,12 @@
 - Bumped the service-worker cache to `pocketwise-shell-v1.3.6`.
 - Checks run for this package: `node --check app.js`, `node --check sw.js`, `node tests/quickadd-shortcut.test.cjs`, and ZIP integrity.
 - Not verified: running this on the user's physical iPhone or editing the already-shared iCloud Shortcut automatically. The Shortcut actions must be corrected in Apple Shortcuts.
+
+
+## v1.3.7 outer arc loss-state fix
+
+- The outer arc now renders a full 100-unit red stroke when the month's net result is negative, with zero dash offset. This removes the grey section left visible in the loss state.
+- Positive and balanced months retain their proportional income/expense segments and small neutral separator. Months with no income or expenses keep the neutral track without colored dots.
+- Bumped the service-worker cache to `pocketwise-shell-v1.3.7` so deployed installs can fetch the updated app shell.
+- Checks run: `node --check app.js`, `node --check sw.js`, `node tests/outer-arc.test.cjs`, `node tests/quickadd-shortcut.test.cjs`, and ZIP integrity. All passed.
+- The fix has been checked with unit tests and source inspection, but has not been deployed to `nithan.in` or visually verified on the user's iPhone. Upload this package to the website's hosting repository to publish the change.
