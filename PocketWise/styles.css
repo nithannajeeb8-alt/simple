@@ -140,34 +140,34 @@ img,svg,canvas{max-width:100%}
 .radial-area svg{overflow:visible;touch-action:pan-y;}
 @media(prefers-reduced-motion:reduce){.arc-income,.arc-expense,.days-progress{transition:none!important}.page{animation:none!important;}}
 
-/* Pocketwise 1.2: compact, reference-led mobile overview with nested radial tracks. */
-.mobile-inner-arc,.mobile-arc-center,.mobile-days-legend{display:none}
-.days-color{background:#70afe9}.remaining-color{background:#141414}
+/* Pocketwise mobile dashboard rebuild: one SVG owns both nested arcs. */
+.mobile-arc-center,.mobile-days-legend{display:none}
+.days-color{background:#70afe9}.remaining-color{background:#151515}
 @media(max-width:720px){
   .hero-grid{display:flex;flex-direction:column;gap:14px}
-  .money-card{padding:20px 18px 18px;border-radius:26px;box-shadow:0 8px 28px rgba(28,48,35,.045)}
+  .money-card{padding:20px 18px 18px;border-radius:26px;box-shadow:0 8px 28px rgba(28,48,35,.045);overflow:hidden}
   .money-card>.balance-number,.money-card>.balance-context{display:none}
-  .money-card>.card-topline{margin-bottom:2px}
+  .money-card>.card-topline{margin-bottom:4px}
   .money-card .card-topline .section-kicker{font-size:11px;letter-spacing:.12em}
   .money-card .text-button{font-size:13px}
-  .radial-area{width:100%;max-width:500px;margin:4px auto 0;position:relative;padding-bottom:0}
-  .radial-area>svg#money-arc{width:100%;height:auto;display:block;position:relative;z-index:1}
-  .arc-track,.arc-income,.arc-expense,.arc-gap-mask{stroke-width:17}
-  .arc-track{stroke:var(--surface-3)}
-  .arc-income{stroke:#7ce879}
-  .arc-expense{stroke:#dc5055}
-  .mobile-inner-arc{display:block;position:absolute;z-index:2;left:13.2%;top:27%;width:73.6%;height:auto;overflow:visible;pointer-events:none}
-  .mobile-inner-track,.mobile-inner-progress{fill:none;stroke-width:10;stroke-linecap:round;vector-effect:non-scaling-stroke}
-  .mobile-inner-track{stroke:#151515}
-  .mobile-inner-progress{stroke:#70afe9;stroke-dasharray:0 100;transition:stroke-dasharray .55s cubic-bezier(.2,.7,.2,1)}
-  .mobile-arc-center{display:flex;position:absolute;z-index:3;left:0;right:0;top:59%;transform:translateY(-50%);align-items:center;flex-direction:column;pointer-events:none;text-align:center;line-height:1.15}
-  .mobile-arc-center>span{font-size:10px;letter-spacing:.13em;color:var(--muted);font-weight:600}
-  .mobile-arc-center>strong{font-size:clamp(26px,7vw,36px);letter-spacing:-1.1px;line-height:1.2;font-weight:800;font-family:var(--display);color:var(--ink);white-space:nowrap}
+  .radial-area{width:100%;max-width:500px;margin:8px auto 0;position:relative;padding:0}
+  .radial-area>svg#money-arc{display:block;width:100%;height:auto;position:relative;overflow:visible;z-index:1}
+  #money-arc .arc-track,#money-arc .arc-income,#money-arc .arc-expense{stroke-width:17;stroke-linecap:round;vector-effect:non-scaling-stroke}
+  #money-arc .arc-track{stroke:var(--surface-3)}
+  #money-arc .arc-income{stroke:#28895d}
+  #money-arc .arc-expense{stroke:#d95d55}
+  #money-arc .mobile-inner-track,#money-arc .mobile-inner-progress{fill:none;stroke-width:10;stroke-linecap:round;vector-effect:non-scaling-stroke}
+  #money-arc .mobile-inner-track{stroke:#171717}
+  #money-arc .mobile-inner-progress{stroke:#75a9e5}
+  .mobile-arc-center{display:flex;position:absolute;z-index:2;left:18%;right:18%;top:56%;transform:translateY(-50%);align-items:center;flex-direction:column;pointer-events:none;text-align:center;line-height:1.15}
+  .mobile-arc-center>span{font-size:10px;letter-spacing:.13em;color:var(--muted);font-weight:700}
+  .mobile-arc-center>strong{font-size:clamp(27px,7.2vw,36px);letter-spacing:-1.1px;line-height:1.2;font-weight:800;font-family:var(--display);color:var(--ink);white-space:nowrap}
   .mobile-arc-center>small{font-size:11px;color:var(--muted);margin-top:3px}
-  .arc-legend{display:grid;grid-template-columns:1fr 1fr;gap:9px 18px;margin:5px auto 8px;width:min(100%,320px);justify-items:start}
-  .arc-legend>span{font-size:12px;color:var(--ink);gap:7px;white-space:nowrap}
+  .arc-legend{display:grid;grid-template-columns:max-content max-content;justify-content:center;gap:10px 25px;margin:2px auto 12px;width:100%;}
+  .arc-legend>span{display:flex;align-items:center;font-size:12px;color:var(--ink);gap:7px;white-space:nowrap;min-width:0}
   .arc-legend strong{font-size:12px}
   .legend-dot{width:8px;height:8px;flex:none}
+  .income-color{background:#28895d}.expense-color{background:#d95d55}
   .mobile-days-legend{display:flex!important}
   .card-separator{margin:15px 0 14px}
   .money-stats{gap:12px}
@@ -193,9 +193,8 @@ img,svg,canvas{max-width:100%}
 }
 @media(max-width:390px){
   .money-card{padding:18px 14px 16px}
-  .mobile-inner-arc{left:12.8%;width:74.4%;top:27.5%}
-  .mobile-arc-center{top:59.5%}
-  .arc-legend{column-gap:10px;width:100%}
+  .mobile-arc-center{left:15%;right:15%;top:56%}
+  .arc-legend{column-gap:13px}
   .arc-legend>span{font-size:11px;gap:6px}
   .arc-legend strong{font-size:11px}
 }

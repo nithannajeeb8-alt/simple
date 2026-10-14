@@ -50,15 +50,12 @@
             <div class="balance-number" data-money="balance">₹0</div>
             <div class="balance-context"><span class="positive-dot"></span><span id="balance-caption">Across your tracked accounts</span></div>
             <div class="radial-area">
-              <svg id="money-arc" viewBox="0 0 360 172" role="img" aria-label="Income and expenses arc">
-                <path class="arc-track" d="M 35 155 A 145 145 0 0 1 325 155" pathLength="100"/>
-                <path class="arc-income" d="M 35 155 A 145 145 0 0 1 325 155" pathLength="100"/>
-                <path class="arc-expense" d="M 35 155 A 145 145 0 0 1 325 155" pathLength="100"/>
-                <path class="arc-gap-mask" d="M 35 155 A 145 145 0 0 1 325 155" pathLength="100"/>
-              </svg>
-              <svg class="mobile-inner-arc" viewBox="0 0 300 124" aria-hidden="true">
-                <path class="mobile-inner-track" d="M 44 108 A 106 106 0 0 1 256 108" pathLength="100"/>
-                <path class="mobile-inner-progress" d="M 44 108 A 106 106 0 0 1 256 108" pathLength="100"/>
+              <svg id="money-arc" viewBox="0 0 360 190" role="img" aria-label="Income, expenses, elapsed days and remaining days">
+                <path class="arc-track" fill="none" d="M 35 155 A 145 145 0 0 1 325 155" pathLength="100"/>
+                <path class="arc-income" fill="none" d="M 35 155 A 145 145 0 0 1 325 155" pathLength="100"/>
+                <path class="arc-expense" fill="none" d="M 35 155 A 145 145 0 0 1 325 155" pathLength="100"/>
+                <path class="mobile-inner-track" fill="none" d="M 75 155 A 105 105 0 0 1 285 155" pathLength="100"/>
+                <path class="mobile-inner-progress" fill="none" d="M 75 155 A 105 105 0 0 1 285 155" pathLength="100"/>
               </svg>
               <div class="mobile-arc-center"><span>BALANCE LEFT</span><strong data-money="balance">₹0</strong><small>Available balance</small></div>
               <div class="arc-legend"><span><i class="legend-dot income-color"></i>Income <strong data-money="income">₹0</strong></span><span><i class="legend-dot expense-color"></i>Expense <strong data-money="expense">₹0</strong></span><span class="mobile-days-legend"><i class="legend-dot days-color"></i>Days elapsed</span><span class="mobile-days-legend"><i class="legend-dot remaining-color"></i>Remaining</span></div>

@@ -172,7 +172,7 @@
     const expenses=Math.max(0,Number(t.expenses)||0);
     const total=income+expenses;
     const segmentGap=2;
-    const availableArc=100-segmentGap;
+    const availableArc=total>0?100-segmentGap:0;
     const incomeLen=total>0?(income/total)*availableArc:0;
     const expenseLen=total>0?(expenses/total)*availableArc:0;
     const incomeArc=$('.arc-income'), expenseArc=$('.arc-expense');
@@ -185,10 +185,10 @@
     expenseArc.style.strokeDashoffset=expenseLen>0.05?`${-(100-expenseLen)}`:'0';
     expenseArc.style.opacity=expenseLen>0.05?'1':'0';
     expenseArc.style.visibility=expenseLen>0.05?'visible':'hidden';
-    $('.days-progress').style.strokeDasharray=`${Math.max(0,Math.min(100,day/daysTotal*100))} 100`;
     const elapsedPct=Math.max(0,Math.min(100,day/daysTotal*100));
+    $('.days-progress').style.strokeDasharray=`${elapsedPct} 100`;
     const mobileProgress=$('.mobile-inner-progress');
-    if(mobileProgress)mobileProgress.style.strokeDasharray=`${elapsedPct>0.05?elapsedPct:0} 100`;
+    if(mobileProgress){mobileProgress.style.strokeDasharray=elapsedPct>0.05?`${elapsedPct} 100`:'0 100';mobileProgress.style.strokeDashoffset='0';}
     if(t.net<0) $('[data-money="net"]').forEach(el=>el.style.color='var(--red)');else $('[data-money="net"]').forEach(el=>el.style.color='var(--green)');
     $('#activity-count').textContent=state.transactions.length;
     renderBudgetCategoryPreview();
