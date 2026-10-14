@@ -1,1 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#e8f2fa">
+<meta name="description" content="A private, customizable life companion for habits, memories, wellbeing and faith.">
+<title>Little Days · Life Companion</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app-shell">
+  <aside class="rail">
+    <a class="brand" href="#" aria-label="Little Days home"><span class="brand-mark"><i class="bi bi-flower1"></i></span><span>little days</span></a>
+    <nav class="side-nav" aria-label="Main navigation">
+      <button class="nav-item active" data-view="home"><i class="bi bi-circle-half"></i><span>Today</span></button>
+      <button class="nav-item" data-view="calendar"><i class="bi bi-calendar3"></i><span>Calendar</span></button>
+      <button class="nav-item" data-view="discover"><i class="bi bi-book-half"></i><span>Faith / Discover</span></button>
+      <button class="nav-item" data-view="settings"><i class="bi bi-sliders2"></i><span>Settings</span></button>
+    </nav>
+    <div class="rail-note"><span class="tiny-spark">✳</span><p>Small steps.<br><em>A life that's yours.</em></p></div>
+    <div class="rail-bottom"><span class="privacy-dot"></span> Your space is private by default</div>
+  </aside>
 
+  <main class="main">
+    <header class="topbar">
+      <div class="mobile-brand"><span class="brand-mark"><i class="bi bi-flower1"></i></span><span>little days</span></div>
+      <div class="topbar-date" id="topDate">YOUR DAY, AT YOUR PACE</div>
+      <div class="topbar-actions"><button class="icon-button" id="quickMood" title="Mood check-in" aria-label="Mood check-in"><i class="bi bi-emoji-smile"></i></button><button class="avatar-button" id="profileBtn" title="Profile">S</button></div>
+    </header>
+
+    <section class="view active" id="view-home">
+      <div class="page-heading home-heading">
+        <div><div class="eyebrow"><span class="eyebrow-dot"></span>YOUR LITTLE CORNER</div><h1>Make room for<br><em>what matters.</em></h1><p id="greeting">A gentle check-in with yourself.</p></div>
+        <div class="perfect-badge"><span class="sparkle">✧</span><strong id="perfectWeeks">0</strong><span>perfect weeks</span></div>
+      </div>
+
+      <section class="week-card glass-card">
+        <div class="week-card-head"><div><span class="section-label">THIS WEEK</span><h2>Seven little chances.</h2></div><span class="week-range" id="weekRange"></span></div>
+        <div class="week-dots" id="weekDots" aria-label="Days of the current week"></div>
+        <div class="week-footer"><span><span class="legend-dot done"></span>Completed</span><span><span class="legend-dot current"></span>Today</span><span class="streak-pill"><i class="bi bi-fire"></i> <b id="currentStreak">0</b> day streak</span></div>
+      </section>
+
+      <div class="content-grid">
+        <div class="primary-column">
+          <section class="section-block">
+            <div class="section-heading"><div><span class="section-label">A LITTLE PROGRESS</span><h2>Today's essentials</h2></div><button class="text-button" id="manageHabits"><i class="bi bi-plus-lg"></i> Edit habits</button></div>
+            <div class="progress-card"><div class="progress-copy"><span id="todayProgressLabel">A good start</span><strong><span id="todayDone">0</span><small> / <span id="todayTotal">0</span> complete</small></strong></div><div class="progress-track"><span id="todayProgressBar"></span></div></div>
+            <div class="habit-list" id="habitList"></div>
+            <button class="add-habit-button" id="addHabit"><i class="bi bi-plus-circle"></i> Add a habit that matters to you</button>
+          </section>
+
+          <section class="section-block mood-section">
+            <div class="section-heading"><div><span class="section-label">CHECK IN WITH YOU</span><h2>How are you feeling?</h2></div><button class="text-button" id="openMoodHistory">Mood history <i class="bi bi-arrow-up-right"></i></button></div>
+            <div class="mood-card glass-card">
+              <p>No right or wrong answers. Just notice where you are today.</p>
+              <div class="mood-options" id="moodOptions">
+                <button data-mood="great"><span>😄</span><small>Great</small></button><button data-mood="good"><span>🙂</span><small>Good</small></button><button data-mood="okay"><span>😐</span><small>Okay</small></button><button data-mood="low"><span>😔</span><small>Low</small></button><button data-mood="rough"><span>😣</span><small>Rough</small></button>
+              </div>
+              <div class="mood-extra"><label for="moodReason">Anything influencing your mood? <span>Optional</span></label><select id="moodReason"><option value="">Prefer not to say</option><option>Sleep or tiredness</option><option>Study or work</option><option>Family or relationships</option><option>Physical wellbeing</option><option>Faith or reflection</option><option>Not sure</option></select><button class="primary-button small" id="saveMood">Save check-in</button></div>
+              <div id="moodSuggestion" class="suggestion hidden"></div>
+            </div>
+          </section>
+
+          <section class="section-block">
+            <div class="section-heading"><div><span class="section-label">KEEP A LITTLE PIECE</span><h2>A memory from today</h2></div><button class="text-button" data-view-link="memories">Memory library <i class="bi bi-arrow-up-right"></i></button></div>
+            <div class="memory-prompt glass-card"><div class="memory-art"><i class="bi bi-journal-heart"></i><span>today, remembered</span></div><div class="memory-write"><p>What's one thing you'd like to remember about today?</p><textarea id="todayMemory" rows="3" placeholder="A conversation, something you learned, a tiny good thing…"></textarea><div class="memory-actions"><span id="memoryStatus">Optional. Skipping is always okay.</span><div><button class="text-button" id="skipMemory">Skip</button><button class="primary-button small" id="saveMemory">Save memory</button></div></div></div></div>
+          </section>
+        </div>
+
+        <aside class="secondary-column">
+          <section class="side-card life-mini">
+            <div class="side-card-top"><span class="section-label">LIFE IN WEEKS</span><i class="bi bi-stars"></i></div>
+            <h3>Time is a collection<br>of little moments.</h3><p>A life map, not a prediction.</p>
+            <div class="life-mini-stat"><strong id="lifeWeeksLeft">—</strong><span>estimated weeks remaining</span></div>
+            <button class="text-button" data-view-link="calendar">Explore your life map <i class="bi bi-arrow-up-right"></i></button>
+          </section>
+          <section class="side-card routine-card">
+            <div class="section-label">COMING UP</div><h3>Your rhythm</h3><div id="upcomingList" class="upcoming-list"></div><button class="text-button" data-view-link="settings">Personalize times <i class="bi bi-arrow-up-right"></i></button>
+          </section>
+          <section class="quote-card"><span class="quote-mark">“</span><p id="dailyQuote">You don't have to do everything. Just the next kind thing.</p><small>A LITTLE REMINDER</small></section>
+          <section class="side-card"><div class="section-heading compact"><div><span class="section-label">THIS MONTH</span><h3>Your patterns</h3></div></div><div class="mini-stat-row"><span>Habit completion</span><strong id="monthCompletion">0%</strong></div><div class="mini-stat-row"><span>Memories saved</span><strong id="memoryCount">0</strong></div><div class="mini-stat-row"><span>Mood check-ins</span><strong id="moodCount">0</strong></div><button class="text-button" data-view-link="calendar">See your progress <i class="bi bi-arrow-up-right"></i></button></section>
+        </aside>
+      </div>
+    </section>
+
+    <section class="view" id="view-calendar">
+      <div class="page-heading"><div><div class="eyebrow"><span class="eyebrow-dot"></span>LOOKING BACK, GENTLY</div><h1>Your days, <em>your story.</em></h1><p>Progress is a pattern, not a perfect line.</p></div></div>
+      <div class="calendar-tabs"><button class="active" data-cal-tab="month">Month</button><button data-cal-tab="life">Life in weeks</button><button data-cal-tab="stats">Statistics</button><button data-cal-tab="memories">Memories</button></div>
+      <div class="calendar-panel active" id="cal-month">
+        <div class="calendar-layout"><div class="calendar-card glass-card"><div class="calendar-toolbar"><button class="icon-button" id="prevMonth" aria-label="Previous month"><i class="bi bi-chevron-left"></i></button><h2 id="monthTitle">October 2026</h2><button class="icon-button" id="nextMonth" aria-label="Next month"><i class="bi bi-chevron-right"></i></button></div><div class="calendar-weekdays"><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span><span>SUN</span></div><div class="calendar-grid" id="calendarGrid"></div><div class="calendar-legend"><span><i class="legend-dot done"></i>Perfect day</span><span><i class="legend-dot partial"></i>Progress</span><span><i class="legend-dot memory"></i>Memory</span></div></div>
+        <aside class="selected-day side-card"><span class="section-label">YOUR DAY</span><h3 id="selectedDateTitle">Choose a date</h3><div id="selectedDayContent"><p class="muted">Tap a day to revisit what happened.</p></div></aside></div>
+      </div>
+      <div class="calendar-panel" id="cal-life"><div class="life-calendar-card glass-card"><div class="section-heading"><div><span class="section-label">A GENTLE PERSPECTIVE</span><h2>Your life, in weeks</h2><p>Default estimate: 74 years. This is not a prediction.</p></div><label class="age-control">Your age <input id="lifeAge" type="number" min="1" max="110" value="21"></label></div><div class="life-legend"><span><i class="legend-dot done"></i>Elapsed</span><span><i class="legend-dot current"></i>Current week</span><span><i class="legend-dot"></i>Future</span></div><div id="lifeGrid" class="life-grid" aria-label="Life in weeks visualization"></div><div class="life-summary"><div><strong id="elapsedWeeks">—</strong><span>estimated weeks elapsed</span></div><div><strong id="remainingWeeks">—</strong><span>estimated weeks remaining</span></div><div><strong>74 years</strong><span>adjustable baseline</span></div></div></div></div>
+      <div class="calendar-panel" id="cal-stats"><div class="stats-grid"><div class="stat-card"><span>THIS MONTH</span><strong id="statCompletion">0%</strong><small>Essential habit completion</small></div><div class="stat-card"><span>PERFECT DAYS</span><strong id="statPerfectDays">0</strong><small>All essentials complete</small></div><div class="stat-card"><span>PERFECT WEEKS</span><strong id="statPerfectWeeks">0</strong><small>Lifetime achievement</small></div><div class="stat-card"><span>BEST STREAK</span><strong id="statBestStreak">0</strong><small>Consecutive qualifying days</small></div></div><div class="side-card stats-note"><h3>Progress without judgement</h3><p>Untracked days are not assumed to be failures. Scores use only the essential habits you chose.</p></div></div>
+      <div class="calendar-panel" id="cal-memories"><div class="section-heading"><div><span class="section-label">LITTLE THINGS, KEPT</span><h2>Your memory library</h2></div><input id="memorySearch" class="search-input" placeholder="Search memories…"></div><div id="memoryLibrary" class="memory-library"></div></div>
+    </section>
+
+    <section class="view" id="view-discover">
+      <div class="page-heading"><div><div class="eyebrow"><span class="eyebrow-dot"></span>GROW AT YOUR OWN PACE</div><h1>Explore what <em>matters.</em></h1><p>Choose faith, learning, movement or a little curiosity.</p></div></div>
+      <div class="discover-tabs"><button class="active" data-discover-tab="learn">Learn & explore</button><button data-discover-tab="faith">Faith & prayer</button><button data-discover-tab="wellbeing">Wellbeing</button><button data-discover-tab="libraries">Open libraries</button></div>
+      <div class="discover-panel active" id="discover-learn">
+        <div class="feature-grid"><article class="feature-card feature-sky"><div class="feature-illustration"><i class="bi bi-journal-bookmark"></i></div><span class="section-label">KNOWLEDGE</span><h3>Read a little.</h3><p>Explore books, save what you're learning, and build a gentle reading routine.</p><a href="https://openlibrary.org/" target="_blank" rel="noopener">Explore Open Library <i class="bi bi-arrow-up-right"></i></a></article><article class="feature-card feature-mint"><div class="feature-illustration"><i class="bi bi-bicycle"></i></div><span class="section-label">MOVEMENT</span><h3>Find your kind of movement.</h3><p>Browse exercises, record activity and create routines that fit your energy.</p><a href="https://wger.de/" target="_blank" rel="noopener">Explore wger <i class="bi bi-arrow-up-right"></i></a></article><article class="feature-card feature-coral"><div class="feature-illustration"><i class="bi bi-egg-fried"></i></div><span class="section-label">NOURISH</span><h3>Learn about your food.</h3><p>Search foods and nutrition information. Portion sizes and estimates matter.</p><a href="https://fdc.nal.usda.gov/" target="_blank" rel="noopener">FoodData Central <i class="bi bi-arrow-up-right"></i></a></article><article class="feature-card feature-lavender"><div class="feature-illustration"><i class="bi bi-palette"></i></div><span class="section-label">HOBBIES</span><h3>Make space for play.</h3><p>Add hobbies you love or try something new. Your interests don't need a score.</p><button class="outline-button" id="addHobby">Add a hobby</button></article></div>
+        <div class="side-card library-catalog"><div class="section-heading"><div><span class="section-label">YOUR PERSONAL CATALOGUE</span><h2>Hobbies & skills</h2></div></div><div id="hobbyList" class="tag-list"></div></div>
+      </div>
+      <div class="discover-panel" id="discover-faith">
+        <div class="faith-banner"><div><span class="section-label">OPTIONAL FAITH SPACE</span><h2>A moment for <em>what grounds you.</em></h2><p>Islamic tools are optional and can be configured for your local practice.</p></div><i class="bi bi-moon-stars"></i></div>
+        <div class="feature-grid"><article class="feature-card feature-mint"><div class="feature-illustration"><i class="bi bi-clock-history"></i></div><span class="section-label">PRAYER TIMES</span><h3>Prayer, in your time.</h3><p>Choose your city and calculation preferences. Verify timings with your local mosque when needed.</p><a href="https://aladhan.com/prayer-times-api" target="_blank" rel="noopener">Prayer time API <i class="bi bi-arrow-up-right"></i></a><div class="inline-form"><label>City or location<input id="prayerCity" placeholder="e.g. Nilambur, Kerala"></label><button class="primary-button small" id="savePrayerCity">Save location</button></div><div id="prayerCityStatus" class="muted small-text"></div></article><article class="feature-card feature-sky"><div class="feature-illustration"><i class="bi bi-book-half"></i></div><span class="section-label">QURAN</span><h3>Read and reflect.</h3><p>Connect a Quran reader with Arabic text, translations, recitation and bookmarks.</p><a href="https://api-docs.quran.com/" target="_blank" rel="noopener">Quran Foundation API <i class="bi bi-arrow-up-right"></i></a></article></div>
+        <div class="side-card prayer-tracker"><div class="section-heading"><div><span class="section-label">TODAY'S PRAYERS</span><h2>Prayer check-in</h2><p>Mark only what you want to track.</p></div></div><div id="prayerChecks" class="prayer-checks"></div><p class="muted small-text">Prayer times and notifications are not yet live in this prototype; this section records local check-ins.</p></div>
+      </div>
+      <div class="discover-panel" id="discover-wellbeing">
+        <div class="distress-card glass-card"><div class="distress-icon"><i class="bi bi-heart-pulse"></i></div><span class="section-label">DISTRESS & BEHAVIOR MODE</span><h2>Take a moment.</h2><p>If things feel heavy, you don't have to solve everything right now. Choose one small next step.</p><div class="support-options"><button data-support="calm"><i class="bi bi-wind"></i><strong>Ground myself</strong><small>A brief breathing or grounding pause</small></button><button data-support="action"><i class="bi bi-list-check"></i><strong>One small action</strong><small>Make the next step manageable</small></button><button data-support="connect"><i class="bi bi-people"></i><strong>Reach out</strong><small>Contact someone I trust</small></button></div><div id="supportResult" class="suggestion hidden"></div></div>
+      </div>
+      <div class="discover-panel" id="discover-libraries">
+        <div class="section-heading"><div><span class="section-label">CONNECTED RESOURCES</span><h2>Useful open libraries</h2><p>Sources to integrate as the app grows.</p></div></div><div class="resource-list" id="resourceList"></div><p class="muted small-text">External links open the provider's website. API integrations, license checks and backend credentials are not configured in this prototype.</p>
+      </div>
+    </section>
+
+    <section class="view" id="view-settings">
+      <div class="page-heading"><div><div class="eyebrow"><span class="eyebrow-dot"></span>MAKE IT YOURS</div><h1>Your space, <em>your rules.</em></h1><p>Small adjustments that make this place feel like yours.</p></div></div>
+      <div class="settings-layout">
+        <div class="settings-main">
+          <section class="settings-group"><div class="settings-heading"><span class="setting-icon"><i class="bi bi-palette2"></i></span><div><h2>Appearance</h2><p>Colors and the feeling of each page.</p></div></div><div class="theme-grid"><button class="theme-choice active" data-theme="sky"><span class="theme-swatch sky-swatch"></span><strong>Sky</strong><small>Calm & clear</small></button><button class="theme-choice" data-theme="coral"><span class="theme-swatch coral-swatch"></span><strong>Coral</strong><small>Warm & open</small></button><button class="theme-choice" data-theme="mint"><span class="theme-swatch mint-swatch"></span><strong>Mint</strong><small>Fresh & bright</small></button><button class="theme-choice" data-theme="lavender"><span class="theme-swatch lavender-swatch"></span><strong>Lavender</strong><small>Soft & dreamy</small></button><button class="theme-choice dynamic-choice" data-theme="dynamic"><span class="theme-swatch dynamic-swatch"><i class="bi bi-stars"></i></span><strong>Dynamic</strong><small>Changes each day</small></button></div>
+            <div class="setting-row"><div><strong>Comfortable text</strong><small>Make reading easier.</small></div><select id="textScale"><option value="normal">Default</option><option value="large">Large</option><option value="xlarge">Extra large</option></select></div><div class="setting-row"><div><strong>Reduce motion</strong><small>Limit animations and movement.</small></div><input type="checkbox" id="reduceMotion" class="toggle"></div></section>
+          <section class="settings-group"><div class="settings-heading"><span class="setting-icon"><i class="bi bi-person-heart"></i></span><div><h2>Your profile</h2><p>Personalize your life map and faith features.</p></div></div><div class="form-grid"><label>Display name<input id="displayName" placeholder="What should we call you?"></label><label>Age<input id="profileAge" type="number" min="1" max="110" value="21"></label><label>Life expectancy baseline<select id="lifeExpectancy"><option value="74">74 years</option><option value="80">80 years</option><option value="85">85 years</option><option value="90">90 years</option></select></label><label>Faith preferences<select id="faithPreference"><option value="none">No faith features</option><option value="islam">Islamic features</option><option value="custom">Custom spiritual habits</option></select></label></div><button class="primary-button" id="saveProfile">Save profile</button></section>
+          <section class="settings-group"><div class="settings-heading"><span class="setting-icon"><i class="bi bi-bell"></i></span><div><h2>Routines & reminders</h2><p>Your time, your choice. No notification overload.</p></div></div><div class="setting-row"><div><strong>Daily motivation</strong><small>One optional gentle message.</small></div><input type="checkbox" class="toggle" id="motivationEnabled"></div><div class="setting-row"><div><strong>Motivation time</strong><small>When should it arrive?</small></div><input type="time" id="motivationTime" value="09:00"></div><div class="setting-row"><div><strong>Water reminders</strong><small>Only if you enable them.</small></div><input type="checkbox" class="toggle" id="waterEnabled"></div><div class="setting-row"><div><strong>Water reminder interval</strong><small>Spaced reminders while awake.</small></div><select id="waterInterval"><option value="120">Every 2 hours</option><option value="180">Every 3 hours</option><option value="240">Every 4 hours</option></select></div><div class="setting-row"><div><strong>Quiet hours start</strong></div><input type="time" id="quietStart" value="22:00"></div><div class="setting-row"><div><strong>Quiet hours end</strong></div><input type="time" id="quietEnd" value="07:00"></div><div class="setting-row"><div><strong>Browser notifications</strong><small>Permission only; reliable scheduling needs a complete notification service.</small></div><button class="outline-button" id="requestNotifications">Enable</button></div><div id="notificationStatus" class="muted small-text"></div><div class="form-grid"><label>Meal time · Breakfast<input type="time" id="breakfastTime" value="08:00"></label><label>Meal time · Lunch<input type="time" id="lunchTime" value="13:00"></label><label>Meal time · Dinner<input type="time" id="dinnerTime" value="19:30"></label><label>Skill practice time<input type="time" id="skillTime" value="18:00"></label><label>Family / friend time<input type="time" id="familyTime" value="20:00"></label></div><button class="primary-button" id="saveSchedule">Save schedule</button></section>
+          <section class="settings-group"><div class="settings-heading"><span class="setting-icon"><i class="bi bi-capsule"></i></span><div><h2>Medication reminders</h2><p>Enter the schedule from your prescription or clinician.</p></div></div><div class="form-grid"><label>Medicine name<input id="medName" placeholder="Medicine name"></label><label>Prescribed dose text<input id="medDose" placeholder="As written on label"></label><label>Reminder time<input id="medTime" type="time" value="08:00"></label><label>Frequency<input id="medFrequency" placeholder="e.g. twice daily"></label><label class="full-span">Precautions / label instructions<textarea id="medPrecautions" rows="2" placeholder="Enter instructions from your pharmacist or medicine label"></textarea></label></div><button class="primary-button" id="addMedication">Save medication record</button><div id="medicationList" class="medication-list"></div><p class="small-text muted">This prototype stores a reminder record only. It does not verify medicines or schedule notifications. Follow professional instructions; never change a dose based on an app suggestion.</p></section>
+          <section class="settings-group"><div class="settings-heading"><span class="setting-icon"><i class="bi bi-heart-pulse"></i></span><div><h2>Wellbeing & privacy</h2><p>Your personal records stay in this browser by default.</p></div></div><div class="setting-row"><div><strong>Save mood check-ins</strong><small>Optional private history.</small></div><input type="checkbox" id="moodEnabled" class="toggle" checked></div><div class="setting-row"><div><strong>Daily memory prompt</strong><small>You can always skip it.</small></div><input type="checkbox" id="memoryEnabled" class="toggle" checked></div><div class="setting-row"><div><strong>Essential habits</strong><small>These determine streak scoring.</small></div><button class="outline-button" id="editEssentials">Choose habits</button></div><div class="data-actions"><button class="outline-button" id="exportData"><i class="bi bi-download"></i> Export backup</button><label class="outline-button file-label"><i class="bi bi-upload"></i> Restore backup<input type="file" id="importData" accept="application/json" hidden></label><button class="danger-button" id="deleteData"><i class="bi bi-trash3"></i> Delete local data</button></div></section>
+          <section class="settings-group"><div class="settings-heading"><span class="setting-icon"><i class="bi bi-images"></i></span><div><h2>Credits & sources</h2><p>Third-party libraries, datasets and image sources.</p></div></div><div id="creditsList" class="credits-list"></div></section>
+        </div>
+        <aside class="settings-aside"><div class="side-card"><span class="section-label">BUILT WITH CARE</span><h3>Private by default.</h3><p>Habits, mood and memories are saved in this browser. This prototype does not send your personal records to a server.</p><div class="privacy-check"><i class="bi bi-shield-check"></i><span>Local-first records</span></div><div class="privacy-check"><i class="bi bi-cloud-slash"></i><span>No account required</span></div><div class="privacy-check"><i class="bi bi-file-earmark-arrow-down"></i><span>Export anytime</span></div></div><div class="quote-card"><span class="quote-mark">✳</span><p>You can begin again without starting from zero.</p><small>A NOTE TO KEEP</small></div></aside>
+      </div>
+    </section>
+
+    <section class="view" id="view-memories"><div class="page-heading"><div><div class="eyebrow"><span class="eyebrow-dot"></span>THE THINGS YOU KEPT</div><h1>Your memory <em>library.</em></h1><p>A small archive of the days you want to remember.</p></div><button class="outline-button" data-view-link="calendar"><i class="bi bi-calendar3"></i> Back to calendar</button></div><div class="section-heading"><div><span class="section-label">YOUR COLLECTION</span><h2>Saved memories</h2></div><input id="memorySearch2" class="search-input" placeholder="Search memories…"></div><div id="memoryLibrary2" class="memory-library"></div></section>
+  </main>
+
+  <nav class="bottom-nav" aria-label="Mobile navigation"><button class="nav-item active" data-view="home"><i class="bi bi-circle-half"></i><span>Today</span></button><button class="nav-item" data-view="calendar"><i class="bi bi-calendar3"></i><span>Calendar</span></button><button class="nav-item" data-view="discover"><i class="bi bi-book-half"></i><span>Discover</span></button><button class="nav-item" data-view="settings"><i class="bi bi-sliders2"></i><span>Settings</span></button></nav>
+</div>
+
+<div class="modal-backdrop hidden" id="modalBackdrop"><section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-head"><div><span class="section-label">MAKE IT YOURS</span><h2 id="modalTitle">Add a habit</h2></div><button class="icon-button" id="closeModal" aria-label="Close"><i class="bi bi-x-lg"></i></button></div><div id="modalBody"></div></section></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="app.js"></script>
+</body>
+</html>
