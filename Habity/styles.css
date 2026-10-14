@@ -816,3 +816,19 @@ html[data-mode="dark"][data-theme="sage"] { color-scheme:dark; --canvas:#111A14;
  .mode-choice { min-width:0; padding-inline:5px; }
 }
 
+
+
+/* Daily Essentials manager */
+.essentials-settings-summary { margin: 2px 0 14px; padding: 13px 15px; border: 1px solid var(--line); border-radius: 15px; background: var(--surface-soft); color: var(--text-secondary); font-size: .9rem; line-height: 1.55; }
+.essential-manager-list { display: grid; gap: 10px; }
+.essential-manager-row { display: grid; grid-template-columns: 40px minmax(0,1fr) auto; align-items: center; gap: 11px; padding: 12px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); }
+.essential-manager-icon { display: grid; width: 40px; height: 40px; place-items: center; border-radius: 13px; background: var(--accent-soft); color: var(--accent-strong); font-size: 1.05rem; }
+.essential-manager-main { min-width: 0; }
+.essential-manager-main > strong { display: block; overflow-wrap: anywhere; font-size: .93rem; }
+.essential-manager-main > small { display: block; margin-top: 3px; color: var(--text-secondary); line-height: 1.4; }
+.essential-toggle { display: flex; align-items: center; gap: 7px; margin-top: 8px; color: var(--text-secondary); font-size: .78rem; }
+.essential-manager-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; }
+.icon-button { display: grid; width: 34px; height: 34px; place-items: center; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-raised); color: var(--text); }
+.icon-button:disabled { opacity: .35; cursor: not-allowed; }
+.icon-button.danger-icon { color: var(--danger); }
+@media (max-width: 560px) { .essential-manager-row { grid-template-columns: 36px minmax(0,1fr); align-items: start; } .essential-manager-icon { width: 36px; height: 36px; } .essential-manager-actions { grid-column: 2; } }

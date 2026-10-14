@@ -80,3 +80,7 @@ When the profile faith preference is set to Islam, the Today screen displays a f
 ## Appearance themes
 
 Choose one of nine palettes independently from System, Light, or Dark appearance. System follows the device setting and updates when the device appearance changes; Light and Dark are explicit overrides. The palette colour remains visible in backgrounds, active controls, buttons, progress indicators, borders, and icons in both modes.
+
+## Daily Essentials customization
+
+Open **Settings → Daily Essentials → Manage daily essentials** to add, edit, reorder, disable, or remove routines. Users can decide which habits count toward Perfect Day and streak calculations. Disabling a habit preserves its record history; removing a habit removes it from the active list while the old record data remains in local storage. The settings summary shows how many habits are active and how many count toward scoring.
