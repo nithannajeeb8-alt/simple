@@ -43,3 +43,10 @@ Profile data, habits, mood entries, memories and preferences are saved in this b
 - Medication entries are notes only and do not verify medicines or schedules. Follow the prescription/clinician instructions.
 - The life-in-weeks view uses a configurable baseline as an illustration, not a prediction.
 - This project has not had complete real-device iOS/Android, WCAG, security or performance testing. After deployment, reopen the site once with an internet connection so the updated service worker can replace the old cached shell.
+
+
+### Life-map and layout refinement (v8)
+- Native time/date controls are explicitly constrained to their grid/card width for iOS Safari.
+- The 52-column life-week grid resets native button padding and border sizing so its cells stay inside the card.
+- Life-map totals show estimated elapsed, remaining and total days alongside weeks represented. Date of birth is used when supplied; otherwise the estimate uses the entered age.
+- Perfect days are highlighted in gold in the monthly calendar; a life-week tile is also highlighted if it contains a recorded perfect day. A perfect day means every currently selected essential habit was completed.

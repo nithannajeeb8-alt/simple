@@ -23,6 +23,7 @@
   --danger-soft: #fbe8e9;
   --highlight-bg: #f5e8b7;
   --highlight-text: #72592c;
+  --perfect-day: #e5bf57; --perfect-day-ink: #463710;
   --shadow-card: 0 6px 24px rgba(36, 58, 72, .055);
   --shadow-float: 0 20px 60px rgba(18, 29, 38, .20);
   --font-serif: "Playfair Display", Georgia, serif;
@@ -611,3 +612,34 @@ html.reduce-motion *, html.reduce-motion *::before, html.reduce-motion *::after 
 .settings-group, .settings-heading, .setting-row, .form-grid, .form-grid > label { min-width: 0; }
 .setting-row > *, .form-grid input, .form-grid select, .form-grid textarea { min-width: 0; max-width: 100%; }
 input[type="time"], input[type="date"], input[type="number"] { width: 100%; min-width: 0; max-width: 100%; }
+
+
+/* Final containment pass: native iOS time inputs and dense life-week tiles must stay inside their cards. */
+*, *::before, *::after { box-sizing: border-box; }
+.settings-group, .settings-group > *, .setting-row, .setting-row > *, .life-calendar-card, .life-calendar-card > *, .calendar-panel, .calendar-panel > * { min-width: 0; max-width: 100%; }
+.setting-row { grid-template-columns: minmax(0, 1fr) minmax(0, min(240px, 100%)); }
+.setting-row > input:not([type="checkbox"]), .setting-row > select, .setting-row > button { justify-self: stretch; inline-size: 100%; min-inline-size: 0; max-inline-size: 100%; }
+input[type="time"], input[type="date"], input[type="number"] { box-sizing: border-box !important; inline-size: 100% !important; min-inline-size: 0 !important; max-inline-size: 100% !important; }
+input[type="time"] { -webkit-appearance: none; appearance: none; }
+input[type="time"]::-webkit-date-and-time-value { display: block; min-width: 0; max-width: 100%; }
+.life-grid { display: grid; width: 100%; min-width: 0; max-width: 100%; box-sizing: border-box; grid-template-columns: repeat(52, minmax(0, 1fr)); align-items: stretch; gap: clamp(1px, .35vw, 3px); overflow: hidden; }
+.life-week { display: block; width: 100%; min-width: 0; max-width: 100%; aspect-ratio: 1 / 1; padding: 0 !important; margin: 0; border: 1px solid color-mix(in srgb, var(--line) 78%, transparent); border-radius: 2px; box-sizing: border-box; appearance: none; -webkit-appearance: none; background: var(--surface-soft); }
+.life-week.elapsed { background: var(--accent); border-color: transparent; }
+.life-week.current { outline: 2px solid var(--focus); outline-offset: -1px; }
+.life-week.has-perfect-day { background: var(--perfect-day, #e5bf57); border-color: var(--perfect-day, #e5bf57); box-shadow: inset 0 0 0 1px rgba(0,0,0,.08); }
+.life-week.has-perfect-day.current { outline-color: var(--focus); }
+.life-summary { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.life-summary > div { min-width: 0; padding: 11px; }
+.life-summary strong { overflow-wrap: anywhere; font-size: clamp(1rem, 2.5vw, 1.35rem); }
+.life-summary span { overflow-wrap: anywhere; font-size: .75rem; line-height: 1.35; }
+.life-note { margin: 12px 0 0; color: var(--text-secondary); font-size: .82rem; line-height: 1.5; }
+.calendar-day.perfect:not(.selected) { position: relative; border-color: var(--perfect-day, #e5bf57); background: var(--perfect-day, #e5bf57); color: var(--perfect-day-ink, #463710); font-weight: 800; }
+.calendar-day.perfect.selected { border-color: var(--perfect-day, #e5bf57); background: var(--perfect-day, #e5bf57); color: var(--perfect-day-ink, #463710); box-shadow: 0 0 0 2px var(--surface); }
+.perfect-day-mark { position: absolute; right: 3px; top: 1px; font-size: .48rem; line-height: 1; }
+.legend-dot.perfect-day-key { background: var(--perfect-day, #e5bf57); }
+@media (max-width: 760px) {
+  .setting-row { grid-template-columns: minmax(0, 1fr); }
+  .setting-row > input:not([type="checkbox"]), .setting-row > select, .setting-row > button { inline-size: 100%; }
+  .life-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .life-grid { gap: 1px; }
+}
