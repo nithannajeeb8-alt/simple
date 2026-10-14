@@ -268,3 +268,8 @@ img,svg,canvas{max-width:100%}
 .quick-flow .form-field input,.quick-flow .form-field select,.quick-flow .form-field textarea{font-size:16px}
 @media(max-width:420px){.debt-direction-switch{gap:7px}.debt-direction-switch button{padding:10px 8px;gap:8px}.debt-direction-switch strong{font-size:12px}.debt-direction-switch small{font-size:9px}.debt-direction-icon{flex-basis:29px;height:29px;font-size:19px}.quick-category-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.quick-category{min-height:84px}.quick-flow{padding-left:18px;padding-right:18px}}
 @media(prefers-reduced-motion:reduce){.quick-choice,.quick-category,.debt-direction-switch button{transition:none!important}}
+
+/* iCloud Shortcut action in Settings */
+.shortcut-link{display:inline-flex;align-items:center;justify-content:center;gap:.45rem;text-decoration:none;white-space:nowrap;flex-shrink:0}
+.shortcut-link .icon-wrap{display:inline-flex;align-items:center}
+@media(max-width:520px){.shortcut-link{font-size:.82rem;padding:.65rem .75rem}.shortcut-link .icon-wrap{display:none}}
