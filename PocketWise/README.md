@@ -57,3 +57,15 @@ The PWA cannot directly listen for the iPhone Back Tap gesture. Configure an App
 - Receipts now open immediately after a successful save, and can be opened again from each transaction's details. Print / Save PDF uses a standalone local document with print-specific styling; it does not upload personal finance data.
 - Money uses consistent Indian digit grouping and shows exactly two decimal places only when the value has paise. Numeric columns use tabular figures; transfer fields are added and removed when the transaction type changes.
 - Tested in headless Chromium at 320, 375, 390 and 430 CSS-pixel widths: startup, decimal/pasted amounts, persistence fallback, receipts, income, transfers, invalid amounts, failed-storage rollback, theme toggling, navigation, and responsive bounds passed. This is not a substitute for testing current iOS Safari / Android Chrome on-device.
+
+## Quick Add from iPhone Back Tap
+
+Pocketwise's `?quickadd=1` route now opens a four-step focused flow: amount, transaction type, category, and optional note/account/payment method. Saving creates the transaction locally and opens its receipt. In Settings, the Back Tap guide provides the URL to use in an Apple Shortcut configured at Settings → Accessibility → Touch → Back Tap.
+
+A web app cannot render an arbitrary interactive entry form inside the Dynamic Island or directly subscribe to a Dynamic Island double-tap. The Back Tap Shortcut is the web/PWA workaround. True Dynamic Island and system Shortcut integration requires a native iOS app using ActivityKit and App Intents.
+
+Debt direction wording uses “Owed to me” and “I owe them” to make the direction clearer at a glance.
+
+## iPhone Shortcut setup
+
+See [SHORTCUT_SETUP.md](./SHORTCUT_SETUP.md) for the step-by-step Apple Shortcuts and Back Tap setup. The app supports a prefilled `?quickadd=shortcut&amount=...&type=...&category=...&note=...` route; it opens a review/save step and removes the query from the address bar after reading it.
