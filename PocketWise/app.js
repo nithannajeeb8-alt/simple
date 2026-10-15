@@ -2,6 +2,8 @@
 (() => {
   'use strict';
   (() => { const link = document.querySelector('link[href*="bootstrap-icons"]'); const mark = () => document.documentElement.classList.add('bi-loaded'); if (link) { if (link.sheet) mark(); else link.addEventListener('load', mark, { once: true }); } })();
+  const isAndroid = /Android/i.test(navigator.userAgent || '') || /Android/i.test(navigator.userAgentData?.platform || '');
+  document.documentElement.classList.toggle('is-android', isAndroid);
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
   const money = n => {
@@ -400,7 +402,7 @@
     const progress=`<div class="quick-progress" aria-label="Step ${({amount:1,type:2,activity:3,note:4})[step]} of 4">${['amount','type','activity','note'].map((x,i)=>`<span class="${['amount','type','activity','note'].indexOf(step)>=i?'done':''}"></span>`).join('')}</div>`;
     let body='';
     if(step==='amount'){
-      body=`<form id="quick-flow-amount" class="modal-body quick-flow"><p class="quick-step-label">STEP 1 OF 4</p><h3>How much?</h3><p class="muted">Enter the amount first. You can add the details in a few quick taps.</p><label class="quick-amount-wrap" for="quick-flow-value"><span>₹</span><input id="quick-flow-value" name="amount" class="quick-flow-value" inputmode="decimal" type="text" autocomplete="off" placeholder="0" value="${escapeHTML(d.amount)}" required aria-label="Amount in rupees"></label><p id="quick-flow-error" class="field-error" hidden></p><button class="primary-button quick-next" type="submit">Continue <span aria-hidden="true">→</span></button><button class="secondary-button quick-paste-button" type="button" id="paste-bank-sms-quick">Paste bank SMS</button><button class="secondary-button quick-paste-button" type="button" id="paste-shortcut-quick">${icon('upload')} Paste transaction from Shortcut</button><button class="text-button" type="button" id="enter-shortcut-key">Enter transaction key manually</button><p class="quick-paste-help">Use this after your iPhone Shortcut copies transaction details and opens PocketWise.</p><button class="text-button quick-cancel" type="button" data-cancel-modal>Cancel</button></form>`;
+      body=`<form id="quick-flow-amount" class="modal-body quick-flow"><p class="quick-step-label">STEP 1 OF 4</p><h3>How much?</h3><p class="muted">Enter the amount first. You can add the details in a few quick taps.</p><label class="quick-amount-wrap" for="quick-flow-value"><span>₹</span><input id="quick-flow-value" name="amount" class="quick-flow-value" inputmode="decimal" type="text" autocomplete="off" placeholder="0" value="${escapeHTML(d.amount)}" required aria-label="Amount in rupees"></label><p id="quick-flow-error" class="field-error" hidden></p><button class="primary-button quick-next" type="submit">Continue <span aria-hidden="true">→</span></button><button class="secondary-button quick-paste-button" type="button" id="paste-bank-sms-quick">Paste bank SMS</button>${isAndroid?'':`<button class="secondary-button quick-paste-button" type="button" id="paste-shortcut-quick">${icon('upload')} Paste transaction from Shortcut</button><button class="text-button" type="button" id="enter-shortcut-key">Enter transaction key manually</button><p class="quick-paste-help">Use this after your iPhone Shortcut copies transaction details and opens PocketWise.</p>`}<button class="text-button quick-cancel" type="button" data-cancel-modal>Cancel</button></form>`;
     } else if(step==='type'){
       body=`<div class="modal-body quick-flow"><p class="quick-step-label">STEP 2 OF 4 · ${escapeHTML(money(parseAmount(d.amount)))}</p><h3>What happened?</h3><p class="muted">Choose how this amount should affect your records.</p><div class="quick-choice-list"><button class="quick-choice income-choice" data-quick-type="income"><span class="quick-choice-icon">↗</span><span><strong>Income</strong><small>Allowance, salary or other money received</small></span><span>›</span></button><button class="quick-choice expense-choice" data-quick-type="expense"><span class="quick-choice-icon">↘</span><span><strong>Purchase / expense</strong><small>A purchase, bill, food, travel or another cost</small></span><span>›</span></button><button class="quick-choice" data-quick-type="refund"><span class="quick-choice-icon">↩</span><span><strong>I got a refund</strong><small>Money returned for a previous purchase</small></span><span>›</span></button></div><button class="text-button quick-cancel" type="button" data-quick-back="amount">← Change amount</button></div>`;
     } else if(step==='activity'){
@@ -572,6 +574,10 @@
   function voiceDraft(){const Speech=window.SpeechRecognition||window.webkitSpeechRecognition;if(!Speech){toast('Voice recognition is not available in this browser. You can use the keyboard microphone instead.','amber');$('#tx-note').focus();return;}const rec=new Speech();rec.lang='en-IN';rec.interimResults=false;rec.maxAlternatives=1;toast('Listening for a short transaction description…');rec.onresult=e=>{const phrase=e.results[0][0].transcript;$('#tx-note').value=phrase;const match=phrase.match(/(?:₹|rs\.?\s*)?(\d+(?:\.\d{1,2})?)/i);if(match)$('#tx-amount').value=match[1];const txt=phrase.toLowerCase();const choices=[['food',['lunch','dinner','breakfast','food','tea','coffee','snack','canteen']],['transport',['bus','auto','taxi','petrol','fuel','travel']],['shopping',['bought','shop','shopping','clothes','headphones']],['education',['book','college','exam','notes','photocopy','course']],['subscriptions',['subscription','recharge','data pack','streaming']]];for(const [id,words] of choices){if(words.some(w=>txt.includes(w))){const act=state.activities.find(a=>a.id===id);if(act)$('#tx-activity').value=act.id;break;}}toast('Draft created. Check the amount and category before saving.');};rec.onerror=()=>toast('Could not hear that clearly. Please enter the details manually.','amber');rec.start();}
 
   function bindEvents(){
+    if(isAndroid){$('#shortcut-import-setting')?.remove();$('#apple-shortcut-setting')?.remove();$('#backtap-setting')?.remove();}
+    const appModal=$('#app-modal');
+    appModal.addEventListener('cancel',()=>{ currentEditId=null; });
+    appModal.addEventListener('click',event=>{ if(event.target===appModal)closeModal(); });
     document.addEventListener('click', async event=>{
       if(event.target.closest('#edit-profile')){showProfileForm(false);return;}
       if(event.target.closest('#open-privacy')){showPrivacyPage();return;}
@@ -771,7 +777,7 @@
     return fields;
   }
   function showShortcutKeyPrompt(){
-    openModal('Import from Shortcut',`<form id="shortcut-key-form" class="modal-body"><p class="muted">Paste the transaction key, complete PocketWise Quick Add URL, or transaction JSON copied by your Shortcut. This is a local import; nothing is sent to a server.</p><div class="form-field"><label for="shortcut-key-value">TRANSACTION KEY OR PAYLOAD</label><textarea id="shortcut-key-value" name="payload" rows="5" autocapitalize="off" autocomplete="off" spellcheck="false" placeholder='Paste the PocketWise URL or JSON here' required></textarea></div><p class="form-note">If your Shortcut copied a URL, paste the entire URL. PocketWise will validate it and show a review screen before saving.</p><div class="form-actions"><button class="secondary-button" type="button" data-cancel-modal>Cancel</button><button class="primary-button" type="submit">Validate & continue</button></div></form>`,'SHORTCUT IMPORT');
+    openModal('Import from Shortcut',`<form id="shortcut-key-form" class="modal-body"><p class="muted">Paste the transaction key, complete PocketWise Quick Add URL, or transaction JSON copied by your Shortcut. This is a local import; nothing is sent to a server.</p><div class="form-field"><label for="shortcut-key-value">TRANSACTION KEY OR PAYLOAD</label><textarea id="shortcut-key-value" name="payload" rows="5" autocapitalize="off" autocomplete="off" spellcheck="false" placeholder='Paste the PocketWise URL or JSON here' required></textarea></div><p class="form-note">If your Shortcut copied a URL, paste the entire URL. PocketWise will validate it and show a review screen before saving.</p><div class="form-actions"><button class="secondary-button" type="button" data-cancel-modal>Cancel</button><button class="primary-button" type="submit">Validate & continue</button></div><button class="text-button dismiss-import" type="button" data-cancel-modal>Close without importing</button></form>`,'SHORTCUT IMPORT');
   }
   async function importShortcutText(raw){
     const fields=parseClipboardShortcut(raw);
@@ -797,6 +803,7 @@
     }
   }
   function showShortcutReturnNudge(){
+    if(isAndroid)return;
     const el=document.createElement('div');el.className='toast shortcut-return-toast';
     el.innerHTML=`${icon('upload')}<span>Back from another app? Import your Shortcut transaction.</span><button type="button" class="toast-action" id="resume-paste">Paste</button><button type="button" class="toast-action" id="resume-key">Enter key</button>`;
     $('#toast-region').append(el);setTimeout(()=>el.remove(),9000);

@@ -362,3 +362,9 @@ img,svg,canvas{max-width:100%}
  #profile-form .form-actions button{flex:1 1 auto;width:100%}
 }
 @media(prefers-reduced-motion:reduce){#profile-form .profile-color-option{transition:none}}
+
+/* PocketWise minimal wallet mark and dismissible shortcut import */
+.brand-mark{background:#103b2d;color:#b9f3d2;border-radius:13px;display:grid;place-items:center;flex:0 0 auto;overflow:hidden}
+.brand-mark svg{display:block;width:100%;height:100%}
+.dismiss-import{display:block;margin:12px auto 0;color:var(--muted);text-decoration:underline;text-underline-offset:3px}
+.is-android #shortcut-import-setting,.is-android #apple-shortcut-setting,.is-android #backtap-setting,.is-android #paste-shortcut-quick,.is-android #enter-shortcut-key,.is-android .quick-paste-help{display:none!important}
