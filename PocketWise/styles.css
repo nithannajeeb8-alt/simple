@@ -274,3 +274,15 @@ img,svg,canvas{max-width:100%}
 .shortcut-link .icon-wrap{display:inline-flex;align-items:center}
 @media(max-width:520px){.shortcut-link{font-size:.82rem;padding:.65rem .75rem}.shortcut-link .icon-wrap{display:none}}
 
+
+/* v1.5 one-screen Quick Add */
+.qs-label{font-size:10px;letter-spacing:.12em;font-weight:800;color:var(--muted);margin:18px 0 8px}
+.qs-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.qs-row input[type=date]{width:auto;min-height:40px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);padding:0 10px}
+#qs-form .quick-amount-wrap{margin:18px 0 4px}
+#qs-form .quick-category-grid{max-height:min(34vh,260px);overflow:auto}
+.quick-category.qs-on{border-color:var(--green);background:var(--green-soft);color:var(--green-deep)}
+.qs-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;position:sticky;bottom:0;padding:16px 0 6px;margin-top:6px;background:linear-gradient(transparent,var(--surface) 28%)}
+.qs-actions .primary-button,.qs-actions .secondary-button{min-height:50px;width:100%}
+
+.guide-steps{margin:6px 0 12px;padding-left:20px;line-height:1.7;font-size:13px}.guide-steps li{margin-bottom:4px}
