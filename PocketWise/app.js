@@ -209,8 +209,21 @@
   function safeToSpend(){const upcoming=state.reminders.filter(r=>r.active&&r.date>=today()&&r.date<=monthEnd()).reduce((s,r)=>s+(+r.amount||0),0);const balance=totalBalance(),budget=budgetAmount();const planned=budget>0?Math.min(balance,Math.max(0,budget-spentForMonth())):balance;return Math.max(0,planned-upcoming);}
   function fmtHidden(v){return hiddenAmounts||state.settings.hideBalances?'••••••':money(v);}
   function fmtSmall(n){n=Number(n)||0;if(Math.abs(n)>=100000)return `₹${(n/100000).toFixed(1)}L`;if(Math.abs(n)>=1000)return `₹${(n/1000).toFixed(1)}k`;return `₹${Math.round(n)}`;}
-  // Haptics are only triggered after explicit successful paste/import or transaction save.
-  function transactionHaptic(){try{if(typeof navigator!=='undefined'&&typeof navigator.vibrate==='function')navigator.vibrate(12);}catch(_){}}
+  // Audible + haptic feedback is deliberately limited to successful paste/import and save actions.
+  // Browsers may suppress Web Audio until a user gesture; failure is harmless and never blocks saving.
+  function transactionHaptic(){
+    try{if(typeof navigator!=='undefined'&&typeof navigator.vibrate==='function')navigator.vibrate(12);}catch(_){}
+    try{
+      const AudioCtx=window.AudioContext||window.webkitAudioContext;
+      if(!AudioCtx)return;
+      const ctx=window.__pocketwiseAudioContext||(window.__pocketwiseAudioContext=new AudioCtx());
+      if(ctx.state==='suspended')ctx.resume().catch(()=>{});
+      const osc=ctx.createOscillator(),gain=ctx.createGain();
+      osc.type='sine';osc.frequency.setValueAtTime(880,ctx.currentTime);
+      gain.gain.setValueAtTime(0.0001,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.045,ctx.currentTime+0.012);gain.gain.exponentialRampToValueAtTime(0.0001,ctx.currentTime+0.095);
+      osc.connect(gain);gain.connect(ctx.destination);osc.start();osc.stop(ctx.currentTime+0.1);
+    }catch(_){}
+  }
   let lastToastSignature='',lastToastAt=0;
   function toast(message, type='success'){
     const signature=`${type}:${String(message)}`;
@@ -358,6 +371,17 @@
   function scheduleCharts(){if(chartFrame)cancelAnimationFrame(chartFrame);chartFrame=requestAnimationFrame(()=>{if(currentPage==='home'||$('#page-home').classList.contains('active')){const mode=$('#home-chart-mode')?.value||'week';const buckets=bucketSeries(mode==='week'?'all':mode,true);const labels=buckets.map(b=>b.label),values=buckets.map(b=>b.expense);drawLineChart($('#home-spending-chart'),labels,[{name:'Spending',values,color:cssVar('--green')}],'area');const current=totalsFor(periodTransactions(mode==='week'?'all':mode));$('#week-total').textContent=fmtHidden(mode==='week'?values.reduce((s,x)=>s+x,0):current.expenses);$('#week-comparison').textContent=mode==='week'?'Spend recorded across the last 7 days':mode==='month'?'Current month to date':'Year to date';}
     if($('#page-insights').classList.contains('active')){const period=chartPeriod();const b=bucketSeries(period,false);const labels=b.map(x=>x.label);const type=$('#trend-type')?.value||'line';if(type==='histogram')drawHistogram($('#trend-chart'),periodTransactions(period));else if(type==='scatter')drawScatter($('#trend-chart'),b);else drawLineChart($('#trend-chart'),labels,[{name:'Income',values:b.map(x=>x.income),color:cssVar('--green')},{name:'Expenses',values:b.map(x=>x.expense),color:cssVar('--red')}],type);const cats=expenseByCategory(period);const cc=$('#category-chart');if(mixView==='doughnut')drawDonut(cc,cats.slice(0,8));else if(mixView==='pie')drawDonut(cc,cats.slice(0,8),true);else drawHorizontal(cc,cats);const yrBuckets=bucketSeries('year');drawLineChart($('#comparison-chart'),yrBuckets.map(x=>x.label),[{name:'Income',values:yrBuckets.map(x=>x.income),color:cssVar('--green')},{name:'Expenses',values:yrBuckets.map(x=>x.expense),color:cssVar('--red')}],'bar');}
     });}
+  async function showInstallGuide(){
+    if(installedPrompt){try{await installedPrompt.prompt();const result=await installedPrompt.userChoice;installedPrompt=null;if(result?.outcome==='accepted'){toast('PocketWise installation started.');return;}}catch(_){} }
+    const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);
+    const android=/android/i.test(navigator.userAgent);
+    const instructions=ios
+      ? '<ol><li>Open PocketWise in Safari.</li><li>Tap Share.</li><li>Choose <strong>Add to Home Screen</strong>, then Add.</li></ol>'
+      : android
+      ? '<ol><li>Open PocketWise in Chrome or another supported browser.</li><li>Use the browser menu and choose <strong>Install app</strong> or <strong>Add to Home screen</strong>.</li><li>Confirm installation. The wording varies by browser.</li></ol>'
+      : '<ol><li>Open PocketWise in a supported browser over HTTPS.</li><li>Use the browser install icon or menu and choose <strong>Install</strong> or <strong>Create shortcut</strong>.</li></ol>';
+    openModal('Install PocketWise',`<div class="modal-body install-guide-content"><p class="muted">PocketWise is an installable website app (PWA), not a native app-store package.</p>${instructions}<p class="fine-print">Installation availability depends on your browser and device. Your local records remain in that browser profile, so export backups before clearing site data.</p><div class="form-actions"><button class="primary-button" type="button" data-cancel-modal>Done</button></div></div>`,'INSTALL ON YOUR DEVICE');
+  }
   function openModal(title,body,kicker='QUICK ACTION'){const dlg=$('#app-modal');if(dlg.open)dlg.close();$('#modal-title').textContent=title;$('#modal-kicker').textContent=kicker;$('#modal-content').innerHTML=body;dlg.showModal();}
   function closeModal(){if($('#app-modal').open)$('#app-modal').close();currentEditId=null;}
   function accountOptions(selected=''){return state.accounts.map(a=>`<option value="${escapeHTML(a.id)}" ${selected===a.id?'selected':''}>${escapeHTML(a.name)}</option>`).join('');}
@@ -702,7 +726,7 @@
     let activity=options.find(a=>words.some(([key,terms])=>terms.some(w=>lower.includes(w))&&a.name.toLowerCase().includes(key)))||options[0];
     return {amount,type,activityId:activity?.id||'other',note:merchant,date:today(),accountId:state.settings.lastQuickAddAccountId||state.accounts[0]?.id||'cash',paymentMethod:'Bank / UPI'};
   }
-  async function pasteBankSms(){try{if(!navigator.clipboard?.readText)throw new Error('Clipboard access is unavailable. Open PocketWise over HTTPS and try again.');const raw=await navigator.clipboard.readText();quickAddDraft={...parseBankSms(raw),requestId:null};renderQuickAddStep('note');toast('SMS parsed on this device. Review the guessed details.');}catch(e){toast(e.message||'Could not read the bank SMS.','error');}}
+  async function pasteBankSms(){try{if(!navigator.clipboard?.readText)throw new Error('Clipboard access is unavailable. Open PocketWise over HTTPS and try again.');const raw=await navigator.clipboard.readText();quickAddDraft={...parseBankSms(raw),requestId:null};transactionHaptic();renderQuickAddStep('note');toast('SMS parsed on this device. Review the guessed details.');}catch(e){toast(e.message||'Could not read the bank SMS.','error');}}
   function parseClipboardShortcut(raw){
     const text=String(raw||'').trim();
     if(!text)throw new Error('The clipboard is empty. Run the Shortcut again and copy its transaction first.');

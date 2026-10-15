@@ -335,3 +335,30 @@ img,svg,canvas{max-width:100%}
 #transaction-form .form-actions button[type="submit"][name="saveMode"][value="another"]{flex-basis:100%}
 #theme-choice{flex-wrap:wrap}
 @media(max-width:420px){#transaction-form .form-actions button{flex:1 1 100%;min-height:44px}}
+
+
+/* v1.5.3: profile selector alignment and cross-platform polish */
+#profile-form .profile-preview-large{display:flex;align-items:center;justify-content:flex-start;gap:16px;width:100%;min-width:0;margin:0;padding:4px 0 22px;text-align:left}
+#profile-form .profile-preview-large .avatar{display:grid;place-items:center;flex:0 0 64px;width:64px;height:64px;margin:0;border-radius:20px;line-height:1}
+#profile-form-preview-name{display:block;min-width:0;flex:1;text-align:left;overflow-wrap:anywhere;line-height:1.25;font-size:clamp(18px,4.8vw,22px);font-weight:700;letter-spacing:-.35px}
+#profile-form .form-field{min-width:0}
+#profile-form .profile-color-options{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:stretch;gap:10px;width:100%;margin:10px 0 0}
+#profile-form .profile-color-option{position:relative;box-sizing:border-box;display:flex;align-items:center;justify-content:center;min-width:0;min-height:100px;padding:12px 5px;gap:9px;text-align:center;border:1px solid var(--line);border-radius:18px;background:var(--surface, #fff);transition:border-color .16s ease,box-shadow .16s ease,background .16s ease}
+#profile-form .profile-color-option span{flex:0 0 36px;width:36px;height:36px;margin:0 auto;border-radius:50%;background:var(--profile-color);}
+#profile-form .profile-color-option small{display:block;width:100%;margin:0;text-align:center;font-size:12px;font-weight:650;line-height:1.25;color:var(--muted);white-space:normal;overflow-wrap:anywhere}
+#profile-form .profile-color-option:has(input:checked){border:2px solid var(--profile-color);padding:11px 4px;background:color-mix(in srgb,var(--profile-color) 6%,var(--surface, #fff));box-shadow:0 0 0 3px color-mix(in srgb,var(--profile-color) 14%,transparent)}
+#profile-form .profile-color-option:focus-within{outline:3px solid color-mix(in srgb,var(--profile-color) 28%,transparent);outline-offset:2px}
+#profile-form .form-actions{display:flex;align-items:stretch;gap:10px;margin-top:22px}
+#profile-form .form-actions button{flex:1 1 0;min-width:0;min-height:52px;padding:12px 14px;white-space:normal;line-height:1.25}
+.install-guide-content ol{padding-left:22px;line-height:1.7}
+.install-guide-content li{padding-left:3px;margin:8px 0}
+@media(max-width:420px){
+ #profile-form .profile-color-options{gap:7px}
+ #profile-form .profile-color-option{min-height:88px;padding:9px 3px;gap:8px;border-radius:15px}
+ #profile-form .profile-color-option span{flex-basis:32px;width:32px;height:32px}
+ #profile-form .profile-color-option small{font-size:11px}
+ #profile-form .profile-preview-large .avatar{flex-basis:58px;width:58px;height:58px;border-radius:18px}
+ #profile-form .form-actions{flex-direction:column-reverse}
+ #profile-form .form-actions button{flex:1 1 auto;width:100%}
+}
+@media(prefers-reduced-motion:reduce){#profile-form .profile-color-option{transition:none}}
