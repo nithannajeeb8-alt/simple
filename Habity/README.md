@@ -84,3 +84,15 @@ Choose one of nine palettes independently from System, Light, or Dark appearance
 ## Daily Essentials customization
 
 Open **Settings → Daily Essentials → Manage daily essentials** to add, edit, reorder, disable, or remove routines. Users can decide which habits count toward Perfect Day and streak calculations. Disabling a habit preserves its record history; removing a habit removes it from the active list while the old record data remains in local storage. The settings summary shows how many habits are active and how many count toward scoring.
+
+
+## Calm luxury rebuild (v14)
+This release refines the existing UI without removing features or changing the storage model. It follows Apple Human Interface Guidelines principles of clear hierarchy, aligned grouping, safe-area handling, accessible touch targets and progressive disclosure, plus Nielsen Norman Group's progressive-disclosure guidance. Changes focus on reduced card emphasis, tighter but readable spacing, quieter progress presentation, a less dominant weekly tracker and a more compact mobile navigation. All existing app views and feature logic remain included.
+
+Design references:
+- Apple HIG Layout: https://developer.apple.com/design/human-interface-guidelines/layout
+- Apple HIG Design Principles: https://developer.apple.com/design/human-interface-guidelines/design-principles/
+- Apple HIG Accessibility: https://developer.apple.com/design/human-interface-guidelines/accessibility
+- Nielsen Norman Group, Progressive Disclosure: https://www.nngroup.com/articles/progressive-disclosure/
+
+Validation: static HTML structure and JavaScript syntax checks should be run before deployment. This package has not been physically tested on an iPhone.

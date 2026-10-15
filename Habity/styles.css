@@ -869,3 +869,133 @@ html[data-mode="dark"][data-theme="sage"] { color-scheme:dark; --canvas:#111A14;
   .settings-heading h2 { font-size: 1.3rem; }
   .settings-heading .setting-icon { flex-basis: 40px; width: 40px; height: 40px; }
 }
+
+
+/* Little Days calm-luxury refinement v1.0
+   Keeps all existing screens and features; reduces competing visual emphasis. */
+:root {
+  --radius-small: 10px;
+  --radius-control: 12px;
+  --radius-card: 18px;
+  --radius-feature: 20px;
+  --shadow-card: 0 2px 12px rgba(24, 19, 30, .035);
+  --shadow-float: 0 16px 48px rgba(18, 13, 24, .18);
+}
+body { letter-spacing: -.01em; }
+.main { padding-bottom: calc(36px + env(safe-area-inset-bottom)); }
+.topbar { margin-bottom: clamp(20px, 3vw, 32px); border-bottom-color: color-mix(in srgb, var(--line) 72%, transparent); }
+.page-heading { margin-bottom: clamp(20px, 3vw, 30px); }
+.page-heading h1 { letter-spacing: -.045em; line-height: 1.03; }
+.page-heading > div > p { max-width: 46ch; line-height: 1.55; }
+.eyebrow, .section-label, .topbar-date { letter-spacing: .13em; }
+/* Quiet surfaces: fewer heavy outlines and fewer nested boxes. */
+.glass-card, .week-card, .progress-card, .mood-card, .memory-prompt,
+.settings-group, .side-card, .quote-card, .discover-card, .calendar-card,
+.stats-card, .life-map-card, .upcoming-card {
+  box-shadow: var(--shadow-card);
+}
+.glass-card, .week-card, .progress-card, .mood-card, .memory-prompt,
+.settings-group, .side-card, .quote-card {
+  border-color: color-mix(in srgb, var(--line) 76%, transparent);
+}
+.week-card { padding: clamp(16px, 2.2vw, 24px); border-radius: var(--radius-feature); }
+.week-card-head { gap: 12px; margin-bottom: 20px; }
+.week-card-head h2 { margin-top: 7px; font-size: clamp(1.55rem, 3vw, 2rem); letter-spacing: -.035em; }
+.week-range { color: var(--text-tertiary); font-size: .82rem; white-space: nowrap; }
+.week-dots { gap: clamp(5px, 1.1vw, 12px); }
+.week-footer { margin-top: 18px; padding-top: 14px; gap: 10px 14px; border-top-color: color-mix(in srgb, var(--line) 75%, transparent); font-size: .8rem; }
+.streak-pill { padding: 7px 10px; font-size: .8rem; }
+.perfect-badge { transform: scale(.88); transform-origin: top right; box-shadow: none; }
+.content-grid { gap: clamp(20px, 3vw, 32px); }
+.section-block { margin-bottom: clamp(24px, 4vw, 36px); }
+.section-heading { gap: 12px; margin-bottom: 14px; }
+.section-heading h2 { letter-spacing: -.035em; line-height: 1.12; }
+.section-heading .section-label { margin-bottom: 6px; }
+.progress-card { padding: 16px 18px; border-radius: 16px; }
+.progress-copy { gap: 10px; }
+.progress-track { height: 5px; }
+.habit-list { gap: 7px; margin-top: 10px; }
+.habit-item, .habit-row { border-color: color-mix(in srgb, var(--line) 78%, transparent); }
+.add-habit-button { min-height: 42px; margin-top: 8px; }
+.today-prayer-card { margin-top: 14px; padding: 17px; border-radius: 18px; }
+.today-prayer-card .section-heading { margin-bottom: 10px; }
+.mood-card { padding: clamp(14px, 2.2vw, 20px); border-radius: 18px; }
+.mood-extra { gap: 10px; }
+.memory-prompt { border-radius: 18px; }
+.memory-art { min-height: 82px; }
+.memory-write { padding: 17px; }
+.memory-actions { gap: 10px; }
+.quote-card { padding: 20px; }
+/* Make secondary information feel optional, not like a list of unfinished tasks. */
+.secondary-column { gap: 14px; }
+.secondary-column > section, .secondary-column > .glass-card { border-radius: 18px; }
+.secondary-column .section-label { letter-spacing: .12em; }
+.secondary-column .quote-card p { line-height: 1.4; }
+/* Settings: clear sections without oversized nested controls. */
+.settings-layout { gap: 22px; }
+.settings-main { gap: 16px; }
+.settings-group { border-radius: 20px; }
+.settings-heading { margin-bottom: 18px; }
+.settings-heading .setting-icon { border-radius: 13px; }
+.settings-group .setting-row { padding: 13px 0; }
+.settings-group .form-grid { gap: 13px; margin: 16px 0; }
+.settings-group .small-text { margin-top: 14px; }
+/* Navigation stays clear but doesn't dominate the phone viewport. */
+.bottom-nav { padding: 8px 10px calc(8px + env(safe-area-inset-bottom)); gap: 4px; }
+.bottom-nav .nav-item { min-height: 58px; padding: 7px 6px; border-radius: 15px; gap: 3px; font-size: .78rem; }
+.bottom-nav .nav-item i { font-size: 1.1rem; }
+/* Forms stay calm, readable, and usable. */
+input, select, textarea { border-radius: 12px; }
+button, input, select, textarea { transition: background-color .16s ease, border-color .16s ease, color .16s ease; }
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline-offset: 3px; }
+@media (min-width: 900px) {
+  .main { padding-inline: clamp(28px, 4vw, 56px); }
+  .home-heading h1 { font-size: clamp(3rem, 5vw, 4.6rem); }
+}
+@media (max-width: 760px) {
+  .main { padding-inline: 16px; padding-bottom: calc(88px + env(safe-area-inset-bottom)); }
+  .topbar { min-height: 60px; margin-bottom: 22px; }
+  .page-heading { align-items: flex-start; gap: 12px; margin-bottom: 22px; }
+  .home-heading { align-items: center; }
+  .home-heading h1 { font-size: clamp(2.15rem, 8.3vw, 3.05rem); line-height: 1.02; }
+  .home-heading > div > p { max-width: 34ch; font-size: .95rem; }
+  .perfect-badge { transform: scale(.76); margin-left: -12px; }
+  .week-card { padding: 17px 15px; }
+  .week-card-head { align-items: flex-start; margin-bottom: 16px; }
+  .week-card-head h2 { font-size: 1.5rem; }
+  .week-range { font-size: .73rem; padding-top: 2px; }
+  .week-dots { gap: 4px; }
+  .week-footer { display: flex; flex-wrap: wrap; align-items: center; }
+  .section-block { margin-bottom: 26px; }
+  .section-heading h2 { font-size: clamp(1.55rem, 6vw, 2rem); }
+  .section-heading .text-button { font-size: .78rem; white-space: nowrap; }
+  .progress-card { padding: 14px; }
+  .progress-copy > span { font-size: .88rem; }
+  .progress-copy strong { font-size: 1.15rem; }
+  .habit-list { gap: 7px; }
+  .today-prayer-card { padding: 15px; }
+  .today-prayer-card .section-heading h3 { font-size: 1.45rem; }
+  .mood-options { gap: 6px; }
+  .mood-option { min-width: 0; }
+  .memory-write { padding: 15px; }
+  .memory-actions { align-items: flex-start; flex-direction: column; }
+  .memory-actions > div { width: 100%; display: flex; justify-content: flex-end; gap: 8px; }
+  .settings-group { padding: 18px 16px; }
+  .settings-heading { margin-bottom: 17px; }
+  .settings-group > .primary-button, .settings-group > .outline-button, .settings-group > .danger-button { min-height: 46px; }
+  .bottom-nav { left: 0; right: 0; bottom: 0; border-radius: 0; border-top: 1px solid var(--line); backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px); }
+  .bottom-nav .nav-item { min-height: 54px; }
+}
+@media (max-width: 390px) {
+  .main { padding-inline: 13px; }
+  .home-heading h1 { font-size: 2.08rem; }
+  .week-card { padding: 14px 12px; }
+  .week-card-head h2 { font-size: 1.35rem; }
+  .week-dots .day-dot { width: 36px; height: 36px; }
+  .week-footer { font-size: .74rem; gap: 8px 10px; }
+  .streak-pill { padding: 6px 8px; }
+  .settings-group { padding: 16px 13px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}

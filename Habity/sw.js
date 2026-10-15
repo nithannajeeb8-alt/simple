@@ -1,9 +1,9 @@
-const CACHE_NAME = "little-days-shell-v13";
+const CACHE_NAME = "little-days-shell-v14";
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./styles.css?v=11",
-  "./app.js?v=11",
+  "./styles.css?v=12",
+  "./app.js?v=12",
   "./manifest.webmanifest",
   "./icons/icon.svg",
   "./icons/brand-mark.svg",
