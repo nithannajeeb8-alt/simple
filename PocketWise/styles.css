@@ -368,3 +368,15 @@ img,svg,canvas{max-width:100%}
 .brand-mark svg{display:block;width:100%;height:100%}
 .dismiss-import{display:block;margin:12px auto 0;color:var(--muted);text-decoration:underline;text-underline-offset:3px}
 .is-android #shortcut-import-setting,.is-android #apple-shortcut-setting,.is-android #backtap-setting,.is-android #paste-shortcut-quick,.is-android #enter-shortcut-key,.is-android .quick-paste-help{display:none!important}
+
+
+/* v1.5.5: tighter, consistent profile spacing on phone and desktop */
+#profile-form .profile-preview-large{gap:12px;padding:0 0 10px;margin:0;align-items:center}
+#profile-form-preview-name{line-height:1.2;letter-spacing:-.45px}
+#profile-form .form-field{margin-top:12px}
+#profile-form .profile-color-options{gap:8px;margin-top:7px}
+#profile-form .profile-color-option{min-height:82px;padding:9px 4px;gap:7px;border-radius:15px}
+#profile-form .profile-color-option span{flex-basis:32px;width:32px;height:32px}
+#profile-form .profile-color-option small{font-size:11px;line-height:1.2}
+#profile-form .fine-print{margin-top:12px}
+@media(max-width:420px){#profile-form .profile-preview-large{gap:11px;padding-bottom:8px}#profile-form .profile-preview-large .avatar{flex-basis:54px;width:54px;height:54px;border-radius:17px}#profile-form-preview-name{font-size:18px}#profile-form .profile-color-options{gap:6px}#profile-form .profile-color-option{min-height:76px;padding:8px 2px}#profile-form .profile-color-option span{flex-basis:29px;width:29px;height:29px}#profile-form .profile-color-option small{font-size:10px}}
