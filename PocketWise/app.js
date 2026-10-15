@@ -1,6 +1,7 @@
 /* Pocketwise: local-first personal finance PWA prototype. */
 (() => {
   'use strict';
+  (() => { const link = document.querySelector('link[href*="bootstrap-icons"]'); const mark = () => document.documentElement.classList.add('bi-loaded'); if (link) { if (link.sheet) mark(); else link.addEventListener('load', mark, { once: true }); } })();
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
   const money = n => {
@@ -144,6 +145,7 @@
     return { indexedDB: indexedSaved, localStorage: localSaved };
   }
   async function initialise(){
+    try { localStorage.removeItem('pocketwise-sync-v1'); } catch {}
     db=await openDB();
     let indexedSaved=await dbLoad(), localSaved=null;
     try{localSaved=JSON.parse(localStorage.getItem(STORE_KEY)||'null')}catch{localSaved=null}
@@ -175,7 +177,7 @@
   const txIsIncome = t => t.type==='income';
   const txIsExpense = t => t.type==='expense';
   const txIsDebt = t => ['borrowed','lent','repay_out','repay_in'].includes(t.type);
-  const txCashDelta = t => ({income:t.amount,refund:t.amount,borrowed:t.amount,lent:-t.amount,repay_out:-t.amount,repay_in:t.amount,expense:-t.amount}[t.type]||0);
+  const txCashDelta = t => { const n=Number(t.amount)||0; return ({income:n,refund:n,borrowed:n,lent:-n,repay_out:-n,repay_in:n,expense:-n}[t.type]||0); };
   function balanceForAccount(accountId){let a=accountById(accountId),total=Number(a.openingBalance)||0;state.transactions.forEach(t=>{if(t.accountId===accountId)total+=txCashDelta(t);if(t.type==='transfer'&&t.accountId===accountId)total-=Number(t.amount)||0;if(t.type==='transfer'&&t.toAccountId===accountId)total+=Number(t.amount)||0;});return total;}
   function totalBalance(){return state.accounts.reduce((sum,a)=>sum+balanceForAccount(a.id),0);}
   function debtPaid(debt){return state.transactions.filter(t=>t.debtId===debt.id&&((debt.direction==='borrowed'&&t.type==='repay_out')||(debt.direction==='lent'&&t.type==='repay_in'))).reduce((s,t)=>s+(Number(t.amount)||0),0);}
@@ -202,28 +204,29 @@
   function updateDateHeader(){const now=new Date();$('#date-eyebrow').textContent=now.toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'long'}).toUpperCase();}
   function setPage(page){if(!['home','activity','insights','settings'].includes(page))page='home';currentPage=page;$$('.page').forEach(p=>p.classList.toggle('active',p.dataset.pagePanel===page));$$('[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page===page));const heads={home:['Good to see you.','A clearer view of what you have and where it goes.'],activity:['Your money, accounted for.','Search, revisit and understand every recorded activity.'],insights:['Make the patterns visible.','The bigger picture, without the spreadsheet headache.'],settings:['Make it yours.','A few thoughtful controls to keep things useful and private.']};$('#page-title').textContent=heads[page][0];$('#page-subtitle').textContent=heads[page][1];$('#page-title').parentElement.style.display='';window.scrollTo({top:0,behavior:'smooth'});renderPage(page);}
   function applyHiddenAmounts(){document.body.classList.toggle('hide-amounts',hiddenAmounts||state.settings.hideBalances);$('#hide-balances').setAttribute('aria-label',(hiddenAmounts||state.settings.hideBalances)?'Show balances':'Hide balances');}
-  // The outer gauge compares income and expenses on one 100-unit semicircle.
-  // Each side is proportional to its actual share of the total, so equal
-  // income and expenses meet exactly at the midpoint (net = ₹0). No artificial
-  // 2% gap and no full-red override for losses: both would distort the data.
-  // A genuinely empty period keeps both colored strokes hidden.
+  // Compute the two outer-ring segments from this month's totals. In a loss
+  // state the complete outer arc becomes red, so a large leftover grey section
+  // cannot imply that income is winning. Empty months keep the neutral track.
   function outerArcLengths(incomeValue, expenseValue, netValue){
     const income=Math.max(0,Number(incomeValue)||0);
     const expenses=Math.max(0,Number(expenseValue)||0);
     const total=income+expenses;
-    const incomeLen=total>0?(income/total)*100:0;
-    const expenseLen=total>0?(expenses/total)*100:0;
-    const expenseOffset=expenseLen>0?-(100-expenseLen):0;
-    return {incomeLen,expenseLen,expenseOffset,isLoss:Number(netValue)<0,total,net:Number(netValue)||0};
+    const isLoss=Number(netValue)<0;
+    const availableArc=total>0?98:0;
+    const incomeLen=!isLoss&&total>0?(income/total)*availableArc:0;
+    const expenseLen=isLoss&&total>0?100:(total>0?(expenses/total)*availableArc:0);
+    const expenseOffset=isLoss?0:(expenseLen>0.05?-(100-expenseLen):0);
+    return {incomeLen,expenseLen,expenseOffset,isLoss,total};
   }
 
   function updateMoneyText(){
     const bal=totalBalance(),t=totalsFor(periodTransactions('month')),dt=debtTotals(),budget=budgetAmount(),spent=spentForMonth(),daysTotal=new Date(new Date().getFullYear(),new Date().getMonth()+1,0).getDate(),day=new Date().getDate(),daysLeft=daysTotal-day;
     $$('[data-money="balance"]').forEach(el=>el.textContent=fmtHidden(bal));$$('[data-money="income"]').forEach(el=>el.textContent=fmtHidden(t.income));$$('[data-money="expense"]').forEach(el=>el.textContent=fmtHidden(t.expenses));$$('[data-money="net"]').forEach(el=>el.textContent=fmtHidden(t.net));$$('[data-money="safe"]').forEach(el=>el.textContent=fmtHidden(safeToSpend()));$$('[data-money="receivable"]').forEach(el=>el.textContent=fmtHidden(dt.receivable));$$('[data-money="payable"]').forEach(el=>el.textContent=fmtHidden(dt.payable));
     const percent=budget?Math.min(spent/budget*100,100):0;$('#budget-progress').style.width=`${percent}%`;$('#budget-progress').style.background=budget&&spent>budget?'var(--red)':'var(--green)';$('#budget-percent').textContent=budget?`${Math.round(spent/budget*100)}% used`:'Set a limit';$('[data-money="budget"]').textContent=budget?fmtHidden(budget):'Not set';$('#budget-spent-text').textContent=budget?`${money(spent)} spent`:'Set a budget to begin';$('#budget-left-text').textContent=budget?`${money(Math.max(0,budget-spent))} left`:'';$('#days-left').textContent=daysLeft;$('#period-caption').textContent=`${day} of ${daysTotal} days elapsed`;
-    // Income grows from the left endpoint and expenses from the right endpoint.
-    // Both are proportional shares of the same 100-unit path: when totals are
-    // equal, they meet exactly at the midpoint. Hide zero-length rounded dashes.
+    // Match the reference: income grows inward from the LEFT endpoint, while
+    // spending grows inward from the RIGHT endpoint on the SAME semicircle.
+    // A small neutral break separates the segments. Zero-length rounded SVG
+    // dashes can look like dots, so hide empty segments completely.
     const arc=outerArcLengths(t.income,t.expenses,t.net);
     const {incomeLen,expenseLen,expenseOffset}=arc;
     const incomeArc=$('.arc-income'), expenseArc=$('.arc-expense');
@@ -232,6 +235,8 @@
     incomeArc.style.opacity=incomeLen>0.05?'1':'0';
     incomeArc.style.visibility=incomeLen>0.05?'visible':'hidden';
     expenseArc.style.strokeDasharray=expenseLen>0.05?`${expenseLen} 100`:'0 100';
+    // A monthly loss uses a full 100-unit dash with zero offset, covering both
+    // rounded endpoints and eliminating the grey gap seen in the loss state.
     expenseArc.style.strokeDashoffset=String(expenseOffset);
     expenseArc.style.opacity=expenseLen>0.05?'1':'0';
     expenseArc.style.visibility=expenseLen>0.05?'visible':'hidden';
@@ -339,14 +344,14 @@
     const progress=`<div class="quick-progress" aria-label="Step ${({amount:1,type:2,activity:3,note:4})[step]} of 4">${['amount','type','activity','note'].map((x,i)=>`<span class="${['amount','type','activity','note'].indexOf(step)>=i?'done':''}"></span>`).join('')}</div>`;
     let body='';
     if(step==='amount'){
-      body=`<form id="quick-flow-amount" class="modal-body quick-flow"><p class="quick-step-label">STEP 1 OF 4</p><h3>How much?</h3><p class="muted">Enter the amount first. You can add the details in a few quick taps.</p><label class="quick-amount-wrap" for="quick-flow-value"><span>₹</span><input id="quick-flow-value" name="amount" class="quick-flow-value" inputmode="decimal" type="text" autocomplete="off" placeholder="0" value="${escapeHTML(d.amount)}" required aria-label="Amount in rupees"></label><p id="quick-flow-error" class="field-error" hidden></p><button class="primary-button quick-next" type="submit">Continue <span aria-hidden="true">→</span></button><button class="text-button quick-cancel" type="button" data-cancel-modal>Cancel</button></form>`;
+      body=`<form id="quick-flow-amount" class="modal-body quick-flow"><p class="quick-step-label">STEP 1 OF 4</p><h3>How much?</h3><p class="muted">Enter the amount first. You can add the details in a few quick taps.</p><label class="quick-amount-wrap" for="quick-flow-value"><span>₹</span><input id="quick-flow-value" name="amount" class="quick-flow-value" inputmode="decimal" type="text" autocomplete="off" placeholder="0" value="${escapeHTML(d.amount)}" required aria-label="Amount in rupees"></label><p id="quick-flow-error" class="field-error" hidden></p><button class="primary-button quick-next" type="submit">Continue <span aria-hidden="true">→</span></button><button class="secondary-button quick-paste-button" type="button" id="paste-shortcut-quick">${icon('upload')} Paste transaction from Shortcut</button><p class="quick-paste-help">Use this after your iPhone Shortcut copies transaction details and opens PocketWise.</p><button class="text-button quick-cancel" type="button" data-cancel-modal>Cancel</button></form>`;
     } else if(step==='type'){
       body=`<div class="modal-body quick-flow"><p class="quick-step-label">STEP 2 OF 4 · ${escapeHTML(money(parseAmount(d.amount)))}</p><h3>What happened?</h3><p class="muted">Choose how this amount should affect your records.</p><div class="quick-choice-list"><button class="quick-choice income-choice" data-quick-type="income"><span class="quick-choice-icon">↗</span><span><strong>Income</strong><small>Allowance, salary or other money received</small></span><span>›</span></button><button class="quick-choice expense-choice" data-quick-type="expense"><span class="quick-choice-icon">↘</span><span><strong>Purchase / expense</strong><small>A purchase, bill, food, travel or another cost</small></span><span>›</span></button><button class="quick-choice" data-quick-type="refund"><span class="quick-choice-icon">↩</span><span><strong>I got a refund</strong><small>Money returned for a previous purchase</small></span><span>›</span></button></div><button class="text-button quick-cancel" type="button" data-quick-back="amount">← Change amount</button></div>`;
     } else if(step==='activity'){
       const type=d.type;const options=state.activities.filter(a=>a.kind==='both'||a.kind===type||(type==='expense'&&a.kind==='refund')).sort((a,b)=>{const ca=state.transactions.filter(t=>t.activityId===a.id).length,cb=state.transactions.filter(t=>t.activityId===b.id).length;return cb-ca||a.name.localeCompare(b.name)});
       body=`<div class="modal-body quick-flow"><p class="quick-step-label">STEP 3 OF 4 · ${escapeHTML(type==='income'?'MONEY IN':type==='refund'?'REFUND':'MONEY OUT')}</p><h3>Choose a category</h3><p class="muted">Pick the closest match. You can change categories later.</p><div class="quick-category-grid">${options.map(a=>`<button class="quick-category" data-quick-activity="${escapeHTML(a.id)}"><span>${icon(a.icon)}</span><strong>${escapeHTML(a.name)}</strong></button>`).join('')}</div><button class="text-button quick-cancel" type="button" data-quick-back="type">← Back</button></div>`;
     } else {
-      body=`<form id="quick-flow-note" class="modal-body quick-flow"><p class="quick-step-label">STEP 4 OF 4 · ${escapeHTML(activityById(d.activityId).name)}</p><h3>Add a note</h3><p class="muted">Optional. A short note makes the receipt easier to recognize later.</p><div class="quick-summary"><span>${escapeHTML(d.type==='income'?'Income':d.type==='refund'?'Refund':'Purchase')}</span><strong>${escapeHTML(money(parseAmount(d.amount)))}</strong><small>${escapeHTML(activityById(d.activityId).name)}</small></div><div class="form-field"><label for="quick-flow-note-value">NOTE · OPTIONAL</label><textarea id="quick-flow-note-value" name="note" rows="2" maxlength="240" placeholder="What was it for?" autofocus>${escapeHTML(d.note||'')}</textarea></div><div class="form-grid quick-extra-fields"><div class="form-field"><label for="quick-flow-account">ACCOUNT</label><select id="quick-flow-account" name="accountId">${accountOptions(d.accountId)}</select></div><div class="form-field"><label for="quick-flow-payment">PAID USING</label><select id="quick-flow-payment" name="paymentMethod">${['Cash','UPI','Bank transfer','Debit card','Credit card','Wallet','Other'].map(v=>`<option value="${v}" ${d.paymentMethod===v?'selected':''}>${v}</option>`).join('')}</select></div></div><button class="primary-button quick-next" type="submit">Save transaction · ${escapeHTML(money(parseAmount(d.amount)))}</button><button class="text-button quick-cancel" type="button" id="quick-flow-skip">Skip note & save</button><button class="text-button quick-cancel" type="button" data-quick-back="activity">← Change category</button></form>`;
+      body=`<form id="quick-flow-note" class="modal-body quick-flow"><p class="quick-step-label">STEP 4 OF 4 · ${escapeHTML(activityById(d.activityId).name)}</p><h3>${d.fromShortcut?'Review transaction':'Add a note'}</h3><p class="muted">${d.fromShortcut?'Imported from your iPhone Shortcut. Check the details before saving.':'Optional. A short note makes the receipt easier to recognize later.'}</p><div class="quick-summary"><span>${escapeHTML(d.type==='income'?'Income':d.type==='refund'?'Refund':'Purchase')}</span><strong>${escapeHTML(money(parseAmount(d.amount)))}</strong><small>${escapeHTML(activityById(d.activityId).name)}</small></div><div class="form-field"><label for="quick-flow-note-value">NOTE · OPTIONAL</label><textarea id="quick-flow-note-value" name="note" rows="2" maxlength="240" placeholder="What was it for?" autofocus>${escapeHTML(d.note||'')}</textarea></div><div class="form-grid quick-extra-fields"><div class="form-field"><label for="quick-flow-account">ACCOUNT</label><select id="quick-flow-account" name="accountId">${accountOptions(d.accountId)}</select></div><div class="form-field"><label for="quick-flow-payment">PAID USING</label><select id="quick-flow-payment" name="paymentMethod">${['Cash','UPI','Bank transfer','Debit card','Credit card','Wallet','Other'].map(v=>`<option value="${v}" ${d.paymentMethod===v?'selected':''}>${v}</option>`).join('')}</select></div></div><button class="primary-button quick-next" type="submit">Save transaction · ${escapeHTML(money(parseAmount(d.amount)))}</button><button class="text-button quick-cancel" type="button" id="quick-flow-skip">Skip note & save</button><button class="text-button quick-cancel" type="button" data-quick-back="activity">← Change category</button></form>`;
     }
     openModal('Quick Add',`${progress}${body}`,'QUICK ENTRY · PRIVATE ON THIS DEVICE');
     if(step==='amount')setTimeout(()=>$('#quick-flow-value')?.focus({preventScroll:true}),60);
@@ -356,11 +361,14 @@
     if(!quickAddDraft)return;
     const d=quickAddDraft,amount=parseAmount(d.amount);
     if(!Number.isFinite(amount)||amount<=0){renderQuickAddStep('amount');toast('Enter an amount greater than ₹0.','error');return;}
+    if(!['income','expense','refund'].includes(d.type)){renderQuickAddStep('type');toast('Choose a transaction type before saving.','error');return;}
+    if(d.requestId&&state.transactions.some(t=>t.shortcutRequestId===d.requestId)){quickAddDraft=null;closeModal();toast('This Shortcut transaction was already saved.','amber');return;}
     const snapshot=JSON.stringify(state);
     try{
       if(state.sample)ensurePersonalWorkspace();
-      const tx=addTransaction({type:d.type,amount,activityId:d.activityId,accountId:d.accountId,date:today(),note:d.note||'',paymentMethod:d.paymentMethod||'Cash',repeat:'none'});
+      const tx=addTransaction({type:d.type,amount,activityId:d.activityId,accountId:d.accountId,date:d.date||today(),note:d.note||'',paymentMethod:d.paymentMethod||'Cash',repeat:'none'});
       if(!tx)throw new Error('The transaction could not be created.');
+      if(d.requestId)tx.shortcutRequestId=d.requestId;
       state.settings.lastQuickAddAccountId=d.accountId;state.settings.lastQuickAddPaymentMethod=d.paymentMethod||'Cash';
       await persist();quickAddDraft=null;closeModal();renderAll();
       try{await evaluateBudgetAlerts();}catch(e){console.warn('Quick Add saved, but alerts did not refresh.',e)}
@@ -470,8 +478,10 @@
     popup.document.open();
     popup.document.write(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pocketwise receipt</title><style>
       *{box-sizing:border-box}body{margin:0;padding:28px;background:#f3f5f2;color:#202820;font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.receipt-paper{max-width:440px;margin:0 auto;background:#fff;padding:28px;border:1px solid #e4e9e3;border-radius:18px;box-shadow:0 8px 28px #1e30200d}.receipt-brand{display:flex;gap:10px;align-items:center}.receipt-mark{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:#e2f2e8;color:#258456;font-size:22px;font-weight:800}.receipt-brand strong,.receipt-brand small{display:block}.receipt-brand strong{font-size:18px}.receipt-brand small{font-size:9px;letter-spacing:1.25px;color:#7a857d}.receipt-status{margin-left:auto;font-size:9px;letter-spacing:1px;font-weight:800;color:#258456;background:#e8f5ec;border-radius:30px;padding:5px 9px}.receipt-rule{height:1px;background:#e5e9e4;margin:20px 0}.receipt-rule-dashed{background:repeating-linear-gradient(to right,#c8d2c9 0 5px,transparent 5px 10px)}.receipt-kicker{margin:0;color:#77837a;font-size:10px;font-weight:800;letter-spacing:1.6px}.receipt-title{margin:6px 0 0;font-size:22px;line-height:1.25;overflow-wrap:anywhere}.receipt-amount{font-weight:800;font-size:36px;line-height:1.2;letter-spacing:-1px;margin:18px 0 5px;font-variant-numeric:tabular-nums}.receipt-in{color:#258456}.receipt-out{color:#c84e48}.receipt-subtitle{margin:0;color:#7a857d;font-size:12px}.receipt-fields{margin:0;display:grid;gap:0}.receipt-fields>div{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px solid #edf0ec}.receipt-fields dt{color:#78827a;font-size:12px}.receipt-fields dd{margin:0;text-align:right;max-width:62%;font-size:12px;font-weight:650;overflow-wrap:anywhere}.receipt-note{margin-top:17px;padding:12px;background:#f6f8f5;border-radius:10px}.receipt-note small{font-size:9px;font-weight:800;letter-spacing:1px;color:#77837a}.receipt-note p{margin:4px 0 0;overflow-wrap:anywhere}.receipt-footnote{font-size:10px;color:#768078;line-height:1.55}.receipt-footer{display:flex;justify-content:space-between;gap:10px;color:#8b948d;font-size:9px;letter-spacing:.3px}.receipt-actions{display:none}@page{size:auto;margin:12mm}@media print{body{background:#fff;padding:0}.receipt-paper{border:0;box-shadow:none;border-radius:0;padding:0;max-width:none}.receipt-actions{display:none}}
-      </style></head><body>${markup}<script>window.addEventListener('load',()=>setTimeout(()=>window.print(),250));</script></body></html>`);
+      </style></head><body>${markup}</body></html>`);
     popup.document.close();
+    // The print call is made from this page: the Content-Security-Policy forbids inline scripts in the receipt window.
+    setTimeout(()=>{try{popup.focus();popup.print();}catch{}},400);
   }
   function confirmDeleteTransaction(id){const tx=state.transactions.find(t=>t.id===id);if(!tx)return;if(!confirm('Delete this transaction? Account balances and reports will be recalculated.'))return;if(tx.debtId&&['borrowed','lent'].includes(tx.type)){state.transactions=state.transactions.filter(t=>t.debtId!==tx.debtId);state.debts=state.debts.filter(d=>d.id!==tx.debtId);}else state.transactions=state.transactions.filter(t=>t.id!==id);persist().then(()=>{closeModal();renderAll();toast('Record deleted. Related balances updated.');});}
   function accountsManager(){openModal('Accounts',`<div class="modal-body"><div class="entity-list">${state.accounts.map(a=>`<div class="entity-row"><span class="transaction-icon blue">${icon(a.type==='cash'?'wallet':a.type==='card'?'receipt':'dollar')}</span><div class="entity-copy"><strong>${escapeHTML(a.name)}</strong><small>${escapeHTML(a.type)} · Opening balance ${money(a.openingBalance)}</small></div><div class="entity-value">${fmtHidden(balanceForAccount(a.id))}</div><div class="entity-actions"><button class="mini-button" data-account-edit="${a.id}" title="Edit account">${icon('edit')}</button>${state.accounts.length>1?`<button class="mini-button" data-account-remove="${a.id}" title="Remove account">${icon('trash')}</button>`:''}</div></div>`).join('')}</div><div class="modal-section-title">ADD AN ACCOUNT</div><form id="account-form"><div class="form-grid"><div class="form-field"><label for="account-name">ACCOUNT NAME</label><input id="account-name" name="name" placeholder="e.g. Scholarship account" required></div><div class="form-field"><label for="account-type">TYPE</label><select id="account-type" name="type"><option value="cash">Cash</option><option value="bank">Bank / UPI</option><option value="card">Card</option><option value="savings">Savings</option><option value="other">Other</option></select></div><div class="form-field full"><label for="account-opening">OPENING BALANCE · INR</label><input id="account-opening" name="openingBalance" type="number" step="0.01" value="0"></div></div><div class="form-actions"><button class="primary-button" type="submit">Add account</button></div></form><div class="form-actions"><button class="secondary-button" data-cancel-modal>Done</button></div></div>`,'ACCOUNTS');}
@@ -494,14 +504,18 @@
   function openNotifications(){const active=makeAlerts().filter(a=>a.id!=='all-clear'),history=state.settings.notifications||[];active.forEach(a=>{if(!state.settings.seenAlerts.includes(a.id))state.settings.seenAlerts.push(a.id)});$('#notifications-content').innerHTML=(history.length?[...history.slice(0,20)]:active).map(a=>`<div class="notification-record"><span class="alert-symbol ${a.type||'blue'}">${icon(a.icon||'bell')}</span><div><strong>${escapeHTML(a.title||'Financial reminder')}</strong><p>${escapeHTML(a.body||'')}</p><small>${escapeHTML(a.createdAt?new Date(a.createdAt).toLocaleString():a.time||'Current')}</small></div></div>`).join('')||'<div class="empty-state"><span class="empty-icon">'+icon('bell')+'</span><h3>All caught up</h3><p>Important reminders will show up here.</p></div>';$('#notifications-modal').showModal();persist();renderAlerts();}
   function downloadBlob(filename,blob){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=filename;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1800);}
   async function exportBackup(){state.settings.lastBackup=new Date().toISOString();await persist();const pack={app:'Pocketwise',format:'pocketwise-backup',version:1,exportedAt:state.settings.lastBackup,description:'Complete local financial records. Keep this file private.',data:state};downloadBlob(`pocketwise-backup-${today()}.json`,new Blob([JSON.stringify(pack,null,2)],{type:'application/json'}));renderSettingsSummary();toast('Full backup exported. Keep it somewhere safe.');}
-  function csvCell(v){const s=String(v??'');return `"${s.replace(/"/g,'""')}"`;}
+  function csvCell(v){let s=String(v??'');if(/^[=+\-@\t\r]/.test(s)&&!/^-?\d+(\.\d+)?$/.test(s))s="'"+s;return `"${s.replace(/"/g,'""')}"`;}
   function exportCSV(){const headers=['id','date','type','amount_inr','activity','account','to_account','debt_person','note'];const rows=state.transactions.slice().sort((a,b)=>a.date.localeCompare(b.date)).map(t=>[t.id,t.date,typeLabel(t.type),t.amount,txActivity(t).name,accountById(t.accountId).name,t.toAccountId?accountById(t.toAccountId).name:'',t.debtId?debtById(t.debtId)?.person||'':'',t.note]);const csv=[headers,...rows].map(r=>r.map(csvCell).join(',')).join('\r\n');downloadBlob(`pocketwise-transactions-${today()}.csv`,new Blob(['\ufeff',csv],{type:'text/csv;charset=utf-8'}));toast('CSV ready for your spreadsheet.');}
   async function importBackup(file){if(!file)return;try{const text=await file.text(),raw=JSON.parse(text);const imported=raw?.data||raw;if(!imported||!Array.isArray(imported.transactions)||!Array.isArray(imported.accounts)||!Array.isArray(imported.activities))throw new Error('That file does not look like a Pocketwise backup.');if(!confirm(`Backup contains ${imported.transactions.length} transactions, ${imported.accounts.length} accounts, and ${imported.debts?.length||0} debt records.\n\nOK = Replace this workspace\nCancel = Keep current records`)){const merge=confirm('Merge records instead? Existing record identifiers will not be duplicated.');if(!merge)return;ensurePersonalWorkspace();const mergeItems=(key)=>{const list=state[key]||[],ids=new Set(list.map(x=>x.id));(imported[key]||[]).forEach(x=>{if(!ids.has(x.id)){list.push(x);ids.add(x.id);}});state[key]=list;};['accounts','activities','transactions','debts','goals','reminders'].forEach(mergeItems);state.budgets={...state.budgets,...(imported.budgets||{})};state.settings={...state.settings,...(imported.settings||{}),theme:state.settings.theme};state.sample=false;}else{if(!confirm('Replace all current Pocketwise records with this backup? Export the current data first if you need it.'))return;state={...initialState(),...imported,settings:{...initialState().settings,...imported.settings},sample:false};}await persist();closeModal();renderAll();toast('Backup restored. Records recalculated.');}catch(err){toast(err.message||'Could not read that backup.','error');}finally{$('#backup-file-input').value='';}}
-  function showBackTapGuide(){const url=`${location.origin}${location.pathname}?quickadd=shortcut`;openModal('Quick Add Shortcut',`<div class="modal-body"><p class="muted">Build a Shortcut that asks for the amount, transaction type, category and optional note, then passes everything into Pocketwise for one final review and save.</p><div class="detail-grid"><div class="detail-cell"><small>STEP 1</small><strong>Ask for Input · Number</strong></div><div class="detail-cell"><small>STEP 2</small><strong>Choose Income / Purchase / Refund</strong></div><div class="detail-cell"><small>STEP 3</small><strong>Ask for category and note</strong></div><div class="detail-cell"><small>STEP 4</small><strong>Open a URL with the answers</strong></div></div><div class="note-box"><small>POCKETWISE QUICK ADD BASE URL</small><p style="word-break:break-all">${escapeHTML(url)}</p><button class="text-button" id="copy-quickadd">Copy base URL</button></div><p class="muted small">Append these query fields to the URL: <code>&amp;amount=[amount]&amp;type=[income|expense|refund]&amp;category=[category]&amp;note=[note]</code>. URL-encode category and note before inserting them. When the URL opens in the same Pocketwise browser context, it pre-fills details for review. Important: iOS Shortcuts may open Safari, whose local storage can be separate from the Home Screen app. A website cannot force Shortcuts to launch the installed PWA or merge those separate records. Assign the Shortcut at Settings → Accessibility → Touch → Back Tap → Double Tap.</p><p class="muted small">iOS does not allow a PWA to display a custom interactive form inside Dynamic Island. This Shortcut is a practical capture flow, not native Dynamic Island integration.</p><div class="form-actions"><button class="secondary-button" data-cancel-modal>Close</button></div></div>`,'IPHONE SHORTCUT');}
+  function showBackTapGuide(){
+    const appURL='webapp://nithan.in/PocketWise/';
+    openModal('Quick Add Shortcut',`<div class="modal-body"><p class="muted"><strong>Local-only setup:</strong> the Shortcut copies a URL containing the transaction to the clipboard, then opens PocketWise. Since iOS may strip the URL data during launch, tap <strong>Paste transaction from Shortcut</strong> in Quick Add or Settings, review the details, and save.</p><div class="detail-grid"><div class="detail-cell"><small>STEP 1</small><strong>Ask for amount</strong></div><div class="detail-cell"><small>STEP 2</small><strong>Choose income, expense or refund</strong></div><div class="detail-cell"><small>STEP 3</small><strong>Choose category and note</strong></div><div class="detail-cell"><small>STEP 4</small><strong>Copy the encoded transaction URL</strong></div><div class="detail-cell"><small>STEP 5</small><strong>Open PocketWise</strong></div></div><div class="note-box"><small>APP LAUNCH URL</small><p style="word-break:break-all">${escapeHTML(appURL)}</p><button class="text-button" id="copy-quickadd">Copy app launch URL</button></div><p class="muted small">The Shortcut should URL-encode the category and note, build a URL with <code>quickadd=shortcut&amp;amount=…&amp;type=…&amp;category=…&amp;note=…&amp;reqId=…</code>, copy that full URL to the clipboard, then open the app launch URL above. Generate a fresh request ID for each run. PocketWise validates and previews the transaction before it saves anything.</p><p class="muted small">This handoff does not send your finances to a server. Clipboard access depends on iOS permission and requires you to tap Paste. If the clipboard cannot be read, enter the transaction normally. Assign the Shortcut at Settings → Accessibility → Touch → Back Tap → Double Tap.</p><div class="form-actions"><button class="secondary-button" data-cancel-modal>Close</button></div></div>`,'IPHONE SHORTCUT');
+  }
   function voiceDraft(){const Speech=window.SpeechRecognition||window.webkitSpeechRecognition;if(!Speech){toast('Voice recognition is not available in this browser. You can use the keyboard microphone instead.','amber');$('#tx-note').focus();return;}const rec=new Speech();rec.lang='en-IN';rec.interimResults=false;rec.maxAlternatives=1;toast('Listening for a short transaction description…');rec.onresult=e=>{const phrase=e.results[0][0].transcript;$('#tx-note').value=phrase;const match=phrase.match(/(?:₹|rs\.?\s*)?(\d+(?:\.\d{1,2})?)/i);if(match)$('#tx-amount').value=match[1];const txt=phrase.toLowerCase();const choices=[['food',['lunch','dinner','breakfast','food','tea','coffee','snack','canteen']],['transport',['bus','auto','taxi','petrol','fuel','travel']],['shopping',['bought','shop','shopping','clothes','headphones']],['education',['book','college','exam','notes','photocopy','course']],['subscriptions',['subscription','recharge','data pack','streaming']]];for(const [id,words] of choices){if(words.some(w=>txt.includes(w))){const act=state.activities.find(a=>a.id===id);if(act)$('#tx-activity').value=act.id;break;}}toast('Draft created. Check the amount and category before saving.');};rec.onerror=()=>toast('Could not hear that clearly. Please enter the details manually.','amber');rec.start();}
 
   function bindEvents(){
     document.addEventListener('click', async event=>{
+      if(event.target.closest('#resume-paste')){await pasteShortcutTransaction();return;}
       const quickType=event.target.closest('[data-quick-type]');if(quickType&&quickAddDraft){quickAddDraft.type=quickType.dataset.quickType;renderQuickAddStep('activity');return;}
       const quickActivity=event.target.closest('[data-quick-activity]');if(quickActivity&&quickAddDraft){quickAddDraft.activityId=quickActivity.dataset.quickActivity;renderQuickAddStep('note');return;}
       const quickBack=event.target.closest('[data-quick-back]');if(quickBack&&quickAddDraft){renderQuickAddStep(quickBack.dataset.quickBack);return;}
@@ -512,7 +526,7 @@
       const closeBtn=event.target.closest('[data-cancel-modal]');if(closeBtn){closeModal();return;}
       if(event.target.closest('[data-close-notifications]')){$('#notifications-modal').close();return;}
       if(event.target.closest('#modal-close')){closeModal();return;}
-      if(event.target.closest('#mobile-add')){quickAddStart();return;}if(event.target.closest('#top-add')||event.target.closest('#activity-add')||event.target.closest('[data-action="add"]')){transactionForm();return;}
+      if(event.target.closest('#mobile-add')){quickAddStart();return;}if(event.target.closest('#paste-shortcut-quick')||event.target.closest('#paste-shortcut-settings')){await pasteShortcutTransaction();return;}if(event.target.closest('#top-add')||event.target.closest('#activity-add')||event.target.closest('[data-action="add"]')){transactionForm();return;}
       const addType=event.target.closest('[data-add-type]');if(addType){transactionForm(null,addType.dataset.addType);return;}
       const action=event.target.closest('[data-action]')?.dataset.action;if(action){if(action==='budget')budgetForm();else if(action==='debts')showDebts();else if(action==='new-debt')debtForm();else if(action==='accounts')accountsManager();return;}
       if(event.target.closest('#theme-toggle')){state.settings.theme=state.settings.theme==='dark'?'light':'dark';await persist();applyTheme();scheduleCharts();return;}
@@ -548,7 +562,7 @@
       if(event.target.closest('#persistent-storage')){if(navigator.storage?.persist){const granted=await navigator.storage.persist();toast(granted?'Persistent storage granted by browser.':'Browser did not grant persistent storage. Keep backups.',granted?'success':'amber');}else toast('Persistent storage request is not supported here. Export backups regularly.','amber');return;}
       if(event.target.closest('#backtap-guide')){showBackTapGuide();return;}
       if(event.target.closest('#install-guide')){showInstallGuide();return;}
-      if(event.target.closest('#copy-quickadd')){const url=`${location.origin}${location.pathname}?quickadd=shortcut`;try{await navigator.clipboard.writeText(url);toast('Quick Add base URL copied.');}catch{toast(url,'amber');}return;}
+      if(event.target.closest('#copy-quickadd')){const url='webapp://nithan.in/PocketWise/';try{await navigator.clipboard.writeText(url);toast('App launch URL copied.');}catch{toast(url,'amber');}return;}
       if(event.target.closest('#enable-notifications')){if(!('Notification'in window)){toast('System notifications are not supported in this browser.','amber');return;}const result=await Notification.requestPermission();renderSettingsSummary();toast(result==='granted'?'Notifications enabled.':'Permission was not granted.',result==='granted'?'success':'amber');return;}
       if(event.target.closest('#reset-data')){if(!confirm('Clear all transactions, debts, goals, accounts, budgets, activities and reminders stored in this app? This cannot be undone.'))return;if(!confirm('Last check: export a backup first if you want to keep any records. Continue clearing?'))return;state=initialState();state.sample=false;state.transactions=[];state.debts=[];state.goals=[];state.reminders=[];state.accounts=state.accounts.map(a=>({...a,openingBalance:0}));state.budgets={total:0,categories:{}};await persist();applyTheme();renderAll();toast('Workspace cleared.');return;}
       if(event.target.closest('[data-reset-filters]')){$('#activity-search').value='';$('#activity-period').value='all';currentFilter='all';renderActivity();return;}
@@ -583,41 +597,133 @@
   /* Add small secondary controls to goal rows after their first render. */
   const _renderGoals = renderGoals;
   renderGoals = function(){_renderGoals();const list=$('#goals-list');if(!list)return;$$('.goal-row',list).forEach((row,i)=>{const goal=state.goals[i];if(!goal)return;const line=$('.goal-line',row);if(line&&!$('.goal-actions',row)){const actions=document.createElement('div');actions.className='goal-actions';actions.style.cssText='display:flex;gap:6px;align-items:center;justify-content:flex-end';actions.innerHTML=`<button class="mini-button" data-goal-add="${goal.id}" title="Add progress">${svgIcon('income')}</button><button class="mini-button" data-goal-edit="${goal.id}" title="Edit goal">${svgIcon('edit')}</button>`;line.append(actions);}});};
+  // Detect when the app returns from Shortcuts or another app. The redirect URL may
+  // arrive on a reused page, but iOS may also remove its parameters entirely.
+  let appReady = false;
+  let pocketwiseHiddenAt=0;
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='hidden'){pocketwiseHiddenAt=Date.now();return;}
+    if(document.visibilityState==='visible'){
+      const wasAway=pocketwiseHiddenAt>0&&Date.now()-pocketwiseHiddenAt>700;
+      pocketwiseHiddenAt=0;
+      if(wasAway&&appReady)showShortcutReturnNudge();
+      checkIncomingShortcutRoute();
+    }
+  });
+
+  function normalizeShortcutType(raw){
+    const value=String(raw||'').trim().toLowerCase().replace(/[\s_-]+/g,' ');
+    const typeMap={'income':'income','money in':'income','expense':'expense','purchase':'expense','purchase / expense':'expense','purchase/expense':'expense','spending':'expense','refund':'refund','money back':'refund'};
+    return typeMap[value]||'';
+  }
+  function shortcutFieldsFromURL(rawURL){
+    try{
+      const url=new URL(rawURL,location.href);
+      const params=new URLSearchParams(url.search);
+      const hash=url.hash.startsWith('#')?url.hash.slice(1):url.hash;
+      const hashParams=new URLSearchParams(hash.includes('?')?hash.split('?').pop():hash);
+      for(const [key,value] of hashParams.entries())if(!params.has(key))params.set(key,value);
+      if(!params.has('quickadd')&&!params.has('amount')&&!params.has('type'))return null;
+      return {amount:params.get('amount')||'',type:params.get('type')||'',category:params.get('category')||'',note:params.get('note')||'',date:params.get('date')||'',requestId:params.get('requestId')||params.get('reqId')||params.get('id')||''};
+    }catch{return null;}
+  }
+  function createShortcutDraft(fields){
+    const rawAmount=fields?.amount??'';
+    const amount=parseAmount(rawAmount);
+    const type=normalizeShortcutType(fields?.type);
+    const category=String(fields?.category??fields?.activity??'').trim().slice(0,100);
+    const note=String(fields?.note??'').slice(0,240);
+    const categoryMatch=category?state.activities.find(a=>(a.id.toLowerCase()===category.toLowerCase()||a.name.toLowerCase()===category.toLowerCase())&&(a.kind==='both'||a.kind===type||(type==='expense'&&a.kind==='refund'))):null;
+    const incomingDate=String(fields?.date||'').slice(0,10);
+    const dateValid=/^\d{4}-\d{2}-\d{2}$/.test(incomingDate)&&!Number.isNaN(new Date(`${incomingDate}T12:00:00`).getTime())&&localDate(new Date(`${incomingDate}T12:00:00`))===incomingDate;
+    const requestId=String(fields?.requestId??fields?.reqId??fields?.id??'').trim().slice(0,120);
+    return {amount:Number.isFinite(amount)&&amount>0?String(amount):'',type,activityId:categoryMatch?.id||'',accountId:state.settings.lastQuickAddAccountId||state.accounts[0]?.id||'cash',paymentMethod:state.settings.lastQuickAddPaymentMethod||'Cash',note,date:dateValid?incomingDate:'',requestId,fromShortcut:true};
+  }
+  function showShortcutDraft(draft){
+    quickAddDraft=draft;
+    if(!draft.amount){renderQuickAddStep('amount');toast('The copied data did not contain a valid amount. Enter it to continue.','amber');return;}
+    if(!draft.type){renderQuickAddStep('type');toast('Choose Income, Expense or Refund to continue.','amber');return;}
+    if(!draft.activityId){renderQuickAddStep('activity');toast('Choose the closest PocketWise category.','amber');return;}
+    renderQuickAddStep('note');
+    const noteInput=$('#quick-flow-note-value');if(noteInput)noteInput.value=draft.note;
+  }
+  function parseClipboardShortcut(raw){
+    const text=String(raw||'').trim();
+    if(!text)throw new Error('The clipboard is empty. Run the Shortcut again and copy its transaction first.');
+    const trimmed=text.replace(/^POCKETWISE\s*:\s*/i,'');
+    let fields=null;
+    if(trimmed.startsWith('{')){
+      let data;try{data=JSON.parse(trimmed);}catch{throw new Error('The clipboard does not contain valid transaction JSON.');}
+      if(data&&typeof data==='object'&&!Array.isArray(data)){
+        if(data.transaction&&typeof data.transaction==='object')data=data.transaction;
+        fields={amount:data.amount,type:data.type,category:data.category??data.activity,note:data.note,date:data.date||data.ts,requestId:data.requestId??data.reqId??data.id};
+      }
+    }else{
+      const fromURL=shortcutFieldsFromURL(trimmed);if(fromURL)fields=fromURL;
+    }
+    if(!fields)throw new Error('No PocketWise transaction was found on the clipboard. Copy the transaction JSON or its Quick Add URL.');
+    const amount=parseAmount(fields.amount);
+    if(!Number.isFinite(amount)||amount<=0)throw new Error('The copied transaction has no valid amount greater than ₹0.');
+    return fields;
+  }
+  async function pasteShortcutTransaction(){
+    if(!navigator.clipboard||typeof navigator.clipboard.readText!=='function'){
+      toast('Clipboard reading is unavailable here. Open PocketWise over HTTPS and try again.','error');return;
+    }
+    try{
+      // Clipboard reads require a direct user gesture on iOS. Keep this call inside the button handler.
+      const raw=await navigator.clipboard.readText();
+      const fields=parseClipboardShortcut(raw);
+      showShortcutDraft(createShortcutDraft(fields));
+    }catch(error){
+      const message=error?.name==='NotAllowedError'?'iOS did not allow clipboard access. Tap Paste again and allow it, or paste the JSON into a note and use the regular Quick Add form.':(error?.message||'Could not read the Shortcut transaction.');
+      toast(message,'error');
+    }
+  }
+  function showShortcutReturnNudge(){
+    const el=document.createElement('div');el.className='toast shortcut-return-toast';
+    el.innerHTML=`${icon('upload')}<span>Back from another app? Paste your copied Shortcut transaction here.</span><button type="button" class="toast-action" id="resume-paste">Paste</button>`;
+    $('#toast-region').append(el);setTimeout(()=>el.remove(),9000);
+  }
+  let lastShortcutRouteSignature='';
   function handleShortcutQuickAdd(){
-    // Some installed-web-app launchers preserve query parameters; others expose
-    // them in the fragment. Accept both so the Shortcut handoff is resilient.
-    const queryParams=new URLSearchParams(location.search);
+    // Check both the current query string and the fragment. Some iOS launch paths
+    // update a reused page; lifecycle listeners below re-run this parser then.
+    const fields=shortcutFieldsFromURL(location.href);
+    if(!fields)return;
+    const params=new URLSearchParams(location.search);
     const hashText=location.hash.startsWith('#')?location.hash.slice(1):location.hash;
     const hashParams=new URLSearchParams(hashText.includes('?')?hashText.split('?').pop():hashText);
-    const params=new URLSearchParams(queryParams);
-    for(const [key,value] of hashParams.entries())if(!params.has(key))params.set(key,value);
-    const mode=params.get('quickadd');
-    if(!mode)return;
-    // Remove captured financial details from the visible URL only after parsing.
+    const mode=params.get('quickadd')||hashParams.get('quickadd')||'shortcut';
+    const signature=location.href;
+    if(signature===lastShortcutRouteSignature)return;
+    lastShortcutRouteSignature=signature;
+    // Strip personal financial details from the address bar as soon as they are read.
     try{history.replaceState(null,'',location.pathname);}catch{}
     setTimeout(()=>{
-      if(mode==='debt'){showDebts();return;}
-      if(mode==='shortcut'||mode==='capture'){
-        const rawAmount=params.get('amount')||'';
-        const amount=parseAmount(rawAmount);
-        const rawType=(params.get('type')||'').trim().toLowerCase().replace(/[\s_-]+/g,' ');
-        const typeMap={'income':'income','money in':'income','expense':'expense','purchase':'expense','purchase / expense':'expense','purchase/expense':'expense','spending':'expense','refund':'refund','money back':'refund'};
-        const type=typeMap[rawType]||'';
-        const category=(params.get('category')||'').trim();
-        const note=(params.get('note')||'').slice(0,240);
-        const categoryMatch=category?state.activities.find(a=>(a.id.toLowerCase()===category.toLowerCase()||a.name.toLowerCase()===category.toLowerCase())&&(a.kind==='both'||a.kind===type||(type==='expense'&&a.kind==='refund'))):null;
-        quickAddDraft={amount:Number.isFinite(amount)&&amount>0?String(amount):'',type,activityId:categoryMatch?.id||'',accountId:state.settings.lastQuickAddAccountId||state.accounts[0]?.id||'cash',paymentMethod:state.settings.lastQuickAddPaymentMethod||'Cash',note};
-        if(!quickAddDraft.amount)renderQuickAddStep('amount');
-        else if(!type)renderQuickAddStep('type');
-        else if(!categoryMatch)renderQuickAddStep('activity');
-        else {renderQuickAddStep('note');const noteInput=$('#quick-flow-note-value');if(noteInput)noteInput.value=note;}
-        return;
+      try{
+        if(mode==='debt'){showDebts();return;}
+        if(mode==='shortcut'||mode==='capture'){
+          const draft=createShortcutDraft(fields);
+          if(!draft.amount){quickAddDraft=draft;renderQuickAddStep('amount');return;}
+          showShortcutDraft(draft);
+          return;
+        }
+        if(mode==='1'||mode==='quick')quickAddStart();
+        else transactionForm(null,['expense','income','transfer','refund'].includes(mode)?mode:'expense');
+      }finally{
+        // Suppress duplicate lifecycle events for this launch, but permit the exact same
+        // URL to be opened again in a later run of the Shortcut.
+        setTimeout(()=>{if(lastShortcutRouteSignature===signature)lastShortcutRouteSignature='';},500);
       }
-      if(mode==='1'||mode==='quick')quickAddStart();
-      else transactionForm(null,['expense','income','transfer','refund'].includes(mode)?mode:'expense');
     },220);
   }
+  function checkIncomingShortcutRoute(){if(appReady)handleShortcutQuickAdd();}
+  window.addEventListener('pageshow',()=>checkIncomingShortcutRoute());
+  window.addEventListener('focus',checkIncomingShortcutRoute);
+  window.addEventListener('popstate',checkIncomingShortcutRoute);
+  window.addEventListener('hashchange',checkIncomingShortcutRoute);
   window.addEventListener('error', event => { console.error('Pocketwise runtime error:',event.error||event.message); });
   window.addEventListener('unhandledrejection', event => { console.error('Pocketwise async error:',event.reason); toast(event.reason?.message||'A background action failed. Your existing records are unchanged.','error'); });
-  initialise().then(handleShortcutQuickAdd);
+  initialise().then(()=>{appReady=true;handleShortcutQuickAdd();}).catch(error=>{console.error('Pocketwise could not initialise.',error);toast('PocketWise could not start correctly. Please reload the app.','error');});
 })();
