@@ -680,7 +680,12 @@
   }
   async function importShortcutText(raw){
     const fields=parseClipboardShortcut(raw);
-    showShortcutDraft(createShortcutDraft(fields));
+    const draft=createShortcutDraft(fields);
+    // Close the import dialog before opening the Quick Add review flow.
+    // Otherwise the native dialog remains above the transaction steps and makes
+    // a successful import look like the button did nothing.
+    closeModal();
+    showShortcutDraft(draft);
   }
   async function pasteShortcutTransaction(){
     if(!navigator.clipboard||typeof navigator.clipboard.readText!=='function'){
