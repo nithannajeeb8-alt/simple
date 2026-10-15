@@ -279,3 +279,59 @@ img,svg,canvas{max-width:100%}
 .profile-settings-preview{display:flex;align-items:center;gap:12px;padding:14px 0 2px}.profile-settings-preview>div{min-width:0;flex:1}.profile-settings-preview strong,.profile-settings-preview small{display:block}.profile-settings-preview strong{font-size:12px}.profile-settings-preview small{font-size:10px;color:var(--muted);margin-top:4px}.avatar{display:grid;place-items:center;width:42px;height:42px;flex:none;border-radius:15px;background:#2f8f67;color:#fff;font-size:18px;font-weight:800;box-shadow:inset 0 1px 0 #ffffff40}.profile-avatar-preview{width:48px;height:48px;border-radius:16px}.profile-preview-large{display:flex;align-items:center;gap:12px;padding:10px 0 20px;font-weight:750;font-size:17px}.profile-preview-large .avatar{width:58px;height:58px;border-radius:19px;font-size:25px}.profile-color-options{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-top:9px}.profile-color-option{--profile-color:#2f8f67;display:flex;flex-direction:column;align-items:center;gap:7px;padding:10px 5px;border:1px solid var(--line);border-radius:13px;cursor:pointer}.profile-color-option input{position:absolute;opacity:0;pointer-events:none}.profile-color-option span{display:block;width:29px;height:29px;border-radius:50%;background:var(--profile-color);box-shadow:inset 0 1px 0 #ffffff55}.profile-color-option small{font-size:10px;color:var(--muted)}.profile-color-option:has(input:checked){border-color:var(--profile-color);box-shadow:0 0 0 2px color-mix(in srgb,var(--profile-color) 18%,transparent)}.privacy-page-content h3{font-size:13px;margin:19px 0 6px}.privacy-page-content p,.privacy-page-content li{font-size:12px;line-height:1.65;color:var(--muted)}.privacy-page-content ul{padding-left:20px}.privacy-callout{background:var(--green-soft);border-radius:14px;padding:14px}.privacy-callout strong{font-size:13px;color:var(--ink)}.privacy-callout p{margin:6px 0 0}.profile-form .form-actions{display:flex;gap:8px}
 
 .shortcut-link-button{display:inline-flex;align-items:center;text-decoration:none;white-space:nowrap}
+
+
+/* v1.5.0: compact, scroll-safe onboarding and deliberate feedback */
+.app-modal{display:none;padding:0;border:1px solid var(--line);overflow:hidden}
+.app-modal[open]{display:flex;flex-direction:column}
+.app-modal::backdrop{background:rgba(17,25,19,.42);backdrop-filter:blur(5px)}
+.modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex:0 0 auto;padding:clamp(16px,3.5vw,25px) clamp(16px,4vw,28px) 16px;border-bottom:1px solid var(--line)}
+.modal-head>div{min-width:0;flex:1}
+.modal-head h2{max-width:100%;overflow-wrap:anywhere;line-height:1.16;margin:7px 0 0;font-size:clamp(20px,5vw,27px);letter-spacing:-.8px}
+.modal-head .icon-button{flex:0 0 44px;width:44px;height:44px}
+#modal-content{min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+#modal-content>.modal-body{padding:clamp(16px,4vw,28px);padding-bottom:calc(clamp(16px,4vw,28px) + env(safe-area-inset-bottom,0px))}
+.profile-preview-large{gap:14px;padding:2px 0 18px;font-size:clamp(16px,4.3vw,20px)}
+.profile-preview-large .avatar{width:64px;height:64px;border-radius:20px;font-size:27px}
+#profile-form>.muted{margin:0 0 14px;font-size:clamp(14px,3.8vw,16px);line-height:1.55}
+#profile-form .form-field{margin-top:15px}
+#profile-form .form-field label{display:block;margin-bottom:8px}
+#profile-name-input{width:100%;min-height:52px;padding:13px 14px;border-radius:16px}
+.profile-color-options{gap:8px;margin-top:4px}
+.profile-color-option{min-height:94px;justify-content:center;gap:8px;padding:10px 4px;border-radius:17px}
+.profile-color-option span{width:36px;height:36px}
+.profile-color-option small{font-size:12px}
+#profile-form .fine-print{margin:15px 0 0;line-height:1.55}
+#profile-form .form-actions{margin-top:18px}
+#profile-form .form-actions .primary-button{width:100%;min-height:54px;white-space:normal;line-height:1.25}
+@media(max-width:720px){
+ .app-modal{width:calc(100% - 24px);max-width:560px;max-height:calc(100dvh - 28px - env(safe-area-inset-top) - env(safe-area-inset-bottom));border-radius:26px}
+ .app-modal[open]{margin:auto}
+ .modal-head{padding:18px 18px 15px}
+ .modal-head h2{font-size:clamp(21px,5.5vw,27px)}
+ #modal-content>.modal-body{padding:18px;padding-bottom:calc(18px + env(safe-area-inset-bottom,0px))}
+ #profile-form>.muted{margin-bottom:12px}
+ .profile-preview-large{padding-bottom:14px}
+ .profile-preview-large .avatar{width:58px;height:58px;border-radius:18px}
+ .profile-color-option{min-height:88px}
+}
+@media(max-height:760px) and (max-width:720px){
+ .app-modal{max-height:calc(100dvh - 16px - env(safe-area-inset-top) - env(safe-area-inset-bottom))}
+ .modal-head{padding:13px 16px 11px}
+ .modal-head h2{font-size:21px}
+ #modal-content>.modal-body{padding:14px 16px calc(14px + env(safe-area-inset-bottom,0px))}
+ .profile-preview-large{padding:0 0 10px}
+ .profile-preview-large .avatar{width:50px;height:50px;font-size:22px}
+ #profile-form .form-field{margin-top:11px}
+ .profile-color-option{min-height:76px;padding:7px 3px}
+ .profile-color-option span{width:30px;height:30px}
+ #profile-form .fine-print{margin-top:10px}
+ #profile-form .form-actions{margin-top:12px}
+}
+
+/* v1.5.2 transaction form actions: keep repeated entry usable on narrow screens */
+#transaction-form .form-actions{display:flex;flex-wrap:wrap;gap:10px}
+#transaction-form .form-actions button{flex:1 1 130px;min-width:0;white-space:normal}
+#transaction-form .form-actions button[type="submit"][name="saveMode"][value="another"]{flex-basis:100%}
+#theme-choice{flex-wrap:wrap}
+@media(max-width:420px){#transaction-form .form-actions button{flex:1 1 100%;min-height:44px}}
