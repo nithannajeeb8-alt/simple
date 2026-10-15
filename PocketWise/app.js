@@ -344,7 +344,7 @@
     const progress=`<div class="quick-progress" aria-label="Step ${({amount:1,type:2,activity:3,note:4})[step]} of 4">${['amount','type','activity','note'].map((x,i)=>`<span class="${['amount','type','activity','note'].indexOf(step)>=i?'done':''}"></span>`).join('')}</div>`;
     let body='';
     if(step==='amount'){
-      body=`<form id="quick-flow-amount" class="modal-body quick-flow"><p class="quick-step-label">STEP 1 OF 4</p><h3>How much?</h3><p class="muted">Enter the amount first. You can add the details in a few quick taps.</p><label class="quick-amount-wrap" for="quick-flow-value"><span>₹</span><input id="quick-flow-value" name="amount" class="quick-flow-value" inputmode="decimal" type="text" autocomplete="off" placeholder="0" value="${escapeHTML(d.amount)}" required aria-label="Amount in rupees"></label><p id="quick-flow-error" class="field-error" hidden></p><button class="primary-button quick-next" type="submit">Continue <span aria-hidden="true">→</span></button><button class="secondary-button quick-paste-button" type="button" id="paste-shortcut-quick">${icon('upload')} Paste transaction from Shortcut</button><p class="quick-paste-help">Use this after your iPhone Shortcut copies transaction details and opens PocketWise.</p><button class="text-button quick-cancel" type="button" data-cancel-modal>Cancel</button></form>`;
+      body=`<form id="quick-flow-amount" class="modal-body quick-flow"><p class="quick-step-label">STEP 1 OF 4</p><h3>How much?</h3><p class="muted">Enter the amount first. You can add the details in a few quick taps.</p><label class="quick-amount-wrap" for="quick-flow-value"><span>₹</span><input id="quick-flow-value" name="amount" class="quick-flow-value" inputmode="decimal" type="text" autocomplete="off" placeholder="0" value="${escapeHTML(d.amount)}" required aria-label="Amount in rupees"></label><p id="quick-flow-error" class="field-error" hidden></p><button class="primary-button quick-next" type="submit">Continue <span aria-hidden="true">→</span></button><button class="secondary-button quick-paste-button" type="button" id="paste-shortcut-quick">${icon('upload')} Paste transaction from Shortcut</button><button class="text-button" type="button" id="enter-shortcut-key">Enter transaction key manually</button><p class="quick-paste-help">Use this after your iPhone Shortcut copies transaction details and opens PocketWise.</p><button class="text-button quick-cancel" type="button" data-cancel-modal>Cancel</button></form>`;
     } else if(step==='type'){
       body=`<div class="modal-body quick-flow"><p class="quick-step-label">STEP 2 OF 4 · ${escapeHTML(money(parseAmount(d.amount)))}</p><h3>What happened?</h3><p class="muted">Choose how this amount should affect your records.</p><div class="quick-choice-list"><button class="quick-choice income-choice" data-quick-type="income"><span class="quick-choice-icon">↗</span><span><strong>Income</strong><small>Allowance, salary or other money received</small></span><span>›</span></button><button class="quick-choice expense-choice" data-quick-type="expense"><span class="quick-choice-icon">↘</span><span><strong>Purchase / expense</strong><small>A purchase, bill, food, travel or another cost</small></span><span>›</span></button><button class="quick-choice" data-quick-type="refund"><span class="quick-choice-icon">↩</span><span><strong>I got a refund</strong><small>Money returned for a previous purchase</small></span><span>›</span></button></div><button class="text-button quick-cancel" type="button" data-quick-back="amount">← Change amount</button></div>`;
     } else if(step==='activity'){
@@ -516,6 +516,7 @@
   function bindEvents(){
     document.addEventListener('click', async event=>{
       if(event.target.closest('#resume-paste')){await pasteShortcutTransaction();return;}
+      if(event.target.closest('#resume-key')){showShortcutKeyPrompt();return;}
       const quickType=event.target.closest('[data-quick-type]');if(quickType&&quickAddDraft){quickAddDraft.type=quickType.dataset.quickType;renderQuickAddStep('activity');return;}
       const quickActivity=event.target.closest('[data-quick-activity]');if(quickActivity&&quickAddDraft){quickAddDraft.activityId=quickActivity.dataset.quickActivity;renderQuickAddStep('note');return;}
       const quickBack=event.target.closest('[data-quick-back]');if(quickBack&&quickAddDraft){renderQuickAddStep(quickBack.dataset.quickBack);return;}
@@ -526,7 +527,7 @@
       const closeBtn=event.target.closest('[data-cancel-modal]');if(closeBtn){closeModal();return;}
       if(event.target.closest('[data-close-notifications]')){$('#notifications-modal').close();return;}
       if(event.target.closest('#modal-close')){closeModal();return;}
-      if(event.target.closest('#mobile-add')){quickAddStart();return;}if(event.target.closest('#paste-shortcut-quick')||event.target.closest('#paste-shortcut-settings')){await pasteShortcutTransaction();return;}if(event.target.closest('#top-add')||event.target.closest('#activity-add')||event.target.closest('[data-action="add"]')){transactionForm();return;}
+      if(event.target.closest('#mobile-add')){quickAddStart();return;}if(event.target.closest('#paste-shortcut-quick')||event.target.closest('#paste-shortcut-settings')){await pasteShortcutTransaction();return;}if(event.target.closest('#enter-shortcut-key')){showShortcutKeyPrompt();return;}if(event.target.closest('#top-add')||event.target.closest('#activity-add')||event.target.closest('[data-action="add"]')){transactionForm();return;}
       const addType=event.target.closest('[data-add-type]');if(addType){transactionForm(null,addType.dataset.addType);return;}
       const action=event.target.closest('[data-action]')?.dataset.action;if(action){if(action==='budget')budgetForm();else if(action==='debts')showDebts();else if(action==='new-debt')debtForm();else if(action==='accounts')accountsManager();return;}
       if(event.target.closest('#theme-toggle')){state.settings.theme=state.settings.theme==='dark'?'light':'dark';await persist();applyTheme();scheduleCharts();return;}
@@ -575,7 +576,7 @@
       const submitButton=form.querySelector('button[type="submit"]');
       if(submitButton){submitButton.disabled=true;submitButton.setAttribute('aria-busy','true');}
       try {
-        if(form.id==='quick-flow-amount'){const fd=new FormData(form),amount=parseAmount(fd.get('amount'));if(!Number.isFinite(amount)||amount<=0){$('#quick-flow-error').hidden=false;$('#quick-flow-error').textContent='Enter an amount greater than ₹0.';$('#quick-flow-value').focus();return;}quickAddDraft.amount=String(amount);renderQuickAddStep('type');}else if(form.id==='quick-flow-note'){quickAddDraft.note=String(new FormData(form).get('note')||'').trim();quickAddDraft.accountId=$('#quick-flow-account').value;quickAddDraft.paymentMethod=$('#quick-flow-payment').value;await saveQuickAdd();}else if(form.id==='transaction-form')await saveTransactionForm(form);else if(form.id==='budget-form')await saveBudget(form);else if(form.id==='debt-form')await saveDebt(form);else if(form.id==='repayment-form')await saveRepayment(form);else if(form.id==='account-form')await addAccountForm(form);else if(form.id==='account-edit-form')await saveAccountEdit(form);else if(form.id==='activity-form')await addActivityForm(form);else if(form.id==='activity-edit-form')await saveActivityEdit(form);else if(form.id==='goal-form')await saveGoal(form);else if(form.id==='goal-contribution-form')await saveGoalContribution(form);else if(form.id==='reminder-form')await saveReminder(form);
+        if(form.id==='shortcut-key-form'){const raw=String(new FormData(form).get('payload')||'').trim();try{await importShortcutText(raw);}catch(error){const field=$('#shortcut-key-value');toast(error.message||'Could not read that transaction.','error');field?.focus();}return;}else if(form.id==='quick-flow-amount'){const fd=new FormData(form),amount=parseAmount(fd.get('amount'));if(!Number.isFinite(amount)||amount<=0){$('#quick-flow-error').hidden=false;$('#quick-flow-error').textContent='Enter an amount greater than ₹0.';$('#quick-flow-value').focus();return;}quickAddDraft.amount=String(amount);renderQuickAddStep('type');}else if(form.id==='quick-flow-note'){quickAddDraft.note=String(new FormData(form).get('note')||'').trim();quickAddDraft.accountId=$('#quick-flow-account').value;quickAddDraft.paymentMethod=$('#quick-flow-payment').value;await saveQuickAdd();}else if(form.id==='transaction-form')await saveTransactionForm(form);else if(form.id==='budget-form')await saveBudget(form);else if(form.id==='debt-form')await saveDebt(form);else if(form.id==='repayment-form')await saveRepayment(form);else if(form.id==='account-form')await addAccountForm(form);else if(form.id==='account-edit-form')await saveAccountEdit(form);else if(form.id==='activity-form')await addActivityForm(form);else if(form.id==='activity-edit-form')await saveActivityEdit(form);else if(form.id==='goal-form')await saveGoal(form);else if(form.id==='goal-contribution-form')await saveGoalContribution(form);else if(form.id==='reminder-form')await saveReminder(form);
       } catch(error) { console.error('Pocketwise form action failed.',error); toast(error.message||'That change could not be saved. Please try again.','error'); }
       finally { if(submitButton && submitButton.isConnected){submitButton.disabled=false;submitButton.removeAttribute('aria-busy');} }
     });
@@ -653,7 +654,15 @@
     const trimmed=text.replace(/^POCKETWISE\s*:\s*/i,'');
     let fields=null;
     if(trimmed.startsWith('{')){
-      let data;try{data=JSON.parse(trimmed);}catch{throw new Error('The clipboard does not contain valid transaction JSON.');}
+      let data;
+      try { data=JSON.parse(trimmed); }
+      catch {
+        // Some Shortcuts accidentally copy a JSON-looking template with unexpanded variables.
+        // Continue to URL parsing where possible and otherwise show a useful recovery message.
+        const fromURL=shortcutFieldsFromURL(trimmed);
+        if(fromURL)fields=fromURL;
+        else throw new Error('The copied text starts like JSON but is malformed. Copy the complete PocketWise transaction URL or valid JSON, then try again.');
+      }
       if(data&&typeof data==='object'&&!Array.isArray(data)){
         if(data.transaction&&typeof data.transaction==='object')data=data.transaction;
         fields={amount:data.amount,type:data.type,category:data.category??data.activity,note:data.note,date:data.date||data.ts,requestId:data.requestId??data.reqId??data.id};
@@ -666,6 +675,13 @@
     if(!Number.isFinite(amount)||amount<=0)throw new Error('The copied transaction has no valid amount greater than ₹0.');
     return fields;
   }
+  function showShortcutKeyPrompt(){
+    openModal('Import from Shortcut',`<form id="shortcut-key-form" class="modal-body"><p class="muted">Paste the transaction key, complete PocketWise Quick Add URL, or transaction JSON copied by your Shortcut. This is a local import; nothing is sent to a server.</p><div class="form-field"><label for="shortcut-key-value">TRANSACTION KEY OR PAYLOAD</label><textarea id="shortcut-key-value" name="payload" rows="5" autocapitalize="off" autocomplete="off" spellcheck="false" placeholder='Paste the PocketWise URL or JSON here' required></textarea></div><p class="form-note">If your Shortcut copied a URL, paste the entire URL. PocketWise will validate it and show a review screen before saving.</p><div class="form-actions"><button class="secondary-button" type="button" data-cancel-modal>Cancel</button><button class="primary-button" type="submit">Validate & continue</button></div></form>`,'SHORTCUT IMPORT');
+  }
+  async function importShortcutText(raw){
+    const fields=parseClipboardShortcut(raw);
+    showShortcutDraft(createShortcutDraft(fields));
+  }
   async function pasteShortcutTransaction(){
     if(!navigator.clipboard||typeof navigator.clipboard.readText!=='function'){
       toast('Clipboard reading is unavailable here. Open PocketWise over HTTPS and try again.','error');return;
@@ -673,8 +689,7 @@
     try{
       // Clipboard reads require a direct user gesture on iOS. Keep this call inside the button handler.
       const raw=await navigator.clipboard.readText();
-      const fields=parseClipboardShortcut(raw);
-      showShortcutDraft(createShortcutDraft(fields));
+      await importShortcutText(raw);
     }catch(error){
       const message=error?.name==='NotAllowedError'?'iOS did not allow clipboard access. Tap Paste again and allow it, or paste the JSON into a note and use the regular Quick Add form.':(error?.message||'Could not read the Shortcut transaction.');
       toast(message,'error');
@@ -682,7 +697,7 @@
   }
   function showShortcutReturnNudge(){
     const el=document.createElement('div');el.className='toast shortcut-return-toast';
-    el.innerHTML=`${icon('upload')}<span>Back from another app? Paste your copied Shortcut transaction here.</span><button type="button" class="toast-action" id="resume-paste">Paste</button>`;
+    el.innerHTML=`${icon('upload')}<span>Back from another app? Import your Shortcut transaction.</span><button type="button" class="toast-action" id="resume-paste">Paste</button><button type="button" class="toast-action" id="resume-key">Enter key</button>`;
     $('#toast-region').append(el);setTimeout(()=>el.remove(),9000);
   }
   let lastShortcutRouteSignature='';
@@ -709,7 +724,8 @@
           showShortcutDraft(draft);
           return;
         }
-        if(mode==='1'||mode==='quick')quickAddStart();
+        if(mode==='key'||mode==='input')showShortcutKeyPrompt();
+        else if(mode==='1'||mode==='quick')quickAddStart();
         else transactionForm(null,['expense','income','transfer','refund'].includes(mode)?mode:'expense');
       }finally{
         // Suppress duplicate lifecycle events for this launch, but permit the exact same
