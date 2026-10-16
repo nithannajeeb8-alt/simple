@@ -1,57 +1,53 @@
-# Mind Atlas v1
+# Mind Atlas · Personal Intelligence Workspace
 
-A first functional, local-first PWA variant with a premium dark/amber interface.
-
-## Included in this build
-
-- Create, edit and delete notes
-- Search notes by title, content or subject
-- Local browser persistence
-- JSON export and import
-- Subject overview, activity timeline and basic subject graph
-- Progress summaries based on real saved notes
-- Component manager and actual browser capability checks
-- Optional editor-activity preference (currently a setting only; detailed keystroke telemetry is not implemented)
-- PWA manifest and service worker shell cache
-- npm dependency declarations for:
-  - `@huggingface/transformers`
-  - `graphology`
-  - `compromise`
-  - `pdfjs-dist`
-  - `tesseract.js`
+Mind Atlas is a local-first personal knowledge workspace and installable PWA prototype. Its aim is to connect notes, projects, learning, intentions, and evolving ideas into an evidence-backed personal knowledge map.
 
 ## Run locally
 
-Requires Node.js 20+ recommended.
+Requirements: Node.js 20+ recommended.
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open the local URL printed by Vite. To build:
+Create a production bundle with `npm run build`, then serve the `dist/` folder over HTTPS or localhost. A static host such as GitHub Pages can host the built app. For an iPhone, open the HTTPS URL in Safari and use Share → Add to Home Screen.
 
-```bash
-npm run build
-npm run preview
-```
+## Currently implemented in this prototype
 
-If npm is blocked on your network, install dependencies on a network that permits npm, then transfer the project and lockfile.
+- Create, edit, delete, search, and subject-organize notes.
+- Local browser persistence and revision snapshots when notes are edited.
+- JSON workspace export/import and explicit clear-data control.
+- Subject activity overview and a basic subject map.
+- Rule-based discoveries and possible intention extraction with source-note links.
+- Optional editor-event statistics while typing analysis is enabled.
+- PDF text extraction and image OCR paths using PDF.js and Tesseract.js.
+- Optional Transformers.js embedding similarity, loaded on demand.
+- Explicit goal tracking and manually created recall prompts with self-ratings.
+- Browser diagnostics, component preference screen, responsive navigation, PWA manifest and service worker.
 
-## Important implementation status
+## Important: prototype, not a verified release
 
-This is the first working application variant, not the finished intelligence engine. Package names are declared in `package.json`; the application does not yet dynamically import or execute those packages. The component manager deliberately says this rather than falsely claiming a library or model is installed.
+The code includes a working foundation, but this archive does **not** claim every feature in `MIND-ATLAS-ROADMAP.md` is complete. The roadmap labels implemented, partial, and planned capabilities. In particular, the app still needs a verified production build and end-to-end tests in a real browser. The component screen records preferences; it is not a secure dynamic package installer. Some dependencies and model weights load only when the corresponding feature is used.
 
-- PDF.js integration still needs a PDF import/viewer workflow.
-- Tesseract.js integration still needs OCR UI and worker/model configuration.
-- Transformers.js integration still needs a selected model, verified model source, download consent, caching, and inference code.
-- Graphology integration still needs graph construction/analysis based on note relationships.
-- Compromise integration still needs extraction pipeline and tests.
-- Current subject graph is a transparent, basic map, not a semantic AI graph.
-- Notes are stored in browser `localStorage` in this starter. For larger files and production use, migrate to IndexedDB and add storage quota handling.
-- Google Fonts are loaded externally; remove the import if fully offline/self-contained fonts are required.
-- Service worker only caches the app shell. It does not cache external packages or model weights.
+## Data and privacy
 
-## Privacy
+- Notes are stored in the current browser's local storage in this prototype. They are not automatically synced between devices.
+- Export backups regularly. Clearing browser/site data can erase the workspace; browser storage can be evicted.
+- A first model/component download requires internet. The app shell may work offline after successful caching, but offline model and document workflows need device testing.
+- PDF/OCR and semantic features may fetch JavaScript/model assets. Do not describe this app as fully offline or network-free until network requests are audited and verified.
+- Editor analysis is opt-in and observes only events in this app. A PWA cannot read WhatsApp, system-wide typing, or other apps' activity.
+- Typing pauses are weak signals and must not be treated as evidence of emotions, diagnoses, or personality.
 
-Data entered in the prototype is stored in this browser's local storage. Export regular backups. Browser storage may be cleared by the user or browser. Do not use shared/public devices for private notes. Before release, review all network requests and write a privacy notice that matches actual implementation.
+## Technology references
+
+- Transformers.js: https://github.com/huggingface/transformers.js
+- Graphology: https://github.com/graphology/graphology
+- Compromise: https://github.com/spencermountain/compromise
+- PDF.js: https://github.com/mozilla/pdf.js
+- Tesseract.js: https://github.com/naptha/tesseract.js
+- IndexedDB: https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API
+- Service workers: https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API
+- Apple Human Interface Guidelines: https://developer.apple.com/design/human-interface-guidelines
+
+The references are intended technology options, not a claim that every library is currently integrated into every feature.

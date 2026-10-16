@@ -19,6 +19,7 @@
         <button class="nav-item" data-view="library"><span>▤</span> Library</button>
         <button class="nav-item" data-view="graph"><span>⌘</span> Knowledge graph</button>
         <button class="nav-item" data-view="progress"><span>◷</span> Progress</button>
+        <button class="nav-item" data-view="insights"><span>✳</span> Discoveries</button>
         <button class="nav-item" data-view="installer"><span>◈</span> Components</button>
       </nav>
       <div class="sidebar-bottom">
@@ -39,6 +40,7 @@
         <button data-view="library"><span>▤</span><small>Library</small></button>
         <button data-view="graph"><span>⌘</span><small>Graph</small></button>
         <button data-view="progress"><span>◷</span><small>Progress</small></button>
+        <button data-view="insights"><span>✳</span><small>Discover</small></button>
         <button data-view="installer"><span>◈</span><small>Setup</small></button>
       </nav>
     </main>
@@ -54,6 +56,7 @@
     </form>
   </dialog>
   <input type="file" id="importFile" accept=".json" hidden>
+  <input type="file" id="documentFile" accept=".pdf,image/*" hidden>
   <div class="toast" id="toast" role="status"></div>
   <script type="module" src="./app.js"></script>
 </body>
