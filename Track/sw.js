@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pocketwise-shell-v3.0.0';
+const CACHE_NAME = 'pocketwise-shell-v4.0.0';
 const APP_SHELL = [
   './',
   './index.html',
