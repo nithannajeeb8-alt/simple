@@ -166,3 +166,209 @@ h1,h2,.balance-number,.receipt-title{font-family:var(--display);font-weight:600;
 @media(max-width:370px){.receipt-paper{padding:17px 14px}.receipt-fields>div{grid-template-columns:1fr;gap:3px}.receipt-fields dd{text-align:left}.receipt-actions{grid-template-columns:minmax(74px,.6fr) minmax(0,1.4fr)}}
 @media(hover:none){.card:hover{transform:none}.transaction-row:hover,.entity-row:hover{transform:none}}
 @media(prefers-reduced-motion:reduce){body::before,.money-card::before,.page-heading h1{animation:none!important}.card,.primary-button,.secondary-button,.quick-action{transition:none!important}}
+
+
+/* TRACK v5.1 — layout integrity pass: readable content, calm dual-tone atmosphere. */
+:root{
+  --track-blue:#4166e8;
+  --track-blue-soft:#edf1ff;
+  --track-green:#398b70;
+  --track-green-soft:#e8f8f0;
+  --track-lilac:#b7a9f5;
+}
+html,body{min-width:0;max-width:100%;overflow-x:clip}
+body{
+  background:
+    radial-gradient(ellipse at 6% 4%,rgba(102,139,244,.18),transparent 35%),
+    radial-gradient(ellipse at 96% 18%,rgba(111,190,164,.17),transparent 34%),
+    radial-gradient(ellipse at 82% 74%,rgba(183,169,245,.13),transparent 37%),
+    linear-gradient(145deg,#f3f5fc 0%,#f7f8fc 47%,#eff8f4 100%);
+  background-attachment:fixed;
+}
+body::before{
+  background:
+    radial-gradient(ellipse at 10% 15%,rgba(100,135,244,.17),transparent 38%),
+    radial-gradient(ellipse at 88% 32%,rgba(91,180,145,.15),transparent 39%),
+    radial-gradient(ellipse at 42% 95%,rgba(177,162,241,.12),transparent 43%);
+  opacity:.9;
+}
+.card,.insight-metrics .metric-card,.insights-grid>.card{
+  min-width:0;max-width:100%;overflow:hidden;
+}
+.card>*{min-width:0}
+.card p,.card small,.card label,.card dd,.card dt,.card strong,.card span{
+  overflow-wrap:anywhere;
+}
+.section-header{align-items:flex-start;flex-wrap:wrap}
+.section-header>div{flex:1 1 210px;min-width:0}
+.section-header>button,.section-header>.muted{flex:0 0 auto;max-width:100%}
+.section-header h2{line-height:1.12;overflow-wrap:anywhere}
+.section-header p{max-width:58ch;line-height:1.65}
+button,input,select,textarea{max-width:100%;min-width:0}
+.chart-canvas,canvas,svg,img{max-width:100%}
+.metric-card>strong,.chart-summary strong,.transaction-amount,.entity-value{overflow-wrap:anywhere;word-break:normal}
+.insights-grid{grid-template-columns:repeat(2,minmax(0,1fr));align-items:stretch}
+.insights-grid>.card{min-width:0}
+.insight-wide{grid-column:1/-1}
+
+/* Calendar: seven balanced columns, full date hit-targets, no detached dots. */
+#heatmap.heatmap{
+  display:grid;grid-template-columns:repeat(7,minmax(0,1fr));
+  gap:clamp(5px,1.4vw,10px);align-items:stretch;margin-top:6px;
+}
+#heatmap .heat-day{
+  display:grid;grid-template-rows:auto minmax(34px,1fr);justify-items:center;
+  align-items:center;gap:7px;min-width:0;
+}
+#heatmap .heat-day>small{
+  display:grid;place-items:center;width:100%;min-height:20px;
+  color:#6f7b95;font:600 11px/1.2 var(--ui);
+}
+#heatmap .heat-day:has(>small:first-child):not(:has(button))>small{
+  font-size:11px;font-weight:800;letter-spacing:.03em;color:#8b96ad;
+}
+#heatmap .heat-day>button.heat-cell{
+  appearance:none;-webkit-appearance:none;display:grid;place-items:center;
+  width:100%;max-width:46px;aspect-ratio:1;min-height:34px;height:auto;
+  padding:0;border:1px solid rgba(100,120,160,.08);border-radius:13px;
+  color:#52617d;background:rgba(232,236,246,.8);
+  font:700 12px/1 var(--ui);box-shadow:inset 0 1px rgba(255,255,255,.8);
+  transition:transform .18s ease,box-shadow .18s ease,background .18s ease;
+}
+
+#heatmap .heat-day>button.heat-0{background:#edf0f7;color:#65728d}
+#heatmap .heat-day>button.heat-1{background:#d8f3e7;color:#397c65;border-color:#c7eadb}
+#heatmap .heat-day>button.heat-2{background:#a8dfc8;color:#245f4d;border-color:#96d5ba}
+#heatmap .heat-day>button.heat-3{background:#69b997;color:#fff;border-color:#5bab89}
+#heatmap .heat-day>button.heat-4{background:linear-gradient(145deg,#4d9b7c,#327c62);color:#fff;border-color:#418b6e;box-shadow:0 5px 12px rgba(49,126,96,.16)}
+#heatmap .heat-day>button.heat-cell:hover{transform:translateY(-2px);box-shadow:0 5px 13px rgba(41,65,111,.12)}
+#heatmap .heat-day>button.heat-cell:focus-visible{outline:3px solid #7d9aff;outline-offset:2px}
+.heatmap-key{flex-wrap:wrap;gap:7px;margin-top:18px}
+.heatmap-key .heat-cell{width:13px;height:13px;min-width:13px;border-radius:4px;flex:0 0 auto}
+.heatmap-key>span{white-space:nowrap}
+.heatmap-key>i.heat-cell{display:inline-block}
+
+/* Year archive becomes a responsive card grid rather than six crushed columns. */
+.yearly-table-wrap{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px;overflow:visible}
+.yearly-row{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 14px;
+  align-content:start;min-width:0;padding:17px;border:1px solid #e7ebf4;
+  border-radius:18px;background:rgba(255,255,255,.72);
+}
+.yearly-row>span,.yearly-row>strong,.yearly-row>button{min-width:0;overflow-wrap:anywhere}
+.yearly-row>span:not(:first-child)::before{display:block;margin-bottom:4px;color:#8994ab;font:700 9px/1.3 var(--mono);letter-spacing:.075em;text-transform:uppercase}
+.yearly-row>span:nth-child(2)::before{content:"Income"}
+.yearly-row>span:nth-child(3)::before{content:"Expenses"}
+.yearly-row>span:nth-child(4)::before{content:"Net flow"}
+.yearly-row>span:nth-child(5)::before{content:"Records"}
+.yearly-row>strong{grid-column:1/-1;font:600 28px/1.1 var(--display);letter-spacing:-.04em;color:#1d2b4d}
+.yearly-row>button{justify-self:start;align-self:center;min-height:38px;padding:7px 13px;border:1px solid #d9e4ff;border-radius:12px;background:#f3f6ff;color:#3e5bb6;font-weight:750}
+.yearly-header{display:none}
+.yearly-row .yearly-positive,.yearly-row .yearly-negative{font-variant-numeric:tabular-nums}
+.yearly-row>span{font-size:13px;line-height:1.45}
+.yearly-row>span:nth-child(4){font-weight:750}
+.yearly-archive>.fine-print{max-width:70ch;line-height:1.7;margin-top:18px}
+
+/* Debts, goals, backup cards: separate labels and values instead of running words together. */
+.debt-summaries{align-items:stretch}
+.debt-summaries>div{min-width:0;align-items:flex-start}
+.debt-summaries>div>div{flex:1;min-width:0}
+.debt-summaries small{line-height:1.45;overflow-wrap:anywhere}
+.debt-summaries strong{display:block;line-height:1.2;overflow-wrap:anywhere}
+.annual-report-banner{align-items:flex-start;flex-wrap:wrap}
+.annual-report-banner>div{min-width:0;flex:1 1 220px}
+.annual-report-banner .secondary-button{flex:0 1 auto;white-space:normal}
+.debt-summary,.debt-summary-item,.budget-mini,.goal-row,.ranking-row,.archive-row{min-width:0}
+.debt-summary strong,.debt-summary small{line-height:1.45;overflow-wrap:anywhere}
+.fine-print,.muted{overflow-wrap:anywhere}
+
+/* Receipt dialog: force a real top-layer modal and bind actions directly as a fallback. */
+#app-modal.receipt-modal[open]{
+  position:fixed;inset: max(12px,env(safe-area-inset-top,0px)) 12px max(12px,env(safe-area-inset-bottom,0px));
+  margin:auto;width:min(620px,calc(100vw - 24px));height:min(860px,calc(100dvh - 24px));
+  max-width:calc(100vw - 24px);max-height:calc(100dvh - 24px);
+  padding:0;border-radius:26px;display:flex;flex-direction:column;
+  overflow:hidden;overscroll-behavior:contain;isolation:isolate;
+  background:#f5f7fc;color:#17233f;
+}
+#app-modal.receipt-modal::backdrop{background:rgba(13,24,48,.58);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px)}
+#app-modal.receipt-modal .modal-head{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  flex:0 0 auto;min-width:0;padding:17px clamp(16px,4vw,26px);
+  background:#fff;border-bottom:1px solid #e5eaf4;
+}
+#app-modal.receipt-modal .modal-head>div{min-width:0}
+#app-modal.receipt-modal .modal-head h2{font:600 clamp(24px,4vw,31px)/1.12 var(--display);overflow-wrap:anywhere}
+#app-modal.receipt-modal #modal-close{flex:0 0 44px;width:44px;height:44px;min-width:44px;min-height:44px}
+#app-modal.receipt-modal #modal-content{display:flex;flex:1 1 auto;min-height:0;overflow:hidden}
+#app-modal.receipt-modal .receipt-preview-layout{display:flex;flex:1 1 auto;min-width:0;min-height:0;flex-direction:column;overflow:hidden}
+#app-modal.receipt-modal .receipt-scroll{flex:1 1 auto;min-height:0;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:16px clamp(12px,3vw,26px)}
+#app-modal.receipt-modal .receipt-paper{width:100%;max-width:500px;margin:0 auto;padding:clamp(18px,4vw,30px);border-radius:21px;overflow-wrap:anywhere}
+#app-modal.receipt-modal .receipt-fields>div{grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:12px}
+#app-modal.receipt-modal .receipt-fields dt{line-height:1.45}
+#app-modal.receipt-modal .receipt-fields dd{text-align:right;min-width:0;overflow-wrap:anywhere;word-break:break-word}
+#app-modal.receipt-modal .receipt-actions{
+  position:relative;display:grid!important;visibility:visible!important;opacity:1!important;
+  grid-template-columns:minmax(84px,.7fr) minmax(0,1.3fr);gap:10px;
+  flex:0 0 auto;min-width:0;padding:12px 14px calc(12px + env(safe-area-inset-bottom,0px));
+  background:#fff;border-top:1px solid #e4e9f3;z-index:20;
+}
+#app-modal.receipt-modal .receipt-actions button{
+  display:flex!important;visibility:visible!important;opacity:1!important;
+  align-items:center;justify-content:center;gap:8px;width:100%;min-width:0;
+  min-height:50px;padding:10px 8px;border-radius:15px;font-size:13px;
+  line-height:1.25;white-space:normal;pointer-events:auto;touch-action:manipulation;
+}
+#app-modal.receipt-modal .receipt-actions button:disabled{opacity:.55}
+body.printing-receipt #receipt-print-root{display:block!important}
+body.printing-receipt #receipt-print-root .receipt-paper{max-width:none!important}
+@media(max-width:760px){
+  #app-modal.receipt-modal[open]{inset:env(safe-area-inset-top,12px) 0 0;width:100%;max-width:100%;height:auto;max-height:calc(100dvh - env(safe-area-inset-top,12px));border-radius:25px 25px 0 0;border-bottom:0}
+  #app-modal.receipt-modal .modal-head{padding:14px 16px}
+  #app-modal.receipt-modal .modal-head h2{font-size:26px}
+  #app-modal.receipt-modal .receipt-scroll{padding:12px 11px}
+  #app-modal.receipt-modal .receipt-paper{padding:19px 16px;border-radius:18px}
+  #app-modal.receipt-modal .receipt-actions{padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));gap:8px}
+  #app-modal.receipt-modal .receipt-actions button{min-height:48px;font-size:12px}
+}
+@media(max-width:380px){
+  #app-modal.receipt-modal .receipt-fields>div{grid-template-columns:minmax(0,1fr);gap:3px}
+  #app-modal.receipt-modal .receipt-fields dd{text-align:left}
+  #app-modal.receipt-modal .receipt-actions{grid-template-columns:minmax(76px,.65fr) minmax(0,1.35fr)}
+}
+@media(max-width:760px){
+  .insights-grid{grid-template-columns:minmax(0,1fr)}
+  .insight-wide{grid-column:auto}
+  .yearly-table-wrap{grid-template-columns:minmax(0,1fr)}
+  .annual-report-banner{padding:17px;gap:12px}
+  .annual-report-banner .secondary-button{width:100%}
+  .heatmap-key{justify-content:center}
+  .section-header>.muted{font-size:12px}
+}
+@media(prefers-reduced-motion:reduce){body::before{animation:none!important}.card,.heat-cell,.primary-button,.secondary-button{transition:none!important}}
+
+#heatmap .heat-empty{min-width:0;min-height:1px}
+#heatmap .heat-weekday{grid-template-rows:auto;min-height:25px}
+
+
+/* Alignment repair for the insight debt cards and footer shown on narrow screens. */
+.debt-insight-row{
+  display:grid;grid-template-columns:44px minmax(0,1fr) auto;align-items:center;
+  gap:12px;min-width:0;padding:16px 0;border-bottom:1px solid #e8edf5;
+}
+.debt-insight-row:last-child{border-bottom:0}
+.debt-insight-row>div{min-width:0}
+.debt-insight-row>div>strong,.debt-insight-row>div>small{display:block;line-height:1.4;overflow-wrap:anywhere}
+.debt-insight-row>div>strong{font-size:14px;letter-spacing:-.025em}
+.debt-insight-row>div>small{margin-top:4px;color:#73819b;font-size:12px}
+.debt-insight-row>b{min-width:0;max-width:100%;text-align:right;font:750 clamp(16px,2vw,22px)/1.2 var(--display);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.app-footer{color:#74819b!important}
+.app-footer,.app-footer *{text-shadow:none}
+.app-footer .privacy-dot{background:#51a986}
+@media(max-width:760px){
+  .app-footer{padding-bottom:calc(116px + env(safe-area-inset-bottom,0px))!important}
+  .main-content{padding-bottom:calc(120px + env(safe-area-inset-bottom,0px))}
+  .debt-insight-row{grid-template-columns:40px minmax(0,1fr) auto;gap:10px}
+  .debt-insight-row>b{font-size:16px}
+  .yearly-row{padding:15px}
+}
