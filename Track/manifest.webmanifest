@@ -1,38 +1,38 @@
 {
-  "id": "/PocketWise/",
-  "name": "Pocketwise \u00b7 Money, made clearer",
-  "short_name": "Pocketwise",
+  "id": "/Track/",
+  "name": "Pocketwise \u00b7 Track your money",
+  "short_name": "Track",
   "description": "A private, offline-first personal finance companion.",
   "lang": "en-IN",
-  "start_url": "/PocketWise/",
-  "scope": "/PocketWise/",
+  "start_url": "/Track/",
+  "scope": "/Track/",
   "display": "standalone",
   "display_override": [
     "standalone",
     "minimal-ui"
   ],
   "orientation": "any",
-  "background_color": "#edf3ff",
-  "theme_color": "#4269e8",
+  "background_color": "#f4f6fb",
+  "theme_color": "#172c63",
   "categories": [
     "finance",
     "utilities"
   ],
   "icons": [
     {
-      "src": "/PocketWise/assets/icons/icon-192.png",
+      "src": "/Track/assets/icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/PocketWise/assets/icons/icon-512.png",
+      "src": "/Track/assets/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/PocketWise/assets/icons/icon.svg",
+      "src": "/Track/assets/icons/icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
@@ -43,10 +43,10 @@
       "name": "Add expense",
       "short_name": "Expense",
       "description": "Open Quick Add for an expense",
-      "url": "/PocketWise/?quickadd=expense",
+      "url": "/Track/?quickadd=expense",
       "icons": [
         {
-          "src": "/PocketWise/assets/icons/icon.svg",
+          "src": "/Track/assets/icons/icon.svg",
           "sizes": "any",
           "type": "image/svg+xml"
         }
@@ -56,10 +56,10 @@
       "name": "Add income",
       "short_name": "Income",
       "description": "Open Quick Add for income",
-      "url": "/PocketWise/?quickadd=income",
+      "url": "/Track/?quickadd=income",
       "icons": [
         {
-          "src": "/PocketWise/assets/icons/icon.svg",
+          "src": "/Track/assets/icons/icon.svg",
           "sizes": "any",
           "type": "image/svg+xml"
         }
@@ -69,15 +69,15 @@
       "name": "Debts and lending",
       "short_name": "Debts",
       "description": "Open debts and lending",
-      "url": "/PocketWise/?quickadd=debt",
+      "url": "/Track/?quickadd=debt",
       "icons": [
         {
-          "src": "/PocketWise/assets/icons/icon.svg",
+          "src": "/Track/assets/icons/icon.svg",
           "sizes": "any",
           "type": "image/svg+xml"
         }
       ]
     }
   ],
-  "version": "4.2.0"
+  "version": "5.0.0"
 }
