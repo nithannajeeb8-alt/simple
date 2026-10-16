@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pocketwise-shell-v2.0.0';
+const CACHE_NAME = 'pocketwise-shell-v2.1.0';
 const APP_SHELL = [
   './',
   './index.html',
@@ -7,7 +7,8 @@ const APP_SHELL = [
   './manifest.webmanifest',
   './assets/icons/icon.svg',
   './assets/icons/icon-192.png',
-  './assets/icons/icon-512.png'
+  './assets/icons/icon-512.png',
+  './assets/blue-glass-atmosphere.svg'
 ];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL.map(path => new Request(path, { cache: 'reload' })))).then(() => self.skipWaiting()));
