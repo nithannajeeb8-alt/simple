@@ -1,83 +1,10 @@
 {
-  "id": "/Track/",
-  "name": "Pocketwise · Track your money",
-  "short_name": "Track",
-  "description": "A private, offline-first personal finance companion with a calmer, more reliable interface.",
-  "lang": "en-IN",
-  "start_url": "/Track/",
-  "scope": "/Track/",
+  "name": "Mind Atlas",
+  "short_name": "Mind Atlas",
+  "description": "A private, evolving map of what you learn, think, and create.",
+  "start_url": "./",
   "display": "standalone",
-  "display_override": [
-    "standalone",
-    "minimal-ui"
-  ],
-  "orientation": "any",
-  "background_color": "#f2f5fc",
-  "theme_color": "#203d4d",
-  "categories": [
-    "finance",
-    "utilities"
-  ],
-  "icons": [
-    {
-      "src": "/Track/assets/icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/Track/assets/icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/Track/assets/icons/icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "Add expense",
-      "short_name": "Expense",
-      "description": "Open Quick Add for an expense",
-      "url": "/Track/?quickadd=expense",
-      "icons": [
-        {
-          "src": "/Track/assets/icons/icon.svg",
-          "sizes": "any",
-          "type": "image/svg+xml"
-        }
-      ]
-    },
-    {
-      "name": "Add income",
-      "short_name": "Income",
-      "description": "Open Quick Add for income",
-      "url": "/Track/?quickadd=income",
-      "icons": [
-        {
-          "src": "/Track/assets/icons/icon.svg",
-          "sizes": "any",
-          "type": "image/svg+xml"
-        }
-      ]
-    },
-    {
-      "name": "Debts and lending",
-      "short_name": "Debts",
-      "description": "Open debts and lending",
-      "url": "/Track/?quickadd=debt",
-      "icons": [
-        {
-          "src": "/Track/assets/icons/icon.svg",
-          "sizes": "any",
-          "type": "image/svg+xml"
-        }
-      ]
-    }
-  ],
-  "version": "5.1.0"
+  "background_color": "#080807",
+  "theme_color": "#080807",
+  "icons": []
 }

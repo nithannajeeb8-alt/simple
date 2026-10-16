@@ -1,0 +1,22 @@
+{
+  "name": "mind-atlas",
+  "version": "0.3.0",
+  "private": true,
+  "type": "module",
+  "description": "Mind Atlas personal knowledge and intelligence PWA prototype",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "^3.7.2",
+    "compromise": "^14.14.4",
+    "graphology": "^0.26.0",
+    "pdfjs-dist": "^5.4.149",
+    "tesseract.js": "^6.0.1"
+  },
+  "devDependencies": {
+    "vite": "^6.4.1"
+  }
+}
