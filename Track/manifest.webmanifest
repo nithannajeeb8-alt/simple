@@ -2,7 +2,7 @@
   "id": "/Track/",
   "name": "Pocketwise · Track your money",
   "short_name": "Track",
-  "description": "A private, offline-first personal finance companion.",
+  "description": "A private, offline-first personal finance companion with a calmer, more reliable interface.",
   "lang": "en-IN",
   "start_url": "/Track/",
   "scope": "/Track/",
@@ -12,8 +12,8 @@
     "minimal-ui"
   ],
   "orientation": "any",
-  "background_color": "#f4f6fb",
-  "theme_color": "#172c63",
+  "background_color": "#f2f5fc",
+  "theme_color": "#203d4d",
   "categories": [
     "finance",
     "utilities"

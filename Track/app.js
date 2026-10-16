@@ -3,7 +3,11 @@
   'use strict';
   (() => { const link = document.querySelector('link[href*="bootstrap-icons"]'); const mark = () => document.documentElement.classList.add('bi-loaded'); if (link) { if (link.sheet) mark(); else link.addEventListener('load', mark, { once: true }); } })();
   const isAndroid = /Android/i.test(navigator.userAgent || '') || /Android/i.test(navigator.userAgentData?.platform || '');
+  const isIOS = /iPad|iPhone|iPod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const isStandalone = !!(navigator.standalone || window.matchMedia?.('(display-mode: standalone)')?.matches || window.matchMedia?.('(display-mode: fullscreen)')?.matches);
+  const isIOSStandalone = isIOS && isStandalone;
   document.documentElement.classList.toggle('is-android', isAndroid);
+  document.documentElement.classList.toggle('is-ios-standalone', isIOSStandalone);
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
   const money = n => {
@@ -244,8 +248,8 @@
     // not with a user-facing Light/Dark/Auto switch.
     document.documentElement.dataset.theme='single';
     const meta=$('meta[name="theme-color"]');
-    const pageColors={home:'#3153b8',activity:'#493b9c',insights:'#176d58',settings:'#92562e'};
-    if(meta)meta.content=pageColors[currentPage]||pageColors.home;
+    // Keep the browser chrome aligned with the app's permanent ink-and-sage theme.
+    if(meta)meta.content='#203d4d';
     if($('#hide-setting'))$('#hide-setting').checked=!!state.settings.hideBalances;
   }
   const profileColors={mint:'#2f8f67',ocean:'#3478c8',plum:'#8756b5',sunset:'#d46b43'};
@@ -296,7 +300,7 @@
   const chartColors=['#2a8a5d','#d85e55','#4e7fd2','#b88334','#9776c7','#49a7a0','#df9a52','#85938a','#d17b9f'];
   function expenseByCategory(period='month'){const txs=periodTransactions(period),map={};txs.forEach(t=>{const name=txActivity(t).name;if(t.type==='expense')map[name]=(map[name]||0)+t.amount;if(t.type==='refund')map[name]=(map[name]||0)-t.amount;});return Object.entries(map).map(([name,value])=>({name,value:Math.max(0,value)})).filter(x=>x.value>0).sort((a,b)=>b.value-a.value);}
   function renderCategoryLegend(period){const items=expenseByCategory(period).slice(0,6);$('#category-legend').innerHTML=items.length?items.map((a,i)=>`<div class="legend-item"><span class="legend-swatches" style="background:${chartColors[i%chartColors.length]}"></span><span>${escapeHTML(a.name)}</span><strong>${fmtHidden(a.value)}</strong></div>`).join(''):`<div class="empty-inline">Add expenses to see your spending mix.</div>`;}
-  function renderHeatmap(period){const [start,end]=getPeriodRange(period);let base=period==='all'?new Date():dateFrom(end);if(period==='year')base=new Date(new Date().getFullYear(),11,31);else if(period==='last-month')base=dateFrom(end);else base=new Date();const y=base.getFullYear(),m=base.getMonth(),days=new Date(y,m+1,0).getDate(),first=new Date(y,m,1).getDay();const daily={};state.transactions.forEach(t=>{if(t.type==='expense'&&t.date.startsWith(`${y}-${String(m+1).padStart(2,'0')}`))daily[t.date]=(daily[t.date]||0)+t.amount;});const max=Math.max(1,...Object.values(daily));let html=['S','M','T','W','T','F','S'].map(d=>`<div class="heat-day heat-weekday"><small>${d}</small></div>`).join('');for(let i=0;i<first;i++)html+='<div class="heat-empty" aria-hidden="true"></div>';for(let d=1;d<=days;d++){const date=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`,v=daily[date]||0;const level=v?Math.min(4,Math.ceil(v/max*4)):0;html+=`<div class="heat-day"><button type="button" class="heat-cell heat-${level}" title="${escapeHTML(date)} · ${money(v)}" data-day="${d}" data-heat-date="${date}" aria-label="${escapeHTML(date)}, ${money(v)} spending">${d}</button></div>`;}$('#heatmap').innerHTML=html;$('#heatmap').setAttribute('aria-label',`Spending calendar for ${new Intl.DateTimeFormat(undefined,{month:'long',year:'numeric'}).format(new Date(y,m,1))}`);}
+  function renderHeatmap(period){const [start,end]=getPeriodRange(period);let base=period==='all'?new Date():dateFrom(end);if(period==='year')base=new Date(new Date().getFullYear(),11,31);else if(period==='last-month')base=dateFrom(end);else base=new Date();const y=base.getFullYear(),m=base.getMonth(),days=new Date(y,m+1,0).getDate(),first=new Date(y,m,1).getDay();const daily={};state.transactions.forEach(t=>{if(t.type==='expense'&&t.date.startsWith(`${y}-${String(m+1).padStart(2,'0')}`))daily[t.date]=(daily[t.date]||0)+t.amount;});const max=Math.max(1,...Object.values(daily));let html=['S','M','T','W','T','F','S'].map(d=>`<div class="heat-day heat-weekday"><small>${d}</small></div>`).join('');for(let i=0;i<first;i++)html+='<div class="heat-empty" aria-hidden="true"></div>';for(let d=1;d<=days;d++){const date=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`,v=daily[date]||0;const level=v?Math.min(4,Math.ceil(v/max*4)):0;const todayClass=date===today()?' heat-today':'';html+=`<div class="heat-day"><button type="button" class="heat-cell heat-${level}${todayClass}" title="${escapeHTML(date)} · ${money(v)}" data-day="${d}" data-heat-date="${date}" ${date===today()?'aria-current="date"':''} aria-label="${escapeHTML(date)}, ${money(v)} spending">${d}</button></div>`;}$('#heatmap').innerHTML=html;$('#heatmap').setAttribute('aria-label',`Spending calendar for ${new Intl.DateTimeFormat(undefined,{month:'long',year:'numeric'}).format(new Date(y,m,1))}`);}
   function renderRankings(period){let items=expenseByCategory(period);const mode=$('#ranking-mode')?.value||'amount';if(mode==='count'){const counts={};periodTransactions(period).filter(t=>t.type==='expense').forEach(t=>{const name=txActivity(t).name;counts[name]=(counts[name]||0)+1;});items.forEach(i=>i.count=counts[i.name]||0);items.sort((a,b)=>b.count-a.count);}else items.sort((a,b)=>b.value-a.value);items=items.slice(0,8);const max=Math.max(1,...items.map(x=>mode==='count'?x.count:x.value));$('#category-ranking').innerHTML=items.length?items.map((a,i)=>`<div class="ranking-row"><div class="ranking-name"><span class="legend-swatches" style="background:${chartColors[i%chartColors.length]}"></span><span>${escapeHTML(a.name)}</span></div><div class="ranking-bar"><span style="width:${Math.max(1,(mode==='count'?a.count:a.value)/max*100)}%;background:${chartColors[i%chartColors.length]}"></span></div><div class="ranking-value">${mode==='count'?`${a.count} entries`:fmtHidden(a.value)}</div></div>`).join(''):`<div class="empty-inline">Your category ranking will appear here.</div>`;}
   function renderGoals(){const list=$('#goals-list');if(!state.goals.length){list.innerHTML=`<div class="empty-state"><span class="empty-icon">${icon('goal')}</span><h3>One thing you're saving for?</h3><p>Create a goal and watch it progress.</p><button class="soft-button" id="goal-empty-add">Add a goal</button></div>`;return;}list.innerHTML=state.goals.map(g=>{const pct=Math.min(100,(+g.saved||0)/(+g.target||1)*100);return `<div class="goal-row"><div class="goal-line"><div><strong>${escapeHTML(g.name)}</strong><small>${fmtHidden(g.saved)} saved · ${Math.round(pct)}%</small></div><span class="goal-amount">${fmtHidden(g.target)}</span></div><div class="progress-track"><span style="width:${pct}%;background:${pct>=100?'var(--green)':'var(--blue)'}"></span></div></div>`}).join('');}
   function renderYearArchive(){const target=$('#yearly-archive');if(!target)return;const currentYear=new Date().getFullYear();const years=state.transactions.map(t=>Number(String(t.date||'').slice(0,4))).filter(y=>y>=1900&&y<=currentYear);const firstYear=years.length?Math.min(...years):currentYear;const rows=[];for(let year=currentYear;year>=Math.max(firstYear,currentYear-39);year--){const txs=state.transactions.filter(t=>String(t.date||'').slice(0,4)===String(year));if(!txs.length&&year!==currentYear)continue;const totals=totalsFor(txs);rows.push({year,...totals,count:txs.length});}if(!rows.length){target.innerHTML='<div class="empty-inline">Your yearly summaries will appear as you record transactions.</div>';return;}target.innerHTML=`<div class="yearly-table-wrap"><div class="yearly-row yearly-header"><span>Year</span><span>Income</span><span>Expenses</span><span>Net flow</span><span>Records</span><span></span></div>${rows.map(r=>`<div class="yearly-row"><strong>${r.year}</strong><span class="yearly-positive">${fmtHidden(r.income)}</span><span>${fmtHidden(r.expenses)}</span><span class="${r.net<0?'yearly-negative':'yearly-positive'}">${fmtHidden(r.net)}</span><span>${r.count}</span><button class="inline-link" data-year-view="${r.year}">View</button></div>`).join('')}</div><p class="fine-print">Annual totals use the records currently stored on this device. Transfers and debt movements are excluded from income and spending totals.</p>`;}
@@ -354,7 +358,7 @@
     openModal('Install PocketWise',`<div class="modal-body install-guide-content"><p class="muted">PocketWise is an installable website app (PWA), not a native app-store package.</p>${instructions}<p class="fine-print">Installation availability depends on your browser and device. Your local records remain in that browser profile, so export backups before clearing site data.</p><div class="form-actions"><button class="primary-button" type="button" data-cancel-modal>Done</button></div></div>`,'INSTALL ON YOUR DEVICE');
   }
   function openModal(title,body,kicker='QUICK ACTION'){const dlg=$('#app-modal');if(dlg.open)dlg.close();$('#modal-title').textContent=title;$('#modal-kicker').textContent=kicker;$('#modal-content').innerHTML=body;try{if(typeof dlg.showModal==='function')dlg.showModal();else dlg.setAttribute('open','');}catch(error){dlg.setAttribute('open','');console.warn('Using accessible dialog fallback.',error);}const first=dlg.querySelector('input:not([type=hidden]),select,textarea,button');if(first)setTimeout(()=>first.focus({preventScroll:true}),30);}
-  function closeModal(){const dlg=$('#app-modal');if(dlg.open){if(typeof dlg.close==='function')dlg.close();else dlg.removeAttribute('open');}dlg.classList.remove('receipt-modal');currentEditId=null;}
+  function closeModal(){const dlg=$('#app-modal');if(dlg.open||dlg.hasAttribute('open')){if(typeof dlg.close==='function')dlg.close();else dlg.removeAttribute('open');}dlg.classList.remove('receipt-modal');currentEditId=null;}
   function accountOptions(selected=''){return state.accounts.map(a=>`<option value="${escapeHTML(a.id)}" ${selected===a.id?'selected':''}>${escapeHTML(a.name)}</option>`).join('');}
   function activityOptions(kind='expense',selected='') {const list=state.activities.filter(a=>a.kind==='both'||a.kind===kind||(kind==='expense'&&a.kind==='refund'));list.sort((a,b)=>{const ca=state.transactions.filter(t=>t.activityId===a.id).length,cb=state.transactions.filter(t=>t.activityId===b.id).length;return cb-ca||a.name.localeCompare(b.name)});return list.map(a=>`<option value="${escapeHTML(a.id)}" ${selected===a.id?'selected':''}>${escapeHTML(a.name)}</option>`).join('');}
   function transactionForm(tx=null,forceType=null){
@@ -522,31 +526,144 @@
       <footer class="receipt-footer"><span>Private by design</span><span>Receipt · ${escapeHTML(ref.slice(-8).toUpperCase()||'LOCAL')}</span></footer>
     </article>`;
   }
+  function receiptRoundRect(ctx,x,y,width,height,radius){
+    const r=Math.min(radius,width/2,height/2);
+    ctx.beginPath();
+    if(typeof ctx.roundRect==='function'){ctx.roundRect(x,y,width,height,r);return;}
+    ctx.moveTo(x+r,y);ctx.lineTo(x+width-r,y);ctx.quadraticCurveTo(x+width,y,x+width,y+r);
+    ctx.lineTo(x+width,y+height-r);ctx.quadraticCurveTo(x+width,y+height,x+width-r,y+height);
+    ctx.lineTo(x+r,y+height);ctx.quadraticCurveTo(x,y+height,x,y+height-r);
+    ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
+  }
+  function receiptTextLines(ctx,value,maxWidth){
+    const result=[];
+    for(const paragraph of String(value??'').split(/\n/)){
+      const words=paragraph.split(/\s+/).filter(Boolean);let line='';
+      if(!words.length){result.push('');continue;}
+      for(const word of words){
+        if(ctx.measureText(word).width>maxWidth){
+          if(line){result.push(line);line='';}
+          let fragment='';
+          for(const char of [...word]){const next=fragment+char;if(fragment&&ctx.measureText(next).width>maxWidth){result.push(fragment);fragment=char;}else fragment=next;}
+          line=fragment;continue;
+        }
+        const next=line?`${line} ${word}`:word;
+        if(line&&ctx.measureText(next).width>maxWidth){result.push(line);line=word;}else line=next;
+      }
+      if(line)result.push(line);
+    }
+    return result.length?result:[''];
+  }
+  function drawReceiptLines(ctx,value,x,y,maxWidth,lineHeight,options={}){
+    const {font='400 24px system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif',color='#27374b',align='left'}=options;
+    ctx.font=font;ctx.fillStyle=color;ctx.textAlign=align;ctx.textBaseline='alphabetic';
+    const lines=receiptTextLines(ctx,value,maxWidth);
+    lines.forEach((line,index)=>ctx.fillText(line,x,y+index*lineHeight,maxWidth));
+    return lines.length*lineHeight;
+  }
+  async function createReceiptPdf(tx){
+    const width=1240,height=1754,canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;
+    const ctx=canvas.getContext('2d');if(!ctx)throw new Error('This browser cannot prepare a receipt image.');
+    const from=accountById(tx.accountId),to=tx.toAccountId?accountById(tx.toAccountId):null;
+    const activity=txActivity(tx),isOut=['expense','lent','repay_out'].includes(tx.type),isIn=['income','refund','borrowed','repay_in'].includes(tx.type);
+    const title=String(tx.note||'').trim()||(tx.type==='transfer'?'Account transfer':activity.name);
+    const ref=String(tx.id||'').replace(/[^a-zA-Z0-9_-]/g,'');
+    ctx.fillStyle='#f2f5fa';ctx.fillRect(0,0,width,height);
+    ctx.save();ctx.shadowColor='rgba(25,45,78,.10)';ctx.shadowBlur=32;ctx.shadowOffsetY=10;
+    receiptRoundRect(ctx,58,48,width-116,height-96,32);ctx.fillStyle='#ffffff';ctx.fill();ctx.restore();
+    const left=124,right=width-124,contentWidth=right-left;
+    receiptRoundRect(ctx,left,112,60,60,18);ctx.fillStyle='#dff5eb';ctx.fill();
+    ctx.strokeStyle='#267d60';ctx.lineWidth=5;ctx.lineCap='round';ctx.lineJoin='round';ctx.beginPath();ctx.moveTo(left+16,142);ctx.lineTo(left+26,152);ctx.lineTo(left+45,129);ctx.stroke();
+    ctx.textAlign='left';ctx.textBaseline='alphabetic';ctx.fillStyle='#17283e';ctx.font='700 34px system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';ctx.fillText('Pocketwise',left+82,139);
+    ctx.fillStyle='#748197';ctx.font='500 15px system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';ctx.fillText('PERSONAL FINANCE RECORD',left+82,165);
+    receiptRoundRect(ctx,right-122,121,122,38,19);ctx.fillStyle='#edf8f2';ctx.fill();ctx.strokeStyle='#d4eee1';ctx.lineWidth=1.5;ctx.stroke();
+    ctx.textAlign='center';ctx.fillStyle='#247c5e';ctx.font='700 15px system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';ctx.fillText('SAVED',right-61,146);
+    let y=222;ctx.strokeStyle='#e8edf4';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(left,y);ctx.lineTo(right,y);ctx.stroke();y+=54;
+    ctx.textAlign='left';ctx.fillStyle='#7a879c';ctx.font='600 17px system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';ctx.fillText('TRANSACTION RECEIPT',left,y);y+=58;
+    const titleHeight=drawReceiptLines(ctx,title,left,y,contentWidth,62,{font:'600 52px Georgia, Times New Roman, serif',color:'#192a43'});y+=Math.max(62,titleHeight)+28;
+    ctx.font='700 61px system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';ctx.fillStyle=isOut?'#c34f62':isIn?'#18845f':'#335dd0';ctx.textAlign='left';ctx.fillText(`${isOut?'−':isIn?'+':''}${money(tx.amount)}`,left,y);y+=42;
+    ctx.font='500 21px system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';ctx.fillStyle='#78859a';ctx.fillText(`${typeLabel(tx.type)}  ·  ${tx.date?niceDate(tx.date):'Date not set'}`,left,y);y+=43;
+    ctx.setLineDash([7,9]);ctx.strokeStyle='#ccd5e3';ctx.beginPath();ctx.moveTo(left,y);ctx.lineTo(right,y);ctx.stroke();ctx.setLineDash([]);y+=18;
+    const fields=[['Reference ID',ref||'Not available'],['Activity',activity.name],['Account',from.name]];
+    if(to)fields.push(['Transferred to',to.name]);
+    fields.push(['Payment method',tx.paymentMethod||'Not specified'],['Record status','Saved on this device'],['Saved on',tx.createdAt?new Date(tx.createdAt).toLocaleString():niceDate(tx.date)]);
+    for(const [label,value] of fields){
+      const valueWidth=contentWidth*.57;ctx.font='500 20px system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
+      const lines=receiptTextLines(ctx,value,valueWidth);const rowHeight=Math.max(58,lines.length*28+22);
+      ctx.textAlign='left';ctx.fillStyle='#758197';ctx.fillText(label,left,y+34);
+      ctx.textAlign='right';ctx.fillStyle='#29384d';ctx.font='500 20px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
+      const actualLines=receiptTextLines(ctx,value,valueWidth);actualLines.forEach((line,index)=>ctx.fillText(line,right,y+30+index*28,valueWidth));
+      y+=rowHeight;ctx.strokeStyle='#edf1f6';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(left,y);ctx.lineTo(right,y);ctx.stroke();
+    }
+    if(tx.note){
+      y+=28;ctx.font='600 15px system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';const noteLines=receiptTextLines(ctx,tx.note,contentWidth-40);
+      const noteHeight=Math.max(96,noteLines.length*28+58);receiptRoundRect(ctx,left,y,contentWidth,noteHeight,18);ctx.fillStyle='#f4f7fc';ctx.fill();ctx.strokeStyle='#e7edf6';ctx.stroke();
+      ctx.textAlign='left';ctx.fillStyle='#7a879c';ctx.fillText('NOTE',left+22,y+30);
+      drawReceiptLines(ctx,tx.note,left+22,y+64,contentWidth-44,28,{font:'400 21px system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif',color:'#354257'});y+=noteHeight+24;
+    }
+    const disclaimer='This is a Pocketwise personal record generated from information you entered. It is not a bank, card-network, or UPI-issued receipt and does not independently prove payment settlement.';
+    const footerY=Math.max(y+46,height-180);
+    ctx.strokeStyle='#e9edf4';ctx.beginPath();ctx.moveTo(left,footerY-28);ctx.lineTo(right,footerY-28);ctx.stroke();
+    drawReceiptLines(ctx,disclaimer,left,footerY,contentWidth,27,{font:'400 17px system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif',color:'#78859a'});
+    ctx.fillStyle='#8995a8';ctx.font='500 15px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';ctx.textAlign='left';ctx.fillText('PRIVATE BY DESIGN',left,height-107);ctx.textAlign='right';ctx.fillText(`RECEIPT · ${(ref.slice(-8)||'LOCAL').toUpperCase()}`,right,height-107);
+    const jpeg=await new Promise((resolve,reject)=>canvas.toBlob(blob=>blob?resolve(blob):reject(new Error('Could not render the receipt.')),'image/jpeg',.96));
+    const jpegBytes=new Uint8Array(await jpeg.arrayBuffer()),encoder=new TextEncoder();
+    const chunks=[];let total=0;const offsets=[0];
+    const push=chunk=>{const bytes=typeof chunk==='string'?encoder.encode(chunk):chunk;chunks.push(bytes);total+=bytes.length;};
+    push(new Uint8Array([37,80,68,70,45,49,46,52,10,37,226,227,207,211,10]));
+    const object=(id,body)=>{offsets[id]=total;push(`${id} 0 obj\n${body}\nendobj\n`);};
+    object(1,'<< /Type /Catalog /Pages 2 0 R >>');
+    object(2,'<< /Type /Pages /Kids [3 0 R] /Count 1 >>');
+    object(3,'<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>');
+    offsets[4]=total;push(`4 0 obj\n<< /Type /XObject /Subtype /Image /Width ${width} /Height ${height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jpegBytes.length} >>\nstream\n`);push(jpegBytes);push('\nendstream\nendobj\n');
+    const content='q\n595.28 0 0 841.89 0 0 cm\n/Im0 Do\nQ';object(5,`<< /Length ${encoder.encode(content).length} >>\nstream\n${content}\nendstream`);
+    const xref=total;push('xref\n0 6\n0000000000 65535 f \n');for(let id=1;id<=5;id++)push(`${String(offsets[id]).padStart(10,'0')} 00000 n \n`);
+    push(`trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`);
+    const pdfBlob=new Blob(chunks,{type:'application/pdf'}),fileName=`Pocketwise-Receipt-${(ref.slice(-8)||'local').toUpperCase()}.pdf`;
+    return typeof File==='function'?new File([pdfBlob],fileName,{type:'application/pdf'}):Object.assign(pdfBlob,{name:fileName});
+  }
+  function downloadReceiptFile(file){
+    const url=URL.createObjectURL(file),anchor=document.createElement('a');anchor.href=url;anchor.download=file.name||'Pocketwise-Receipt.pdf';anchor.rel='noopener';anchor.style.display='none';document.body.append(anchor);anchor.click();anchor.remove();setTimeout(()=>URL.revokeObjectURL(url),120000);
+  }
+  async function shareOrDownloadReceipt(tx){
+    try{
+      const file=await createReceiptPdf(tx);
+      if(typeof navigator.share==='function'&&typeof navigator.canShare==='function'&&navigator.canShare({files:[file]})){
+        try{await navigator.share({files:[file],title:'Pocketwise receipt',text:'Personal finance receipt, created on this device.'});}
+        catch(error){if(error?.name!=='AbortError')throw error;}
+        return;
+      }
+      downloadReceiptFile(file);toast('Receipt PDF prepared. Open it to print or save it.','success');
+    }catch(error){console.error('Pocketwise receipt PDF export failed.',error);toast(error.message||'Could not prepare the receipt PDF. Try opening Pocketwise in Safari and printing again.','error');}
+  }
   function showTransactionReceipt(tx){
     const dlg=$('#app-modal');
     dlg.classList.add('receipt-modal');
-    openModal('Receipt preview',`<div class="receipt-preview-layout"><div class="receipt-scroll">${receiptMarkup(tx)}</div><div class="receipt-actions"><button class="secondary-button" type="button" id="receipt-close-action" data-cancel-modal>Close</button><button class="primary-button" type="button" id="print-receipt" data-print-receipt="${escapeHTML(tx.id)}">${icon('download')} Print / Save PDF</button></div></div>`,'SAVE OR PRINT');
+    const actionLabel=isIOSStandalone?'Save / Share PDF':'Print / Save PDF';
+    openModal('Receipt preview',`<div class="receipt-preview-layout"><div class="receipt-scroll">${receiptMarkup(tx)}</div><div class="receipt-actions"><button class="secondary-button" type="button" id="receipt-close-action" data-cancel-modal>Close</button><button class="primary-button" type="button" id="print-receipt" data-print-receipt="${escapeHTML(tx.id)}">${icon('download')} ${actionLabel}</button></div></div>`,'SAVE OR PRINT');
     dlg.classList.add('receipt-modal');
-    // Bind the two critical actions directly. This deliberately does not depend on
-    // the document-level delegated listener, which can be disrupted by nested UI.
-    const closeButton=$('#receipt-close-action');
-    const printButton=$('#print-receipt');
+    const closeButton=$('#receipt-close-action'),printButton=$('#print-receipt');
     closeButton?.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();closeModal();},{once:true});
-    printButton?.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();printTransactionReceipt(tx.id);},{once:true});
+    printButton?.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();void printTransactionReceipt(tx.id);},{once:true});
     dlg.querySelector('.receipt-scroll')?.scrollTo?.({top:0,behavior:'auto'});
     closeButton?.focus({preventScroll:true});
   }
-  function printTransactionReceipt(id){
+  async function printTransactionReceipt(id){
     const tx=state.transactions.find(item=>item.id===id);if(!tx){toast('This transaction could not be found.','error');return;}
-    // Print in the current browsing context. This avoids Safari/iOS popup blockers and keeps records local.
+    // iOS Home Screen apps can silently ignore window.print(). Create a true local PDF instead.
+    if(isIOSStandalone){closeModal();await shareOrDownloadReceipt(tx);return;}
+    // Close the native top-layer dialog before printing, so it cannot cover the printable root.
+    closeModal();
     const existing=$('#receipt-print-root');if(existing)existing.remove();
     const root=document.createElement('div');root.id='receipt-print-root';root.innerHTML=receiptMarkup(tx);document.body.append(root);
     document.body.classList.add('printing-receipt');
-    const cleanup=()=>{document.body.classList.remove('printing-receipt');root.remove();window.removeEventListener('afterprint',cleanup);};
+    let fallbackTimer=0;
+    const cleanup=()=>{if(fallbackTimer)clearTimeout(fallbackTimer);document.body.classList.remove('printing-receipt');root.remove();window.removeEventListener('afterprint',cleanup);};
     window.addEventListener('afterprint',cleanup,{once:true});
-    try{window.print();}catch(error){cleanup();toast('Printing is not available in this browser. Try Share → Print in Safari.','amber');return;}
-    // Some iOS standalone versions do not fire afterprint consistently; leave the printable view only while the dialog is active.
-    setTimeout(()=>{if(document.body.classList.contains('printing-receipt'))cleanup();},30000);
+    try{window.print();}
+    catch(error){cleanup();toast('Print is unavailable here. Preparing a PDF instead.','amber');await shareOrDownloadReceipt(tx);return;}
+    // Some WebKit standalone builds skip afterprint; keep the document stable long enough for print UI.
+    fallbackTimer=setTimeout(cleanup,120000);
   }
   function confirmDeleteTransaction(id){const tx=state.transactions.find(t=>t.id===id);if(!tx)return;const debt=(tx.debtId&&['borrowed','lent'].includes(tx.type))?state.debts.find(d=>d.id===tx.debtId):null;window.__pocketwiseUndoTx={tx:{...tx},debt:debt?{...debt}:null};state.transactions=state.transactions.filter(t=>t.id!==id);if(debt)state.debts=state.debts.filter(d=>d.id!==debt.id);persist().then(()=>{closeModal();renderAll();const region=$('#toast-region');region.querySelectorAll('.toast').forEach(el=>el.remove());const el=document.createElement('div');el.className='toast';el.innerHTML=`${icon('check')}<span>Transaction deleted.</span><button type="button" class="text-button" data-undo-tx="${'${escapeHTML(tx.id)}'}">Undo</button>`;region.append(el);setTimeout(()=>el.remove(),6000);});}
   function accountsManager(){openModal('Accounts',`<div class="modal-body"><div class="entity-list">${state.accounts.map(a=>`<div class="entity-row"><span class="transaction-icon blue">${icon(a.type==='cash'?'wallet':a.type==='card'?'receipt':'dollar')}</span><div class="entity-copy"><strong>${escapeHTML(a.name)}</strong><small>${escapeHTML(a.type)} · Opening balance ${money(a.openingBalance)}</small></div><div class="entity-value">${fmtHidden(balanceForAccount(a.id))}</div><div class="entity-actions"><button class="mini-button" data-account-edit="${a.id}" title="Edit account">${icon('edit')}</button>${state.accounts.length>1?`<button class="mini-button" data-account-remove="${a.id}" title="Remove account">${icon('trash')}</button>`:''}</div></div>`).join('')}</div><div class="modal-section-title">ADD AN ACCOUNT</div><form id="account-form"><div class="form-grid"><div class="form-field"><label for="account-name">ACCOUNT NAME</label><input id="account-name" name="name" placeholder="e.g. Scholarship account" required></div><div class="form-field"><label for="account-type">TYPE</label><select id="account-type" name="type"><option value="cash">Cash</option><option value="bank">Bank / UPI</option><option value="card">Card</option><option value="savings">Savings</option><option value="other">Other</option></select></div><div class="form-field full"><label for="account-opening">OPENING BALANCE · INR</label><input id="account-opening" name="openingBalance" type="number" step="0.01" value="0"></div></div><div class="form-actions"><button class="primary-button" type="submit">Add account</button></div></form><div class="form-actions"><button class="secondary-button" data-cancel-modal>Done</button></div></div>`,'ACCOUNTS');}
@@ -589,7 +706,8 @@
     bindMoneyEntry('[data-add-type]',button=>transactionForm(null,button.dataset.addType));
     if(isAndroid){$('#shortcut-import-setting')?.remove();$('#apple-shortcut-setting')?.remove();$('#backtap-setting')?.remove();}
     const appModal=$('#app-modal');
-    appModal.addEventListener('cancel',()=>{ currentEditId=null; });
+    appModal.addEventListener('cancel',()=>{ currentEditId=null; appModal.classList.remove('receipt-modal'); });
+    appModal.addEventListener('close',()=>{ if(!appModal.open){currentEditId=null;appModal.classList.remove('receipt-modal');} });
     appModal.addEventListener('click',event=>{ if(event.target===appModal)closeModal(); });
     document.addEventListener('click', async event=>{
       if(event.target.closest('#edit-profile')){showProfileForm(false);return;}
@@ -602,7 +720,7 @@
       const quickActivity=event.target.closest('[data-quick-activity]');if(quickActivity&&quickAddDraft){quickAddDraft.activityId=quickActivity.dataset.quickActivity;renderQuickAddStep('note');return;}
       const quickBack=event.target.closest('[data-quick-back]');if(quickBack&&quickAddDraft){renderQuickAddStep(quickBack.dataset.quickBack);return;}
       if(event.target.closest('#quick-flow-skip')){const note=$('#quick-flow-note-value');quickAddDraft.note=String(note?.value||'').trim();const account=$('#quick-flow-account'),payment=$('#quick-flow-payment');if(account)quickAddDraft.accountId=account.value;if(payment)quickAddDraft.paymentMethod=payment.value;await saveQuickAdd();return;}
-      const pageBtn=event.target.closest('[data-page]');if(pageBtn){setPage(pageBtn.dataset.page);return;}
+      const pageBtn=event.target.closest('button[data-page]');if(pageBtn){setPage(pageBtn.dataset.page);return;}
       const typeBtn=event.target.closest('.type-switch button[data-type]');if(typeBtn&&typeBtn.closest('#transaction-form')){event.preventDefault();currentTxType=typeBtn.dataset.type;const form=$('#transaction-form');form.dataset.type=currentTxType;$$('.type-switch [data-type]',form).forEach(b=>{b.classList.toggle('selected',b===typeBtn);b.setAttribute('aria-pressed',b===typeBtn?'true':'false');});const act=$('#tx-activity');const wanted=currentTxType==='income'?'salary':currentTxType==='refund'?'refunds':'food';act.innerHTML=activityOptions(currentTxType==='refund'?'refund':currentTxType,wanted);const note=$('#tx-form-note');if(note)note.textContent=currentTxType==='transfer'?'Transfers change account balances but do not count as income or spending.':currentTxType==='refund'?'Refunds reduce recorded spending, rather than inflate income.':'Choose a category to keep your records organized.';const accountField=$('#tx-account')?.closest('.form-field');if(accountField){const label=accountField.querySelector('label');if(label)label.textContent=currentTxType==='transfer'?'FROM ACCOUNT':'ACCOUNT';}if(currentTxType==='transfer'&&!$('#tx-to-account')){$('#tx-account').closest('.form-field').insertAdjacentHTML('afterend',`<div class="form-field" id="tx-to-account-wrap"><label for="tx-to-account">TO ACCOUNT</label><select id="tx-to-account" name="toAccountId">${accountOptions(state.accounts.find(a=>a.id!==$('#tx-account').value)?.id)}</select></div>`);}else if(currentTxType!=='transfer')$('#tx-to-account-wrap')?.remove();return;}
       const debtDir=event.target.closest('[data-debt-direction]');if(debtDir){const direction=debtDir.dataset.debtDirection;$('#debt-direction').value=direction;$$('[data-debt-direction]').forEach(b=>{b.classList.toggle('selected',b===debtDir);b.setAttribute('aria-pressed',b===debtDir?'true':'false')});const label=$('#debt-amount')?.closest('.form-field')?.querySelector('label');if(label)label.textContent=(direction==='lent'?'AMOUNT THEY OWE YOU':'AMOUNT YOU OWE')+' · INR';const note=$('.debt-form .form-note');if(note)note.textContent=direction==='lent'?'This tracks money you expect to get back. It is not counted as spending.':'This tracks money you need to repay. It is not counted as income.';return;}
       const closeBtn=event.target.closest('[data-cancel-modal]');if(closeBtn){closeModal();return;}
