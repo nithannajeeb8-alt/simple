@@ -95,3 +95,50 @@ button:disabled{filter:saturate(.65)}
 }
 @media(max-width:370px){.shortcut-return-toast{grid-template-columns:20px minmax(0,1fr) auto}.shortcut-return-toast #resume-key{grid-column:3}.shortcut-return-toast #resume-paste{grid-column:3}.shortcut-return-toast>span:not(.icon-wrap){grid-column:2;grid-row:1 / span 2}.shortcut-return-toast .toast-action{min-width:50px}.balance-number{font-size:38px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}body::before{animation:none;will-change:auto}}
+
+/* v4.2 transaction editor: explicit hierarchy, reliable hit areas, and a visible save action. */
+.app-modal[open]{z-index:1000;pointer-events:auto;isolation:isolate;overscroll-behavior:contain;touch-action:pan-y}
+.app-modal::backdrop{background:rgba(15,26,49,.52);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.app-modal .modal-head{background:rgba(255,255,255,.98)}
+.transaction-editor{gap:17px;padding:22px 24px 0}
+.transaction-editor-intro p{margin:7px 0 0;color:#687895;font-size:13px;line-height:1.5}
+.transaction-editor .type-switch{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;padding:5px;border:1px solid #e3e9f4;border-radius:17px;background:#f5f7fb}
+.transaction-editor .type-switch button{min-height:44px;padding:9px 6px;border:1px solid transparent;border-radius:12px;font-size:13px;font-weight:750;transition:background .18s ease,color .18s ease,box-shadow .18s ease,border-color .18s ease}
+.transaction-editor .type-switch button.selected{background:#fff;color:#3158c8;border-color:#e3eaff;box-shadow:0 3px 10px rgba(34,55,103,.08)}
+.amount-entry-panel{padding:17px 18px 14px;border:1px solid #dfe7f7;border-radius:20px;background:linear-gradient(145deg,#f7f9ff,#fff 75%)}
+.amount-entry-panel>label{display:flex;justify-content:space-between;gap:12px;color:#71809a;font-size:10px;font-weight:850;letter-spacing:.12em}
+.amount-entry-panel>label span{letter-spacing:.04em;font-weight:700;color:#9aa6bb}
+.amount-entry-input{display:flex;align-items:center;gap:9px;margin-top:5px}
+.amount-entry-input>span{font:750 27px/1 var(--display);color:#7e8baa}
+.amount-entry-input .amount-input{width:100%;min-width:0;min-height:58px;padding:0;border:0;border-radius:0;background:transparent;color:#172b54;font:800 clamp(34px,7vw,44px)/1.1 var(--display);letter-spacing:-.06em;font-variant-numeric:tabular-nums;box-shadow:none!important}
+.amount-entry-input .amount-input:focus{outline:none}
+.amount-helper{margin:5px 0 0;color:#7886a0;font-size:11px;line-height:1.5}
+.transaction-fields{gap:15px;margin-top:0!important}
+.transaction-fields .form-field label{display:flex;align-items:center;gap:7px;font-size:10px;letter-spacing:.11em}
+.optional-label{color:#a2acc0;font-size:9px;letter-spacing:.06em}
+.transaction-fields .form-field input,.transaction-fields .form-field select,.transaction-fields .form-field textarea{min-height:48px;border-color:#dfe6f1;border-radius:13px;background:#fff;font-size:14px}
+.transaction-fields .form-field textarea{min-height:74px}
+.transaction-editor .form-note{margin:0;background:#f6f8fc;border:1px solid #edf0f7;color:#657590}
+.transaction-form-actions{position:sticky;bottom:-1px;z-index:5;display:grid;grid-template-columns:minmax(88px,.65fr) minmax(0,1.35fr);gap:9px;margin:0 -24px 0;padding:14px 24px calc(16px + var(--safe-bottom));border-top:1px solid #e8edf6;background:rgba(255,255,255,.97);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.transaction-form-actions .primary-button{grid-column:2;grid-row:1;min-height:50px;border-radius:15px;box-shadow:0 8px 18px rgba(49,85,200,.2)}
+.transaction-form-actions>[data-cancel-modal]{grid-column:1;grid-row:1;min-height:50px}
+.transaction-form-actions .save-another-button{grid-column:1/-1;grid-row:2;min-height:44px;background:#f7f9fd}
+.transaction-editor .field-error{margin:5px 0 0}
+#mobile-add,#top-add,[data-add-type],#activity-add,[data-action="add"]{pointer-events:auto;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.mobile-tabbar{isolation:isolate;pointer-events:auto}
+@media(max-width:760px){
+ .app-modal{position:fixed;inset:auto 0 0;margin:auto auto 0;width:100%;max-width:100%;max-height:calc(94dvh - var(--safe-bottom));border-radius:27px 27px 0 0;border-bottom:0;padding-bottom:env(safe-area-inset-bottom,0px);overscroll-behavior:contain}
+ .app-modal .modal-head{padding:17px 18px}
+ .transaction-editor{gap:15px;padding:18px 18px 0}
+ .transaction-editor .type-switch{grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;padding:4px}
+ .transaction-editor .type-switch button{min-height:43px;padding:8px 3px;font-size:12px}
+ .amount-entry-panel{padding:15px 15px 13px;border-radius:18px}
+ .amount-entry-input .amount-input{font-size:39px;min-height:52px}
+ .transaction-fields{grid-template-columns:minmax(0,1fr);gap:13px}
+ .transaction-fields .form-field.full{grid-column:auto}
+ .transaction-form-actions{margin:0 -18px;padding:12px 18px calc(13px + var(--safe-bottom));grid-template-columns:minmax(82px,.7fr) minmax(0,1.3fr)}
+ .transaction-form-actions .primary-button,.transaction-form-actions>[data-cancel-modal]{min-height:50px;font-size:14px}
+ .transaction-form-actions .save-another-button{grid-column:1/-1}
+}
+@media(max-width:370px){.transaction-editor .type-switch button{font-size:11px}.transaction-editor{padding-left:14px;padding-right:14px}.transaction-form-actions{margin-inline:-14px;padding-inline:14px}}
+@media(prefers-reduced-motion:reduce){.transaction-editor .type-switch button{transition:none}}

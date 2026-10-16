@@ -1,6 +1,6 @@
 {
   "id": "/PocketWise/",
-  "name": "Pocketwise · Money, made clearer",
+  "name": "Pocketwise \u00b7 Money, made clearer",
   "short_name": "Pocketwise",
   "description": "A private, offline-first personal finance companion.",
   "lang": "en-IN",
@@ -78,5 +78,6 @@
         }
       ]
     }
-  ]
+  ],
+  "version": "4.2.0"
 }
