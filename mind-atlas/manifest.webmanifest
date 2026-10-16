@@ -1,0 +1,10 @@
+{
+  "name": "Mind Atlas",
+  "short_name": "Mind Atlas",
+  "description": "A private, evolving map of what you learn, think, and create.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#080807",
+  "theme_color": "#080807",
+  "icons": []
+}

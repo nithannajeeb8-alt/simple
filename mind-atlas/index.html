@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#080807">
+  <meta name="description" content="Mind Atlas — a private, evolving map of what you learn, think, and create.">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="./styles.css">
+  <title>Mind Atlas</title>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand"><div class="brand-mark">M</div><div><strong>Mind Atlas</strong><span>PERSONAL KNOWLEDGE SYSTEM</span></div></div>
+      <button class="new-note" id="newNote"><span>＋</span> New thought</button>
+      <nav class="nav">
+        <button class="nav-item active" data-view="home"><span>⌂</span> Overview</button>
+        <button class="nav-item" data-view="library"><span>▤</span> Library</button>
+        <button class="nav-item" data-view="graph"><span>⌘</span> Knowledge graph</button>
+        <button class="nav-item" data-view="progress"><span>◷</span> Progress</button>
+        <button class="nav-item" data-view="installer"><span>◈</span> Components</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="local-status"><i></i><div><strong>Local workspace</strong><small>Your notes stay in this browser</small></div></div>
+        <button class="nav-item" data-view="settings"><span>⚙</span> Settings</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="mobile-brand"><div class="brand-mark">M</div><strong>Mind Atlas</strong></div>
+        <div class="breadcrumb" id="breadcrumb">YOUR SPACE <span>/</span> OVERVIEW</div>
+        <div class="top-actions"><span class="date-label" id="todayLabel"></span><button class="icon-btn" id="exportBtn" title="Export your data">↗</button><button class="avatar" title="Personal workspace">N</button></div>
+      </header>
+      <div class="content" id="content"></div>
+      <nav class="mobile-nav">
+        <button class="active" data-view="home"><span>⌂</span><small>Home</small></button>
+        <button data-view="library"><span>▤</span><small>Library</small></button>
+        <button data-view="graph"><span>⌘</span><small>Graph</small></button>
+        <button data-view="progress"><span>◷</span><small>Progress</small></button>
+        <button data-view="installer"><span>◈</span><small>Setup</small></button>
+      </nav>
+    </main>
+  </div>
+
+  <dialog id="noteDialog" class="modal">
+    <form id="noteForm" method="dialog">
+      <div class="modal-head"><div><span class="eyebrow">CAPTURE A THOUGHT</span><h2 id="dialogTitle">New thought</h2></div><button class="icon-btn" type="button" id="closeDialog">×</button></div>
+      <label for="noteTitle">Title</label><input id="noteTitle" maxlength="180" placeholder="What is on your mind?" required>
+      <label for="noteSubject">Subject</label><input id="noteSubject" maxlength="80" placeholder="e.g. Philosophy, AI, Business">
+      <label for="noteBody">Your note</label><textarea id="noteBody" rows="7" placeholder="Write freely. Connections and patterns can be discovered later." required></textarea>
+      <div class="modal-foot"><span class="privacy-note">Saved to this browser</span><button class="primary-btn" type="submit">Save thought <span>↗</span></button></div>
+    </form>
+  </dialog>
+  <input type="file" id="importFile" accept=".json" hidden>
+  <div class="toast" id="toast" role="status"></div>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
