@@ -252,46 +252,11 @@
   function updateDateHeader(){const now=new Date();$('#date-eyebrow').textContent=now.toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'long'}).toUpperCase();}
   function setPage(page){if(!['home','activity','insights','settings'].includes(page))page='home';currentPage=page;$$('.page').forEach(p=>p.classList.toggle('active',p.dataset.pagePanel===page));$$('[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page===page));const heads={home:['Good to see you.','A clearer view of what you have and where it goes.'],activity:['Your money, accounted for.','Search, revisit and understand every recorded activity.'],insights:['Make the patterns visible.','The bigger picture, without the spreadsheet headache.'],settings:['Make it yours.','A few thoughtful controls to keep things useful and private.']};$('#page-title').textContent=heads[page][0];$('#page-subtitle').textContent=heads[page][1];$('#page-title').parentElement.style.display='';window.scrollTo({top:0,behavior:'smooth'});renderPage(page);}
   function applyHiddenAmounts(){document.body.classList.toggle('hide-amounts',hiddenAmounts||state.settings.hideBalances);$('#hide-balances').setAttribute('aria-label',(hiddenAmounts||state.settings.hideBalances)?'Show balances':'Hide balances');}
-  // Compute the two outer-ring segments from this month's totals. In a loss
-  // state the complete outer arc becomes red, so a large leftover grey section
-  // cannot imply that income is winning. Empty months keep the neutral track.
-  function outerArcLengths(incomeValue, expenseValue, netValue){
-    const income=Math.max(0,Number(incomeValue)||0);
-    const expenses=Math.max(0,Number(expenseValue)||0);
-    const total=income+expenses;
-    const isLoss=Number(netValue)<0;
-    const availableArc=total>0?98:0;
-    const incomeLen=!isLoss&&total>0?(income/total)*availableArc:0;
-    const expenseLen=isLoss&&total>0?100:(total>0?(expenses/total)*availableArc:0);
-    const expenseOffset=isLoss?0:(expenseLen>0.05?-(100-expenseLen):0);
-    return {incomeLen,expenseLen,expenseOffset,isLoss,total};
-  }
 
   function updateMoneyText(){
-    const bal=totalBalance(),t=totalsFor(periodTransactions('month')),dt=debtTotals(),budget=budgetAmount(),spent=spentForMonth(),daysTotal=new Date(new Date().getFullYear(),new Date().getMonth()+1,0).getDate(),day=new Date().getDate(),daysLeft=daysTotal-day;
+    const bal=totalBalance(),t=totalsFor(periodTransactions('month')),dt=debtTotals(),budget=budgetAmount(),spent=spentForMonth();
     $$('[data-money="balance"]').forEach(el=>el.textContent=fmtHidden(bal));$$('[data-money="income"]').forEach(el=>el.textContent=fmtHidden(t.income));$$('[data-money="expense"]').forEach(el=>el.textContent=fmtHidden(t.expenses));$$('[data-money="net"]').forEach(el=>el.textContent=fmtHidden(t.net));$$('[data-money="safe"]').forEach(el=>el.textContent=fmtHidden(safeToSpend()));$$('[data-money="receivable"]').forEach(el=>el.textContent=fmtHidden(dt.receivable));$$('[data-money="payable"]').forEach(el=>el.textContent=fmtHidden(dt.payable));
-    const percent=budget?Math.min(spent/budget*100,100):0;$('#budget-progress').style.width=`${percent}%`;$('#budget-progress').style.background=budget&&spent>budget?'var(--red)':'var(--green)';$('#budget-percent').textContent=budget?`${Math.round(spent/budget*100)}% used`:'Set a limit';$('[data-money="budget"]').textContent=budget?fmtHidden(budget):'Not set';$('#budget-spent-text').textContent=budget?`${money(spent)} spent`:'Set a budget to begin';$('#budget-left-text').textContent=budget?`${money(Math.max(0,budget-spent))} left`:'';$('#days-left').textContent=daysLeft;$('#period-caption').textContent=`${day} of ${daysTotal} days elapsed`;
-    // Match the reference: income grows inward from the LEFT endpoint, while
-    // spending grows inward from the RIGHT endpoint on the SAME semicircle.
-    // A small neutral break separates the segments. Zero-length rounded SVG
-    // dashes can look like dots, so hide empty segments completely.
-    const arc=outerArcLengths(t.income,t.expenses,t.net);
-    const {incomeLen,expenseLen,expenseOffset}=arc;
-    const incomeArc=$('.arc-income'), expenseArc=$('.arc-expense');
-    incomeArc.style.strokeDasharray=incomeLen>0.05?`${incomeLen} 100`:'0 100';
-    incomeArc.style.strokeDashoffset='0';
-    incomeArc.style.opacity=incomeLen>0.05?'1':'0';
-    incomeArc.style.visibility=incomeLen>0.05?'visible':'hidden';
-    expenseArc.style.strokeDasharray=expenseLen>0.05?`${expenseLen} 100`:'0 100';
-    // A monthly loss uses a full 100-unit dash with zero offset, covering both
-    // rounded endpoints and eliminating the grey gap seen in the loss state.
-    expenseArc.style.strokeDashoffset=String(expenseOffset);
-    expenseArc.style.opacity=expenseLen>0.05?'1':'0';
-    expenseArc.style.visibility=expenseLen>0.05?'visible':'hidden';
-    const elapsedPct=Math.max(0,Math.min(100,day/daysTotal*100));
-    $('.days-progress').style.strokeDasharray=`${elapsedPct} 100`;
-    const mobileProgress=$('.mobile-inner-progress');
-    if(mobileProgress){mobileProgress.style.strokeDasharray=elapsedPct>0.05?`${elapsedPct} 100`:'0 100';mobileProgress.style.strokeDashoffset='0';}
+    const percent=budget?Math.min(spent/budget*100,100):0;$('#budget-progress').style.width=`${percent}%`;$('#budget-progress').style.background=budget&&spent>budget?'var(--red)':'var(--green)';$('#budget-percent').textContent=budget?`${Math.round(spent/budget*100)}% used`:'Set a limit';$('[data-money="budget"]').textContent=budget?fmtHidden(budget):'Not set';$('#budget-spent-text').textContent=budget?`${money(spent)} spent`:'Set a budget to begin';$('#budget-left-text').textContent=budget?`${money(Math.max(0,budget-spent))} left`:'';
     if(t.net<0) $$('[data-money="net"]').forEach(el=>el.style.color='var(--red)');else $$('[data-money="net"]').forEach(el=>el.style.color='var(--green)');
     $('#activity-count').textContent=state.transactions.length;
     renderBudgetCategoryPreview();
