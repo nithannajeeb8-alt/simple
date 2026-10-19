@@ -348,9 +348,9 @@ html.large-text{--font-scale:1.08} html.xlarge-text{--font-scale:1.16}
   body.qp-keyboard-open #screen-editor:has(#editorBody:focus) .editor-field:has(#editorTitle) { display:none !important; }
   body.qp-keyboard-open #screen-editor .editor-field.writing-field { margin-top:0 !important; }
   body.qp-keyboard-open #screen-editor .rich-toolbar {
-    /* Keep formatting at the bottom, immediately above the iOS keyboard. */
+    /* Compact keyboard mode; V24's final override anchors the revealed bar at the top. */
     position:fixed !important; left:10px; right:10px;
-    bottom:calc(var(--qp-keyboard-bottom, 0px) + 8px) !important; top:auto !important;
+    top:calc(env(safe-area-inset-top, 0px) + 8px) !important; bottom:auto !important;
     z-index:1000; display:flex; flex-wrap:nowrap; overflow-x:auto; overscroll-behavior-x:contain; scrollbar-width:none;
     width:auto; max-width:none; margin:0 !important; padding:7px !important; gap:5px !important;
     border:1px solid var(--line); border-radius:15px !important; background:color-mix(in srgb,var(--surface) 96%,transparent);
@@ -500,8 +500,8 @@ html[data-theme="midnight"] .detail-photo-overlay button,html[data-theme="ember"
 .app-shell:focus,.app-shell:focus-visible,#mainContent:focus,#mainContent:focus-visible,
 #screen-editor:focus,#screen-editor:focus-visible { outline:none !important; }
 
-/* V17 scroll-direction formatting bar. Space remains reserved while the bar
-   tucks away, avoiding a layout jump; the keyboard-pinned mode always stays open. */
+/* Scroll-direction formatting bar. Space remains reserved while the bar
+   tucks away, avoiding a layout jump; keyboard visibility does not override scroll intent. */
 #screen-editor .rich-toolbar {
   transition: transform .18s ease, opacity .18s ease, box-shadow .18s ease;
   transform: translateY(0);
@@ -511,11 +511,6 @@ html[data-theme="midnight"] .detail-photo-overlay button,html[data-theme="ember"
   transform: translateY(calc(-100% - 14px));
   opacity: 0;
   pointer-events: none;
-}
-body.qp-keyboard-open #screen-editor .rich-toolbar:not(.qp-toolbar-hidden) {
-  transform: translateY(0) !important;
-  opacity: 1 !important;
-  pointer-events: auto !important;
 }
 html.reduce-motion #screen-editor .rich-toolbar { transition:none !important; }
 
@@ -540,23 +535,29 @@ html.reduce-motion #screen-editor .rich-toolbar { transition:none !important; }
 #screen-editor .qp-date-today { display:block; margin:10px auto 0; padding:7px 13px; border:1px solid var(--line); border-radius:999px; background:var(--accent-soft); color:var(--accent-strong); font-size:11px; font-weight:700; }
 
 
-/* V22 keyboard accessory hardening: never hide formatting while the iOS keyboard is open. */
+/* V24: when revealed with the iOS keyboard open, keep the toolbar at the TOP
+   of the visible screen, below the safe-area inset. Keyboard visibility alone
+   never reveals it; scroll direction still controls reveal/hide. */
 @media (max-width: 799px) {
-  body.qp-keyboard-open #screen-editor .rich-toolbar,
-  body.qp-keyboard-open #screen-editor .rich-toolbar.qp-toolbar-hidden {
-    display:flex !important;
-    visibility:visible !important;
-    opacity:1 !important;
-    transform:none !important;
-    pointer-events:auto !important;
-  }
   body.qp-keyboard-open #screen-editor .rich-toolbar {
     position:fixed !important;
     left:8px !important;
     right:8px !important;
-    bottom:calc(var(--qp-keyboard-bottom, 0px) + 8px) !important;
-    top:auto !important;
+    top:calc(var(--qp-visual-top, 0px) + env(safe-area-inset-top, 0px) + 8px) !important;
+    bottom:auto !important;
     z-index:10000 !important;
     min-height:56px;
+  }
+}
+@media (max-width: 799px) {
+  body.qp-keyboard-open #screen-editor .rich-toolbar.qp-toolbar-hidden {
+    transform:translateY(calc(-100dvh - 100%)) !important;
+    opacity:0 !important;
+    pointer-events:none !important;
+  }
+  body.qp-keyboard-open #screen-editor .rich-toolbar:not(.qp-toolbar-hidden) {
+    transform:translateY(0) !important;
+    opacity:1 !important;
+    pointer-events:auto !important;
   }
 }

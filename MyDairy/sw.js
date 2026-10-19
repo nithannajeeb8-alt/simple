@@ -1,5 +1,5 @@
 /* Best-effort app-shell cache. User data is stored by the page in IndexedDB, not in this cache. */
-const CACHE_NAME = 'quiet-pages-shell-v22-keyboard-accessory-shortcuts';
+const CACHE_NAME = 'quiet-pages-shell-v24-toolbar-top-position';
 const BASE = self.registration.scope;
 const SHELL = ['./', './index.html', './styles.css', './app.js', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png'];
 

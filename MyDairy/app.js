@@ -1788,11 +1788,14 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
       // Distance from the visible viewport bottom to the layout viewport bottom.
       // Freeze during caret scrolling to avoid the toolbar chasing iOS viewport jitter.
       const keyboardBottom = vv
-        ? Math.max(0, window.innerHeight - (vv.height + (vv.offsetTop || 0)))
+        ? Math.max(0, document.documentElement.clientHeight - (vv.height + (vv.offsetTop || 0)))
         : Math.max(0, baselineHeight - visibleHeight);
-      if (allowReposition || !keyboardLikelyOpen || !wasKeyboardOpen) {
-        document.documentElement.style.setProperty('--qp-keyboard-bottom', `${keyboardLikelyOpen ? keyboardBottom : 0}px`);
-      }
+      // Keep both visual-viewport edges available to CSS. Positioning from the
+      // visible viewport's top edge avoids the double-bottom-offset that made
+      // the toolbar float far above the keyboard on iOS.
+      document.documentElement.style.setProperty('--qp-visual-top', `${Math.max(0, vv?.offsetTop || 0)}px`);
+      document.documentElement.style.setProperty('--qp-visual-height', `${visibleHeight}px`);
+      document.documentElement.style.setProperty('--qp-keyboard-bottom', `${keyboardLikelyOpen ? keyboardBottom : 0}px`);
       document.body.classList.toggle('qp-keyboard-open', keyboardLikelyOpen);
       if (!keyboardLikelyOpen && visibleHeight > baselineHeight - 80) baselineHeight = visibleHeight;
     };
@@ -1876,10 +1879,10 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
       if (!toolbar || !isEditorVisible()) { resetToolbar(); return; }
       const active = document.activeElement;
       const usingToolbar = toolbar.contains(active) || Date.now() < interactionUntil;
-      // In keyboard mode the toolbar is an editor accessory, not a scroll-away
-      // header. Keep it visible above the keyboard even when focus briefly leaves
-      // contenteditable for a formatting button or select.
-      if (document.body.classList.contains('qp-keyboard-open') || usingToolbar || Math.abs(delta) < 0.5) {
+      // Keyboard/VisualViewport movement is not a reading scroll. Only active
+      // toolbar interaction may keep the bar visible; opening the keyboard alone
+      // must never reveal it. A hidden bar returns after 2px of upward scrolling.
+      if (usingToolbar || Math.abs(delta) < 0.5) {
         showToolbar();
         return;
       }
