@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pocketwise-shell-v2.0.5';
+const CACHE_NAME = 'pocketwise-shell-v2.0.8';
 const BASE_URL = self.registration.scope;
 const asset = path => new URL(path, BASE_URL).href;
 const APP_SHELL = [
@@ -6,6 +6,7 @@ const APP_SHELL = [
   asset('index.html'),
   asset('styles.css'),
   asset('app.js'),
+  asset('onboarding.js'),
   asset('pwa.js'),
   asset('manifest.webmanifest'),
   asset('assets/icons/icon.svg'),
