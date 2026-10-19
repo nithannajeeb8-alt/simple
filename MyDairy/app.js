@@ -1839,9 +1839,9 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
   })();
 
 
-  // V17 editor toolbar behaviour: scroll down to get the writing canvas back;
-  // scroll up to bring formatting tools back. Viewport/keyboard movement is not
-  // interpreted as reading scroll, and the toolbar stays available while in use.
+  // V25 editor toolbar behaviour: scroll down to get the writing canvas back;
+  // scroll up by 2px to reveal formatting tools. Each reveal auto-hides after
+  // four seconds unless another reveal/toolbar interaction resets the timer.
   (() => {
     const editorScreen = document.querySelector('#screen-editor');
     let lastWindowY = Math.max(0, window.scrollY || 0);
@@ -1850,14 +1850,18 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
     let upDistance = 0;
     let interactionUntil = 0;
     let syncTimer = 0;
+    let autoHideTimer = 0;
+    const AUTO_HIDE_MS = 4000;
 
     const isEditorVisible = () => Boolean(editorScreen && (currentScreen === 'editor' || editorScreen.classList.contains('active')));
     const currentToolbar = () => editorScreen?.querySelector('.rich-toolbar');
-    const setHidden = hidden => {
+    const setHidden = (hidden, force = false) => {
       const toolbar = currentToolbar();
       if (!toolbar) return;
-      // Do not put a currently focused control inside an inert/hidden subtree.
-      if (hidden && toolbar.contains(document.activeElement)) hidden = false;
+      // Normal hiding avoids stranding keyboard focus. The 4-second timeout
+      // explicitly blurs a toolbar control before hiding it.
+      if (hidden && toolbar.contains(document.activeElement) && !force) hidden = false;
+      if (hidden) clearTimeout(autoHideTimer);
       toolbar.classList.toggle('qp-toolbar-hidden', Boolean(hidden));
       toolbar.setAttribute('aria-hidden', String(Boolean(hidden)));
       toolbar.inert = Boolean(hidden);
@@ -1866,6 +1870,14 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
       downDistance = 0;
       upDistance = 0;
       setHidden(false);
+      clearTimeout(autoHideTimer);
+      autoHideTimer = setTimeout(() => {
+        const toolbar = currentToolbar();
+        if (!toolbar || !isEditorVisible()) return;
+        if (toolbar.contains(document.activeElement)) document.activeElement.blur?.();
+        interactionUntil = 0;
+        setHidden(true, true);
+      }, AUTO_HIDE_MS);
     };
     const resetToolbar = () => {
       downDistance = 0;
@@ -1882,7 +1894,8 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
       // Keyboard/VisualViewport movement is not a reading scroll. Only active
       // toolbar interaction may keep the bar visible; opening the keyboard alone
       // must never reveal it. A hidden bar returns after 2px of upward scrolling.
-      if (usingToolbar || Math.abs(delta) < 0.5) {
+      if (Math.abs(delta) < 0.5) return;
+      if (usingToolbar) {
         showToolbar();
         return;
       }
@@ -1893,7 +1906,7 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
       } else {
         upDistance += Math.abs(delta);
         downDistance = 0;
-        if (upDistance >= 2) setHidden(false);
+        if (upDistance >= 2) showToolbar();
       }
     };
 
