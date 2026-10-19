@@ -15,3 +15,11 @@
 
 ## Not device-verified
 The app has not been run in Safari/iOS or Chrome/Android in this environment. The new import-launcher and Shortcut-banner swipe gestures need confirmation on the user's actual device after deployment. This ZIP is a PWA/source bundle, not an APK.
+
+
+## Floating import launcher animation update
+- Added a 5-second expanded intro on initial page load and when the app returns to the foreground.
+- Launcher smoothly contracts into a circular icon-only button; the button remains clickable and opens payment import.
+- Horizontal swipe-to-dismiss remains enabled.
+- Added reduced-motion handling and bumped the service-worker cache to `v2.0.4`.
+- Real-device visual/gesture verification is still required.

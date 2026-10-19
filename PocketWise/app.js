@@ -946,10 +946,19 @@
   document.addEventListener('pointerup',event=>{const start=txSwipeStart;txSwipeStart=null;if(!start||!start.row.isConnected||!start.id)return;const dx=event.clientX-start.x,dy=event.clientY-start.y;if(dx>72&&dx>Math.abs(dy)*1.35){txSwipeSuppressClickUntil=Date.now()+600;start.row.classList.add('tx-swipe-dismiss');start.row.setAttribute('aria-label','Deleting transaction');setTimeout(()=>{if(start.row.isConnected)confirmDeleteTransaction(start.id);},220);}},{passive:true});
   document.addEventListener('pointercancel',()=>{txSwipeStart=null;},{passive:true});
   document.addEventListener('click',event=>{if(Date.now()<txSwipeSuppressClickUntil&&event.target.closest('.transaction-row')){event.preventDefault();event.stopPropagation();}},true);
-  // Both floating import surfaces can be dismissed with a horizontal swipe in either direction.
-  // The launcher is intentionally hidden only for this page session; reloading restores it.
+  // Import launcher opens expanded, then elegantly contracts to an icon after five seconds.
+  // Returning to the app repeats the short intro; tapping the compact icon still opens import.
   const importLauncher=$('#pw-import-launch');
-  if(importLauncher){let swipe=null;importLauncher.addEventListener('pointerdown',e=>{swipe={x:e.clientX,y:e.clientY};},{passive:true});importLauncher.addEventListener('pointerup',e=>{if(!swipe)return;const dx=e.clientX-swipe.x,dy=e.clientY-swipe.y;swipe=null;if(Math.abs(dx)>55&&Math.abs(dx)>Math.abs(dy)*1.2){importLauncher.classList.add('pw-import-dismissed');setTimeout(()=>{importLauncher.hidden=true;},220);}} ,{passive:true});importLauncher.addEventListener('pointercancel',()=>{swipe=null;},{passive:true});}
+  if(importLauncher){
+    let swipe=null,collapseTimer=null;
+    const expandImportLauncher=()=>{importLauncher.classList.remove('pw-import-compact','pw-import-dismissed');importLauncher.hidden=false;clearTimeout(collapseTimer);collapseTimer=setTimeout(()=>{if(importLauncher.isConnected&&!importLauncher.hidden)importLauncher.classList.add('pw-import-compact');},5000);};
+    expandImportLauncher();
+    window.addEventListener('pageshow',expandImportLauncher);
+    document.addEventListener('visibilitychange',()=>{if(!document.hidden)expandImportLauncher();});
+    importLauncher.addEventListener('pointerdown',e=>{swipe={x:e.clientX,y:e.clientY};},{passive:true});
+    importLauncher.addEventListener('pointerup',e=>{if(!swipe)return;const dx=e.clientX-swipe.x,dy=e.clientY-swipe.y;swipe=null;if(Math.abs(dx)>55&&Math.abs(dx)>Math.abs(dy)*1.2){clearTimeout(collapseTimer);importLauncher.classList.remove('pw-import-compact');importLauncher.classList.add('pw-import-dismissed');setTimeout(()=>{importLauncher.hidden=true;},220);}} ,{passive:true});
+    importLauncher.addEventListener('pointercancel',()=>{swipe=null;},{passive:true});
+  }
   document.addEventListener('click',e=>{if(e.target.closest('#pw-import-launch'))pwShowImport();if(e.target.closest('#pw-parse-payment')){const parsed=pwParsePaymentText($('#pw-import-raw')?.value||'');pwReviewImport(parsed);} });
   // iOS may strip query parameters when launching an installed PWA. Clipboard paste remains the reliable fallback.
   (function(){try{const q=new URLSearchParams(location.search);const payload=q.get('transaction')||q.get('payload')||q.get('text');if(payload){history.replaceState({},'',location.pathname);setTimeout(()=>{pwShowImport();const el=$('#pw-import-raw');if(el)el.value=payload;},350);}if(q.get('quickadd'))setTimeout(()=>showAddEntryChoices(),400);}catch{}})();
