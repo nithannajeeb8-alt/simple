@@ -157,6 +157,15 @@
       error.cause = indexedError || localError;
       throw error;
     }
+    // Native Android wrapper bridge: keep the home-screen widget derived from the same local ledger.
+    try {
+      if (window.PocketWiseNative && typeof window.PocketWiseNative.updateWidget === 'function') {
+        const available = (state.accounts || []).reduce((sum, account) => sum + balanceForAccount(account.id), 0);
+        const cutoff = new Date(); cutoff.setHours(0,0,0,0); cutoff.setDate(cutoff.getDate()-6);
+        const weekSpend = (state.transactions || []).filter(t => t.type === 'expense' && dateFrom(t.date) >= cutoff).reduce((sum,t) => sum + (Number(t.amount)||0),0);
+        window.PocketWiseNative.updateWidget(money(available), `7-day spending · ${money(weekSpend)}`);
+      }
+    } catch (error) { console.warn('PocketWise widget update skipped.', error); }
     return { indexedDB: indexedSaved, localStorage: localSaved };
   }
   async function initialise(){
@@ -884,4 +893,36 @@
   window.addEventListener('error', event => { console.error('Pocketwise runtime error:',event.error||event.message); });
   window.addEventListener('unhandledrejection', event => { console.error('Pocketwise async error:',event.reason); toast(event.reason?.message||'A background action failed. Your existing records are unchanged.','error'); });
   initialise().then(()=>{appReady=true;handleShortcutQuickAdd();}).catch(error=>{console.error('Pocketwise could not initialise.',error);toast('PocketWise could not start correctly. Please reload the app.','error');});
+
+  // PocketWise 2.0 import helpers: conservative parsing, preview-before-save and duplicate checks.
+  function pwParsePaymentText(raw){
+    const text=String(raw||'').replace(/\u00a0/g,' ').trim(); if(!text)return null;
+    if(/\b(OTP|one time password|verification code|offer|cashback|won a prize)\b/i.test(text) && !/\b(debited|credited|sent|received|paid|payment)\b/i.test(text))return {ignored:true,reason:'This looks like an OTP or promotional message, not a transaction.'};
+    const amtMatches=[...text.matchAll(/(?:₹|Rs\.?|INR\s*)\s*([0-9,]+(?:\.\d{1,2})?)/ig)];
+    if(!amtMatches.length)return {error:'No clear INR amount found. Check the pasted text.'};
+    const amount=Number(amtMatches[0][1].replace(/,/g,'')); if(!Number.isFinite(amount)||amount<=0)return {error:'The amount could not be read safely.'};
+    const ref=(text.match(/\b(?:RRN|UTR|UPI\s*Ref(?:erence)?(?:\s*No)?|Ref(?:erence)?(?:\s*No)?|Txn\s*ID|Transaction\s*ID)\s*[:#.-]?\s*([A-Z0-9]{6,30})/i)||text.match(/\bRRN\s+([0-9]{8,})/i)||[])[1]||'';
+    const upi=(text.match(/[A-Z0-9._-]+@[A-Z0-9.-]+/i)||[])[0]||'';
+    const acct=(text.match(/(?:A\/c|account|acct)\s*[*xX-]*\s*([0-9]{3,6})/i)||[])[1]||'';
+    let date=''; let m=text.match(/\b(\d{1,2})[-/](\d{1,2})[-/](\d{2,4})\b/); if(m){let y=Number(m[3]);if(y<100)y+=2000;date=`${y}-${String(Number(m[2])).padStart(2,'0')}-${String(Number(m[1])).padStart(2,'0')}`;if(Number(m[2])>12){date=`${y}-${String(Number(m[1])).padStart(2,'0')}-${String(Number(m[2])).padStart(2,'0')}`;}}
+    if(!date)date=today();
+    const incoming=/\b(credited|received|deposited|refund received|money received)\b/i.test(text);
+    const outgoing=/\b(debited|sent|paid|payment to|purchase|withdrawn|transferred to)\b/i.test(text);
+    const type=incoming&&!outgoing?'income':'expense';
+    let party=''; const to=text.match(/\bto\s+([^,.;\n]+?)(?=\s+(?:on|at|via|UPI|RRN|UTR|Ref|A\/c|from)\b|[,.]|$)/i); const from=text.match(/\bfrom\s+([^,.;\n]+?)(?=\s+(?:on|at|via|UPI|RRN|UTR|Ref|A\/c)\b|[,.]|$)/i); party=(incoming?(from||to):(to||from))?.[1]?.trim()||upi||'';
+    return {amount,type,date,reference:ref,upi,accountSuffix:acct,party,raw:text};
+  }
+  function pwHasDuplicate(parsed){return state.transactions.some(t=>{const note=String(t.note||'');if(parsed.reference&&new RegExp(`(?:RRN|UTR|Ref(?:erence)?):?\\s*${parsed.reference.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}`,'i').test(note))return true;return Number(t.amount)===parsed.amount&&String(t.date||'')===parsed.date&&(/UPI/i.test(String(t.paymentMethod||''))||parsed.upi&&note.includes(parsed.upi))&&(!parsed.party||note.toLowerCase().includes(parsed.party.toLowerCase()));});}
+  function pwShowImport(){openModal('Import a payment',`<div class="modal-body pw-import"><p>Paste a bank SMS, UPI message, or text copied from a payment screenshot. PocketWise extracts only details it can identify and asks you to review before saving.</p><label class="form-field"><span>PAYMENT MESSAGE OR SHORTCUT PAYLOAD</span><textarea id="pw-import-raw" rows="6" placeholder="Paste payment text here…"></textarea></label><div class="form-actions"><button class="secondary-button" type="button" data-cancel-modal>Cancel</button><button class="primary-button" type="button" id="pw-parse-payment">Extract details</button></div><p class="fine-print">Privacy: parsing happens in this browser. No SMS history is read automatically. Screenshot OCR depends on your device; you can use Live Text / Google Lens to copy text first.</p></div>`,'IMPORT · REVIEW BEFORE SAVING');}
+  function pwReviewImport(d){if(d.ignored){toast(d.reason,'amber');return;}if(d.error){toast(d.error,'error');return;}if(pwHasDuplicate(d)){toast('This looks like a duplicate transaction. Nothing was added.','amber');return;}
+    const details=[d.party,d.upi?`UPI: ${d.upi}`:'',d.accountSuffix?`Account ending ${d.accountSuffix}`:'',d.reference?`RRN: ${d.reference}`:'',`Imported text: ${d.raw.slice(0,240)}`].filter(Boolean).join(' · ');
+    openModal('Review imported transaction',`<div class="modal-body"><div class="pw-import-summary"><span>${d.type==='income'?'Money received':'Money sent'}</span><strong>${escapeHTML(money(d.amount))}</strong><small>${escapeHTML(d.date)}</small></div><dl class="pw-import-details"><dt>Direction</dt><dd>${d.type==='income'?'Incoming':'Outgoing'}</dd><dt>Merchant / UPI</dt><dd>${escapeHTML(d.party||d.upi||'Not identified')}</dd><dt>Reference</dt><dd>${escapeHTML(d.reference||'Not found')}</dd><dt>Account suffix</dt><dd>${escapeHTML(d.accountSuffix||'Not found')}</dd></dl><p class="fine-print">Confirm the category and account on the next screen. Missing information is not guessed.</p><div class="form-actions"><button class="secondary-button" type="button" data-cancel-modal>Cancel</button><button class="primary-button" type="button" id="pw-confirm-import">Review category & save</button></div></div>`,'CHECK THE DETAILS');
+    $('#pw-confirm-import').addEventListener('click',()=>{transactionForm(null,d.type);const form=$('#transaction-form');$('#tx-amount').value=String(d.amount);$('#tx-date').value=d.date;$('#tx-payment-method').value='UPI';$('#tx-note').value=details;form.dataset.importReference=d.reference||'';form.dataset.importUpi=d.upi||'';});
+  }
+  function pwPlatformSetup(){const android=isAndroid;document.documentElement.classList.toggle('pw-is-iphone',/iPhone|iPad|iPod/i.test(navigator.userAgent));document.documentElement.classList.toggle('pw-is-android',android);}
+  pwPlatformSetup();
+  document.addEventListener('click',e=>{if(e.target.closest('#pw-import-launch'))pwShowImport();if(e.target.closest('#pw-parse-payment')){const parsed=pwParsePaymentText($('#pw-import-raw')?.value||'');pwReviewImport(parsed);} });
+  // iOS may strip query parameters when launching an installed PWA. Clipboard paste remains the reliable fallback.
+  (function(){try{const q=new URLSearchParams(location.search);const payload=q.get('transaction')||q.get('payload')||q.get('text');if(payload){history.replaceState({},'',location.pathname);setTimeout(()=>{pwShowImport();const el=$('#pw-import-raw');if(el)el.value=payload;},350);}if(q.get('quickadd'))setTimeout(()=>showAddEntryChoices(),400);}catch{}})();
+
 })();

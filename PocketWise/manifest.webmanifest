@@ -2,7 +2,7 @@
   "id": "/PocketWise/",
   "name": "Pocketwise · Money, made clearer",
   "short_name": "Pocketwise",
-  "description": "A private, offline-first personal finance companion.",
+  "description": "Offline-first personal finance tracker with reviewed payment imports.",
   "lang": "en-IN",
   "start_url": "/PocketWise/",
   "scope": "/PocketWise/",
@@ -84,5 +84,15 @@
         }
       ]
     }
-  ]
+  ],
+  "share_target": {
+    "action": "/PocketWise/",
+    "method": "GET",
+    "enctype": "application/x-www-form-urlencoded",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
 }
