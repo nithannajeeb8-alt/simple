@@ -411,12 +411,12 @@ img,svg,canvas{max-width:100%}
 @media(max-width:600px){.pw-import-details{grid-template-columns:100px minmax(0,1fr)}}
 
 /* PocketWise first-run guided tour */
-.pw-tour-overlay{position:fixed;inset:0;z-index:1002;display:grid;place-items:center;padding:22px;pointer-events:none;opacity:0;animation:pw-tour-fade .22s ease forwards}
+.pw-tour-overlay{position:fixed;inset:0;z-index:10020;display:block;padding:0;pointer-events:none;opacity:0;animation:pw-tour-fade .22s ease forwards}
 .pw-tour-overlay[hidden]{display:none}
-.pw-tour-spotlight{position:fixed;z-index:1000;pointer-events:none;border-radius:16px;box-shadow:0 0 0 9999px rgba(9,17,12,.66);outline:3px solid color-mix(in srgb,var(--green) 80%,white);outline-offset:1px;transition:top .22s ease,left .22s ease,width .22s ease,height .22s ease}
+.pw-tour-spotlight{position:fixed;z-index:10010;pointer-events:none;border-radius:16px;box-shadow:0 0 0 9999px rgba(9,17,12,.66);outline:3px solid color-mix(in srgb,var(--green) 80%,white);outline-offset:1px;transition:top .22s ease,left .22s ease,width .22s ease,height .22s ease}
 .pw-tour-spotlight[hidden]{display:none}
-.pw-tour-card{position:relative;pointer-events:auto;width:min(420px,100%);max-height:calc(100dvh - 36px);overflow:auto;padding:25px 23px 20px;border:1px solid color-mix(in srgb,var(--green) 30%,var(--line));border-radius:26px;background:var(--surface);color:var(--ink);box-shadow:0 24px 90px #0004;animation:pw-tour-pop .28s cubic-bezier(.2,.8,.2,1) both}
-.pw-tour-visual{display:flex;align-items:center;justify-content:center;width:76px;height:76px;margin:0 0 17px;border-radius:24px;background:var(--green-soft);color:var(--green)}
+.pw-tour-card{position:fixed;pointer-events:auto;width:min(420px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow:auto;padding:20px 19px 16px;border:1px solid color-mix(in srgb,var(--green) 30%,var(--line));border-radius:26px;background:var(--surface);color:var(--ink);box-shadow:0 24px 90px #0004;animation:pw-tour-pop .28s cubic-bezier(.2,.8,.2,1) both}
+.pw-tour-visual{display:flex;align-items:center;justify-content:center;width:54px;height:54px;margin:0 0 12px;border-radius:24px;background:var(--green-soft);color:var(--green)}
 .pw-tour-visual img{display:block;width:100%;height:100%;object-fit:cover;border-radius:inherit;animation:pw-tour-image-in .35s ease both}.pw-tour-visual.image-unavailable{background:linear-gradient(135deg,var(--green-soft),var(--surface-2))}.pw-tour-visual.image-unavailable:after{content:"✦";font-size:32px;color:var(--green)}
 .pw-tour-kicker{display:block;margin-bottom:7px;font-size:10px;letter-spacing:1.5px;font-weight:800;color:var(--green)}
 .pw-tour-card h2{font-family:var(--display);font-size:25px;letter-spacing:-.8px;line-height:1.12;margin:0 0 10px}
