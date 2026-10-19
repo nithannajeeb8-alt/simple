@@ -5,13 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#e8f2fa">
   <meta name="description" content="A quiet, private diary with a thoughtful on-device AI companion.">
-  <meta name="color-scheme" content="light">
+  <meta name="color-scheme" content="light dark">
   <title>Quiet Pages — A little room for you</title>
   <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.PNG">
-  <!-- Bootstrap Icons are bundled locally, including their font, for the original icon appearance offline. -->
-  <link rel="stylesheet" href="./assets/bootstrap-icons.css">
+  <link rel="icon" href="./icons/icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.2/font/bootstrap-icons.min.css">
 <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
@@ -29,6 +31,13 @@
 
     <main id="mainContent" tabindex="-1">
       <section class="screen active" id="screen-diary" data-screen="diary">
+        <section class="memory-stories" id="memoryStories" aria-label="Photo memories">
+          <div class="stories-heading">
+            <div><span class="section-kicker">PHOTO MEMORIES</span><h2>Little moments</h2><p>Photos you saved, returned to you.</p></div>
+            <span class="stories-count" id="storiesCount">0 moments</span>
+          </div>
+          <div class="story-rail" id="storyRail" aria-label="Your photo memories"></div>
+        </section>
         <div class="home-intro">
           <div class="eyebrow"><span class="eyebrow-dot"></span><span id="todayLabel">A little note for today</span></div>
           <h1 class="ai-greeting" id="homeSubheading" aria-live="polite">A little room for whatever is on your mind.</h1>
@@ -38,14 +47,13 @@
           <i class="bi bi-search"></i><input type="search" id="searchInput" placeholder="Search your memories…" autocomplete="off">
           <button class="icon-button compact" id="closeSearch" aria-label="Close search"><i class="bi bi-x-lg"></i></button>
         </div>
-        <div class="tag-filter-chips hidden" id="tagFilterChips" aria-label="Filter by tag"></div>
         <div class="section-heading">
           <div><span class="section-kicker">YOUR JOURNAL</span><h2 id="entriesHeading">Recent pages</h2></div>
           <span class="subtle-count" id="entryCount">0 pages</span>
         </div>
         <div id="entryStack" class="entry-stack"></div>
         <div id="emptyState" class="empty-state hidden">
-          <div class="empty-art"><span></span><i class="bi bi-feather"></i></div>
+          <div class="empty-art" aria-hidden="true"><i class="bi bi-pencil"></i></div>
           <h3>Your first page is waiting.</h3>
           <p>Start with one small thing: what stayed with you today?</p>
           <button class="primary-button" data-action="new-entry"><i class="bi bi-plus-lg"></i> Write your first entry</button>
@@ -111,27 +119,23 @@
         </div>
         <section class="settings-group">
           <div class="settings-heading"><span class="setting-icon"><i class="bi bi-palette2"></i></span><div><h2>Appearance</h2><p>Colors and the feeling of each page.</p></div></div>
+          <p class="theme-section-label">Light palettes</p>
           <div class="theme-grid" id="themeGrid">
             <button class="theme-choice active" data-theme-choice="sky"><span class="theme-swatch sky-swatch"></span><strong>Sky</strong><small>Calm & clear</small></button>
             <button class="theme-choice" data-theme-choice="coral"><span class="theme-swatch coral-swatch"></span><strong>Coral</strong><small>Warm & open</small></button>
             <button class="theme-choice" data-theme-choice="mint"><span class="theme-swatch mint-swatch"></span><strong>Mint</strong><small>Fresh & bright</small></button>
             <button class="theme-choice" data-theme-choice="lavender"><span class="theme-swatch lavender-swatch"></span><strong>Lavender</strong><small>Soft & dreamy</small></button>
-            <button class="theme-choice" data-theme-choice="rose"><span class="theme-swatch rose-swatch"></span><strong>Rose</strong><small>Soft & tender</small></button>
-            <button class="theme-choice" data-theme-choice="peach"><span class="theme-swatch peach-swatch"></span><strong>Peach</strong><small>Warm & sunny</small></button>
-            <button class="theme-choice" data-theme-choice="sand"><span class="theme-swatch sand-swatch"></span><strong>Sand</strong><small>Quiet & earthy</small></button>
-            <button class="theme-choice" data-theme-choice="ocean"><span class="theme-swatch ocean-swatch"></span><strong>Ocean</strong><small>Cool & clear</small></button>
             <button class="theme-choice dynamic-choice" data-theme-choice="dynamic"><span class="theme-swatch dynamic-swatch"><i class="bi bi-stars"></i></span><strong>Dynamic</strong><small>Changes each day</small></button>
+          </div>
+          <p class="theme-section-label dark-palette-label">Dark palettes <span>Made for dim rooms and LCD screens</span></p>
+          <div class="theme-grid dark-theme-grid" aria-label="Dark color themes">
+            <button class="theme-choice" data-theme-choice="midnight"><span class="theme-swatch midnight-swatch"></span><strong>Midnight</strong><small>Ink & blue</small></button>
+            <button class="theme-choice" data-theme-choice="ember"><span class="theme-swatch ember-swatch"></span><strong>Ember</strong><small>Warm charcoal</small></button>
+            <button class="theme-choice" data-theme-choice="forest"><span class="theme-swatch forest-swatch"></span><strong>Forest</strong><small>Deep green</small></button>
+            <button class="theme-choice" data-theme-choice="plum"><span class="theme-swatch plum-swatch"></span><strong>Plum</strong><small>Quiet violet</small></button>
           </div>
           <div class="setting-row"><div><strong>Comfortable text</strong><p>Increase the text size across the app.</p></div><select id="textScale" aria-label="Text size"><option value="normal">Standard</option><option value="large">Large</option><option value="xlarge">Extra large</option></select></div>
           <label class="setting-row"><div><strong>Reduce motion</strong><p>Use fewer transitions and animations.</p></div><input type="checkbox" id="reduceMotion" class="toggle-input"></label>
-        </section>
-        <section class="settings-group" id="notificationSettings">
-          <div class="settings-heading"><span class="setting-icon"><i class="bi bi-bell"></i></span><div><h2>Gentle reminders</h2><p>Small reminders of hope, perspective and self-kindness.</p></div></div>
-          <label class="setting-row"><div><strong>Daily motivational note</strong><p>Send a gentle motivational quote, without showing diary details.</p></div><input type="checkbox" id="remindersEnabled" class="toggle-input"></label>
-          <div class="setting-row"><div><strong>Reminder time</strong><p>Uses your device's local time.</p></div><input type="time" id="reminderTime" value="20:30" aria-label="Daily reminder time"></div>
-          <div class="model-controls"><button class="primary-button" id="enableNotificationsButton"><i class="bi bi-bell"></i> Enable notifications</button><button class="secondary-button" id="testNotificationButton"><i class="bi bi-send"></i> Send test</button></div>
-          <p class="model-disclaimer" id="notificationStatus" role="status" aria-live="polite">Notifications are off. Choose a time and enable them when ready.</p>
-          <p class="model-disclaimer"><i class="bi bi-info-circle"></i> Motivational notes rotate through 40+ original quotes. This version checks the reminder while Quiet Pages is open; it cannot reliably wake itself after being fully closed. Reliable closed-app reminders require a push service/server.</p>
         </section>
         <section class="settings-group">
           <div class="settings-heading"><span class="setting-icon"><i class="bi bi-cpu"></i></span><div><h2>Your local companion</h2><p>Download a compatible model to generate responses on this device.</p></div></div>
@@ -145,7 +149,7 @@
         <section class="settings-group">
           <div class="settings-heading"><span class="setting-icon"><i class="bi bi-database-lock"></i></span><div><h2>Privacy &amp; your data</h2><p>Your pages are saved in browser storage on this device.</p></div></div>
           <div class="privacy-card"><i class="bi bi-shield-lock"></i><div><strong>No account. No diary server.</strong><p>Quiet Pages does not send your entries to a diary backend. Export backups regularly because browser storage can be cleared by the operating system or browser.</p></div></div>
-          <div class="settings-actions"><button class="action-row" id="exportPdfButton"><span><i class="bi bi-file-earmark-pdf"></i></span><div><strong>Print / Save as PDF</strong><small>Open your device print dialog to save a readable PDF.</small></div><i class="bi bi-chevron-right"></i></button><button class="action-row" id="exportHtmlButton"><span><i class="bi bi-filetype-html"></i></span><div><strong>Export readable HTML</strong><small>Save a styled, portable copy of your diary.</small></div><i class="bi bi-chevron-right"></i></button><button class="action-row" id="exportButton"><span><i class="bi bi-box-arrow-up-right"></i></span><div><strong>Export a backup</strong><small>Save entries, memories, settings and photos.</small></div><i class="bi bi-chevron-right"></i></button><button class="action-row" id="importButton"><span><i class="bi bi-box-arrow-in-down-left"></i></span><div><strong>Restore a backup</strong><small>Import a previously exported JSON file.</small></div><i class="bi bi-chevron-right"></i></button><input type="file" id="importFile" accept="application/json,.json" class="hidden">
+          <div class="settings-actions"><button class="action-row" id="exportButton"><span><i class="bi bi-box-arrow-up-right"></i></span><div><strong>Export a backup</strong><small>Save entries, memories, settings and photos.</small></div><i class="bi bi-chevron-right"></i></button><button class="action-row" id="importButton"><span><i class="bi bi-box-arrow-in-down-left"></i></span><div><strong>Restore a backup</strong><small>Import a previously exported JSON file.</small></div><i class="bi bi-chevron-right"></i></button><input type="file" id="importFile" accept="application/json,.json" class="hidden">
             <button class="action-row danger-row" id="clearDataButton"><span><i class="bi bi-trash3"></i></span><div><strong>Delete all local data</strong><small>Remove diary entries and memories from this browser.</small></div><i class="bi bi-chevron-right"></i></button></div>
         </section>
         <footer class="settings-footer"><span class="brand-mark mini-mark">q.</span><p>Quiet Pages · A little room for you</p><small>Private by default, imperfect by design. Please keep a backup.</small></footer>
@@ -165,23 +169,21 @@
     </nav>
   </div>
 
-  <dialog class="confirm-dialog privacy-welcome" id="privacyWelcomeDialog" aria-labelledby="privacyWelcomeTitle">
-    <div class="dialog-icon"><i class="bi bi-shield-lock"></i></div>
-    <h2 id="privacyWelcomeTitle">Your pages are yours.</h2>
-    <p>Quiet Pages is designed to keep your diary on this device. There is no account and no app-owned diary server. Your entries, photos and memories are stored in this browser.</p>
-    <div class="privacy-welcome-points">
-      <p><i class="bi bi-check-circle"></i> Your diary is not uploaded to a Quiet Pages diary backend.</p>
-      <p><i class="bi bi-cpu"></i> When you use a compatible local AI model, diary context is processed in this browser. Model runtime code and model files are downloaded from their providers only when you request them.</p>
-      <p><i class="bi bi-lock"></i> Local storage is not the same as encryption. Protect your device and export backups. Browser data can be cleared.</p>
-      <p><i class="bi bi-bell"></i> Motivational notifications use general quotes, never your private diary text.</p>
-    </div>
-    <div class="dialog-actions"><button class="primary-button" id="privacyWelcomeContinue">I understand</button></div>
-  </dialog>
-  <div id="printRoot" aria-hidden="true"></div>
+
+  <div class="story-viewer hidden" id="storyViewer" role="dialog" aria-modal="true" aria-label="Photo memory" aria-hidden="true">
+    <div class="story-viewer-backdrop" data-story-close></div>
+    <section class="story-stage">
+      <div class="story-progress" id="storyProgress" aria-hidden="true"></div>
+      <header class="story-viewer-header"><span class="story-viewer-brand"><i class="bi bi-journal-heart"></i> A moment, kept</span><button class="story-close" type="button" data-story-close aria-label="Close memory"><i class="bi bi-x-lg"></i></button></header>
+      <div class="story-viewer-photo-wrap"><img id="storyViewerImage" alt="Saved diary memory"></div>
+      <div class="story-viewer-copy"><span class="story-viewer-kicker" id="storyViewerKicker">PHOTO MEMORY</span><h2 id="storyViewerTitle">A moment, kept</h2><p class="story-viewer-date" id="storyViewerDate"></p><p class="story-viewer-excerpt" id="storyViewerExcerpt"></p><button class="story-open-entry" type="button" id="storyOpenEntry" data-story-open-entry><i class="bi bi-journal-text"></i> Open diary page <i class="bi bi-arrow-up-right"></i></button></div>
+      <div class="story-viewer-nav"><button type="button" data-story-prev aria-label="Previous memory"><i class="bi bi-chevron-left"></i></button><span id="storyPosition">1 of 1</span><button type="button" data-story-next aria-label="Next memory"><i class="bi bi-chevron-right"></i></button></div>
+    </section>
+  </div>
+
   <div class="toast-region" id="toastRegion" aria-live="polite" aria-atomic="true"></div>
   <dialog class="confirm-dialog" id="confirmDialog"><div class="dialog-icon"><i class="bi bi-question-lg"></i></div><h2 id="dialogTitle">Are you sure?</h2><p id="dialogMessage">This action cannot be undone.</p><div class="dialog-actions"><button class="secondary-button" id="dialogCancel">Cancel</button><button class="primary-button danger-button" id="dialogConfirm">Continue</button></div></dialog>
   <script src="./app.js" defer></script>
-
   <script>
     // Register offline support only on HTTPS or localhost. Relative path works in GitHub Pages subdirectories.
     if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {

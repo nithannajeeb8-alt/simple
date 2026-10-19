@@ -1,7 +1,7 @@
 /* Best-effort app-shell cache. User data is stored by the page in IndexedDB, not in this cache. */
-const CACHE_NAME = 'quiet-pages-shell-v25-print-gesture-fix';
+const CACHE_NAME = 'quiet-pages-shell-v18-v17-scroll-toolbar-stories-dark-themes-short-greetings';
 const BASE = self.registration.scope;
-const SHELL = ['./', './index.html', './styles.css', './app.js', './assets/bootstrap-icons.css', './manifest.webmanifest', './icons/icon.svg', './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png', './assets/themes/paper-grain.svg', './assets/themes/rose.svg', './assets/themes/peach.svg', './assets/themes/sand.svg', './assets/themes/ocean.svg', './assets/stickers/flower.svg', './assets/stickers/leaf.svg', './assets/stickers/moon.svg', './assets/stickers/star.svg', './assets/stickers/heart.svg', './assets/stickers/butterfly.svg'];
+const SHELL = ['./', './index.html', './styles.css', './app.js', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png'];
 
 self.addEventListener('install', event => {
   event.waitUntil((async () => {
@@ -68,18 +68,5 @@ self.addEventListener('fetch', event => {
     } catch (_) {
       return new Response('Offline: this resource is not cached yet.', { status: 503, headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
     }
-  })());
-});
-
-
-self.addEventListener('notificationclick', event => {
-  event.notification.close();
-  const target = event.notification.data && event.notification.data.url ? event.notification.data.url : self.registration.scope;
-  event.waitUntil((async () => {
-    const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
-    for (const client of windows) {
-      if ('focus' in client) { await client.focus(); if ('navigate' in client) await client.navigate(target); return; }
-    }
-    if (self.clients.openWindow) await self.clients.openWindow(target);
   })());
 });

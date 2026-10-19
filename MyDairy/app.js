@@ -4,16 +4,18 @@
 
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
-  const THEMES = ['sky', 'coral', 'mint', 'lavender', 'rose', 'peach', 'sand', 'ocean'];
+  const THEMES = ['sky', 'coral', 'mint', 'lavender'];
+  const DARK_THEMES = ['midnight', 'ember', 'forest', 'plum'];
+  const ALL_THEMES = [...THEMES, ...DARK_THEMES];
   const THEME_INFO = {
     sky: { label: 'Sky', hello: 'A clear little space for your thoughts.' },
     coral: { label: 'Coral', hello: 'Keep the things that made you feel.' },
     mint: { label: 'Mint', hello: 'There is room to begin again.' },
     lavender: { label: 'Lavender', hello: 'Let the day settle gently.' },
-    rose: { label: 'Rose', hello: 'A soft place for the things you feel.' },
-    peach: { label: 'Peach', hello: 'Keep a little warmth from today.' },
-    sand: { label: 'Sand', hello: 'Slow down and leave a little room.' },
-    ocean: { label: 'Ocean', hello: 'Let your thoughts find their own tide.' }
+    midnight: { label: 'Midnight', hello: 'A calm, low-glare place for your thoughts.' },
+    ember: { label: 'Ember', hello: 'A warm, quiet place for your thoughts.' },
+    forest: { label: 'Forest', hello: 'A grounded, low-glare place for your thoughts.' },
+    plum: { label: 'Plum', hello: 'A soft, evening-toned place for your thoughts.' }
   };
   const MOODS = [
     { value: 'calm', label: 'Calm', emoji: '☁️' },
@@ -50,6 +52,8 @@
   let state = freshState();
   let greetingRequestKey = '';
   let greetingRequestInFlight = false;
+  let storyItems = [];
+  let activeStoryIndex = 0;
   let savedEditorRange = null;
   let editorSelectionListener = null;
 
@@ -72,7 +76,7 @@
         id: id(), role: 'assistant', text: 'Hey, I’m glad you’re here. This is your space to think out loud, talk things through, and return to whatever matters to you. I can use the pages and memories you keep here when they help, and we can just chat when they don’t.', createdAt: new Date().toISOString(), source: 'welcome'
       }],
       settings: {
-        theme: 'sky', activeThemeDate: TODAY, activeTheme: 'sky', textScale: 'normal', reduceMotion: false, modelId: '', reminders: { enabled: false, time: '20:30', lastReminderDate: '' }
+        theme: 'sky', activeThemeDate: TODAY, activeTheme: 'sky', textScale: 'normal', reduceMotion: false, modelId: ''
       }
     };
   }
@@ -108,7 +112,7 @@
   }
   function richTextPlain(value) {
     const raw = String(value ?? '');
-    const markup = /<\/?(?:p|div|br|strong|b|em|i|u|h1|h2|h3|blockquote|mark|span|font|ul|ol|li|img|hr)\b/i.test(raw);
+    const markup = /<\/?(?:p|div|br|strong|b|em|i|u|h1|h2|h3|blockquote|mark|span|font|ul|ol|li|img)\b/i.test(raw);
     if (!markup) return decodeLegacyEntities(raw).replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim();
     const doc = new DOMParser().parseFromString(raw, 'text/html');
     doc.querySelectorAll('br').forEach(node => node.replaceWith(doc.createTextNode(' ')));
@@ -118,14 +122,14 @@
   }
   function sanitizeRichHtml(value) {
     let raw = String(value ?? '');
-    const markupPattern = /<\/?(?:p|div|br|strong|b|em|i|u|h1|h2|h3|blockquote|mark|span|font|ul|ol|li|img|hr)\b/i;
+    const markupPattern = /<\/?(?:p|div|br|strong|b|em|i|u|h1|h2|h3|blockquote|mark|span|font|ul|ol|li|img)\b/i;
     if (!markupPattern.test(raw)) {
       raw = decodeLegacyEntities(raw);
       // If a legacy encoded HTML string decodes into actual formatting markup, sanitize it as markup.
       if (!markupPattern.test(raw)) return escapeHTML(raw).replace(/\r\n?/g, '\n').replace(/\n/g, '<br>');
     }
     const doc = new DOMParser().parseFromString(raw, 'text/html');
-    const allowed = new Set(['P', 'DIV', 'BR', 'STRONG', 'B', 'EM', 'I', 'U', 'H2', 'H3', 'BLOCKQUOTE', 'MARK', 'SPAN', 'IMG', 'UL', 'OL', 'LI', 'HR']);
+    const allowed = new Set(['P', 'DIV', 'BR', 'STRONG', 'B', 'EM', 'I', 'U', 'H2', 'H3', 'BLOCKQUOTE', 'MARK', 'SPAN', 'IMG', 'UL', 'OL', 'LI']);
     const blocked = new Set(['SCRIPT', 'STYLE', 'IFRAME', 'OBJECT', 'EMBED', 'SVG', 'MATH', 'VIDEO', 'AUDIO', 'FORM', 'INPUT', 'BUTTON', 'TEXTAREA', 'SELECT', 'META', 'LINK']);
     const colorPattern = /^(?:#[\da-f]{3,8}|rgba?\(\s*[\d.%\s,]+\)|hsla?\(\s*[-\d.%\s,]+\)|[a-z]{3,20})$/i;
     const familyPattern = /^[a-z\d\s"'(),-]{1,100}$/i;
@@ -177,19 +181,8 @@
       const originalStyle = tag === 'SPAN' ? safeStyle(node.getAttribute('style')) : '';
       const imageSrc = tag === 'IMG' ? node.getAttribute('src') || '' : '';
       const imageAlt = tag === 'IMG' ? (node.getAttribute('alt') || 'Diary image').slice(0, 160) : '';
-      const dividerClass = tag === 'HR' ? 'scrapbook-divider' : '';
-      const sticker = tag === 'P' && node.classList.contains('scrapbook-sticker') ? 'scrapbook-sticker' : '';
-      const stickyNote = tag === 'DIV' && node.classList.contains('scrapbook-sticky-note') ? 'scrapbook-sticky-note' : '';
-      const noteColors = ['butter','rose','mint','lavender','sky'];
-      const noteColor = tag === 'DIV' && noteColors.includes(node.getAttribute('data-note-color')) ? node.getAttribute('data-note-color') : 'butter';
-      const allowedStickers = ['sparkle','flower','moon','leaf','heart','butterfly','star'];
-      const stickerValue = tag === 'P' ? node.getAttribute('data-sticker') : '';
-      const stickerData = allowedStickers.includes(stickerValue) ? stickerValue : '';
       [...node.attributes].forEach(attr => node.removeAttribute(attr.name));
       if (tag === 'SPAN' && originalStyle) node.setAttribute('style', originalStyle);
-      if (dividerClass) node.setAttribute('class', dividerClass);
-      if (sticker) { node.setAttribute('class', sticker); node.setAttribute('contenteditable', 'false'); if (stickerData) node.setAttribute('data-sticker', stickerData); }
-      if (stickyNote) { node.setAttribute('class', stickyNote); node.setAttribute('contenteditable', 'true'); node.setAttribute('data-note-color', noteColor); node.setAttribute('role', 'textbox'); node.setAttribute('aria-label', 'Editable sticky note'); }
       if (tag === 'IMG') {
         if (!/^data:image\/(?:png|jpeg|webp|gif);base64,[a-z\d+/=\r\n]+$/i.test(imageSrc)) { node.remove(); return; }
         node.setAttribute('src', imageSrc);
@@ -220,7 +213,7 @@
     return normalized.length > length ? `${normalized.slice(0, length).trimEnd()}…` : normalized;
   }
   function activeTheme() {
-    if (state.settings.theme !== 'dynamic') return THEMES.includes(state.settings.theme) ? state.settings.theme : 'sky';
+    if (state.settings.theme !== 'dynamic') return ALL_THEMES.includes(state.settings.theme) ? state.settings.theme : 'sky';
     const key = dateKey(new Date());
     if (state.settings.activeThemeDate !== key || !THEMES.includes(state.settings.activeTheme)) {
       // A deterministic date-based rotation means the same theme appears all day, including after reload.
@@ -242,8 +235,7 @@
     base.entries = entries.map(e => ({
       id: String(e.id), title: String(e.title || ''), body: String(e.body || ''), date: /^\d{4}-\d{2}-\d{2}$/.test(e.date) ? e.date : TODAY,
       mood: MOODS.some(m => m.value === e.mood) ? e.mood : '', theme: THEMES.includes(e.theme) ? e.theme : 'sky',
-      photos: Array.isArray(e.photos) ? e.photos.filter(p => p && typeof p.dataUrl === 'string' && p.dataUrl.startsWith('data:image/')).map(p => ({ id: String(p.id || id()), dataUrl: p.dataUrl, cover: Boolean(p.cover), caption: String(p.caption || '').slice(0, 300) })).slice(0, 12) : [],
-      tags: Array.isArray(e.tags) ? [...new Set(e.tags.map(tag => String(tag).trim().replace(/^#/, '').slice(0, 32)).filter(Boolean))].slice(0, 20) : [],
+      photos: Array.isArray(e.photos) ? e.photos.filter(p => p && typeof p.dataUrl === 'string' && p.dataUrl.startsWith('data:image/')).map(p => ({ id: String(p.id || id()), dataUrl: p.dataUrl, cover: Boolean(p.cover) })).slice(0, 12) : [],
       createdAt: e.createdAt || new Date().toISOString(), updatedAt: e.updatedAt || e.createdAt || new Date().toISOString(), reflection: String(e.reflection || ''), memoryScanSignature: String(e.memoryScanSignature || '')
     }));
     base.memories = memories.map(m => ({ id: String(m.id), text: String(m.text).slice(0, 800), createdAt: m.createdAt || new Date().toISOString(), updatedAt: m.updatedAt || m.createdAt || new Date().toISOString(), source: String(m.source || 'manual'), sourceEntryId: String(m.sourceEntryId || '') })).slice(0, 160);
@@ -256,16 +248,11 @@
     if (!safeMessages.some(m => m.source === 'welcome')) safeMessages.unshift(base.messages[0]);
     base.messages = safeMessages.slice(-100);
     base.settings = {
-      theme: [...THEMES, 'dynamic'].includes(settings.theme) ? settings.theme : 'sky',
+      theme: [...ALL_THEMES, 'dynamic'].includes(settings.theme) ? settings.theme : 'sky',
       activeThemeDate: typeof settings.activeThemeDate === 'string' ? settings.activeThemeDate : TODAY,
       activeTheme: THEMES.includes(settings.activeTheme) ? settings.activeTheme : 'sky',
       textScale: ['normal', 'large', 'xlarge'].includes(settings.textScale) ? settings.textScale : 'normal',
-      reduceMotion: Boolean(settings.reduceMotion), modelId: typeof settings.modelId === 'string' ? settings.modelId : '',
-      reminders: {
-        enabled: Boolean(settings.reminders && settings.reminders.enabled),
-        time: /^([01]\d|2[0-3]):[0-5]\d$/.test(settings.reminders?.time || '') ? settings.reminders.time : '20:30',
-        lastReminderDate: typeof settings.reminders?.lastReminderDate === 'string' ? settings.reminders.lastReminderDate : ''
-      }
+      reduceMotion: Boolean(settings.reduceMotion), modelId: typeof settings.modelId === 'string' ? settings.modelId : ''
     };
     return base;
   }
@@ -330,12 +317,6 @@
     });
     return saveChain;
   }
-
-  // Font choices use local system stacks and never fetch font binaries from a third party.
-  const FONT_NAMES = ['Caveat', 'Lora', 'Patrick Hand', 'DM Sans', 'EB Garamond'];
-  const FONT_ASSET_NAMES = [...FONT_NAMES, 'Manrope', 'Playfair Display'];
-  async function ensureDiaryFont(family) { return true; }
-
   async function initializeStorage() {
     try {
       await openDB();
@@ -358,19 +339,7 @@
     applySettings();
     await saveNow();
     renderAll();
-    showPrivacyWelcomeIfNeeded();
   }
-
-  function showPrivacyWelcomeIfNeeded() {
-    const dialog = $('#privacyWelcomeDialog');
-    if (!dialog) return;
-    let acknowledged = false; try { acknowledged = localStorage.getItem('quietPagesPrivacyWelcomeV1') === 'accepted'; } catch (_) {}
-    if (!acknowledged && !dialog.open) { try { dialog.showModal(); } catch (_) { dialog.setAttribute('open', ''); } }
-  }
-  $('#privacyWelcomeContinue')?.addEventListener('click', () => {
-    try { localStorage.setItem('quietPagesPrivacyWelcomeV1', 'accepted'); } catch (_) {}
-    const dialog = $('#privacyWelcomeDialog'); if (dialog?.open) dialog.close(); else dialog?.removeAttribute('open');
-  });
 
   function refreshCompanionWelcome() {
     const welcome = state.messages.find(message => message.source === 'welcome');
@@ -413,17 +382,14 @@
     document.documentElement.classList.remove('large-text', 'xlarge-text');
     if (state.settings.textScale === 'large') document.documentElement.classList.add('large-text');
     if (state.settings.textScale === 'xlarge') document.documentElement.classList.add('xlarge-text');
-    const themeColors = { sky:'#e8f2fa', coral:'#fbebe5', mint:'#eaf4eb', lavender:'#f0e8f8', rose:'#f7e8ed', peach:'#fff0e4', sand:'#f1eadb', ocean:'#e4eff4' };
+    const themeColors = { sky:'#e8f2fa', coral:'#fbebe5', mint:'#eaf4eb', lavender:'#f0e8f8', midnight:'#0e1925', ember:'#1b1514', forest:'#101b17', plum:'#1b1523' };
     $('meta[name="theme-color"]').content = themeColors[activeTheme()] || themeColors.sky;
     $$('[data-theme-choice]').forEach(button => button.classList.toggle('active', button.dataset.themeChoice === state.settings.theme));
     $('#textScale').value = state.settings.textScale;
     $('#reduceMotion').checked = state.settings.reduceMotion;
-    if ($('#remindersEnabled')) $('#remindersEnabled').checked = Boolean(state.settings.reminders?.enabled);
-    if ($('#reminderTime')) $('#reminderTime').value = state.settings.reminders?.time || '20:30';
-    updateNotificationStatus();
   }
   function setTheme(theme) {
-    if (![...THEMES, 'dynamic'].includes(theme)) return;
+    if (![...ALL_THEMES, 'dynamic'].includes(theme)) return;
     state.settings.theme = theme;
     if (theme === 'dynamic') {
       state.settings.activeThemeDate = '';
@@ -436,12 +402,7 @@
   }
   function navTo(screen) {
     if (!['diary', 'companion', 'calendar', 'settings', 'detail', 'editor'].includes(screen)) screen = 'diary';
-    if (currentScreen === 'editor' && screen !== 'editor') {
-      flushEditorSave();
-      document.getElementById('qpEditorAccessory')?.remove();
-      document.body.classList.remove('qp-keyboard-open', 'qp-body-focused', 'qp-title-focused');
-      document.documentElement.style.setProperty('--qp-keyboard-inset', '0px');
-    }
+    if (currentScreen === 'editor' && screen !== 'editor') flushEditorSave();
     // Preserve the originating tab while opening an editor or a detail view.
     if (['diary', 'calendar'].includes(currentScreen) && ['detail', 'editor'].includes(screen)) previousScreen = currentScreen;
     else if (!['detail', 'editor'].includes(screen)) previousScreen = screen;
@@ -462,16 +423,96 @@
   function getEntry(idValue) { return state.entries.find(entry => entry.id === idValue); }
   function moodInfo(value) { return MOODS.find(mood => mood.value === value); }
   function coverPhoto(entry) { return entry && Array.isArray(entry.photos) ? (entry.photos.find(photo => photo.cover) || entry.photos[0]) : null; }
+  function storyHash(value) {
+    let hash = 2166136261;
+    for (let i = 0; i < value.length; i++) { hash ^= value.charCodeAt(i); hash = Math.imul(hash, 16777619); }
+    return hash >>> 0;
+  }
+  function getStoryItems() {
+    const today = new Date();
+    const todayKey = dateKey(today);
+    const items = [];
+    state.entries.forEach(entry => {
+      if (!Array.isArray(entry.photos)) return;
+      entry.photos.forEach((photo, photoIndex) => {
+        if (!photo || typeof photo.dataUrl !== 'string' || !photo.dataUrl.startsWith('data:image/')) return;
+        const savedDate = parseDate(entry.date || todayKey);
+        items.push({
+          key: `${entry.id}::${photo.id || photoIndex}`, entryId: entry.id,
+          date: entry.date || todayKey, title: String(entry.title || '').trim() || 'A moment, kept',
+          image: photo.dataUrl, isAnniversary: savedDate.getDate() === today.getDate(),
+          excerpt: excerpt(entry.body || '', 120), sortKey: storyHash(`${todayKey}:${entry.id}:${photo.id || photoIndex}`)
+        });
+      });
+    });
+    const anniversaries = items.filter(item => item.isAnniversary).sort((a, b) => b.date.localeCompare(a.date) || a.title.localeCompare(b.title));
+    const randomMemories = items.filter(item => !item.isAnniversary).sort((a, b) => a.sortKey - b.sortKey);
+    // Every same-numbered day-of-month memory is kept at the front; the remaining photos are shuffled deterministically per day.
+    const remainingCount = Math.max(0, 10 - anniversaries.length);
+    return [...anniversaries, ...randomMemories.slice(0, remainingCount)];
+  }
+  function renderStories() {
+    const rail = $('#storyRail');
+    if (!rail) return;
+    storyItems = getStoryItems();
+    const count = storyItems.length;
+    $('#storiesCount').textContent = `${count} ${count === 1 ? 'moment' : 'moments'}`;
+    if (!count) {
+      rail.innerHTML = `<div class="stories-empty"><span class="stories-empty-icon"><i class="bi bi-image"></i></span><div><strong>Your photos will live here.</strong><p>Add an image to a diary page and it will become a memory you can revisit.</p></div><button type="button" class="stories-add" data-action="new-entry"><i class="bi bi-plus-lg"></i> Add a photo</button></div>`;
+      return;
+    }
+    rail.innerHTML = storyItems.map((item, index) => {
+      const dateLabel = item.isAnniversary ? 'On this day' : formatDate(item.date, { month: 'short', day: 'numeric' });
+      return `<button type="button" class="story-item${item.isAnniversary ? ' is-anniversary' : ''}" data-story-index="${index}" aria-label="View memory: ${escapeHTML(item.title)}, ${escapeHTML(formatDate(item.date))}">
+        <span class="story-ring"><span class="story-image"><img src="${escapeHTML(item.image)}" alt="" loading="lazy"></span>${item.isAnniversary ? '<span class="story-memory-mark"><i class="bi bi-arrow-repeat"></i></span>' : ''}</span>
+        <span class="story-item-title">${escapeHTML(item.title)}</span><span class="story-item-date${item.isAnniversary ? ' anniversary-label' : ''}">${escapeHTML(dateLabel)}</span>
+      </button>`;
+    }).join('');
+  }
+  function renderStoryViewer() {
+    const item = storyItems[activeStoryIndex];
+    if (!item) return closeStory();
+    const viewer = $('#storyViewer');
+    $('#storyViewerImage').src = item.image;
+    $('#storyViewerImage').alt = item.title || 'Saved diary memory';
+    $('#storyViewerTitle').textContent = item.title;
+    $('#storyViewerKicker').textContent = item.isAnniversary ? 'ON THIS DAY' : 'PHOTO MEMORY';
+    $('#storyViewerDate').textContent = formatDate(item.date, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+    $('#storyViewerExcerpt').textContent = item.excerpt || 'A picture from a page you chose to keep.';
+    $('#storyOpenEntry').dataset.storyOpenEntry = item.entryId;
+    $('#storyPosition').textContent = `${activeStoryIndex + 1} of ${storyItems.length}`;
+    $('#storyProgress').innerHTML = storyItems.map((_, index) => `<span class="${index === activeStoryIndex ? 'current' : ''}${index < activeStoryIndex ? ' passed' : ''}"><i></i></span>`).join('');
+    $('[data-story-prev]').disabled = storyItems.length < 2;
+    $('[data-story-next]').disabled = storyItems.length < 2;
+    $('#storyOpenEntry').disabled = !getEntry(item.entryId);
+    viewer.setAttribute('aria-hidden', 'false');
+  }
+  function openStory(index) {
+    storyItems = getStoryItems();
+    if (!storyItems.length) return;
+    activeStoryIndex = Math.max(0, Math.min(storyItems.length - 1, Number(index) || 0));
+    $('#storyViewer').classList.remove('hidden');
+    document.body.classList.add('story-viewer-open');
+    renderStoryViewer();
+    $('.story-close').focus({ preventScroll: true });
+  }
+  function closeStory() {
+    const viewer = $('#storyViewer');
+    if (!viewer) return;
+    viewer.classList.add('hidden');
+    viewer.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('story-viewer-open');
+  }
+  function moveStory(direction) {
+    if (!storyItems.length) return;
+    activeStoryIndex = (activeStoryIndex + direction + storyItems.length) % storyItems.length;
+    renderStoryViewer();
+  }
   function cardTheme(entry) { return THEMES.includes(entry.theme) ? entry.theme : activeTheme(); }
   function renderDiary() {
+    renderStories();
     const query = ($('#searchInput')?.value || '').trim().toLowerCase();
-    const allTags = [...new Set(state.entries.flatMap(entry => entry.tags || []))].sort((a,b) => a.localeCompare(b));
-    const tagHost = $('#tagFilterChips');
-    if (tagHost) {
-      tagHost.innerHTML = allTags.length ? allTags.slice(0,12).map(tag => `<button type="button" data-filter-tag="${escapeHTML(tag)}" class="${query === tag.toLowerCase() ? 'active' : ''}">#${escapeHTML(tag)}</button>`).join('') : '';
-      tagHost.classList.toggle('hidden', !allTags.length || $('#searchPanel')?.classList.contains('hidden'));
-    }
-    const list = sortedEntries().filter(entry => !query || `${entry.title} ${richTextPlain(entry.body)} ${entry.date} ${entry.mood} ${(entry.tags || []).join(' ')} ${(entry.photos || []).map(p => p.caption || '').join(' ')}`.toLowerCase().includes(query));
+    const list = sortedEntries().filter(entry => !query || `${entry.title} ${richTextPlain(entry.body)} ${entry.date} ${entry.mood}`.toLowerCase().includes(query));
     $('#entryCount').textContent = `${list.length} ${list.length === 1 ? 'page' : 'pages'}`;
     $('#entriesHeading').textContent = query ? 'Search results' : 'Recent pages';
     $('#todayLabel').textContent = new Intl.DateTimeFormat(undefined, { weekday: 'long', month: 'long', day: 'numeric' }).format(new Date());
@@ -484,7 +525,7 @@
       const hasInlineImage = /<img\b/i.test(String(entry.body || ''));
       const title = entry.title.trim() || 'An untitled page';
       // Rotate the scrapbook palette per visible card so adjacent entries never all inherit one theme.
-      const cardPalette = ['sky', 'mint', 'coral', 'lavender', 'rose', 'peach', 'sand', 'ocean'];
+      const cardPalette = ['sky', 'mint', 'coral', 'lavender'];
       const visualTheme = cardPalette[index % cardPalette.length];
       const className = `entry-card theme-${visualTheme}${cover ? ' has-cover' : ' no-cover'}`;
       const date = formatDate(entry.date, { month: 'short', day: 'numeric', year: 'numeric' });
@@ -495,7 +536,7 @@
       return `<article class="${className}" data-open-entry="${escapeHTML(entry.id)}" tabindex="0" role="button" aria-label="Open ${escapeHTML(title)}">
         <div class="entry-copy">
           <div class="card-topline"><span>${escapeHTML(date)}</span>${mood ? `<span class="entry-pill">${mood.emoji} ${escapeHTML(mood.label)}</span>` : `<span class="entry-pill"><i class="bi bi-bookmark-heart"></i> Kept</span>`}</div>
-          <h3>${escapeHTML(title)}</h3><p class="entry-excerpt">${escapeHTML(excerptText)}</p>${entry.tags?.length ? `<div class="entry-tags">${entry.tags.slice(0,3).map(tag => `<span data-filter-tag="${escapeHTML(tag)}" role="button" tabindex="0" title="Search this tag">#${escapeHTML(tag)}</span>`).join('')}</div>` : ''}
+          <h3>${escapeHTML(title)}</h3><p class="entry-excerpt">${escapeHTML(excerptText)}</p>
           <div class="card-bottom"><span>${entry.photos?.length ? `<i class="bi bi-images"></i> ${entry.photos.length} ${entry.photos.length === 1 ? 'photo' : 'photos'}` : 'A page of your own'}</span><span class="arrow-circle"><i class="bi bi-arrow-up-right"></i></span></div>
         </div>
         ${photoMarkup}
@@ -527,6 +568,15 @@
   function greetingCacheKey() {
     return `quiet-pages-greeting-v2:${dateKey(new Date())}:${greetingPeriod()}:${greetingContextFingerprint()}`;
   }
+  function shortenGreeting(value, fallback = '') {
+    const cleaned = String(value || '').replace(/<think>[\s\S]*?<\/think>/gi, '').replace(/\s+/g, ' ').replace(/^['"“”]+|['"“”]+$/g, '').trim();
+    if (!cleaned) return fallback;
+    const firstSentence = (cleaned.match(/^[^.!?]+[.!?]?/) || [cleaned])[0].trim();
+    const words = firstSentence.split(/\s+/).filter(Boolean).slice(0, 12);
+    let greeting = words.join(' ').slice(0, 96).trim();
+    if (greeting && !/[.!?…]$/.test(greeting)) greeting = greeting.replace(/[,;:]$/, '') + (words.length >= 12 ? '…' : '.');
+    return greeting || fallback;
+  }
   function getGreetingFallback() {
     const defaults = {
       morning: 'A new morning, a little room to begin.',
@@ -536,7 +586,7 @@
     };
     try {
       const cached = JSON.parse(localStorage.getItem(greetingCacheKey()) || 'null');
-      if (cached && typeof cached.text === 'string' && cached.text.trim()) return cached.text;
+      if (cached && typeof cached.text === 'string' && cached.text.trim()) return shortenGreeting(cached.text, defaults[greetingPeriod()]);
     } catch (_) {}
     return defaults[greetingPeriod()];
   }
@@ -547,7 +597,9 @@
     let cached = null;
     try { cached = JSON.parse(localStorage.getItem(key) || 'null'); } catch (_) {}
     if (!force && cached && typeof cached.text === 'string' && cached.text.trim()) {
-      $('#homeSubheading').textContent = cached.text;
+      const shortText = shortenGreeting(cached.text, getGreetingFallback());
+      $('#homeSubheading').textContent = shortText;
+      if (shortText !== cached.text) { try { localStorage.setItem(key, JSON.stringify({ text: shortText, generatedAt: new Date().toISOString() })); } catch (_) {} }
       greetingRequestKey = key;
       return;
     }
@@ -566,16 +618,16 @@
       const memories = relevantMemories('welcome greeting goals preferences', 8).map(memory => `- ${memory.text}`).join('\n');
       const response = await createModelCompletion({
         messages: [
-          { role: 'system', content: `You are Quiet Pages' warm, chatty companion welcoming the diary owner. It is currently ${period}. Write 1–2 natural sentences, maximum 30 words. Make them feel welcome, not monitored. Use diary context only if the reference is clearly supportive and non-sensitive; never reveal private details or infer a mood. Avoid robotic or overly poetic clichés. Do not mention AI. If context is sparse, simply say hello naturally. No quotes or markdown.\n\nApproved memories:\n${memories || '(none)'}\n\nRecent diary entries:\n${recentEntries || '(no entries yet)'}` },
+          { role: 'system', content: `You are Quiet Pages' warm, chatty companion welcoming the diary owner. It is currently ${period}. Write exactly one short, natural sentence, maximum 12 words. Make them feel welcome, not monitored. Use diary context only if the reference is clearly supportive and non-sensitive; never reveal private details or infer a mood. Avoid robotic or overly poetic clichés. Do not mention AI. If context is sparse, simply say hello naturally. No quotes or markdown.\n\nApproved memories:\n${memories || '(none)'}\n\nRecent diary entries:\n${recentEntries || '(no entries yet)'}` },
           { role: 'user', content: `Write a fresh ${period} greeting for today. Keep it gentle and not overly sentimental. Avoid repeating a generic greeting if the context allows something more personal.` }
         ],
-        temperature: 0.85,
-        max_tokens: 70,
+        temperature: 0.75,
+        max_tokens: 32,
         ...(String(engine?._qpModelId || state.settings.modelId || '').toLowerCase().includes('qwen3') ? { extra_body: { enable_thinking: false } } : {})
       });
       const text = cleanAssistantOutput(response?.choices?.[0]?.message?.content || '').trim().replace(/^['"“”]+|['"“”]+$/g, '');
       if (text && currentScreen === 'diary' && greetingCacheKey() === key) {
-        const greeting = text.split(/\n+/)[0].slice(0, 240);
+        const greeting = shortenGreeting(text.split(/\n+/)[0], fallback);
         $('#homeSubheading').textContent = greeting;
         try { localStorage.setItem(key, JSON.stringify({ text: greeting, generatedAt: new Date().toISOString() })); } catch (_) {}
       }
@@ -655,8 +707,7 @@
     const first = new Date(year, month, 1);
     const mondayOffset = (first.getDay() + 6) % 7;
     const start = new Date(year, month, 1 - mondayOffset);
-    const entriesByDate = new Map();
-    state.entries.forEach(entry => { if (!entriesByDate.has(entry.date)) entriesByDate.set(entry.date, entry); });
+    const entryDates = new Set(state.entries.map(entry => entry.date));
     const cells = [];
     for (let i = 0; i < 42; i++) {
       const date = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
@@ -664,10 +715,8 @@
       const outside = date.getMonth() !== month;
       const isToday = key === TODAY;
       const isSelected = key === selectedCalendarDate;
-      const entryForDay = entriesByDate.get(key);
-      const hasEntry = Boolean(entryForDay);
-      const dayMood = entryForDay ? moodInfo(entryForDay.mood) : null;
-      cells.push(`<button class="calendar-day${outside ? ' outside' : ''}${isToday ? ' today' : ''}${isSelected ? ' selected' : ''}" role="gridcell" aria-label="${escapeHTML(formatDate(key))}${hasEntry ? ', has diary entries' : ''}${dayMood ? `, mood ${escapeHTML(dayMood.label)}` : ''}" aria-pressed="${isSelected}" data-calendar-date="${key}"><span>${date.getDate()}</span>${hasEntry ? (dayMood ? `<i class="day-mood" aria-hidden="true">${dayMood.emoji}</i>` : '<i class="day-dot"></i>') : ''}</button>`);
+      const hasEntry = entryDates.has(key);
+      cells.push(`<button class="calendar-day${outside ? ' outside' : ''}${isToday ? ' today' : ''}${isSelected ? ' selected' : ''}" role="gridcell" aria-label="${escapeHTML(formatDate(key))}${hasEntry ? ', has diary entries' : ''}" aria-pressed="${isSelected}" data-calendar-date="${key}"><span>${date.getDate()}</span>${hasEntry ? '<i class="day-dot"></i>' : ''}</button>`);
     }
     $('#calendarGrid').innerHTML = cells.join('');
     $('#selectedDateLabel').textContent = formatDate(selectedCalendarDate, { weekday: 'long' }).toUpperCase();
@@ -705,9 +754,9 @@
     const photos = entry.photos || [];
     $('#screen-detail').innerHTML = `
       <div class="back-row"><button class="back-button" data-action="back-detail"><i class="bi bi-arrow-left"></i> Back to ${previousScreen === 'calendar' ? 'calendar' : 'your pages'}</button><div class="detail-actions"><button class="soft-icon-button" data-action="edit-entry" data-entry-id="${escapeHTML(entry.id)}" aria-label="Edit entry" title="Edit"><i class="bi bi-pencil"></i></button><button class="soft-icon-button" data-action="delete-entry" data-entry-id="${escapeHTML(entry.id)}" aria-label="Delete entry" title="Delete"><i class="bi bi-trash3"></i></button></div></div>
-      <div class="detail-hero theme-${theme}${cover ? ' has-image' : ''}">${cover ? `<img src="${escapeHTML(cover.dataUrl)}" alt="Cover photo for ${escapeHTML(entry.title || 'diary entry')}">` : ''}<div class="detail-hero-copy"><div class="entry-meta">${escapeHTML(formatDate(entry.date))} · ${escapeHTML(THEME_INFO[theme].label)} theme</div><h1>${escapeHTML(entry.title || 'An untitled page')}</h1>${mood ? `<span class="detail-mood">${mood.emoji} ${escapeHTML(mood.label)}</span>` : ''}${entry.tags?.length ? `<div class="detail-tags">${entry.tags.map(tag => `<span>#${escapeHTML(tag)}</span>`).join('')}</div>` : ''}</div></div>
+      <div class="detail-hero theme-${theme}${cover ? ' has-image' : ''}">${cover ? `<img src="${escapeHTML(cover.dataUrl)}" alt="Cover photo for ${escapeHTML(entry.title || 'diary entry')}">` : ''}<div class="detail-hero-copy"><div class="entry-meta">${escapeHTML(formatDate(entry.date))} · ${escapeHTML(THEME_INFO[theme].label)} theme</div><h1>${escapeHTML(entry.title || 'An untitled page')}</h1>${mood ? `<span class="detail-mood">${mood.emoji} ${escapeHTML(mood.label)}</span>` : ''}</div></div>
       <article class="detail-content"><div class="detail-writing${richTextHasContent(entry.body) ? '' : ' empty-writing'}">${richTextHasContent(entry.body) ? sanitizeRichHtml(entry.body) : 'This page is still waiting for its words.'}</div>
-      ${photos.length ? `<div class="detail-gallery" aria-label="Entry photos">${photos.map((photo, i) => `<figure class="detail-photo-figure"><button type="button" data-view-photo="${i}" aria-label="View photo ${i + 1}"><img src="${escapeHTML(photo.dataUrl)}" alt="${escapeHTML(photo.caption || `Diary photo ${i + 1}`)}" loading="lazy"></button>${photo.caption ? `<figcaption>${escapeHTML(photo.caption)}</figcaption>` : ''}</figure>`).join('')}</div>` : ''}
+      ${photos.length ? `<div class="detail-gallery" aria-label="Entry photos">${photos.map((photo, i) => `<button type="button" data-view-photo="${i}" aria-label="View photo ${i + 1}"><img src="${escapeHTML(photo.dataUrl)}" alt="Diary photo ${i + 1}" loading="lazy"></button>`).join('')}</div>` : ''}
       ${entry.reflection ? `<div class="reflection-card"><strong><i class="bi bi-stars"></i> A reflection</strong><p>${escapeHTML(entry.reflection)}</p></div>` : ''}
       <div class="detail-footer"><span>Saved ${escapeHTML(new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }).format(new Date(entry.updatedAt || entry.createdAt)))}</span><button class="text-button" data-action="reflect-entry" data-entry-id="${escapeHTML(entry.id)}"><i class="bi bi-stars"></i> Reflect with companion</button></div></article>`;
     navTo('detail');
@@ -721,20 +770,19 @@
     editorIsNew = !existing;
     currentEditId = existing ? existing.id : id();
     editorData = existing ? JSON.parse(JSON.stringify(existing)) : {
-      id: currentEditId, title: '', body: '', date, mood: '', theme: activeTheme(), photos: [], tags: [], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), reflection: ''
+      id: currentEditId, title: '', body: '', date, mood: '', theme: activeTheme(), photos: [], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), reflection: ''
     };
     editorDirty = false;
     previousScreen = currentScreen === 'calendar' ? 'calendar' : (currentScreen === 'detail' ? previousScreen : 'diary');
     renderEditor();
     navTo('editor');
-    // Do not auto-focus the title: iOS Safari can open the keyboard during the screen transition
-    // and scroll the title out from under the user. Let the user choose title or body explicitly.
+    setTimeout(() => $('#editorTitle')?.focus({ preventScroll: true }), 120);
   }
   function renderEditor() {
     savedEditorRange = null;
     const data = editorData;
     const moods = MOODS.map(mood => `<button type="button" class="mood-option${data.mood === mood.value ? ' active' : ''}" data-mood="${mood.value}" aria-pressed="${data.mood === mood.value}"><span>${mood.emoji}</span>${escapeHTML(mood.label)}</button>`).join('');
-    const photos = (data.photos || []).map((photo, index) => `<div class="photo-preview${photo.cover ? ' cover' : ''}"><img src="${escapeHTML(photo.dataUrl)}" alt="Selected diary photo ${index + 1}"><button type="button" class="photo-remove" data-remove-photo="${escapeHTML(photo.id)}" aria-label="Remove photo"><i class="bi bi-x"></i></button><button type="button" class="cover-select" data-cover-photo="${escapeHTML(photo.id)}">${photo.cover ? 'COVER' : 'MAKE COVER'}</button><label class="photo-caption-label"><span class="sr-only">Photo caption</span><input class="photo-caption" data-photo-caption="${escapeHTML(photo.id)}" maxlength="300" placeholder="Add a caption…" value="${escapeHTML(photo.caption || '')}"></label></div>`).join('');
+    const photos = (data.photos || []).map((photo, index) => `<div class="photo-preview${photo.cover ? ' cover' : ''}"><img src="${escapeHTML(photo.dataUrl)}" alt="Selected diary photo ${index + 1}"><button type="button" class="photo-remove" data-remove-photo="${escapeHTML(photo.id)}" aria-label="Remove photo"><i class="bi bi-x"></i></button><button type="button" class="cover-select" data-cover-photo="${escapeHTML(photo.id)}">${photo.cover ? 'COVER' : 'MAKE COVER'}</button></div>`).join('');
     $('#screen-editor').innerHTML = `<div class="back-row"><button class="back-button" data-action="cancel-editor"><i class="bi bi-arrow-left"></i> Back</button><span class="subtle-count">${editorIsNew ? 'A NEW PAGE' : 'EDITING PAGE'}</span></div>
       <div class="editor-card"><div class="eyebrow"><span class="eyebrow-dot"></span>A PAGE OF YOUR OWN</div><p class="editor-intro-note">A little space for whatever you want to keep.</p>
       <div class="editor-field"><label class="sr-only" for="editorTitle">Entry title</label><input id="editorTitle" class="title-input" maxlength="140" placeholder="Give this day a name…" value="${escapeHTML(data.title)}"></div>
@@ -742,37 +790,20 @@
       <div class="rich-toolbar" role="toolbar" aria-label="Writing format tools">
         <button type="button" data-format="bold" aria-label="Bold" title="Bold"><i class="bi bi-type-bold" aria-hidden="true"></i></button><button type="button" data-format="italic" aria-label="Italic" title="Italic"><i class="bi bi-type-italic" aria-hidden="true"></i></button><button type="button" data-format="underline" aria-label="Underline" title="Underline"><i class="bi bi-type-underline" aria-hidden="true"></i></button>
         <span class="toolbar-divider"></span><button type="button" data-block="h2" title="Heading" aria-label="Heading"><i class="bi bi-type-h1" aria-hidden="true"></i></button><button type="button" data-block="h3" title="Subheading" aria-label="Subheading"><i class="bi bi-type-h2" aria-hidden="true"></i></button><button type="button" data-block="blockquote" title="Quote" aria-label="Quote"><i class="bi bi-quote" aria-hidden="true"></i></button>
-        <select id="editorFont" aria-label="Font family" title="Font family"><option value="Georgia">System serif</option><option value="Caveat">Caveat</option><option value="Lora">Lora</option><option value="Patrick Hand">Patrick Hand</option><option value="DM Sans">DM Sans</option><option value="EB Garamond">EB Garamond</option><option value="Arial">System sans</option><option value="monospace">Mono</option></select><select id="editorFontSize" aria-label="Text size" title="Text size"><option value="3">Normal</option><option value="2">Small</option><option value="4">Large</option><option value="5">Larger</option></select>
+        <select id="editorFont" aria-label="Font family" title="Font family"><option value="Georgia">Serif</option><option value="Arial">Sans</option><option value="monospace">Mono</option></select><select id="editorFontSize" aria-label="Text size" title="Text size"><option value="3">Normal</option><option value="2">Small</option><option value="4">Large</option><option value="5">Larger</option></select>
         <label class="highlight-picker" title="Highlight text" aria-label="Highlight text"><i class="bi bi-highlighter" aria-hidden="true"></i><input id="highlightColor" type="color" value="#fff09a" aria-label="Highlight colour"></label>
         <label class="text-color-picker" title="Text colour" aria-label="Text colour"><i class="bi bi-palette" aria-hidden="true"></i><input id="textColor" type="color" value="#2c3b35" aria-label="Text colour"></label>
-        <button type="button" data-insert-block="divider" title="Insert divider" aria-label="Insert divider"><i class="bi bi-three-dots" aria-hidden="true"></i></button><button type="button" data-insert-block="sticker" title="Insert decorative sticker" aria-label="Insert sticker"><i class="bi bi-stars" aria-hidden="true"></i></button><button type="button" data-insert-block="sticky-note" title="Insert editable sticky note" aria-label="Insert sticky note"><i class="bi bi-sticky" aria-hidden="true"></i></button><button type="button" id="inlineImageButton" title="Insert image between paragraphs" aria-label="Insert image"><i class="bi bi-image" aria-hidden="true"></i></button><input id="inlineImageInput" class="hidden" type="file" accept="image/*">
+        <button type="button" id="inlineImageButton" title="Insert image between paragraphs" aria-label="Insert image"><i class="bi bi-image" aria-hidden="true"></i></button><input id="inlineImageInput" class="hidden" type="file" accept="image/*">
         <button type="button" data-format="removeFormat" title="Clear formatting" aria-label="Clear formatting"><i class="bi bi-eraser" aria-hidden="true"></i></button>
       </div>
       <div id="editorBody" class="entry-writing-input rich-editor" contenteditable="true" role="textbox" aria-multiline="true" data-placeholder="Start anywhere. A moment, a thought, something you don't want to forget…">${sanitizeRichHtml(data.body)}</div>
       <p class="hint">Your original words stay yours. Format them however you like. Changes save on this device.</p></div>
-      <div class="editor-meta-grid"><div class="editor-field"><label for="editorDate">Date</label><input type="date" id="editorDate" value="${escapeHTML(data.date)}" required></div><div class="editor-field"><label for="editorTheme">Entry theme</label><select id="editorTheme"><option value="sky" ${data.theme === 'sky' ? 'selected' : ''}>Sky</option><option value="coral" ${data.theme === 'coral' ? 'selected' : ''}>Coral</option><option value="mint" ${data.theme === 'mint' ? 'selected' : ''}>Mint</option><option value="lavender" ${data.theme === 'lavender' ? 'selected' : ''}>Lavender</option><option value="rose" ${data.theme === 'rose' ? 'selected' : ''}>Rose</option><option value="peach" ${data.theme === 'peach' ? 'selected' : ''}>Peach</option><option value="sand" ${data.theme === 'sand' ? 'selected' : ''}>Sand</option><option value="ocean" ${data.theme === 'ocean' ? 'selected' : ''}>Ocean</option></select></div></div>
+      <div class="editor-meta-grid"><div class="editor-field"><label for="editorDate">Date</label><input type="date" id="editorDate" value="${escapeHTML(data.date)}" required></div><div class="editor-field"><label for="editorTheme">Entry theme</label><select id="editorTheme"><option value="sky" ${data.theme === 'sky' ? 'selected' : ''}>Sky</option><option value="coral" ${data.theme === 'coral' ? 'selected' : ''}>Coral</option><option value="mint" ${data.theme === 'mint' ? 'selected' : ''}>Mint</option><option value="lavender" ${data.theme === 'lavender' ? 'selected' : ''}>Lavender</option></select></div></div>
       <div class="editor-field"><label>How did today feel? <span class="hint">(optional)</span></label><div class="mood-picker">${moods}</div></div>
-      <div class="editor-field"><label for="editorTags">Tags <span class="hint">(optional, comma-separated)</span></label><input id="editorTags" type="text" maxlength="300" placeholder="college, ideas, travel" value="${escapeHTML((data.tags || []).join(", "))}"><p class="hint">Tags stay on this device and are included in search and backups.</p></div>
       <div class="editor-field"><label>Photos <span class="hint">(optional, up to 12)</span></label><div class="photo-drop"><label for="photoInput"><i class="bi bi-images"></i> Choose from gallery</label><input id="photoInput" class="hidden" type="file" accept="image/*" multiple><p>Photos are resized for storage and remain in this browser. Choose one photo as the cover.</p></div><div id="photoPreviews" class="photo-previews">${photos}</div></div>
       <div class="autosave-status" id="autosaveStatus">${editorIsNew ? 'Your page is not saved until you start writing.' : 'All changes are saved on this device.'}</div>
       <div class="editor-footer"><div class="left">${editorIsNew ? '' : `<button class="secondary-button editor-delete" data-action="delete-entry" data-entry-id="${escapeHTML(data.id)}"><i class="bi bi-trash3"></i> Delete</button>`}</div><button type="button" class="primary-button" id="saveEntryButton"><i class="bi bi-check2"></i> Save page</button></div></div>`;
     bindEditorEvents();
-    mountEditorToolbarAccessory();
-  }
-  function mountEditorToolbarAccessory() {
-    // A fixed element inside .screen/.app-shell can inherit a transformed containing block on iOS.
-    // Move the toolbar to a direct body-level accessory and leave a placeholder in the editor flow.
-    document.getElementById('qpEditorAccessory')?.remove();
-    const toolbar = $('#screen-editor .rich-toolbar');
-    if (!toolbar) return;
-    const placeholder = document.createComment('Quiet Pages formatting toolbar position');
-    toolbar.parentNode.insertBefore(placeholder, toolbar);
-    const accessory = document.createElement('div');
-    accessory.id = 'qpEditorAccessory';
-    accessory.appendChild(toolbar);
-    document.body.appendChild(accessory);
-    toolbar.dataset.portal = 'true';
-    toolbar._qpPlaceholder = placeholder;
   }
   function bindEditorEvents() {
     const title = $('#editorTitle');
@@ -793,29 +824,23 @@
     body.addEventListener('input', rememberSelection);
     body.addEventListener('touchend', () => setTimeout(rememberSelection, 0), { passive: true });
     const restoreSelection = () => {
-      const selection = window.getSelection();
-      if (!body.contains(selection?.anchorNode) && savedEditorRange && body.contains(savedEditorRange.commonAncestorContainer)) {
-        try { selection?.removeAllRanges(); selection?.addRange(savedEditorRange); } catch (_) { savedEditorRange = null; }
-      }
       body.focus({ preventScroll: true });
-      const activeSelection = window.getSelection();
-      if (!activeSelection) return;
-      activeSelection.removeAllRanges();
+      const selection = window.getSelection();
+      if (!selection) return;
+      selection.removeAllRanges();
       if (savedEditorRange && body.contains(savedEditorRange.commonAncestorContainer)) {
-        try { activeSelection.addRange(savedEditorRange); return; } catch (_) { savedEditorRange = null; }
+        try { selection.addRange(savedEditorRange); return; } catch (_) { savedEditorRange = null; }
       }
       const range = document.createRange();
       range.selectNodeContents(body);
       range.collapse(false);
-      activeSelection.addRange(range);
+      selection.addRange(range);
     };
     const track = () => {
       editorData.title = title.value;
       editorData.body = sanitizeRichHtml(body.innerHTML);
       editorData.date = date.value || TODAY;
       editorData.theme = THEMES.includes(theme.value) ? theme.value : activeTheme();
-      const tagsInput = $('#editorTags');
-      editorData.tags = tagsInput ? [...new Set(tagsInput.value.split(',').map(tag => tag.trim().replace(/^#/, '').slice(0, 32)).filter(Boolean))].slice(0, 20) : (editorData.tags || []);
       editorData.updatedAt = new Date().toISOString();
       editorDirty = true;
       $('#autosaveStatus').textContent = 'Saving changes…';
@@ -825,38 +850,27 @@
     };
     title.addEventListener('input', track);
     body.addEventListener('input', track);
-    $('#editorTags').addEventListener('input', track);
-    // Save the editor range before any toolbar interaction. Prevent focus loss for action buttons,
-    // but leave native selects and colour inputs operable on Android/iOS.
-    $$('.rich-toolbar', document).forEach(toolbar => {
-      toolbar.addEventListener('pointerdown', event => { if (body.contains(document.activeElement) || body.contains(window.getSelection()?.anchorNode)) rememberSelection(); }, true);
-      toolbar.addEventListener('mousedown', event => { if (event.target.closest('button,[data-insert-block]')) event.preventDefault(); }, true);
-    });
-    $$('.rich-toolbar button', document).forEach(button => button.addEventListener('pointerdown', event => { rememberSelection(); if (!event.target.closest('input,select')) event.preventDefault(); }));
-    $$('.rich-toolbar [data-format]', document).forEach(button => button.addEventListener('click', () => {
+    // Prevent mouse-down from discarding the selected range before a toolbar command runs.
+    $$('.rich-toolbar button', $('#screen-editor')).forEach(button => button.addEventListener('mousedown', event => event.preventDefault()));
+    $$('.rich-toolbar [data-format]', $('#screen-editor')).forEach(button => button.addEventListener('click', () => {
       restoreSelection();
       document.execCommand('styleWithCSS', false, true);
       document.execCommand(button.dataset.format, false, null);
       track();
       rememberSelection();
     }));
-    $$('.rich-toolbar [data-block]', document).forEach(button => button.addEventListener('click', () => {
+    $$('.rich-toolbar [data-block]', $('#screen-editor')).forEach(button => button.addEventListener('click', () => {
       restoreSelection();
       document.execCommand('formatBlock', false, `<${button.dataset.block}>`);
       track();
       rememberSelection();
     }));
-    $('#editorFont').addEventListener('change', async event => {
-      const family = event.target.value;
-      restoreSelection();
-      const fontLoaded = FONT_NAMES.includes(family) ? await ensureDiaryFont(family) : true;
+    $('#editorFont').addEventListener('change', event => {
       restoreSelection();
       document.execCommand('styleWithCSS', false, true);
-      document.execCommand('fontName', false, family);
+      document.execCommand('fontName', false, event.target.value);
       track();
       rememberSelection();
-      document.body.classList.add('qp-toolbar-formatting');
-      toast(fontLoaded ? `${family} applied.` : `${family} selected; connect once to download its font for offline use.`, fontLoaded ? '' : 'error');
     });
     $('#editorFontSize').addEventListener('change', event => {
       restoreSelection();
@@ -897,32 +911,6 @@
       } catch (error) { toast('That image could not be inserted.', 'error'); }
       event.target.value = '';
     });
-    $$('.rich-toolbar [data-insert-block]', document).forEach(button => button.addEventListener('click', () => {
-      restoreSelection();
-      const kind = button.dataset.insertBlock;
-      const stickerSet = [{id:'sparkle',text:'✦ ✧ ✦'},{id:'flower',text:'✿ ❀ ✿'},{id:'moon',text:'☾ ✧ ☽'},{id:'leaf',text:'❧ ❦ ❧'},{id:'heart',text:'♡ ♥ ♡'},{id:'butterfly',text:'🦋 ✧ 🦋'},{id:'star',text:'☆ ★ ☆'}];
-      window.qpStickerIndex = (window.qpStickerIndex || 0) % stickerSet.length;
-      window.qpNoteIndex = (window.qpNoteIndex || 0) % 5;
-      const sticker = stickerSet[window.qpStickerIndex++];
-      const noteColor = ['butter','rose','mint','lavender','sky'][window.qpNoteIndex++];
-      const markup = kind === 'divider' ? '<hr class="scrapbook-divider"><p><br></p>' : kind === 'sticky-note' ? `<div class="scrapbook-sticky-note" contenteditable="true" role="textbox" aria-label="Editable sticky note" data-note-color="${noteColor}">Write your note here…</div><p><br></p>` : `<p class="scrapbook-sticker" contenteditable="false" data-sticker="${sticker.id}">${sticker.text}</p><p><br></p>`;
-      document.execCommand('insertHTML', false, markup);
-      track(); rememberSelection();
-    }));
-    $$('.photo-caption', $('#screen-editor')).forEach(input => input.addEventListener('input', () => {
-      const photo = editorData.photos.find(item => item.id === input.dataset.photoCaption);
-      if (photo) photo.caption = input.value.slice(0, 300);
-      editorData.updatedAt = new Date().toISOString(); editorDirty = true; scheduleEditorSave();
-    }));
-    $$('.photo-remove', $('#screen-editor')).forEach(button => button.addEventListener('click', () => {
-      editorData.photos = editorData.photos.filter(photo => photo.id !== button.dataset.removePhoto);
-      if (editorData.photos.length && !editorData.photos.some(photo => photo.cover)) editorData.photos[0].cover = true;
-      editorDirty = true; renderEditor(); scheduleEditorSave();
-    }));
-    $$('.cover-select', $('#screen-editor')).forEach(button => button.addEventListener('click', () => {
-      editorData.photos.forEach(photo => photo.cover = photo.id === button.dataset.coverPhoto);
-      editorDirty = true; renderEditor(); scheduleEditorSave();
-    }));
     date.addEventListener('change', track);
     theme.addEventListener('change', track);
     $$('.mood-option', $('#screen-editor')).forEach(button => button.addEventListener('click', () => {
@@ -940,7 +928,7 @@
         try {
           $('#autosaveStatus').textContent = 'Preparing photos…';
           const dataUrl = await resizeImage(file);
-          const photo = { id: id(), dataUrl, cover: editorData.photos.length === 0, caption: '' };
+          const photo = { id: id(), dataUrl, cover: editorData.photos.length === 0 };
           editorData.photos.push(photo);
         } catch (error) { toast(`Could not add ${file.name}: ${error.message || 'unsupported image'}`, 'error'); }
       }
@@ -998,8 +986,6 @@
     editorData.body = sanitizeRichHtml($('#editorBody').innerHTML);
     editorData.date = $('#editorDate').value || TODAY;
     editorData.theme = $('#editorTheme').value;
-    const tagsInput = $('#editorTags');
-    editorData.tags = tagsInput ? [...new Set(tagsInput.value.split(',').map(tag => tag.trim().replace(/^#/, '').slice(0, 32)).filter(Boolean))].slice(0, 20) : (editorData.tags || []);
     const meaningful = editorData.title || richTextHasContent(editorData.body) || editorData.photos.length;
     if (!meaningful) return toast('Write something or add a photo before saving this page.');
     if (!editorData.photos.some(photo => photo.cover) && editorData.photos.length) editorData.photos[0].cover = true;
@@ -1548,47 +1534,6 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
       toast('Backup prepared. On iPhone, choose Save to Files if prompted.');
     } catch (error) { toast(error.message || 'Could not create backup.', 'error'); }
   }
-  async function exportReadableHtml() {
-    try {
-      await saveNow();
-      const entries = sortedEntries();
-      const pages = entries.map(entry => {
-        const tags = (entry.tags || []).map(tag => `<span class="tag">#${escapeHTML(tag)}</span>`).join(' ');
-        const photos = (entry.photos || []).map(photo => `<figure><img src="${escapeHTML(photo.dataUrl)}" alt="${escapeHTML(photo.caption || 'Diary photo')}">${photo.caption ? `<figcaption>${escapeHTML(photo.caption)}</figcaption>` : ''}</figure>`).join('');
-        return `<article><header><p>${escapeHTML(formatDate(entry.date))} · ${escapeHTML(THEME_INFO[entry.theme]?.label || 'Sky')}</p><h1>${escapeHTML(entry.title || 'Untitled page')}</h1>${tags}</header><section>${sanitizeRichHtml(entry.body)}</section><div class="photos">${photos}</div></article>`;
-      }).join('<hr>');
-      const documentHtml = `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Quiet Pages archive</title><style>body{max-width:760px;margin:40px auto;padding:0 20px;font:17px/1.8 Georgia,serif;color:#2c3b35;background:#f7f5ef}article{margin:0 0 48px;padding:28px;background:#fffdf8;border-radius:22px}header p{font:12px system-ui;color:#718078}h1{font-size:2rem;line-height:1.2}.tag{font:12px system-ui;color:#37654f;background:#eaf4eb;border-radius:20px;padding:4px 8px}img{max-width:100%;height:auto;border-radius:12px}figure{margin:18px 0}figcaption{font:13px system-ui;color:#68746e}blockquote{border-left:3px solid #aacbb6;padding-left:18px;color:#4f6659}.scrapbook-divider{border:0;border-top:1px solid #d6e4d9;margin:24px 0}</style><body><h1>Quiet Pages</h1>${pages || '<p>No entries to export.</p>'}</body></html>`;
-      const blob = new Blob([documentHtml], { type: 'text/html;charset=utf-8' });
-      const url = URL.createObjectURL(blob); const anchor = document.createElement('a');
-      anchor.href = url; anchor.download = `quiet-pages-archive-${TODAY}.html`; anchor.style.display = 'none'; document.body.append(anchor); anchor.click(); anchor.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 30000); toast('Readable HTML archive prepared.');
-    } catch (error) { toast(error.message || 'Could not export HTML.', 'error'); }
-  }
-
-  function exportPrintPdf() {
-    try {
-      // Start persistence, but do not await it: iOS Safari may discard the
-      // user-activation needed by window.print() after an async boundary.
-      saveNow().catch(() => {});
-      const root = $('#printRoot');
-      const pages = sortedEntries().map(entry => {
-        const tags = (entry.tags || []).map(tag => `#${escapeHTML(tag)}`).join(' · ');
-        const photos = (entry.photos || []).map(photo => `<figure><img src="${escapeHTML(photo.dataUrl)}" alt="${escapeHTML(photo.caption || 'Diary photo')}">${photo.caption ? `<figcaption>${escapeHTML(photo.caption)}</figcaption>` : ''}</figure>`).join('');
-        return `<article class="print-page"><h1>${escapeHTML(entry.title || 'Untitled page')}</h1><div class="print-meta">${escapeHTML(formatDate(entry.date))} · ${escapeHTML(THEME_INFO[entry.theme]?.label || 'Sky')}${entry.mood ? ` · ${escapeHTML(moodInfo(entry.mood)?.label || entry.mood)}` : ''}</div>${tags ? `<div class="print-tags">${tags}</div>` : ''}<section>${sanitizeRichHtml(entry.body)}</section>${photos}</article>`;
-      }).join('');
-      if (!pages) return toast('There are no entries to print yet.');
-      root.innerHTML = `<h1>Quiet Pages</h1><p class="print-meta">Private diary archive · ${escapeHTML(formatDate(TODAY))}</p>${pages}`;
-      root.setAttribute('aria-hidden','false');
-      const cleanup = () => { root.innerHTML = ''; root.setAttribute('aria-hidden','true'); window.removeEventListener('afterprint', cleanup); };
-      window.addEventListener('afterprint', cleanup, { once:true });
-      // Invoke print synchronously in the original button gesture.
-      // Some iOS standalone PWA contexts still do not expose a print UI;
-      // in that case use Export readable HTML and Share > Print from Safari.
-      window.print();
-      setTimeout(cleanup, 120000);
-    } catch (error) { toast(error.message || 'Could not prepare the PDF print view.', 'error'); }
-  }
-
   async function importBackup(file) {
     if (!file) return;
     if (file.size > 250 * 1024 * 1024) return toast('This backup is over 250 MB and cannot be imported by this app.', 'error');
@@ -1597,10 +1542,8 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
       const payload = parsed?.data ? parsed.data : parsed;
       if (!payload || !Array.isArray(payload.entries) || !Array.isArray(payload.memories)) throw new Error('This file does not look like a Quiet Pages backup.');
       const imported = normalizeState(payload);
-      const ok = await askConfirm('Restore this backup?', `This will replace the current ${state.entries.length} entries and ${state.memories.length} memories with ${imported.entries.length} entries and ${imported.memories.length} memories from the selected file. A recovery backup will be downloaded first.`, 'Restore backup');
+      const ok = await askConfirm('Restore this backup?', `This will replace the current ${state.entries.length} entries and ${state.memories.length} memories with ${imported.entries.length} entries and ${imported.memories.length} memories from the selected file. Export a backup first if needed.`, 'Restore backup');
       if (!ok) return;
-      // Best-effort recovery export before destructive replacement.
-      try { const recovery = new Blob([JSON.stringify({ app: 'Quiet Pages', formatVersion: 1, exportedAt: new Date().toISOString(), data: state }, null, 2)], { type: 'application/json' }); const recoveryUrl = URL.createObjectURL(recovery); const a = document.createElement('a'); a.href = recoveryUrl; a.download = `quiet-pages-before-restore-${TODAY}.json`; a.click(); setTimeout(() => URL.revokeObjectURL(recoveryUrl), 30000); } catch (_) {}
       state = imported;
       const persisted = await saveNow();
       applySettings(); renderAll(); navTo('diary');
@@ -1617,15 +1560,16 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
 
   // Event delegation for generated cards/screens.
   document.addEventListener('click', async event => {
+    const closeStoryButton = event.target.closest('[data-story-close]');
+    if (closeStoryButton) { closeStory(); return; }
+    const storyButton = event.target.closest('[data-story-index]');
+    if (storyButton) { openStory(storyButton.dataset.storyIndex); return; }
+    if (event.target.closest('[data-story-prev]')) { moveStory(-1); return; }
+    if (event.target.closest('[data-story-next]')) { moveStory(1); return; }
+    const storyOpenEntry = event.target.closest('[data-story-open-entry]');
+    if (storyOpenEntry) { const entryId = storyOpenEntry.dataset.storyOpenEntry; closeStory(); openDetail(entryId); return; }
     const nav = event.target.closest('[data-nav]');
     if (nav) { event.preventDefault(); navTo(nav.dataset.nav); return; }
-    const tagFilter = event.target.closest('[data-filter-tag]');
-    if (tagFilter) {
-      event.preventDefault(); event.stopPropagation();
-      const panel = $('#searchPanel'); panel?.classList.remove('hidden');
-      $('#searchInput').value = tagFilter.dataset.filterTag;
-      renderDiary(); return;
-    }
     const entryOpen = event.target.closest('[data-open-entry]');
     if (entryOpen) { openDetail(entryOpen.dataset.openEntry); return; }
     const themeButton = event.target.closest('[data-theme-choice]');
@@ -1679,6 +1623,11 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
   });
 
   document.addEventListener('keydown', event => {
+    if (!$('#storyViewer').classList.contains('hidden')) {
+      if (event.key === 'Escape') { event.preventDefault(); closeStory(); return; }
+      if (event.key === 'ArrowRight') { event.preventDefault(); moveStory(1); return; }
+      if (event.key === 'ArrowLeft') { event.preventDefault(); moveStory(-1); return; }
+    }
     const entryOpen = event.target.closest?.('[data-open-entry]');
     if (entryOpen && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); openDetail(entryOpen.dataset.openEntry); }
     if (event.key === 'Escape') $$('.detail-photo-overlay').forEach(overlay => overlay.remove());
@@ -1686,7 +1635,7 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
 
   $('#floatingAdd').addEventListener('click', () => openEditor(null, currentScreen === 'calendar' ? selectedCalendarDate : TODAY));
   $('#settingsShortcut').addEventListener('click', () => navTo('settings'));
-  $('#searchToggle').addEventListener('click', () => { $('#searchPanel').classList.remove('hidden'); renderDiary(); $('#searchInput').focus(); });
+  $('#searchToggle').addEventListener('click', () => { $('#searchPanel').classList.remove('hidden'); $('#searchInput').focus(); });
   $('#closeSearch').addEventListener('click', () => { $('#searchInput').value = ''; $('#searchPanel').classList.add('hidden'); renderDiary(); });
   $('#searchInput').addEventListener('input', renderDiary);
   $('#prevMonth').addEventListener('click', () => { calendarCursor = new Date(calendarCursor.getFullYear(), calendarCursor.getMonth() - 1, 1); renderCalendar(); });
@@ -1713,139 +1662,6 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
       state.memories = state.memories.filter(item => item.id !== memory.id); await saveNow(); renderCompanion(); toast('Memory deleted.');
     }
   });
-  const MOTIVATIONAL_QUOTES = [
-    'Remember who you are, even on the days you forget.',
-    'This time shall pass, too.',
-    'You have survived days you once thought you could not.',
-    'You do not have to solve your whole life today.',
-    'Rest is part of the journey, not a failure of it.',
-    'Your worth is not measured by your productivity.',
-    'A difficult chapter is not the whole story.',
-    'You are allowed to begin again, as many times as needed.',
-    'Small steps still move you forward.',
-    'Speak to yourself like someone you love.',
-    'You can be a work in progress and still be worthy.',
-    'Not every thought deserves to become a belief.',
-    'You have permission to outgrow old versions of yourself.',
-    "You do not need to bloom on anyone else's schedule.",
-    'One quiet breath is a place to start.',
-    'You are more than the worst thing you have felt.',
-    'Let today be a day, not a verdict on your life.',
-    'Progress can be invisible and still be real.',
-    'You can pause without giving up.',
-    'Your future is not limited to how today feels.',
-    'You deserve the kindness you keep giving away.',
-    'It is okay to take the long way back to yourself.',
-    'You do not need every answer to take one good step.',
-    'Some days, getting through is enough.',
-    'You are still becoming. Give yourself room.',
-    'Let the moment be temporary, not your identity.',
-    'You can change direction without calling the past a waste.',
-    'There is courage in asking for help.',
-    'You are not behind in a life only you are living.',
-    'Be patient with the person you are learning to be.',
-    'A softer day is still a meaningful day.',
-    'You can release what no longer fits your life.',
-    'You are allowed to protect your peace.',
-    'The way forward can begin with one small choice.',
-    'You do not have to earn the right to rest.',
-    'Your feelings are real, but they are not the entire horizon.',
-    'Give yourself the same chance you give other people.',
-    'You can be grateful and still want things to change.',
-    'Even slow healing is movement.',
-    'There is no shame in starting from where you are.',
-    'Your story has room for better days.',
-    'You are not required to be strong every minute.',
-    'Let one mistake be an event, not a definition.',
-    'You can miss what was and still welcome what comes next.',
-    'Keep a little hope for the version of you that comes after this.',
-    'You matter outside of what you achieve.',
-    'You are allowed to make your life feel like yours.',
-    'Take the next step, not every step at once.',
-    'A hard day does not erase all the good you carry.',
-    'Be here for yourself, especially when it is difficult.',
-    'You can move gently and still move forward.'
-  ];
-  function pickMotivationalQuote() {
-    let previous = -1; try { previous = Number(localStorage.getItem("qpMotivationalQuoteIndex") || -1); } catch (_) {}
-    let index = Math.floor(Math.random() * MOTIVATIONAL_QUOTES.length);
-    if (MOTIVATIONAL_QUOTES.length > 1 && index === previous) index = (index + 1 + Math.floor(Math.random() * (MOTIVATIONAL_QUOTES.length - 1))) % MOTIVATIONAL_QUOTES.length;
-    try { localStorage.setItem("qpMotivationalQuoteIndex", String(index)); } catch (_) {}
-    return MOTIVATIONAL_QUOTES[index];
-  }
-
-  function updateNotificationStatus(message = '') {
-    const el = $('#notificationStatus');
-    if (!el) return;
-    if (message) { el.textContent = message; return; }
-    if (!('Notification' in window)) { el.textContent = 'This browser does not support notifications.'; return; }
-    const permission = Notification.permission;
-    if (permission === 'denied') { el.textContent = 'Notifications are blocked in browser or device settings. Change permission there to enable them.'; return; }
-    if (state.settings.reminders?.enabled && permission === 'granted') { el.textContent = `Daily motivational quote is set for ${state.settings.reminders.time}. It is checked while Quiet Pages is open. ${MOTIVATIONAL_QUOTES.length} original quotes rotate; private diary text is never included.`; return; }
-    if (state.settings.reminders?.enabled) { el.textContent = 'Reminder is selected, but notification permission is not granted yet. Tap Enable notifications.'; return; }
-    el.textContent = permission === 'granted' ? 'Notifications are allowed. Turn on the daily reminder when you want it.' : 'Notifications are off. Choose a time and enable them when ready.';
-  }
-
-  async function showQuietNotification(title, body, tag = 'quiet-pages') {
-    if (!('Notification' in window)) { updateNotificationStatus('This browser does not support notifications.'); return false; }
-    if (Notification.permission !== 'granted') { updateNotificationStatus('Allow notifications first, using the Enable notifications button.'); return false; }
-    try {
-      if ('serviceWorker' in navigator) {
-        const registration = await navigator.serviceWorker.ready;
-        await registration.showNotification(title, { body, icon: new URL('./icons/icon-192.png', document.baseURI).href, badge: new URL('./icons/icon.svg', document.baseURI).href, tag, renotify: false, data: { url: new URL('./', document.baseURI).href } });
-      } else { new Notification(title, { body, tag }); }
-      return true;
-    } catch (error) { updateNotificationStatus('Could not show a notification in this browser. Check site permissions.'); return false; }
-  }
-
-  async function enableNotifications() {
-    if (!('Notification' in window)) { updateNotificationStatus('This browser does not support notifications.'); return; }
-    if (!window.isSecureContext) { updateNotificationStatus('Notifications require HTTPS. Open the secure Quiet Pages website.'); return; }
-    try {
-      const permission = await Notification.requestPermission();
-      if (permission !== 'granted') { updateNotificationStatus(permission === 'denied' ? 'Permission was denied. Enable it in browser or device settings.' : 'Permission was not granted.'); return; }
-      state.settings.reminders.enabled = Boolean($('#remindersEnabled').checked);
-      state.settings.reminders.time = $('#reminderTime').value || '20:30';
-      await saveNow();
-      updateNotificationStatus('Notifications are enabled. Send a test to confirm they appear on this device.');
-      await showQuietNotification('A note for you', pickMotivationalQuote(), 'quiet-pages-test');
-    } catch (_) { updateNotificationStatus('Could not request notification permission. Try opening Quiet Pages from its secure website or Home Screen.'); }
-  }
-
-  async function checkDiaryReminder() {
-    const reminder = state.settings.reminders;
-    if (!reminder?.enabled || !('Notification' in window) || Notification.permission !== 'granted' || document.visibilityState !== 'visible') return;
-    const now = new Date();
-    const today = dateKey(now);
-    const time = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-    if (time < reminder.time || reminder.lastReminderDate === today) return;
-    reminder.lastReminderDate = today;
-    await saveNow();
-    await showQuietNotification('A note for you', pickMotivationalQuote(), `quiet-pages-diary-${today}`);
-    updateNotificationStatus(`Today's reminder was sent. Next reminder: ${reminder.time}.`);
-  }
-
-  $('#enableNotificationsButton')?.addEventListener('click', enableNotifications);
-  $('#testNotificationButton')?.addEventListener('click', async () => {
-    if (!('Notification' in window)) { updateNotificationStatus('This browser does not support notifications.'); return; }
-    if (Notification.permission !== 'granted') { await enableNotifications(); return; }
-    const shown = await showQuietNotification('A note for you', pickMotivationalQuote(), 'quiet-pages-test');
-    if (shown) updateNotificationStatus('Test notification sent.');
-  });
-  $('#remindersEnabled')?.addEventListener('change', async () => {
-    state.settings.reminders.enabled = $('#remindersEnabled').checked;
-    if (state.settings.reminders.enabled && (!('Notification' in window) || Notification.permission !== 'granted')) {
-      updateNotificationStatus('Tap Enable notifications to grant permission.');
-    } else { updateNotificationStatus(); }
-    await saveNow();
-  });
-  $('#reminderTime')?.addEventListener('change', async () => {
-    state.settings.reminders.time = $('#reminderTime').value || '20:30';
-    await saveNow(); updateNotificationStatus();
-  });
-  window.setInterval(() => { checkDiaryReminder().catch(() => {}); }, 20000);
-  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') checkDiaryReminder().catch(() => {}); });
-
   $('#textScale').addEventListener('change', () => { state.settings.textScale = $('#textScale').value; applySettings(); scheduleSave(); });
   $('#reduceMotion').addEventListener('change', () => { state.settings.reduceMotion = $('#reduceMotion').checked; applySettings(); scheduleSave(); });
   $('#checkModelsButton').addEventListener('click', discoverModels);
@@ -1853,8 +1669,6 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
   $('#loadModelButton').addEventListener('click', loadSelectedModel);
   $('#unloadModelButton').addEventListener('click', unloadModel);
   $('#exportButton').addEventListener('click', exportBackup);
-  $('#exportPdfButton')?.addEventListener('click', exportPrintPdf);
-  $('#exportHtmlButton')?.addEventListener('click', exportReadableHtml);
   $('#importButton').addEventListener('click', () => $('#importFile').click());
   $('#importFile').addEventListener('change', async event => { if (!importBusy) { importBusy = true; await importBackup(event.target.files?.[0]); importBusy = false; } });
   $('#clearDataButton').addEventListener('click', clearAllData);
@@ -1874,178 +1688,181 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
 
   // Let the interface appear immediately, then hydrate saved data. If storage fails, the app remains usable.
   applySettings();
-  // Keyboard-aware writing layout plus scroll-direction toolbar controller.
-  // The toolbar is positioned once at the top of the viewport; scrolling only
-  // changes its visibility. This avoids continuously chasing iOS keyboard geometry.
+  // Keyboard-aware writing layout for iOS Safari/PWA. Use VisualViewport because
+  // iOS may resize the visual viewport without resizing the layout viewport.
   (() => {
-    const root = document.documentElement;
-    const bodyClass = document.body.classList;
-    let lastEditorField = null; // 'title' or 'body'
-    let baselineHeight = Math.max(window.visualViewport?.height || 0, window.innerHeight || 0);
-    let blurTimer = 0;
-    let frame = 0;
-    let followupTimers = [];
-    let lastScrollY = window.scrollY || 0;
-    let accumulatedUp = 0;
-    let accumulatedDown = 0;
-    let formattingMode = false;
-    let lastDirection = 'none';
-    const SHOW_AFTER_UP = 9;
-    const HIDE_AFTER_DOWN = 14;
+    let editorFocused = false;
+    let baselineHeight = window.visualViewport?.height || window.innerHeight;
+    let closeTimer = 0;
+    const refreshKeyboardLayout = (allowReposition = true) => {
+      const vv = window.visualViewport;
+      const visibleHeight = vv?.height || window.innerHeight;
+      const wasKeyboardOpen = document.body.classList.contains('qp-keyboard-open');
+      const keyboardLikelyOpen = editorFocused && (baselineHeight - visibleHeight > 120);
+      // Distance between the visible viewport bottom and layout viewport bottom.
+      // Update on viewport resizes/focus transitions, not every viewport scroll;
+      // iOS changes offsetTop during caret scrolling and that previously made the
+      // fixed format bar visibly chase the keyboard.
+      const keyboardBottom = vv ? Math.max(0, window.innerHeight - (vv.height + (vv.offsetTop || 0))) : Math.max(0, baselineHeight - visibleHeight);
+      if (allowReposition || !keyboardLikelyOpen || !wasKeyboardOpen) {
+        document.documentElement.style.setProperty('--qp-keyboard-bottom', `${keyboardLikelyOpen ? keyboardBottom : 0}px`);
+      }
+      document.body.classList.toggle('qp-keyboard-open', keyboardLikelyOpen);
+      if (!editorFocused && visibleHeight > baselineHeight - 80) baselineHeight = visibleHeight;
+    };
+    const bindEditorFocus = () => {
+      const editor = document.querySelector('#editorBody');
+      const title = document.querySelector('#editorTitle');
+      [editor, title].filter(Boolean).forEach(el => {
+        el.addEventListener('focus', () => {
+          editorFocused = true;
+          clearTimeout(closeTimer);
+          setTimeout(refreshKeyboardLayout, 80);
+          setTimeout(refreshKeyboardLayout, 320);
+        });
+        el.addEventListener('blur', () => {
+          closeTimer = setTimeout(() => {
+            editorFocused = !!document.querySelector('#screen-editor :is(#editorBody,#editorTitle):focus');
+            if (!editorFocused) document.body.classList.remove('qp-keyboard-open');
+            refreshKeyboardLayout();
+          }, 220);
+        });
+      });
+    };
+    const observer = new MutationObserver(bindEditorFocus);
+    observer.observe(document.querySelector('#screen-editor') || document.body, { childList:true, subtree:true });
+    window.visualViewport?.addEventListener('resize', refreshKeyboardLayout);
+    window.visualViewport?.addEventListener('scroll', () => refreshKeyboardLayout(false));
+    window.addEventListener('resize', refreshKeyboardLayout);
+    document.addEventListener('focusin', event => {
+      if (event.target.matches('#editorBody,#editorTitle')) { editorFocused = true; refreshKeyboardLayout(); }
+    });
+    document.addEventListener('focusout', event => {
+      if (event.target.matches('#editorBody,#editorTitle')) setTimeout(refreshKeyboardLayout, 250);
+    });
+    bindEditorFocus();
+  })();
 
-    const activeEditorField = () => {
+
+  // V17 editor toolbar behaviour: scroll down to get the writing canvas back;
+  // scroll up to bring formatting tools back. Viewport/keyboard movement is not
+  // interpreted as reading scroll, and the toolbar stays available while in use.
+  (() => {
+    const editorScreen = document.querySelector('#screen-editor');
+    let lastWindowY = Math.max(0, window.scrollY || 0);
+    let lastEditorY = 0;
+    let downDistance = 0;
+    let upDistance = 0;
+    let interactionUntil = 0;
+    let syncTimer = 0;
+
+    const isEditorVisible = () => Boolean(editorScreen && (currentScreen === 'editor' || editorScreen.classList.contains('active')));
+    const currentToolbar = () => editorScreen?.querySelector('.rich-toolbar');
+    const setHidden = hidden => {
+      const toolbar = currentToolbar();
+      if (!toolbar) return;
+      // Do not put a currently focused control inside an inert/hidden subtree.
+      if (hidden && toolbar.contains(document.activeElement)) hidden = false;
+      toolbar.classList.toggle('qp-toolbar-hidden', Boolean(hidden));
+      toolbar.setAttribute('aria-hidden', String(Boolean(hidden)));
+      toolbar.inert = Boolean(hidden);
+    };
+    const showToolbar = () => {
+      downDistance = 0;
+      upDistance = 0;
+      setHidden(false);
+    };
+    const resetToolbar = () => {
+      downDistance = 0;
+      upDistance = 0;
+      lastWindowY = Math.max(0, window.scrollY || 0);
+      lastEditorY = editorScreen?.querySelector('#editorBody')?.scrollTop || 0;
+      showToolbar();
+    };
+    const processDelta = delta => {
+      const toolbar = currentToolbar();
+      if (!toolbar || !isEditorVisible()) { resetToolbar(); return; }
       const active = document.activeElement;
-      if (active?.id === 'editorTitle') return 'title';
-      if (active?.id === 'editorBody') return 'body';
-      return null;
-    };
-
-    const setToolbarVisible = visible => {
-      bodyClass.toggle('qp-toolbar-visible', !!visible);
-    };
-
-    const resetToolbarState = () => {
-      accumulatedUp = 0;
-      accumulatedDown = 0;
-      formattingMode = false;
-      lastDirection = 'none';
-      setToolbarVisible(false);
-    };
-
-    const handleUserScroll = () => {
-      const currentY = window.scrollY || root.scrollTop || 0;
-      const delta = currentY - lastScrollY;
-      lastScrollY = currentY;
-      if (!bodyClass.contains('qp-body-focused') || Math.abs(delta) < 1) return;
-      // Ignore scrolls at the top boundary and very small Safari layout adjustments.
-      if (currentY <= 1 && delta < 0) {
-        accumulatedUp = 0;
+      const usingToolbar = toolbar.contains(active) || Date.now() < interactionUntil;
+      // Never hide a format bar sitting directly above the software keyboard.
+      // visualViewport scroll events are ignored by the keyboard layout code too.
+      if (document.body.classList.contains('qp-keyboard-open') || usingToolbar || Math.abs(delta) < 0.5) {
+        showToolbar();
         return;
       }
-      if (delta < 0) {
-        if (lastDirection !== 'up') accumulatedUp = 0;
-        lastDirection = 'up';
-        accumulatedUp += -delta;
-        accumulatedDown = 0;
-        if (accumulatedUp >= SHOW_AFTER_UP) {
-          setToolbarVisible(true);
-          formattingMode = false;
-        }
+      if (delta > 0) {
+        downDistance += delta;
+        upDistance = 0;
+        if (downDistance >= 14) setHidden(true);
       } else {
-        if (lastDirection !== 'down') accumulatedDown = 0;
-        lastDirection = 'down';
-        accumulatedDown += delta;
-        accumulatedUp = 0;
-        if (accumulatedDown >= HIDE_AFTER_DOWN) {
-          setToolbarVisible(false);
-          formattingMode = false;
-        }
+        upDistance += Math.abs(delta);
+        downDistance = 0;
+        if (upDistance >= 9) setHidden(false);
       }
     };
 
-    const refreshKeyboardLayout = () => {
-      frame = 0;
-      const vv = window.visualViewport;
-      const layoutHeight = window.innerHeight || root.clientHeight || 0;
-      const visibleHeight = vv?.height || layoutHeight;
-      const focusedField = activeEditorField();
-      if (focusedField) lastEditorField = focusedField;
-      const active = document.activeElement;
-      const activeInToolbar = !!active?.closest?.('.rich-toolbar');
-      if (!focusedField && !activeInToolbar) lastEditorField = null;
+    window.addEventListener('scroll', () => {
+      const nextY = Math.max(0, window.scrollY || 0);
+      const delta = nextY - lastWindowY;
+      lastWindowY = nextY;
+      processDelta(delta);
+    }, { passive: true });
 
-      const keyboardDifference = Math.max(baselineHeight - visibleHeight, layoutHeight - visibleHeight);
-      // Native iOS/Android select menus can temporarily resize the visual viewport or
-      // dismiss the software keyboard. Keep the editor accessory mounted while a toolbar
-      // control owns focus; otherwise the layout refresh hides the select while its menu is open.
-      const toolbarControlActive = activeInToolbar && currentScreen === 'editor' && formattingMode;
-      const keyboardOpen = (!!lastEditorField && keyboardDifference > 120) || toolbarControlActive;
-      const bodyFocused = (keyboardOpen && lastEditorField === 'body') || toolbarControlActive;
-      const titleFocused = keyboardOpen && lastEditorField === 'title' && !toolbarControlActive;
-      const wasBodyFocused = bodyClass.contains('qp-body-focused');
-      bodyClass.toggle('qp-keyboard-open', keyboardOpen);
-      bodyClass.toggle('qp-body-focused', bodyFocused);
-      bodyClass.toggle('qp-title-focused', titleFocused);
-
-      // Show on first entry into body editing. Thereafter scroll direction owns visibility.
-      if (bodyFocused && !wasBodyFocused) {
-        accumulatedUp = accumulatedDown = 0;
-        formattingMode = false;
-        lastDirection = 'none';
-        setToolbarVisible(true);
-        lastScrollY = window.scrollY || 0;
-      }
-      if (!bodyFocused && !toolbarControlActive) resetToolbarState();
-
-      // Retained only for existing editor layout compatibility. It does not position the toolbar.
-      if (keyboardOpen) {
-        const keyboardInset = Math.max(0, layoutHeight - visibleHeight);
-        root.style.setProperty('--qp-keyboard-inset', `${keyboardInset}px`);
-      } else {
-        root.style.setProperty('--qp-keyboard-inset', '0px');
-        if (!lastEditorField) baselineHeight = Math.max(visibleHeight, layoutHeight);
-      }
-    };
-
-    const scheduleRefresh = () => {
-      if (!frame) frame = requestAnimationFrame(refreshKeyboardLayout);
-    };
-    const scheduleSettledRefresh = () => {
-      scheduleRefresh();
-      followupTimers.forEach(clearTimeout);
-      followupTimers = [100, 280, 520].map(delay => setTimeout(scheduleRefresh, delay));
-    };
-
-    document.addEventListener('focusin', event => {
-      if (event.target?.id === 'editorTitle' || event.target?.id === 'editorBody') {
-        lastEditorField = event.target.id === 'editorBody' ? 'body' : 'title';
-        clearTimeout(blurTimer);
-        scheduleSettledRefresh();
-      } else if (event.target?.closest?.('.rich-toolbar') && lastEditorField === 'body') {
-        // Keep the toolbar open while a formatting control is being used.
-        formattingMode = true;
-        setToolbarVisible(true);
-        clearTimeout(blurTimer);
-        scheduleSettledRefresh();
-      }
-    });
-
-    document.addEventListener('click', event => {
-      if (event.target?.closest?.('.rich-toolbar')) {
-        formattingMode = true;
-        setToolbarVisible(true);
-      }
-      if (event.target?.closest?.('[data-action="cancel-editor"], #saveEntryButton')) {
-        resetToolbarState();
-      }
+    // Some mobile browsers scroll the editable canvas itself rather than the page.
+    document.addEventListener('scroll', event => {
+      if (event.target?.id !== 'editorBody') return;
+      const nextY = Math.max(0, event.target.scrollTop || 0);
+      const delta = nextY - lastEditorY;
+      lastEditorY = nextY;
+      processDelta(delta);
     }, true);
 
+    const keepVisibleWhileInteracting = event => {
+      const toolbar = event.target?.closest?.('#screen-editor .rich-toolbar');
+      if (!toolbar) return;
+      showToolbar();
+      interactionUntil = Date.now() + 1800;
+      clearTimeout(syncTimer);
+      syncTimer = setTimeout(() => {
+        if (!toolbar.contains(document.activeElement)) interactionUntil = 0;
+      }, 1900);
+    };
+    document.addEventListener('pointerdown', keepVisibleWhileInteracting, true);
+    document.addEventListener('touchstart', keepVisibleWhileInteracting, { capture: true, passive: true });
+    document.addEventListener('focusin', event => {
+      if (event.target?.closest?.('#screen-editor .rich-toolbar')) {
+        interactionUntil = Date.now() + 60000;
+        showToolbar();
+      }
+    }, true);
     document.addEventListener('focusout', event => {
-      if (event.target?.id !== 'editorTitle' && event.target?.id !== 'editorBody') return;
-      clearTimeout(blurTimer);
-      blurTimer = setTimeout(() => {
-        const active = document.activeElement;
-        const toolbarOwnsFocus = !!active?.closest?.('.rich-toolbar');
-        const next = activeEditorField();
-        if (next) lastEditorField = next;
-        else if (toolbarOwnsFocus || (formattingMode && currentScreen === 'editor')) {
-          // Android native select/color pickers can temporarily blur contenteditable. Do not
-          // treat that transient focus move as a request to remove the toolbar.
-          lastEditorField = 'body';
-          setToolbarVisible(true);
-        } else lastEditorField = null;
-        scheduleSettledRefresh();
-      }, 220);
-    });
+      if (!event.target?.closest?.('#screen-editor .rich-toolbar')) return;
+      setTimeout(() => {
+        const toolbar = currentToolbar();
+        if (!toolbar?.contains(document.activeElement)) interactionUntil = 0;
+      }, 0);
+    }, true);
 
-    window.addEventListener('scroll', handleUserScroll, { passive: true });
-    window.visualViewport?.addEventListener('resize', scheduleRefresh, { passive: true });
-    window.addEventListener('resize', scheduleRefresh, { passive: true });
-    window.addEventListener('orientationchange', scheduleSettledRefresh, { passive: true });
-    window.addEventListener('pageshow', scheduleSettledRefresh, { passive: true });
-    scheduleSettledRefresh();
+    // Editor HTML is rebuilt on each open; reset visibility and the scroll baseline
+    // whenever that happens or when navigation leaves the editor.
+    const observer = new MutationObserver(() => {
+      if (!isEditorVisible()) { resetToolbar(); return; }
+      if (currentToolbar()) showToolbar();
+      lastEditorY = editorScreen?.querySelector('#editorBody')?.scrollTop || 0;
+    });
+    observer.observe(editorScreen || document.body, { childList: true, subtree: true });
+    document.addEventListener('click', event => {
+      if (event.target?.closest?.('[data-action="cancel-editor"],[data-action="save-entry"],[data-nav]')) {
+        setTimeout(() => {
+          interactionUntil = 0;
+          lastWindowY = Math.max(0, window.scrollY || 0);
+          lastEditorY = editorScreen?.querySelector('#editorBody')?.scrollTop || 0;
+          if (!isEditorVisible()) resetToolbar();
+          else showToolbar();
+        }, 0);
+      }
+    }, true);
   })();
 
   initializeStorage();
-  // Font assets are downloaded and cached on first online use, then loaded from Cache Storage when offline.
 })();
