@@ -855,7 +855,7 @@
     // Dismiss the return banner with a left-to-right swipe, including touch screens.
     let startX=0,startY=0,tracking=false;
     el.addEventListener('pointerdown',event=>{if(event.target.closest('button'))return;startX=event.clientX;startY=event.clientY;tracking=true;el.setPointerCapture?.(event.pointerId);});
-    el.addEventListener('pointerup',event=>{if(!tracking)return;tracking=false;const dx=event.clientX-startX,dy=event.clientY-startY;if(dx>65&&Math.abs(dx)>Math.abs(dy)*1.25){el.classList.add('shortcut-toast-dismiss');setTimeout(()=>el.remove(),220);}});
+    el.addEventListener('pointerup',event=>{if(!tracking)return;tracking=false;const dx=event.clientX-startX,dy=event.clientY-startY;if(Math.abs(dx)>55&&Math.abs(dx)>Math.abs(dy)*1.2){el.classList.add('shortcut-toast-dismiss');setTimeout(()=>el.remove(),220);}});
     el.addEventListener('pointercancel',()=>{tracking=false;});
     setTimeout(()=>{if(el.isConnected){el.classList.add('shortcut-toast-dismiss');setTimeout(()=>el.remove(),220);}},9000);
   }
@@ -946,6 +946,10 @@
   document.addEventListener('pointerup',event=>{const start=txSwipeStart;txSwipeStart=null;if(!start||!start.row.isConnected||!start.id)return;const dx=event.clientX-start.x,dy=event.clientY-start.y;if(dx>72&&dx>Math.abs(dy)*1.35){txSwipeSuppressClickUntil=Date.now()+600;start.row.classList.add('tx-swipe-dismiss');start.row.setAttribute('aria-label','Deleting transaction');setTimeout(()=>{if(start.row.isConnected)confirmDeleteTransaction(start.id);},220);}},{passive:true});
   document.addEventListener('pointercancel',()=>{txSwipeStart=null;},{passive:true});
   document.addEventListener('click',event=>{if(Date.now()<txSwipeSuppressClickUntil&&event.target.closest('.transaction-row')){event.preventDefault();event.stopPropagation();}},true);
+  // Both floating import surfaces can be dismissed with a horizontal swipe in either direction.
+  // The launcher is intentionally hidden only for this page session; reloading restores it.
+  const importLauncher=$('#pw-import-launch');
+  if(importLauncher){let swipe=null;importLauncher.addEventListener('pointerdown',e=>{swipe={x:e.clientX,y:e.clientY};},{passive:true});importLauncher.addEventListener('pointerup',e=>{if(!swipe)return;const dx=e.clientX-swipe.x,dy=e.clientY-swipe.y;swipe=null;if(Math.abs(dx)>55&&Math.abs(dx)>Math.abs(dy)*1.2){importLauncher.classList.add('pw-import-dismissed');setTimeout(()=>{importLauncher.hidden=true;},220);}} ,{passive:true});importLauncher.addEventListener('pointercancel',()=>{swipe=null;},{passive:true});}
   document.addEventListener('click',e=>{if(e.target.closest('#pw-import-launch'))pwShowImport();if(e.target.closest('#pw-parse-payment')){const parsed=pwParsePaymentText($('#pw-import-raw')?.value||'');pwReviewImport(parsed);} });
   // iOS may strip query parameters when launching an installed PWA. Clipboard paste remains the reliable fallback.
   (function(){try{const q=new URLSearchParams(location.search);const payload=q.get('transaction')||q.get('payload')||q.get('text');if(payload){history.replaceState({},'',location.pathname);setTimeout(()=>{pwShowImport();const el=$('#pw-import-raw');if(el)el.value=payload;},350);}if(q.get('quickadd'))setTimeout(()=>showAddEntryChoices(),400);}catch{}})();
