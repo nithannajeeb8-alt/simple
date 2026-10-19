@@ -421,7 +421,10 @@
     const d=quickAddDraft,amount=parseAmount(d.amount);
     if(!Number.isFinite(amount)||amount<=0){renderQuickAddStep('amount');toast('Enter an amount greater than ₹0.','error');return;}
     if(!['income','expense','refund'].includes(d.type)){renderQuickAddStep('type');toast('Choose a transaction type before saving.','error');return;}
-    if(d.requestId&&state.transactions.some(t=>t.shortcutRequestId===d.requestId)){quickAddDraft=null;closeModal();toast('This Shortcut transaction was already saved.','amber');return;}
+    if(d.requestId){
+      const existing=state.transactions.find(t=>t.shortcutRequestId===d.requestId);
+      if(existing){quickAddDraft=null;closeModal();toast('This Shortcut transaction was already saved. Showing its receipt instead.','amber');showTransactionReceipt(existing);return;}
+    }
     const snapshot=JSON.stringify(state);
     try{
       if(state.sample)ensurePersonalWorkspace();
@@ -431,7 +434,9 @@
       state.settings.lastQuickAddAccountId=d.accountId;state.settings.lastQuickAddPaymentMethod=d.paymentMethod||'Cash';
       await persist();transactionHaptic();quickAddDraft=null;closeModal();renderAll();
       try{await evaluateBudgetAlerts();}catch(e){console.warn('Quick Add saved, but alerts did not refresh.',e)}
-      toast('Saved. Your receipt is ready.');showTransactionReceipt(state.transactions.find(t=>t.id===tx.id)||tx);
+      const savedTransaction=state.transactions.find(t=>t.id===tx.id)||tx;
+      showTransactionReceipt(savedTransaction);
+      toast('Saved. Your receipt is ready.');
     }catch(error){state=JSON.parse(snapshot);renderAll();console.error('Quick Add save failed.',error);toast(error.message||'Could not save. Your previous records were restored.','error');}
   }
   function addTransaction(data){const tx={id:uid('tx'),type:data.type,amount:Number(data.amount),activityId:data.activityId||'other',accountId:data.accountId||state.accounts[0]?.id,date:data.date||today(),note:(data.note||'').trim(),paymentMethod:data.paymentMethod||'Cash',createdAt:new Date().toISOString()};if(data.type==='transfer'){tx.toAccountId=data.toAccountId;if(!tx.toAccountId||tx.toAccountId===tx.accountId){toast('Choose two different accounts.','error');return false;}}if(data.repeat&&data.repeat!=='none'){let due=dateFrom(data.date||today());if(['weekly','monthly','yearly','year'].includes(data.repeat)){let next=localDate(due),guard=0;while(next<=today()&&guard++<120)next=addCalendarInterval(next,data.repeat);due=dateFrom(next);}state.reminders.push({id:uid('rem'),name:data.note||activityById(data.activityId).name,amount:tx.amount,date:localDate(due),accountId:tx.accountId,repeat:data.repeat,active:true,note:'Reminder created from a transaction; confirm payment manually'});}state.transactions.push(tx);return tx;}
@@ -570,7 +575,7 @@
   async function importBackup(file){if(!file)return;try{const text=await file.text(),raw=JSON.parse(text);const imported=raw?.data||raw;if(!imported||!Array.isArray(imported.transactions)||!Array.isArray(imported.accounts)||!Array.isArray(imported.activities))throw new Error('That file does not look like a Pocketwise backup.');if(!confirm(`Backup contains ${imported.transactions.length} transactions, ${imported.accounts.length} accounts, and ${imported.debts?.length||0} debt records.\n\nOK = Replace this workspace\nCancel = Keep current records`)){const merge=confirm('Merge records instead? Existing record identifiers will not be duplicated.');if(!merge)return;ensurePersonalWorkspace();const mergeItems=(key)=>{const list=state[key]||[],ids=new Set(list.map(x=>x.id));(imported[key]||[]).forEach(x=>{if(!ids.has(x.id)){list.push(x);ids.add(x.id);}});state[key]=list;};['accounts','activities','transactions','debts','goals','reminders'].forEach(mergeItems);state.budgets={...state.budgets,...(imported.budgets||{})};state.settings={...state.settings,...(imported.settings||{}),theme:state.settings.theme};state.sample=false;}else{if(!confirm('Replace all current Pocketwise records with this backup? Export the current data first if you need it.'))return;state={...initialState(),...imported,settings:{...initialState().settings,...imported.settings},sample:false};}await persist();closeModal();renderAll();toast('Backup restored. Records recalculated.');}catch(err){toast(err.message||'Could not read that backup.','error');}finally{$('#backup-file-input').value='';}}
   function showBackTapGuide(){
     const appURL='webapp://nithan.in/PocketWise/';
-    openModal('Quick Add Shortcut',`<div class="modal-body"><p class="muted"><strong>Local-only setup:</strong> the Shortcut copies a URL containing the transaction to the clipboard, then opens PocketWise. Since iOS may strip the URL data during launch, tap <strong>Paste transaction from Shortcut</strong> in Quick Add or Settings, review the details, and save.</p><div class="detail-grid"><div class="detail-cell"><small>STEP 1</small><strong>Ask for amount</strong></div><div class="detail-cell"><small>STEP 2</small><strong>Choose income, expense or refund</strong></div><div class="detail-cell"><small>STEP 3</small><strong>Choose category and note</strong></div><div class="detail-cell"><small>STEP 4</small><strong>Copy the encoded transaction URL</strong></div><div class="detail-cell"><small>STEP 5</small><strong>Open PocketWise</strong></div></div><div class="note-box"><small>APP LAUNCH URL</small><p style="word-break:break-all">${escapeHTML(appURL)}</p><button class="text-button" id="copy-quickadd">Copy app launch URL</button></div><p class="muted small">The Shortcut should URL-encode the category and note, build a URL with <code>quickadd=shortcut&amp;amount=…&amp;type=…&amp;category=…&amp;note=…&amp;reqId=…</code>, copy that full URL to the clipboard, then open the app launch URL above. Generate a fresh request ID for each run. PocketWise validates and previews the transaction before it saves anything.</p><p class="muted small">This handoff does not send your finances to a server. Clipboard access depends on iOS permission and requires you to tap Paste. If the clipboard cannot be read, enter the transaction normally. Assign the Shortcut at Settings → Accessibility → Touch → Back Tap → Double Tap.</p><div class="form-actions"><button class="secondary-button" data-cancel-modal>Close</button></div></div>`,'IPHONE SHORTCUT');
+    openModal('Quick Add Shortcut',`<div class="modal-body"><p class="muted"><strong>Local-only setup:</strong> the Shortcut copies a URL containing the transaction to the clipboard, then opens PocketWise. Since iOS may strip URL data during launch. Tap <strong>Paste transaction from Shortcut</strong> in Quick Add or Settings; PocketWise saves the copied transaction and opens its receipt automatically.</p><div class="detail-grid"><div class="detail-cell"><small>STEP 1</small><strong>Ask for amount</strong></div><div class="detail-cell"><small>STEP 2</small><strong>Choose income, expense or refund</strong></div><div class="detail-cell"><small>STEP 3</small><strong>Choose category and note</strong></div><div class="detail-cell"><small>STEP 4</small><strong>Copy the encoded transaction URL</strong></div><div class="detail-cell"><small>STEP 5</small><strong>Open PocketWise</strong></div></div><div class="note-box"><small>APP LAUNCH URL</small><p style="word-break:break-all">${escapeHTML(appURL)}</p><button class="text-button" id="copy-quickadd">Copy app launch URL</button></div><p class="muted small">The Shortcut should URL-encode the category and note, build a URL with <code>quickadd=shortcut&amp;amount=…&amp;type=…&amp;category=…&amp;note=…&amp;reqId=…</code>, copy that full URL to the clipboard, then open the app launch URL above. Generate a fresh request ID for each run. PocketWise validates and previews the transaction before it saves anything.</p><p class="muted small">This handoff does not send your finances to a server. Clipboard access depends on iOS permission and requires you to tap Paste. If the clipboard cannot be read, enter the transaction normally. Assign the Shortcut at Settings → Accessibility → Touch → Back Tap → Double Tap.</p><div class="form-actions"><button class="secondary-button" data-cancel-modal>Close</button></div></div>`,'IPHONE SHORTCUT');
   }
   function voiceDraft(){const Speech=window.SpeechRecognition||window.webkitSpeechRecognition;if(!Speech){toast('Voice recognition is not available in this browser. You can use the keyboard microphone instead.','amber');$('#tx-note').focus();return;}const rec=new Speech();rec.lang='en-IN';rec.interimResults=false;rec.maxAlternatives=1;toast('Listening for a short transaction description…');rec.onresult=e=>{const phrase=e.results[0][0].transcript;$('#tx-note').value=phrase;const match=phrase.match(/(?:₹|rs\.?\s*)?(\d+(?:\.\d{1,2})?)/i);if(match)$('#tx-amount').value=match[1];const txt=phrase.toLowerCase();const choices=[['food',['lunch','dinner','breakfast','food','tea','coffee','snack','canteen']],['transport',['bus','auto','taxi','petrol','fuel','travel']],['shopping',['bought','shop','shopping','clothes','headphones']],['education',['book','college','exam','notes','photocopy','course']],['subscriptions',['subscription','recharge','data pack','streaming']]];for(const [id,words] of choices){if(words.some(w=>txt.includes(w))){const act=state.activities.find(a=>a.id===id);if(act)$('#tx-activity').value=act.id;break;}}toast('Draft created. Check the amount and category before saving.');};rec.onerror=()=>toast('Could not hear that clearly. Please enter the details manually.','amber');rec.start();}
 
@@ -699,7 +704,7 @@
       const hashParams=new URLSearchParams(hash.includes('?')?hash.split('?').pop():hash);
       for(const [key,value] of hashParams.entries())if(!params.has(key))params.set(key,value);
       if(!params.has('quickadd')&&!params.has('amount')&&!params.has('type'))return null;
-      return {amount:params.get('amount')||'',type:params.get('type')||'',category:params.get('category')||'',note:params.get('note')||'',date:params.get('date')||'',requestId:params.get('requestId')||params.get('reqId')||params.get('id')||''};
+      return {amount:params.get('amount')||'',type:params.get('type')||'',category:params.get('category')||'',note:params.get('note')||'',date:params.get('date')||'',accountId:params.get('accountId')||params.get('account')||'',paymentMethod:params.get('paymentMethod')||params.get('payment')||'',requestId:params.get('requestId')||params.get('reqId')||params.get('id')||''};
     }catch{return null;}
   }
   function createShortcutDraft(fields){
@@ -708,11 +713,18 @@
     const type=normalizeShortcutType(fields?.type);
     const category=String(fields?.category??fields?.activity??'').trim().slice(0,100);
     const note=String(fields?.note??'').slice(0,240);
-    const categoryMatch=category?state.activities.find(a=>(a.id.toLowerCase()===category.toLowerCase()||a.name.toLowerCase()===category.toLowerCase())&&(a.kind==='both'||a.kind===type||(type==='expense'&&a.kind==='refund'))):null;
+    const normalizeCategory=value=>String(value||'').toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'').trim();
+    const categoryKey=normalizeCategory(category);
+    const categoryMatch=category?state.activities.find(a=>(normalizeCategory(a.id)===categoryKey||normalizeCategory(a.name)===categoryKey)&&(a.kind==='both'||a.kind===type||(type==='expense'&&a.kind==='refund')))||state.activities.find(a=>categoryKey&&(normalizeCategory(a.name).includes(categoryKey)||categoryKey.includes(normalizeCategory(a.name)))&&(a.kind==='both'||a.kind===type||(type==='expense'&&a.kind==='refund'))):null;
     const incomingDate=String(fields?.date||'').slice(0,10);
     const dateValid=/^\d{4}-\d{2}-\d{2}$/.test(incomingDate)&&!Number.isNaN(new Date(`${incomingDate}T12:00:00`).getTime())&&localDate(new Date(`${incomingDate}T12:00:00`))===incomingDate;
     const requestId=String(fields?.requestId??fields?.reqId??fields?.id??'').trim().slice(0,120);
-    return {amount:Number.isFinite(amount)&&amount>0?String(amount):'',type,activityId:categoryMatch?.id||'',accountId:state.settings.lastQuickAddAccountId||state.accounts[0]?.id||'cash',paymentMethod:state.settings.lastQuickAddPaymentMethod||'Cash',note,date:dateValid?incomingDate:'',requestId,fromShortcut:true};
+    const fallbackActivity=state.activities.find(a=>a.id==='other'&&(a.kind==='both'||a.kind===type))||state.activities.find(a=>a.kind==='both'||a.kind===type)||(state.activities[0]||null);
+    const requestedAccount=String(fields?.accountId??fields?.account??'').trim();
+    const accountId=state.accounts.some(a=>a.id===requestedAccount)?requestedAccount:(state.settings.lastQuickAddAccountId||state.accounts[0]?.id||'cash');
+    const requestedPayment=String(fields?.paymentMethod??fields?.payment??'').trim();
+    const paymentMethod=['Cash','UPI','Bank transfer','Debit card','Credit card','Wallet','Other','Bank / UPI'].find(v=>v.toLowerCase()===requestedPayment.toLowerCase())||state.settings.lastQuickAddPaymentMethod||'Cash';
+    return {amount:Number.isFinite(amount)&&amount>0?String(amount):'',type,activityId:categoryMatch?.id||fallbackActivity?.id||'other',accountId,paymentMethod,note,date:dateValid?incomingDate:'',requestId,fromShortcut:true};
   }
   function showShortcutDraft(draft){
     quickAddDraft=draft;
@@ -767,7 +779,7 @@
       }
       if(data&&typeof data==='object'&&!Array.isArray(data)){
         if(data.transaction&&typeof data.transaction==='object')data=data.transaction;
-        fields={amount:data.amount,type:data.type,category:data.category??data.activity,note:data.note,date:data.date||data.ts,requestId:data.requestId??data.reqId??data.id};
+        fields={amount:data.amount,type:data.type,category:data.category??data.activity,note:data.note,date:data.date||data.ts,accountId:data.accountId??data.account,paymentMethod:data.paymentMethod??data.payment,requestId:data.requestId??data.reqId??data.id};
       }
     }else{
       const fromURL=shortcutFieldsFromURL(trimmed);if(fromURL)fields=fromURL;
@@ -778,17 +790,19 @@
     return fields;
   }
   function showShortcutKeyPrompt(){
-    openModal('Import from Shortcut',`<form id="shortcut-key-form" class="modal-body"><p class="muted">Paste the transaction key, complete PocketWise Quick Add URL, or transaction JSON copied by your Shortcut. This is a local import; nothing is sent to a server.</p><div class="form-field"><label for="shortcut-key-value">TRANSACTION KEY OR PAYLOAD</label><textarea id="shortcut-key-value" name="payload" rows="5" autocapitalize="off" autocomplete="off" spellcheck="false" placeholder='Paste the PocketWise URL or JSON here' required></textarea></div><p class="form-note">If your Shortcut copied a URL, paste the entire URL. PocketWise will validate it and show a review screen before saving.</p><div class="form-actions"><button class="secondary-button" type="button" data-cancel-modal>Cancel</button><button class="primary-button" type="submit">Validate & continue</button></div><button class="text-button dismiss-import" type="button" data-cancel-modal>Close without importing</button></form>`,'SHORTCUT IMPORT');
+    openModal('Import from Shortcut',`<form id="shortcut-key-form" class="modal-body"><p class="muted">Paste the transaction key, complete PocketWise Quick Add URL, or transaction JSON copied by your Shortcut. This is a local import; nothing is sent to a server.</p><div class="form-field"><label for="shortcut-key-value">TRANSACTION KEY OR PAYLOAD</label><textarea id="shortcut-key-value" name="payload" rows="5" autocapitalize="off" autocomplete="off" spellcheck="false" placeholder='Paste the PocketWise URL or JSON here' required></textarea></div><p class="form-note">Paste the complete URL or JSON payload. PocketWise validates it, saves the transaction, and opens the receipt automatically.</p><div class="form-actions"><button class="secondary-button" type="button" data-cancel-modal>Cancel</button><button class="primary-button" type="submit">Validate & continue</button></div><button class="text-button dismiss-import" type="button" data-cancel-modal>Close without importing</button></form>`,'SHORTCUT IMPORT');
   }
   async function importShortcutText(raw){
     const fields=parseClipboardShortcut(raw);
     transactionHaptic();
     const draft=createShortcutDraft(fields);
-    // Close the import dialog before opening the Quick Add review flow.
-    // Otherwise the native dialog remains above the transaction steps and makes
-    // a successful import look like the button did nothing.
+    // The Shortcut has already collected the transaction details. Do not send
+    // the user through Quick Add to enter/review the same information again.
+    // Save the pasted payload directly and show the existing receipt on success.
     closeModal();
-    showShortcutDraft(draft);
+    if(!draft.amount||!draft.type){throw new Error('The copied Shortcut payload is missing a valid amount or transaction type. Run the Shortcut again.');}
+    quickAddDraft=draft;
+    await saveQuickAdd();
   }
   async function pasteShortcutTransaction(){
     if(!navigator.clipboard||typeof navigator.clipboard.readText!=='function'){
