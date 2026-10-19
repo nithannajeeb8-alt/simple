@@ -393,8 +393,11 @@
     $('#transaction-form').dataset.type=currentTxType;$('#tx-amount').focus({preventScroll:true});
   }
   let quickAddDraft = null;
+  function showAddEntryChoices(){
+    openModal('Add an entry',`<div class="modal-body add-entry-choices"><p class="muted">Choose how much detail you want to record.</p><button type="button" class="quick-choice" id="start-simple-entry"><span class="quick-choice-icon">✎</span><span><strong>Quick entry</strong><small>Fast amount, type and category. No date field or extra form.</small></span><span>›</span></button><button type="button" class="quick-choice" id="start-detailed-entry"><span class="quick-choice-icon">☷</span><span><strong>Detailed entry</strong><small>Choose date, account, payment method, repeat and notes.</small></span><span>›</span></button><div class="form-actions"><button class="secondary-button" type="button" data-cancel-modal>Cancel</button></div></div>`,'ADD TRANSACTION');
+  }
   function quickAddStart(){
-    quickAddDraft={amount:'',type:'',activityId:'',accountId:state.settings.lastQuickAddAccountId||state.accounts[0]?.id||'cash',paymentMethod:state.settings.lastQuickAddPaymentMethod||'Cash',note:''};
+    quickAddDraft={amount:'',type:'',activityId:'',accountId:state.settings.lastQuickAddAccountId||state.accounts[0]?.id||'cash',paymentMethod:state.settings.lastQuickAddPaymentMethod||'Cash',note:'',date:today()};
     renderQuickAddStep('amount');
   }
   function renderQuickAddStep(step){
@@ -601,7 +604,9 @@
       const closeBtn=event.target.closest('[data-cancel-modal]');if(closeBtn){closeModal();return;}
       if(event.target.closest('[data-close-notifications]')){$('#notifications-modal').close();return;}
       if(event.target.closest('#modal-close')){closeModal();return;}
-      if(event.target.closest('#mobile-add')){quickAddStart();return;}if(event.target.closest('#paste-shortcut-quick')||event.target.closest('#paste-shortcut-settings')){await pasteShortcutTransaction();return;}if(event.target.closest('#enter-shortcut-key')){showShortcutKeyPrompt();return;}if(event.target.closest('#top-add')||event.target.closest('#activity-add')||event.target.closest('[data-action="add"]')){transactionForm();return;}
+      if(event.target.closest('#mobile-add')){showAddEntryChoices();return;}
+      if(event.target.closest('#start-simple-entry')){quickAddStart();return;}
+      if(event.target.closest('#start-detailed-entry')){closeModal();transactionForm();return;}if(event.target.closest('#paste-shortcut-quick')||event.target.closest('#paste-shortcut-settings')){await pasteShortcutTransaction();return;}if(event.target.closest('#enter-shortcut-key')){showShortcutKeyPrompt();return;}if(event.target.closest('#top-add')){showAddEntryChoices();return;}if(event.target.closest('#activity-add')||event.target.closest('[data-action="add"]')){transactionForm();return;}
       const addType=event.target.closest('[data-add-type]');if(addType){transactionForm(null,addType.dataset.addType);return;}
       const action=event.target.closest('[data-action]')?.dataset.action;if(action){if(action==='budget')budgetForm();else if(action==='debts')showDebts();else if(action==='new-debt')debtForm();else if(action==='accounts')accountsManager();return;}
       if(event.target.closest('#theme-toggle')){state.settings.theme=state.settings.theme==='dark'?'light':'dark';await persist();applyTheme();scheduleCharts();return;}
@@ -736,16 +741,30 @@
   }
   function parseBankSms(raw){
     const text=String(raw||'').trim();if(!text)throw new Error('Copy a bank SMS first.');
-    const m=text.match(/(?:INR|Rs\.?|₹)\s*([\d,]+(?:\.\d{1,2})?)|(?:debited|credited|spent|received|paid|purchase|payment)[^\d₹]{0,24}(?:INR|Rs\.?|₹)?\s*([\d,]+(?:\.\d{1,2})?)/i);
-    const amount=parseAmount((m?.[1]||m?.[2]||'').replace(/,/g,''));if(!(amount>0))throw new Error('Could not find an amount in that SMS.');
-    const credit=/credited|received|deposited|refund|salary|cashback/i.test(text)&&!/debited|spent|paid|purchase/i.test(text);
-    const type=credit?'income':'expense';const merchant=text.match(/(?:at|to|from|via|on)\s+([A-Z0-9][A-Z0-9 &._'-]{2,35}?)(?:\s+(?:on|at|ref|upi|txn|transaction|dated)\b|[.,;]|$)/i)?.[1]?.trim()||'Bank transaction';
-    const lower=(text+' '+merchant).toLowerCase();const words=[['grocery',['grocery','supermarket','mart','vegetable','milk']],['food',['swiggy','zomato','restaurant','cafe','tea','coffee','food']],['transport',['uber','ola','fuel','petrol','metro','bus']],['bill',['electricity','recharge','broadband','water bill','mobile bill']],['shopping',['amazon','flipkart','myntra','shopping']]];
-    const options=state.activities.filter(a=>a.kind==='both'||a.kind===type||(type==='expense'&&a.kind==='refund'));
-    let activity=options.find(a=>words.some(([key,terms])=>terms.some(w=>lower.includes(w))&&a.name.toLowerCase().includes(key)))||options[0];
-    return {amount,type,activityId:activity?.id||'other',note:merchant,date:today(),accountId:state.settings.lastQuickAddAccountId||state.accounts[0]?.id||'cash',paymentMethod:'Bank / UPI'};
+    // Most Indian bank SMS formats omit a currency symbol: “debited by 10.00”.
+    const amountMatch=text.match(/(?:INR|Rs\.?|₹)\s*([\d,]+(?:\.\d{1,2})?)|(?:debited|credited|spent|received|paid|purchase|payment)\s*(?:by|with|of)?[^\d₹]{0,18}(?:INR|Rs\.?|₹)?\s*([\d,]+(?:\.\d{1,2})?)/i)
+      || text.match(/\b(?:debited|credited|spent|received|paid)\b[^\d]{0,20}([\d,]+(?:\.\d{1,2})?)/i);
+    const amount=parseAmount(String(amountMatch?.[1]||amountMatch?.[2]||'').replace(/,/g,''));
+    if(!(amount>0))throw new Error('Could not find the amount. Copy the full bank message and try again.');
+    const credit=/\b(?:credited|received|deposited)\b/i.test(text)&&!/\b(?:debited|spent|paid|purchase)\b/i.test(text);
+    const type=credit?'income':'expense';
+    // Prefer the destination/source explicitly named in common bank wording.
+    let merchant='';
+    const merchantPatterns=[/\b(?:trf|transfer|transferred)\s+to\s+(.+?)(?=\s+(?:ref(?:no|erence)?|upi|txn|transaction|on\s+date|dated)\b|[.;]|$)/i,/\b(?:to|at|from)\s+([A-Z0-9][A-Z0-9 &._'/-]{1,45}?)(?=\s+(?:ref(?:no|erence)?|upi|txn|transaction|on\s+date|on\s+\d|dated)\b|[.;]|$)/i,/\b(?:merchant|payee)\s*[:=-]\s*([^,;.]+)/i];
+    for(const re of merchantPatterns){const hit=text.match(re);if(hit?.[1]){merchant=hit[1].trim().replace(/\s+/g,' ');break;}}
+    if(!merchant)merchant='Bank transaction';
+    const refMatch=text.match(/\b(?:ref(?:erence)?\s*(?:no\.?|number)?|utr|rrn)\s*[:#-]?\s*([A-Z0-9-]{6,})/i);
+    const reference=refMatch?.[1]||'';
+    const dateMatch=text.match(/\b(\d{1,2})[- /]?([A-Z]{3})[- ,/]?(\d{2,4})\b/i)||text.match(/\b(\d{4})-(\d{2})-(\d{2})\b/);
+    let date=today();
+    if(dateMatch){
+      if(dateMatch[0].includes('-')&&/^\d{4}-\d{2}-\d{2}$/.test(dateMatch[0]))date=dateMatch[0];
+      else {const months={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};const day=Number(dateMatch[1]),month=months[String(dateMatch[2]).slice(0,3).toLowerCase()],rawYear=String(dateMatch[3]),year=Number(rawYear.length===2?'20'+rawYear:rawYear);if(month&&day>=1&&day<=31&&year>=2000&&year<=2100)date=`${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;}
+    }
+    const noteParts=[`Transfer ${credit?'from':'to'}: ${merchant}`];if(reference)noteParts.push(`Ref: ${reference}`);noteParts.push('Imported from bank SMS');
+    return {amount,type,activityId:'',note:noteParts.join(' · '),date,accountId:state.settings.lastQuickAddAccountId||state.accounts[0]?.id||'cash',paymentMethod:/UPI|VPA|@/i.test(text)?'UPI':'Bank transfer',bankSmsRaw:text};
   }
-  async function pasteBankSms(){try{if(!navigator.clipboard?.readText)throw new Error('Clipboard access is unavailable. Open PocketWise over HTTPS and try again.');const raw=await navigator.clipboard.readText();quickAddDraft={...parseBankSms(raw),requestId:null};transactionHaptic();renderQuickAddStep('note');toast('SMS parsed on this device. Review the guessed details.');}catch(e){toast(e.message||'Could not read the bank SMS.','error');}}
+  async function pasteBankSms(){try{if(!navigator.clipboard?.readText)throw new Error('Clipboard access is unavailable. Open PocketWise over HTTPS and try again.');const raw=await navigator.clipboard.readText();quickAddDraft={...parseBankSms(raw),requestId:null};transactionHaptic();renderQuickAddStep('activity');toast('Amount, date and transfer details extracted. Choose the category for this entry.');}catch(e){toast(e.message||'Could not read the bank SMS.','error');}}
   function parseClipboardShortcut(raw){
     const text=String(raw||'').trim();
     if(!text)throw new Error('The clipboard is empty. Run the Shortcut again and copy its transaction first.');
