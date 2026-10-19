@@ -162,8 +162,8 @@
       if (window.PocketWiseNative && typeof window.PocketWiseNative.updateWidget === 'function') {
         const available = (state.accounts || []).reduce((sum, account) => sum + balanceForAccount(account.id), 0);
         const cutoff = new Date(); cutoff.setHours(0,0,0,0); cutoff.setDate(cutoff.getDate()-6);
-        const weekSpend = (state.transactions || []).filter(t => t.type === 'expense' && dateFrom(t.date) >= cutoff).reduce((sum,t) => sum + (Number(t.amount)||0),0);
-        window.PocketWiseNative.updateWidget(money(available), `7-day spending · ${money(weekSpend)}`);
+        const weekSpend = (state.transactions || []).filter(t => ['expense','refund'].includes(t.type) && dateFrom(t.date) >= cutoff && t.date <= today()).reduce((sum,t) => sum + (t.type === 'refund' ? -1 : 1) * (Number(t.amount)||0),0);
+        window.PocketWiseNative.updateWidget(money(available), `7-day spending · ${money(Math.max(0,weekSpend))}`);
       }
     } catch (error) { console.warn('PocketWise widget update skipped.', error); }
     return { indexedDB: indexedSaved, localStorage: localSaved };
@@ -561,7 +561,7 @@
     // The print call is made from this page: the Content-Security-Policy forbids inline scripts in the receipt window.
     setTimeout(()=>{try{popup.focus();popup.print();}catch{}},400);
   }
-  function confirmDeleteTransaction(id){const tx=state.transactions.find(t=>t.id===id);if(!tx)return;const debt=(tx.debtId&&['borrowed','lent'].includes(tx.type))?state.debts.find(d=>d.id===tx.debtId):null;window.__pocketwiseUndoTx={tx:{...tx},debt:debt?{...debt}:null};state.transactions=state.transactions.filter(t=>t.id!==id);if(debt)state.debts=state.debts.filter(d=>d.id!==debt.id);persist().then(()=>{closeModal();renderAll();const region=$('#toast-region');region.querySelectorAll('.toast').forEach(el=>el.remove());const el=document.createElement('div');el.className='toast';el.innerHTML=`${icon('check')}<span>Transaction deleted.</span><button type="button" class="text-button" data-undo-tx="${'${escapeHTML(tx.id)}'}">Undo</button>`;region.append(el);setTimeout(()=>el.remove(),6000);});}
+  function confirmDeleteTransaction(id){const tx=state.transactions.find(t=>t.id===id);if(!tx)return;const debt=(tx.debtId&&['borrowed','lent'].includes(tx.type))?state.debts.find(d=>d.id===tx.debtId):null;window.__pocketwiseUndoTx={tx:{...tx},debt:debt?{...debt}:null};state.transactions=state.transactions.filter(t=>t.id!==id);if(debt)state.debts=state.debts.filter(d=>d.id!==debt.id);persist().then(()=>{closeModal();renderAll();const region=$('#toast-region');region.querySelectorAll('.toast').forEach(el=>el.remove());const el=document.createElement('div');el.className='toast';el.innerHTML=`${icon('check')}<span>Transaction deleted.</span><button type="button" class="text-button" data-undo-tx="${escapeHTML(tx.id)}">Undo</button>`;region.append(el);setTimeout(()=>el.remove(),6000);});}
   function accountsManager(){openModal('Accounts',`<div class="modal-body"><div class="entity-list">${state.accounts.map(a=>`<div class="entity-row"><span class="transaction-icon blue">${icon(a.type==='cash'?'wallet':a.type==='card'?'receipt':'dollar')}</span><div class="entity-copy"><strong>${escapeHTML(a.name)}</strong><small>${escapeHTML(a.type)} · Opening balance ${money(a.openingBalance)}</small></div><div class="entity-value">${fmtHidden(balanceForAccount(a.id))}</div><div class="entity-actions"><button class="mini-button" data-account-edit="${a.id}" title="Edit account">${icon('edit')}</button>${state.accounts.length>1?`<button class="mini-button" data-account-remove="${a.id}" title="Remove account">${icon('trash')}</button>`:''}</div></div>`).join('')}</div><div class="modal-section-title">ADD AN ACCOUNT</div><form id="account-form"><div class="form-grid"><div class="form-field"><label for="account-name">ACCOUNT NAME</label><input id="account-name" name="name" placeholder="e.g. Scholarship account" required></div><div class="form-field"><label for="account-type">TYPE</label><select id="account-type" name="type"><option value="cash">Cash</option><option value="bank">Bank / UPI</option><option value="card">Card</option><option value="savings">Savings</option><option value="other">Other</option></select></div><div class="form-field full"><label for="account-opening">OPENING BALANCE · INR</label><input id="account-opening" name="openingBalance" type="number" step="0.01" value="0"></div></div><div class="form-actions"><button class="primary-button" type="submit">Add account</button></div></form><div class="form-actions"><button class="secondary-button" data-cancel-modal>Done</button></div></div>`,'ACCOUNTS');}
   async function addAccountForm(form){const fd=new FormData(form),name=String(fd.get('name')||'').trim();if(!name){toast('Give the account a name.','error');return;}ensurePersonalWorkspace();state.accounts.push({id:uid('acct'),name,type:fd.get('type'),openingBalance:Number(fd.get('openingBalance'))||0});await persist();accountsManager();renderAll();toast('Account added.');}
   function editAccount(id){const account=accountById(id);openModal('Edit account',`<form class="modal-body" id="account-edit-form" data-id="${id}"><div class="form-field"><label for="edit-account-name">ACCOUNT NAME</label><input id="edit-account-name" name="name" value="${escapeHTML(account.name)}" required></div><div class="form-field" style="margin-top:14px"><label for="edit-account-opening">OPENING BALANCE · INR</label><input id="edit-account-opening" name="openingBalance" type="number" step="0.01" value="${account.openingBalance}"></div><p class="form-note">Opening balance is the amount held in this account before any transactions stored in Pocketwise.</p><div class="form-actions"><button class="secondary-button" data-cancel-modal>Cancel</button><button class="primary-button" type="submit">Save account</button></div></form>`,'ACCOUNT SETTINGS');}
@@ -751,9 +751,9 @@
   function parseBankSms(raw){
     const text=String(raw||'').trim();if(!text)throw new Error('Copy a bank SMS first.');
     // Most Indian bank SMS formats omit a currency symbol: “debited by 10.00”.
-    const amountMatch=text.match(/(?:INR|Rs\.?|₹)\s*([\d,]+(?:\.\d{1,2})?)|(?:debited|credited|spent|received|paid|purchase|payment)\s*(?:by|with|of)?[^\d₹]{0,18}(?:INR|Rs\.?|₹)?\s*([\d,]+(?:\.\d{1,2})?)/i)
-      || text.match(/\b(?:debited|credited|spent|received|paid)\b[^\d]{0,20}([\d,]+(?:\.\d{1,2})?)/i);
-    const amount=parseAmount(String(amountMatch?.[1]||amountMatch?.[2]||'').replace(/,/g,''));
+    const amountMatch=text.match(/(?:INR|Rs\.?|₹)\s*([\d,]+(?:\.\d{1,2})?)/i)
+      || text.match(/\b(?:debited|credited|spent|received|paid)\b(?:\s+(?:by|with|of|for))?\s*(?:INR|Rs\.?|₹)?\s*([\d,]+(?:\.\d{1,2})?)/i);
+    const amount=parseAmount(String(amountMatch?.[1]||'').replace(/,/g,''));
     if(!(amount>0))throw new Error('Could not find the amount. Copy the full bank message and try again.');
     const credit=/\b(?:credited|received|deposited)\b/i.test(text)&&!/\b(?:debited|spent|paid|purchase)\b/i.test(text);
     const type=credit?'income':'expense';
@@ -764,14 +764,16 @@
     if(!merchant)merchant='Bank transaction';
     const refMatch=text.match(/\b(?:ref(?:erence)?\s*(?:no\.?|number)?|utr|rrn)\s*[:#-]?\s*([A-Z0-9-]{6,})/i);
     const reference=refMatch?.[1]||'';
-    const dateMatch=text.match(/\b(\d{1,2})[- /]?([A-Z]{3})[- ,/]?(\d{2,4})\b/i)||text.match(/\b(\d{4})-(\d{2})-(\d{2})\b/);
     let date=today();
-    if(dateMatch){
-      if(dateMatch[0].includes('-')&&/^\d{4}-\d{2}-\d{2}$/.test(dateMatch[0]))date=dateMatch[0];
-      else {const months={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};const day=Number(dateMatch[1]),month=months[String(dateMatch[2]).slice(0,3).toLowerCase()],rawYear=String(dateMatch[3]),year=Number(rawYear.length===2?'20'+rawYear:rawYear);if(month&&day>=1&&day<=31&&year>=2000&&year<=2100)date=`${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;}
-    }
-    const noteParts=[`Transfer ${credit?'from':'to'}: ${merchant}`];if(reference)noteParts.push(`Ref: ${reference}`);noteParts.push('Imported from bank SMS');
-    return {amount,type,activityId:'',note:noteParts.join(' · '),date,accountId:state.settings.lastQuickAddAccountId||state.accounts[0]?.id||'cash',paymentMethod:/UPI|VPA|@/i.test(text)?'UPI':'Bank transfer',bankSmsRaw:text};
+    const isoDate=text.match(/\b(\d{4})-(\d{2})-(\d{2})\b/);
+    const numericDate=text.match(/\b(\d{1,2})[-/](\d{1,2})[-/](\d{2,4})\b/);
+    if(isoDate){const year=Number(isoDate[1]),month=Number(isoDate[2]),day=Number(isoDate[3]),check=new Date(year,month-1,day);if(year>=2000&&year<=2100&&check.getFullYear()===year&&check.getMonth()===month-1&&check.getDate()===day)date=`${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;}
+    else if(numericDate){let day=Number(numericDate[1]),month=Number(numericDate[2]),year=Number(numericDate[3]);if(year<100)year+=2000;if(month>12&&day<=12)[day,month]=[month,day];const check=new Date(year,month-1,day);if(year>=2000&&year<=2100&&check.getFullYear()===year&&check.getMonth()===month-1&&check.getDate()===day)date=`${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;}
+    else {const dateMatch=text.match(/\b(\d{1,2})[- /]?([A-Z]{3,9})[- ,/]?(\d{2,4})\b/i);if(dateMatch){const months={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};const day=Number(dateMatch[1]),month=months[String(dateMatch[2]).slice(0,3).toLowerCase()],rawYear=String(dateMatch[3]),year=Number(rawYear.length===2?'20'+rawYear:rawYear),check=new Date(year,(month||1)-1,day);if(month&&year>=2000&&year<=2100&&check.getFullYear()===year&&check.getMonth()===month-1&&check.getDate()===day)date=`${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;}}
+    const accountMatch=text.match(/\bA\/C\s+(?:X|\*|x)?([A-Z0-9]{3,})\b/i)||text.match(/\b(?:A\/c|account)\s*[*Xx-]+([0-9]{3,})\b/i);
+    const accountSuffix=accountMatch?.[1] ? accountMatch[1].slice(-4) : '';
+    const noteParts=[`Transfer ${credit?'from':'to'}: ${merchant}`];if(accountSuffix)noteParts.push(`Account ••${accountSuffix}`);if(reference)noteParts.push(`Ref: ${reference}`);noteParts.push('Imported from bank SMS');
+    return {amount,type,activityId:'',note:noteParts.join(' · '),date,accountSuffix,reference,merchant,accountId:state.settings.lastQuickAddAccountId||state.accounts[0]?.id||'cash',paymentMethod:/UPI|VPA|@/i.test(text)?'UPI':'Bank transfer',bankSmsRaw:text};
   }
   async function pasteBankSms(){try{if(!navigator.clipboard?.readText)throw new Error('Clipboard access is unavailable. Open PocketWise over HTTPS and try again.');const raw=await navigator.clipboard.readText();quickAddDraft={...parseBankSms(raw),requestId:null};transactionHaptic();renderQuickAddStep('activity');toast('Amount, date and transfer details extracted. Choose the category for this entry.');}catch(e){toast(e.message||'Could not read the bank SMS.','error');}}
   function parseClipboardShortcut(raw){
@@ -849,7 +851,13 @@
     if(isAndroid)return;
     const el=document.createElement('div');el.className='toast shortcut-return-toast';
     el.innerHTML=`${icon('upload')}<span>Back from another app? Import your Shortcut transaction.</span><button type="button" class="toast-action" id="resume-paste">Paste</button><button type="button" class="toast-action" id="resume-key">Enter key</button>`;
-    $('#toast-region').append(el);setTimeout(()=>el.remove(),9000);
+    $('#toast-region').append(el);
+    // Dismiss the return banner with a left-to-right swipe, including touch screens.
+    let startX=0,startY=0,tracking=false;
+    el.addEventListener('pointerdown',event=>{if(event.target.closest('button'))return;startX=event.clientX;startY=event.clientY;tracking=true;el.setPointerCapture?.(event.pointerId);});
+    el.addEventListener('pointerup',event=>{if(!tracking)return;tracking=false;const dx=event.clientX-startX,dy=event.clientY-startY;if(dx>65&&Math.abs(dx)>Math.abs(dy)*1.25){el.classList.add('shortcut-toast-dismiss');setTimeout(()=>el.remove(),220);}});
+    el.addEventListener('pointercancel',()=>{tracking=false;});
+    setTimeout(()=>{if(el.isConnected){el.classList.add('shortcut-toast-dismiss');setTimeout(()=>el.remove(),220);}},9000);
   }
   let lastShortcutRouteSignature='';
   function handleShortcutQuickAdd(){
@@ -898,18 +906,29 @@
   function pwParsePaymentText(raw){
     const text=String(raw||'').replace(/\u00a0/g,' ').trim(); if(!text)return null;
     if(/\b(OTP|one time password|verification code|offer|cashback|won a prize)\b/i.test(text) && !/\b(debited|credited|sent|received|paid|payment)\b/i.test(text))return {ignored:true,reason:'This looks like an OTP or promotional message, not a transaction.'};
-    const amtMatches=[...text.matchAll(/(?:₹|Rs\.?|INR\s*)\s*([0-9,]+(?:\.\d{1,2})?)/ig)];
-    if(!amtMatches.length)return {error:'No clear INR amount found. Check the pasted text.'};
-    const amount=Number(amtMatches[0][1].replace(/,/g,'')); if(!Number.isFinite(amount)||amount<=0)return {error:'The amount could not be read safely.'};
+    // Prefer an explicit INR marker. Some Indian bank SMS messages omit it and say “debited by 135.00”.
+    const currencyAmount=text.match(/(?:₹|Rs\.?|INR\s*)\s*([0-9,]+(?:\.\d{1,2})?)/i);
+    const contextualAmount=text.match(/\b(?:debited|credited|spent|received|paid)\b(?:\s+(?:by|with|of|for))?\s*(?:₹|Rs\.?|INR\s*)?\s*([0-9][0-9,]*(?:\.\d{1,2})?)/i);
+    const amountText=currencyAmount?.[1]||contextualAmount?.[1];
+    if(!amountText)return {error:'No clear INR amount found. Check the pasted text.'};
+    const amount=Number(amountText.replace(/,/g,'')); if(!Number.isFinite(amount)||amount<=0)return {error:'The amount could not be read safely.'};
     const ref=(text.match(/\b(?:RRN|UTR|UPI\s*Ref(?:erence)?(?:\s*No)?|Ref(?:erence)?(?:\s*No)?|Txn\s*ID|Transaction\s*ID)\s*[:#.-]?\s*([A-Z0-9]{6,30})/i)||text.match(/\bRRN\s+([0-9]{8,})/i)||[])[1]||'';
     const upi=(text.match(/[A-Z0-9._-]+@[A-Z0-9.-]+/i)||[])[0]||'';
     const acct=(text.match(/(?:A\/c|account|acct)\s*[*xX-]*\s*([0-9]{3,6})/i)||[])[1]||'';
-    let date=''; let m=text.match(/\b(\d{1,2})[-/](\d{1,2})[-/](\d{2,4})\b/); if(m){let y=Number(m[3]);if(y<100)y+=2000;date=`${y}-${String(Number(m[2])).padStart(2,'0')}-${String(Number(m[1])).padStart(2,'0')}`;if(Number(m[2])>12){date=`${y}-${String(Number(m[1])).padStart(2,'0')}-${String(Number(m[2])).padStart(2,'0')}`;}}
+    const monthNumbers={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
+    let date=''; const isoDate=text.match(/\b(\d{4})-(\d{2})-(\d{2})\b/);
+    if(isoDate){const year=Number(isoDate[1]),month=Number(isoDate[2]),day=Number(isoDate[3]),check=new Date(year,month-1,day);if(year>=2000&&year<=2100&&check.getFullYear()===year&&check.getMonth()===month-1&&check.getDate()===day)date=`${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;}
+    const numericDate=text.match(/\b(\d{1,2})[-/](\d{1,2})[-/](\d{2,4})\b/);
+    if(!date&&numericDate){let day=Number(numericDate[1]),month=Number(numericDate[2]),year=Number(numericDate[3]);if(year<100)year+=2000;if(month>12&&day<=12)[day,month]=[month,day];const check=new Date(year,month-1,day);if(year>=2000&&year<=2100&&check.getFullYear()===year&&check.getMonth()===month-1&&check.getDate()===day)date=`${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;}
+    if(!date){const namedDate=text.match(/\b(\d{1,2})[- /]?([A-Z]{3,9})[- ,/]?(\d{2,4})\b/i);if(namedDate){let day=Number(namedDate[1]),month=monthNumbers[namedDate[2].slice(0,3).toLowerCase()],year=Number(namedDate[3]);if(year<100)year+=2000;const check=new Date(year,(month||1)-1,day);if(month&&year>=2000&&year<=2100&&check.getFullYear()===year&&check.getMonth()===month-1&&check.getDate()===day)date=`${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;}}
     if(!date)date=today();
     const incoming=/\b(credited|received|deposited|refund received|money received)\b/i.test(text);
     const outgoing=/\b(debited|sent|paid|payment to|purchase|withdrawn|transferred to)\b/i.test(text);
     const type=incoming&&!outgoing?'income':'expense';
-    let party=''; const to=text.match(/\bto\s+([^,.;\n]+?)(?=\s+(?:on|at|via|UPI|RRN|UTR|Ref|A\/c|from)\b|[,.]|$)/i); const from=text.match(/\bfrom\s+([^,.;\n]+?)(?=\s+(?:on|at|via|UPI|RRN|UTR|Ref|A\/c)\b|[,.]|$)/i); party=(incoming?(from||to):(to||from))?.[1]?.trim()||upi||'';
+    const partyStop=String.raw`(?:on|at|via|UPI|RRN|UTR|Ref(?:erence)?(?:\s*No)?|A\/c|from)`;
+    const to=text.match(new RegExp(String.raw`\bto\s+([^,.;\n]+?)(?=\s+${partyStop}\b|[,.]|$)`,'i'));
+    const from=text.match(new RegExp(String.raw`\bfrom\s+([^,.;\n]+?)(?=\s+${partyStop}\b|[,.]|$)`,'i'));
+    const party=(incoming?(from||to):(to||from))?.[1]?.trim().replace(/\s+/g,' ')||upi||'';
     return {amount,type,date,reference:ref,upi,accountSuffix:acct,party,raw:text};
   }
   function pwHasDuplicate(parsed){return state.transactions.some(t=>{const note=String(t.note||'');if(parsed.reference&&new RegExp(`(?:RRN|UTR|Ref(?:erence)?):?\\s*${parsed.reference.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}`,'i').test(note))return true;return Number(t.amount)===parsed.amount&&String(t.date||'')===parsed.date&&(/UPI/i.test(String(t.paymentMethod||''))||parsed.upi&&note.includes(parsed.upi))&&(!parsed.party||note.toLowerCase().includes(parsed.party.toLowerCase()));});}
@@ -921,6 +940,12 @@
   }
   function pwPlatformSetup(){const android=isAndroid;document.documentElement.classList.toggle('pw-is-iphone',/iPhone|iPad|iPod/i.test(navigator.userAgent));document.documentElement.classList.toggle('pw-is-android',android);}
   pwPlatformSetup();
+  // Swipe a transaction row from left to right to delete it. Deletion is undoable from the toast.
+  let txSwipeStart=null,txSwipeSuppressClickUntil=0;
+  document.addEventListener('pointerdown',event=>{const row=event.target.closest('.transaction-row');if(!row||event.button!==0||event.target.closest('button,a,input,select,textarea'))return;txSwipeStart={row,id:row.dataset.txOpen,x:event.clientX,y:event.clientY};},{passive:true});
+  document.addEventListener('pointerup',event=>{const start=txSwipeStart;txSwipeStart=null;if(!start||!start.row.isConnected||!start.id)return;const dx=event.clientX-start.x,dy=event.clientY-start.y;if(dx>72&&dx>Math.abs(dy)*1.35){txSwipeSuppressClickUntil=Date.now()+600;start.row.classList.add('tx-swipe-dismiss');start.row.setAttribute('aria-label','Deleting transaction');setTimeout(()=>{if(start.row.isConnected)confirmDeleteTransaction(start.id);},220);}},{passive:true});
+  document.addEventListener('pointercancel',()=>{txSwipeStart=null;},{passive:true});
+  document.addEventListener('click',event=>{if(Date.now()<txSwipeSuppressClickUntil&&event.target.closest('.transaction-row')){event.preventDefault();event.stopPropagation();}},true);
   document.addEventListener('click',e=>{if(e.target.closest('#pw-import-launch'))pwShowImport();if(e.target.closest('#pw-parse-payment')){const parsed=pwParsePaymentText($('#pw-import-raw')?.value||'');pwReviewImport(parsed);} });
   // iOS may strip query parameters when launching an installed PWA. Clipboard paste remains the reliable fallback.
   (function(){try{const q=new URLSearchParams(location.search);const payload=q.get('transaction')||q.get('payload')||q.get('text');if(payload){history.replaceState({},'',location.pathname);setTimeout(()=>{pwShowImport();const el=$('#pw-import-raw');if(el)el.value=payload;},350);}if(q.get('quickadd'))setTimeout(()=>showAddEntryChoices(),400);}catch{}})();
