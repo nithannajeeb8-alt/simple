@@ -805,7 +805,7 @@
       <div class="editor-field"><label class="sr-only" for="editorTitle">Entry title</label><input id="editorTitle" class="title-input" maxlength="140" placeholder="Give this day a name…" value="${escapeHTML(data.title)}"></div>
       <div class="editor-field writing-field"><label for="editorBody">What would you like to keep?</label>
       <div class="rich-toolbar" role="toolbar" aria-label="Writing format tools">
-        <button type="button" data-format="bold" aria-label="Bold" title="Bold"><i class="bi bi-type-bold" aria-hidden="true"></i></button><button type="button" data-format="italic" aria-label="Italic" title="Italic"><i class="bi bi-type-italic" aria-hidden="true"></i></button><button type="button" data-format="underline" aria-label="Underline" title="Underline"><i class="bi bi-type-underline" aria-hidden="true"></i></button>
+        <button type="button" data-format="bold" aria-label="Bold" title="Bold · ⌘B"><i class="bi bi-type-bold" aria-hidden="true"></i></button><button type="button" data-format="italic" aria-label="Italic" title="Italic · ⌘I"><i class="bi bi-type-italic" aria-hidden="true"></i></button><button type="button" data-format="underline" aria-label="Underline" title="Underline · ⌘U"><i class="bi bi-type-underline" aria-hidden="true"></i></button>
         <span class="toolbar-divider"></span><button type="button" data-block="h2" title="Heading" aria-label="Heading"><i class="bi bi-type-h1" aria-hidden="true"></i></button><button type="button" data-block="h3" title="Subheading" aria-label="Subheading"><i class="bi bi-type-h2" aria-hidden="true"></i></button><button type="button" data-block="blockquote" title="Quote" aria-label="Quote"><i class="bi bi-quote" aria-hidden="true"></i></button>
         <select id="editorFont" aria-label="Font family" title="Font family"><option value="Georgia">Serif</option><option value="Arial">Sans</option><option value="monospace">Mono</option></select><select id="editorFontSize" aria-label="Text size" title="Text size"><option value="3">Normal</option><option value="2">Small</option><option value="4">Large</option><option value="5">Larger</option></select>
         <label class="highlight-picker" title="Highlight text" aria-label="Highlight text"><i class="bi bi-highlighter" aria-hidden="true"></i><input id="highlightColor" type="color" value="#fff09a" aria-label="Highlight colour"></label>
@@ -910,6 +910,28 @@
     };
     title.addEventListener('input', track);
     body.addEventListener('input', track);
+
+    // iPhone/iPad external-keyboard shortcuts matching the visible format controls.
+    // For the on-screen iOS keyboard, the same actions stay in the accessory toolbar.
+    body.addEventListener('keydown', event => {
+      const command = event.metaKey || (event.ctrlKey && !event.altKey);
+      if (!command) return;
+      const key = event.key.toLowerCase();
+      const formats = { b: 'bold', i: 'italic', u: 'underline' };
+      if (formats[key]) {
+        event.preventDefault();
+        document.execCommand('styleWithCSS', false, true);
+        document.execCommand(formats[key], false, null);
+        track();
+        rememberSelection();
+      } else if (key === 'z') {
+        event.preventDefault();
+        document.execCommand(event.shiftKey ? 'redo' : 'undo', false, null);
+        track();
+        rememberSelection();
+      }
+    });
+
     // Prevent mouse-down from discarding the selected range before a toolbar command runs.
     $$('.rich-toolbar button', $('#screen-editor')).forEach(button => button.addEventListener('mousedown', event => event.preventDefault()));
     $$('.rich-toolbar [data-format]', $('#screen-editor')).forEach(button => button.addEventListener('click', () => {
@@ -1748,57 +1770,67 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
 
   // Let the interface appear immediately, then hydrate saved data. If storage fails, the app remains usable.
   applySettings();
-  // Keyboard-aware writing layout for iOS Safari/PWA. Use VisualViewport because
-  // iOS may resize the visual viewport without resizing the layout viewport.
+  // Keyboard-aware writing layout for iOS Safari/PWA.
+  // Keep keyboard mode tied to the visual viewport, not only to editor focus:
+  // tapping a formatting button can blur contenteditable while the iPhone keyboard stays open.
   (() => {
     let editorFocused = false;
     let baselineHeight = window.visualViewport?.height || window.innerHeight;
     let closeTimer = 0;
+    const isEditorInteraction = () => Boolean(document.querySelector('#screen-editor :focus'));
     const refreshKeyboardLayout = (allowReposition = true) => {
       const vv = window.visualViewport;
       const visibleHeight = vv?.height || window.innerHeight;
       const wasKeyboardOpen = document.body.classList.contains('qp-keyboard-open');
-      const keyboardLikelyOpen = editorFocused && (baselineHeight - visibleHeight > 120);
-      // Distance between the visible viewport bottom and layout viewport bottom.
-      // Update on viewport resizes/focus transitions, not every viewport scroll;
-      // iOS changes offsetTop during caret scrolling and that previously made the
-      // fixed format bar visibly chase the keyboard.
-      const keyboardBottom = vv ? Math.max(0, window.innerHeight - (vv.height + (vv.offsetTop || 0))) : Math.max(0, baselineHeight - visibleHeight);
+      const activeInEditor = isEditorInteraction();
+      const viewportIsKeyboardSized = baselineHeight - visibleHeight > 120;
+      const keyboardLikelyOpen = viewportIsKeyboardSized && (editorFocused || activeInEditor || wasKeyboardOpen);
+      // Distance from the visible viewport bottom to the layout viewport bottom.
+      // Freeze during caret scrolling to avoid the toolbar chasing iOS viewport jitter.
+      const keyboardBottom = vv
+        ? Math.max(0, window.innerHeight - (vv.height + (vv.offsetTop || 0)))
+        : Math.max(0, baselineHeight - visibleHeight);
       if (allowReposition || !keyboardLikelyOpen || !wasKeyboardOpen) {
         document.documentElement.style.setProperty('--qp-keyboard-bottom', `${keyboardLikelyOpen ? keyboardBottom : 0}px`);
       }
       document.body.classList.toggle('qp-keyboard-open', keyboardLikelyOpen);
-      if (!editorFocused && visibleHeight > baselineHeight - 80) baselineHeight = visibleHeight;
+      if (!keyboardLikelyOpen && visibleHeight > baselineHeight - 80) baselineHeight = visibleHeight;
     };
     const bindEditorFocus = () => {
       const editor = document.querySelector('#editorBody');
       const title = document.querySelector('#editorTitle');
       [editor, title].filter(Boolean).forEach(el => {
+        if (el.dataset.qpKeyboardBound === '1') return;
+        el.dataset.qpKeyboardBound = '1';
         el.addEventListener('focus', () => {
           editorFocused = true;
           clearTimeout(closeTimer);
-          setTimeout(refreshKeyboardLayout, 80);
-          setTimeout(refreshKeyboardLayout, 320);
+          setTimeout(() => refreshKeyboardLayout(true), 80);
+          setTimeout(() => refreshKeyboardLayout(true), 320);
+          setTimeout(() => refreshKeyboardLayout(true), 650);
         });
         el.addEventListener('blur', () => {
           closeTimer = setTimeout(() => {
-            editorFocused = !!document.querySelector('#screen-editor :is(#editorBody,#editorTitle):focus');
-            if (!editorFocused) document.body.classList.remove('qp-keyboard-open');
-            refreshKeyboardLayout();
-          }, 220);
+            editorFocused = Boolean(document.querySelector('#screen-editor :is(#editorBody,#editorTitle):focus'));
+            // Do not forcibly clear keyboard mode here: the keyboard may remain open
+            // while the user taps a formatting button or font selector.
+            refreshKeyboardLayout(true);
+          }, 180);
         });
       });
     };
     const observer = new MutationObserver(bindEditorFocus);
     observer.observe(document.querySelector('#screen-editor') || document.body, { childList:true, subtree:true });
-    window.visualViewport?.addEventListener('resize', refreshKeyboardLayout);
+    window.visualViewport?.addEventListener('resize', () => refreshKeyboardLayout(true));
     window.visualViewport?.addEventListener('scroll', () => refreshKeyboardLayout(false));
-    window.addEventListener('resize', refreshKeyboardLayout);
+    window.addEventListener('resize', () => refreshKeyboardLayout(true));
     document.addEventListener('focusin', event => {
-      if (event.target.matches('#editorBody,#editorTitle')) { editorFocused = true; refreshKeyboardLayout(); }
+      if (event.target.matches('#editorBody,#editorTitle')) editorFocused = true;
+      if (event.target.closest?.('#screen-editor .rich-toolbar')) editorFocused = true;
+      refreshKeyboardLayout(true);
     });
     document.addEventListener('focusout', event => {
-      if (event.target.matches('#editorBody,#editorTitle')) setTimeout(refreshKeyboardLayout, 250);
+      if (event.target.matches('#editorBody,#editorTitle')) setTimeout(() => refreshKeyboardLayout(true), 250);
     });
     bindEditorFocus();
   })();
@@ -1844,9 +1876,10 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
       if (!toolbar || !isEditorVisible()) { resetToolbar(); return; }
       const active = document.activeElement;
       const usingToolbar = toolbar.contains(active) || Date.now() < interactionUntil;
-      // Never hide a format bar sitting directly above the software keyboard.
-      // visualViewport scroll events are ignored by the keyboard layout code too.
-      if (usingToolbar || Math.abs(delta) < 0.5) {
+      // In keyboard mode the toolbar is an editor accessory, not a scroll-away
+      // header. Keep it visible above the keyboard even when focus briefly leaves
+      // contenteditable for a formatting button or select.
+      if (document.body.classList.contains('qp-keyboard-open') || usingToolbar || Math.abs(delta) < 0.5) {
         showToolbar();
         return;
       }

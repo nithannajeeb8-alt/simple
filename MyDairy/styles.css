@@ -538,3 +538,25 @@ html.reduce-motion #screen-editor .rich-toolbar { transition:none !important; }
 #screen-editor .qp-date-day.selected { background:var(--action); color:#fff; }
 #screen-editor .qp-date-day:focus-visible,#screen-editor .qp-date-month-button:focus-visible,#screen-editor .qp-date-today:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
 #screen-editor .qp-date-today { display:block; margin:10px auto 0; padding:7px 13px; border:1px solid var(--line); border-radius:999px; background:var(--accent-soft); color:var(--accent-strong); font-size:11px; font-weight:700; }
+
+
+/* V22 keyboard accessory hardening: never hide formatting while the iOS keyboard is open. */
+@media (max-width: 799px) {
+  body.qp-keyboard-open #screen-editor .rich-toolbar,
+  body.qp-keyboard-open #screen-editor .rich-toolbar.qp-toolbar-hidden {
+    display:flex !important;
+    visibility:visible !important;
+    opacity:1 !important;
+    transform:none !important;
+    pointer-events:auto !important;
+  }
+  body.qp-keyboard-open #screen-editor .rich-toolbar {
+    position:fixed !important;
+    left:8px !important;
+    right:8px !important;
+    bottom:calc(var(--qp-keyboard-bottom, 0px) + 8px) !important;
+    top:auto !important;
+    z-index:10000 !important;
+    min-height:56px;
+  }
+}
