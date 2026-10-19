@@ -456,16 +456,15 @@
     if (!rail) return;
     storyItems = getStoryItems();
     const count = storyItems.length;
-    $('#storiesCount').textContent = `${count} ${count === 1 ? 'moment' : 'moments'}`;
     if (!count) {
-      rail.innerHTML = `<div class="stories-empty"><span class="stories-empty-icon"><i class="bi bi-image"></i></span><div><strong>Your photos will live here.</strong><p>Add an image to a diary page and it will become a memory you can revisit.</p></div><button type="button" class="stories-add" data-action="new-entry"><i class="bi bi-plus-lg"></i> Add a photo</button></div>`;
+      rail.innerHTML = `<div class="stories-empty"><span class="stories-empty-icon"><i class="bi bi-image"></i></span><span class="stories-empty-label">Your photo memories</span><button type="button" class="stories-add" data-action="new-entry" aria-label="Add a photo"><i class="bi bi-plus-lg"></i></button></div>`;
       return;
     }
     rail.innerHTML = storyItems.map((item, index) => {
-      const dateLabel = item.isAnniversary ? 'On this day' : formatDate(item.date, { month: 'short', day: 'numeric' });
+      const dateLabel = formatDate(item.date, { month: 'short', day: 'numeric' });
       return `<button type="button" class="story-item${item.isAnniversary ? ' is-anniversary' : ''}" data-story-index="${index}" aria-label="View memory: ${escapeHTML(item.title)}, ${escapeHTML(formatDate(item.date))}">
         <span class="story-ring"><span class="story-image"><img src="${escapeHTML(item.image)}" alt="" loading="lazy"></span>${item.isAnniversary ? '<span class="story-memory-mark"><i class="bi bi-arrow-repeat"></i></span>' : ''}</span>
-        <span class="story-item-title">${escapeHTML(item.title)}</span><span class="story-item-date${item.isAnniversary ? ' anniversary-label' : ''}">${escapeHTML(dateLabel)}</span>
+        <span class="story-item-date${item.isAnniversary ? ' anniversary-label' : ''}">${escapeHTML(dateLabel)}</span>
       </button>`;
     }).join('');
   }

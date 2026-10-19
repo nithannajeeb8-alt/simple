@@ -1,5 +1,5 @@
 /* Best-effort app-shell cache. User data is stored by the page in IndexedDB, not in this cache. */
-const CACHE_NAME = 'quiet-pages-shell-v18-v17-scroll-toolbar-stories-dark-themes-short-greetings';
+const CACHE_NAME = 'quiet-pages-shell-v19-unboxed-minimal-photo-stories';
 const BASE = self.registration.scope;
 const SHELL = ['./', './index.html', './styles.css', './app.js', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png'];
 
