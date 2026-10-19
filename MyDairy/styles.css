@@ -388,7 +388,7 @@ html.large-text{--font-scale:1.08} html.xlarge-text{--font-scale:1.16}
 .empty-state { padding:36px 20px; }
 
 /* Photo memories are intentionally editorial, not a copy of Instagram's chrome. */
-.memory-stories { margin:4px 0 10px; padding:0; border:0; border-radius:0; background:transparent; box-shadow:none; overflow:visible; }
+.memory-stories { margin:5px 0 12px; padding:0; border:0; border-radius:0; background:transparent; box-shadow:none; overflow:visible; }
 .story-rail { display:flex; gap:15px; padding:2px 1px 5px; overflow-x:auto; overscroll-behavior-inline:contain; scroll-snap-type:x proximity; scrollbar-width:none; }
 .story-rail::-webkit-scrollbar { display:none; }
 .story-item { display:flex; flex:0 0 76px; flex-direction:column; align-items:center; gap:7px; padding:0; border:0; background:transparent; color:var(--ink); text-align:center; min-width:0; scroll-snap-align:start; }
