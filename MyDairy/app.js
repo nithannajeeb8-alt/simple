@@ -777,6 +777,24 @@
     navTo('editor');
     setTimeout(() => $('#editorTitle')?.focus({ preventScroll: true }), 120);
   }
+  let editorDatePickerMonth = null;
+  function editorDatePickerMarkup(value) {
+    const selected = parseDate(value || TODAY);
+    const cursor = editorDatePickerMonth || new Date(selected.getFullYear(), selected.getMonth(), 1);
+    const first = new Date(cursor.getFullYear(), cursor.getMonth(), 1);
+    const offset = (first.getDay() + 6) % 7; // Monday-first calendar
+    const daysInMonth = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 0).getDate();
+    const cells = [];
+    for (let i = 0; i < offset; i++) cells.push('<span class="qp-date-empty" aria-hidden="true"></span>');
+    for (let day = 1; day <= daysInMonth; day++) {
+      const key = dateKey(new Date(cursor.getFullYear(), cursor.getMonth(), day));
+      const isSelected = key === value;
+      const isToday = key === TODAY;
+      cells.push(`<button type="button" class="qp-date-day${isSelected ? ' selected' : ''}${isToday ? ' today' : ''}" data-editor-date-pick="${key}" aria-pressed="${isSelected}" aria-label="${escapeHTML(formatDate(key, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }))}">${day}</button>`);
+    }
+    return `<div class="qp-date-calendar" id="editorDateCalendar" hidden><div class="qp-date-calendar-head"><button type="button" class="qp-date-month-button" data-editor-date-month="-1" aria-label="Previous month"><i class="bi bi-chevron-left"></i></button><strong>${escapeHTML(formatMonth(cursor))}</strong><button type="button" class="qp-date-month-button" data-editor-date-month="1" aria-label="Next month"><i class="bi bi-chevron-right"></i></button></div><div class="qp-date-weekdays"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div><div class="qp-date-grid">${cells.join('')}</div><button type="button" class="qp-date-today" data-editor-date-today>Today</button></div>`;
+  }
+
   function renderEditor() {
     savedEditorRange = null;
     const data = editorData;
@@ -797,7 +815,7 @@
       </div>
       <div id="editorBody" class="entry-writing-input rich-editor" contenteditable="true" role="textbox" aria-multiline="true" data-placeholder="Start anywhere. A moment, a thought, something you don't want to forget…">${sanitizeRichHtml(data.body)}</div>
       <p class="hint">Your original words stay yours. Format them however you like. Changes save on this device.</p></div>
-      <div class="editor-meta-grid"><div class="editor-field"><label for="editorDate">Date</label><input type="date" id="editorDate" value="${escapeHTML(data.date)}" required></div><div class="editor-field"><label for="editorTheme">Entry theme</label><select id="editorTheme"><option value="sky" ${data.theme === 'sky' ? 'selected' : ''}>Sky</option><option value="coral" ${data.theme === 'coral' ? 'selected' : ''}>Coral</option><option value="mint" ${data.theme === 'mint' ? 'selected' : ''}>Mint</option><option value="lavender" ${data.theme === 'lavender' ? 'selected' : ''}>Lavender</option></select></div></div>
+      <div class="editor-meta-grid"><div class="editor-field"><label for="editorDateToggle">Date</label><div class="qp-date-box"><input type="hidden" id="editorDate" value="${escapeHTML(data.date)}" required><button type="button" id="editorDateToggle" class="qp-date-toggle" aria-expanded="false" aria-controls="editorDateCalendar"><span id="editorDateLabel">${escapeHTML(formatDate(data.date, { day: 'numeric', month: 'short', year: 'numeric' }))}</span><i class="bi bi-calendar3" aria-hidden="true"></i></button>${editorDatePickerMarkup(data.date)}</div></div><div class="editor-field"><label for="editorTheme">Entry theme</label><select id="editorTheme"><option value="sky" ${data.theme === 'sky' ? 'selected' : ''}>Sky</option><option value="coral" ${data.theme === 'coral' ? 'selected' : ''}>Coral</option><option value="mint" ${data.theme === 'mint' ? 'selected' : ''}>Mint</option><option value="lavender" ${data.theme === 'lavender' ? 'selected' : ''}>Lavender</option></select></div></div>
       <div class="editor-field"><label>How did today feel? <span class="hint">(optional)</span></label><div class="mood-picker">${moods}</div></div>
       <div class="editor-field"><label>Photos <span class="hint">(optional, up to 12)</span></label><div class="photo-drop"><label for="photoInput"><i class="bi bi-images"></i> Choose from gallery</label><input id="photoInput" class="hidden" type="file" accept="image/*" multiple><p>Photos are resized for storage and remain in this browser. Choose one photo as the cover.</p></div><div id="photoPreviews" class="photo-previews">${photos}</div></div>
       <div class="autosave-status" id="autosaveStatus">${editorIsNew ? 'Your page is not saved until you start writing.' : 'All changes are saved on this device.'}</div>
@@ -809,6 +827,49 @@
     const body = $('#editorBody');
     const date = $('#editorDate');
     const theme = $('#editorTheme');
+    editorDatePickerMonth = new Date(parseDate(date.value).getFullYear(), parseDate(date.value).getMonth(), 1);
+    const dateBox = $('.qp-date-box', $('#screen-editor'));
+    const dateToggle = $('#editorDateToggle');
+    const closeDateCalendar = () => { const current = $('#editorDateCalendar', dateBox); if (current) current.hidden = true; dateToggle.setAttribute('aria-expanded', 'false'); };
+    dateToggle.addEventListener('click', () => {
+      const opening = $('#editorDateCalendar', dateBox).hidden;
+      if (opening) {
+        const chosen = parseDate(date.value || TODAY);
+        editorDatePickerMonth = new Date(chosen.getFullYear(), chosen.getMonth(), 1);
+        $('#editorDateCalendar', dateBox).outerHTML = editorDatePickerMarkup(date.value || TODAY);
+        // Reacquire the newly rendered calendar after replacing its markup.
+        const calendar = $('#editorDateCalendar', dateBox);
+        calendar.hidden = false;
+        dateToggle.setAttribute('aria-expanded', 'true');
+      } else closeDateCalendar();
+    });
+    dateBox.addEventListener('click', event => {
+      const monthButton = event.target.closest('[data-editor-date-month]');
+      if (monthButton) {
+        editorDatePickerMonth = new Date(editorDatePickerMonth.getFullYear(), editorDatePickerMonth.getMonth() + Number(monthButton.dataset.editorDateMonth), 1);
+        const wasOpen = !$('#editorDateCalendar', dateBox).hidden;
+        $('#editorDateCalendar', dateBox).outerHTML = editorDatePickerMarkup(date.value || TODAY);
+        if (wasOpen) $('#editorDateCalendar', dateBox).hidden = false;
+        return;
+      }
+      const dayButton = event.target.closest('[data-editor-date-pick]');
+      if (dayButton) {
+        date.value = dayButton.dataset.editorDatePick;
+        $('#editorDateLabel').textContent = formatDate(date.value, { day: 'numeric', month: 'short', year: 'numeric' });
+        editorDatePickerMonth = new Date(parseDate(date.value).getFullYear(), parseDate(date.value).getMonth(), 1);
+        closeDateCalendar();
+        track();
+        return;
+      }
+      if (event.target.closest('[data-editor-date-today]')) {
+        date.value = TODAY;
+        $('#editorDateLabel').textContent = formatDate(TODAY, { day: 'numeric', month: 'short', year: 'numeric' });
+        editorDatePickerMonth = new Date(parseDate(TODAY).getFullYear(), parseDate(TODAY).getMonth(), 1);
+        closeDateCalendar();
+        track();
+      }
+    });
+    document.addEventListener('pointerdown', event => { if (dateBox.isConnected && !dateBox.contains(event.target)) closeDateCalendar(); }, true);
     savedEditorRange = null;
     if (editorSelectionListener) document.removeEventListener('selectionchange', editorSelectionListener);
     const rememberSelection = () => {
@@ -1785,7 +1846,7 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
       const usingToolbar = toolbar.contains(active) || Date.now() < interactionUntil;
       // Never hide a format bar sitting directly above the software keyboard.
       // visualViewport scroll events are ignored by the keyboard layout code too.
-      if (document.body.classList.contains('qp-keyboard-open') || usingToolbar || Math.abs(delta) < 0.5) {
+      if (usingToolbar || Math.abs(delta) < 0.5) {
         showToolbar();
         return;
       }
@@ -1796,7 +1857,7 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
       } else {
         upDistance += Math.abs(delta);
         downDistance = 0;
-        if (upDistance >= 9) setHidden(false);
+        if (upDistance >= 2) setHidden(false);
       }
     };
 

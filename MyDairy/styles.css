@@ -345,7 +345,7 @@ html.large-text{--font-scale:1.08} html.xlarge-text{--font-scale:1.16}
   body.qp-keyboard-open #screen-editor .editor-card > .eyebrow,
   body.qp-keyboard-open #screen-editor .editor-intro-note,
   body.qp-keyboard-open #screen-editor .writing-field > label,
-  body.qp-keyboard-open #screen-editor .editor-field:has(#editorTitle) { display:none !important; }
+  body.qp-keyboard-open #screen-editor:has(#editorBody:focus) .editor-field:has(#editorTitle) { display:none !important; }
   body.qp-keyboard-open #screen-editor .editor-field.writing-field { margin-top:0 !important; }
   body.qp-keyboard-open #screen-editor .rich-toolbar {
     /* Keep formatting at the bottom, immediately above the iOS keyboard. */
@@ -512,8 +512,7 @@ html[data-theme="midnight"] .detail-photo-overlay button,html[data-theme="ember"
   opacity: 0;
   pointer-events: none;
 }
-body.qp-keyboard-open #screen-editor .rich-toolbar,
-body.qp-keyboard-open #screen-editor .rich-toolbar.qp-toolbar-hidden {
+body.qp-keyboard-open #screen-editor .rich-toolbar:not(.qp-toolbar-hidden) {
   transform: translateY(0) !important;
   opacity: 1 !important;
   pointer-events: auto !important;
@@ -522,8 +521,8 @@ html.reduce-motion #screen-editor .rich-toolbar { transition:none !important; }
 
 
 /* V20: compact calendar lives inside the date field instead of invoking the browser's detached picker. */
-#screen-editor .qp-date-box { position:relative; box-sizing:border-box; width:100%; border:1px solid var(--line); border-radius:18px; background:var(--surface-2); overflow:visible; }
-#screen-editor .qp-date-toggle { display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%; min-height:58px; padding:15px 16px; border:0; border-radius:17px; background:transparent; color:var(--ink); text-align:left; font:inherit; cursor:pointer; }
+#screen-editor .qp-date-box { position:relative; box-sizing:border-box; width:100%; min-width:0; border:1px solid var(--line); border-radius:18px; background:var(--surface-2); overflow:visible; }
+#screen-editor .qp-date-toggle { box-sizing:border-box; display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%; min-width:0; min-height:58px; padding:15px 16px; border:0; border-radius:17px; background:transparent; color:var(--ink); text-align:left; font:inherit; cursor:pointer; }
 #screen-editor .qp-date-toggle .bi { color:var(--accent-strong); font-size:17px; }
 #screen-editor .qp-date-toggle:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
 #screen-editor .qp-date-calendar { margin:0 10px 10px; padding:12px; border:1px solid var(--line); border-radius:15px; background:var(--surface); color:var(--ink); box-shadow:0 8px 24px rgba(0,0,0,.08); }
@@ -539,63 +538,3 @@ html.reduce-motion #screen-editor .rich-toolbar { transition:none !important; }
 #screen-editor .qp-date-day.selected { background:var(--action); color:#fff; }
 #screen-editor .qp-date-day:focus-visible,#screen-editor .qp-date-month-button:focus-visible,#screen-editor .qp-date-today:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
 #screen-editor .qp-date-today { display:block; margin:10px auto 0; padding:7px 13px; border:1px solid var(--line); border-radius:999px; background:var(--accent-soft); color:var(--accent-strong); font-size:11px; font-weight:700; }
-
-/* Quiet Pages: place photo memories below the greeting without changing the markup. */
-#screen-diary.screen.active {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-}
-#screen-diary > .home-intro { order: 1; padding-bottom: 14px; }
-#screen-diary > .memory-stories {
-  order: 2;
-  width: 100%;
-  margin: 0 0 27px;
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
-  overflow: visible;
-}
-#screen-diary > .memory-stories .story-rail {
-  width: 100%;
-  gap: 15px;
-  padding: 2px 1px 5px;
-}
-#screen-diary > .search-panel { order: 3; }
-#screen-diary > .section-heading { order: 4; }
-#screen-diary > .entry-stack { order: 5; }
-#screen-diary > .empty-state { order: 6; }
-#screen-diary > .bottom-note { order: 7; }
-@media (max-width: 560px) {
-  #screen-diary > .home-intro { padding-top: 27px; padding-bottom: 12px; }
-  #screen-diary > .memory-stories { margin-bottom: 25px; }
-  #screen-diary > .memory-stories .story-rail { gap: 12px; }
-}
-
-/* Quiet Pages: keep the same vertical spacing above and below the home photo stories. */
-#screen-diary > .home-intro {
-  padding-bottom: 0 !important;
-  margin-bottom: 18px !important;
-}
-#screen-diary > .memory-stories {
-  margin-top: 0 !important;
-  margin-bottom: 18px !important;
-}
-#screen-diary > .section-heading {
-  margin-top: 0 !important;
-}
-@media (max-width: 560px) {
-  #screen-diary > .home-intro {
-    padding-bottom: 0 !important;
-    margin-bottom: 18px !important;
-  }
-  #screen-diary > .memory-stories {
-    margin-top: 0 !important;
-    margin-bottom: 18px !important;
-  }
-  #screen-diary > .section-heading {
-    margin-top: 0 !important;
-  }
-}
