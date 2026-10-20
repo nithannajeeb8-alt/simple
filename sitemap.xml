@@ -1,36 +1,33 @@
+
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
   <url>
     <loc>https://nithan.in/</loc>
   </url>
+
   <url>
-    <loc>https://nithan.in/reaction-time-test.html</loc>
+    <loc>https://nithan.in/work.html</loc>
   </url>
+
   <url>
-    <loc>https://nithan.in/SYS_DEFEND.html</loc>
+    <loc>https://nithan.in/MyDiary/</loc>
   </url>
-  <url>
-    <loc>https://nithan.in/game.html</loc>
-  </url>
-  <url>
-    <loc>https://nithan.in/blog.html</loc>
-  </url>
-  <url>
-    <loc>https://nithan.in/mind-atlas.html</loc>
-  </url>
-  <url>
-    <loc>https://nithan.in/nithan.html</loc>
-  </url>
-  <url>
-    <loc>https://nithan.in/gallery.html</loc>
-  </url>
+
   <url>
     <loc>https://nithan.in/pdf-maker/</loc>
   </url>
+
   <url>
-    <loc>hhttps://nithan.in/MyDairy/</loc>
+    <loc>https://nithan.in/PocketWise/</loc>
   </url>
+
   <url>
-    <loc>https://nithan.in/flames.html</loc>
+    <loc>https://nithan.in/mind-atlas/</loc>
   </url>
+
+  <url>
+    <loc>https://nithan.in/Habity/</loc>
+  </url>
+
 </urlset>
