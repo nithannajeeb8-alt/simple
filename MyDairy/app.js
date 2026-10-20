@@ -1851,7 +1851,10 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
     let interactionUntil = 0;
     let syncTimer = 0;
     let autoHideTimer = 0;
+    let typingSuppressUntil = 0;
+    let observedToolbar = null;
     const AUTO_HIDE_MS = 4000;
+    const TYPING_SCROLL_GUARD_MS = 1200;
 
     const isEditorVisible = () => Boolean(editorScreen && (currentScreen === 'editor' || editorScreen.classList.contains('active')));
     const currentToolbar = () => editorScreen?.querySelector('.rich-toolbar');
@@ -1891,6 +1894,9 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
       if (!toolbar || !isEditorVisible()) { resetToolbar(); return; }
       const active = document.activeElement;
       const usingToolbar = toolbar.contains(active) || Date.now() < interactionUntil;
+      // iOS scrolls the page/caret while text is being inserted. Those synthetic
+      // scroll deltas must never reveal the toolbar over the user's typing area.
+      if (Date.now() < typingSuppressUntil && !usingToolbar) return;
       // Keyboard/VisualViewport movement is not a reading scroll. Only active
       // toolbar interaction may keep the bar visible; opening the keyboard alone
       // must never reveal it. A hidden bar returns after 2px of upward scrolling.
@@ -1952,14 +1958,50 @@ Only cite diary facts shown above. These excerpts are not the whole diary. For d
       }, 0);
     }, true);
 
-    // Editor HTML is rebuilt on each open; reset visibility and the scroll baseline
-    // whenever that happens or when navigation leaves the editor.
+    // The editor body is contenteditable, so a subtree MutationObserver also
+    // fires for every keystroke. Only reveal when the toolbar DOM node itself is
+    // newly created/replaced, never for ordinary text-node/paragraph mutations.
     const observer = new MutationObserver(() => {
-      if (!isEditorVisible()) { resetToolbar(); return; }
-      if (currentToolbar()) showToolbar();
-      lastEditorY = editorScreen?.querySelector('#editorBody')?.scrollTop || 0;
+      if (!isEditorVisible()) {
+        if (observedToolbar) {
+          observedToolbar = null;
+          resetToolbar();
+        }
+        return;
+      }
+      const toolbar = currentToolbar();
+      if (toolbar && toolbar !== observedToolbar) {
+        observedToolbar = toolbar;
+        lastEditorY = editorScreen?.querySelector('#editorBody')?.scrollTop || 0;
+        showToolbar();
+      }
     });
     observer.observe(editorScreen || document.body, { childList: true, subtree: true });
+
+    // Typing is not a scroll gesture. Hide immediately on text edits and ignore
+    // iOS caret/viewport scroll jitter briefly after each edit. Formatting
+    // commands (formatBold/formatItalic/etc.) do not match these input types.
+    const bindTypingGuard = () => {
+      const body = editorScreen?.querySelector('#editorBody');
+      const title = editorScreen?.querySelector('#editorTitle');
+      [body, title].filter(Boolean).forEach(field => {
+        if (field.dataset.qpToolbarTypingGuard === '1') return;
+        field.dataset.qpToolbarTypingGuard = '1';
+        field.addEventListener('input', event => {
+          const type = String(event.inputType || '');
+          const isTextEdit = !type || /^(insert|delete|historyUndo|historyRedo)/.test(type);
+          if (!isTextEdit || toolbarContainsFocus()) return;
+          typingSuppressUntil = Date.now() + TYPING_SCROLL_GUARD_MS;
+          interactionUntil = 0;
+          clearTimeout(autoHideTimer);
+          setHidden(true, true);
+        });
+      });
+    };
+    const toolbarContainsFocus = () => Boolean(currentToolbar()?.contains(document.activeElement));
+    const typingGuardObserver = new MutationObserver(bindTypingGuard);
+    typingGuardObserver.observe(editorScreen || document.body, { childList: true, subtree: true });
+    bindTypingGuard();
     document.addEventListener('click', event => {
       if (event.target?.closest?.('[data-action="cancel-editor"],[data-action="save-entry"],[data-nav]')) {
         setTimeout(() => {
