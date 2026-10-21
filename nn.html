@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="intro-lock">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -24,39 +24,8 @@
 <meta name="twitter:image" content="https://nithan.in/nithanl.webp">
 <link rel="icon" href="/favicon.png" type="image/png" sizes="64x64">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
-<script>document.documentElement.classList.add('js');
-// Scroll-linked Roman composition. The statue rises from below, then drifts above the city as the scene passes.
-(function animateRomeScene(){
-  const section = document.querySelector('.rome-build');
-  const wrap = document.querySelector('.rome-scene-wrap');
-  const statue = document.querySelector('.rome-sculptor');
-  const city = document.querySelector('.rome-city');
-  if (!section || !wrap || !statue || !city) return;
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (reduced) { statue.style.opacity = '1'; statue.style.transform = 'translate3d(-50%,0,0)'; return; }
-  let queued = false;
-  const clamp = (n,min,max) => Math.max(min,Math.min(max,n));
-  const update = () => {
-    queued = false;
-    const rect = wrap.getBoundingClientRect();
-    const progress = clamp((window.innerHeight - rect.top) / Math.max(1, rect.height), 0, 1);
-    const reveal = clamp(progress / .22, 0, 1);
-    const y = 58 - progress * 80;
-    statue.style.opacity = String(reveal);
-    statue.style.transform = `translate3d(-50%, ${y.toFixed(2)}%, 0)`;
-    city.style.transform = `scale(${(1.06 + progress * .045).toFixed(3)}) translate3d(0, ${(progress * -1.8).toFixed(2)}%, 0)`;
-  };
-  const requestUpdate = () => {
-    if (queued) return;
-    queued = true;
-    requestAnimationFrame(update);
-  };
-  window.addEventListener('scroll', requestUpdate, {passive:true});
-  window.addEventListener('resize', requestUpdate, {passive:true});
-  requestUpdate();
-})();
+<script>document.documentElement.classList.add('js');</script>
 
-</script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -403,41 +372,112 @@ body{overflow-x:clip}
 }
 
 
-/* Rome section: scroll-led title, panoramic city and sculptor rising through the frame. */
-.rome-build{position:relative;background:var(--paper);color:var(--ink);overflow:clip;padding:0 var(--gutter,5vw);}
-.rome-heading{height:clamp(260px,38vh,430px);display:flex;align-items:center;max-width:var(--content-width,1440px);margin:0 auto;position:relative;z-index:2;}
-.rome-heading .eyebrow{position:absolute;top:clamp(28px,5vw,64px);left:0;}
-.rome-title{font:800 clamp(48px,9.5vw,138px)/.88 var(--sans);letter-spacing:-.105em;max-width:1200px;margin:30px 0 0;}
+/* Rome section: restrained title, generous dotted negative space, inset city card, oversized rising sculptor. */
+.rome-build{
+  position:relative;isolation:isolate;overflow:hidden;color:var(--ink);
+  padding:0 var(--gutter,5vw) clamp(28px,5vw,72px);
+  background-color:var(--paper);
+  background-image:radial-gradient(circle,rgba(156,161,175,.36) 1.65px,transparent 2.15px);
+  background-size:34px 34px;background-position:0 1px;
+}
+.rome-heading{
+  min-height:clamp(230px,25vw,340px);display:flex;align-items:center;
+  max-width:var(--content-width,1440px);margin:0 auto;position:relative;z-index:3;
+  padding:clamp(72px,8vw,108px) 0 clamp(24px,3vw,42px);
+}
+.rome-heading .eyebrow{position:absolute;top:clamp(24px,3vw,42px);left:0;}
+.rome-title{font:800 clamp(48px,9vw,124px)/.9 var(--sans);letter-spacing:-.105em;max-width:1200px;margin:15px 0 0;}
 .rome-title em{font:italic 500 .92em var(--serif);letter-spacing:-.07em;}
-.rome-title .word-reveal{color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.03);}
+.rome-title .word-reveal{color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.035);transition:color .11s linear;}
 .rome-title .word-reveal.is-ink{color:#171612;}
-.rome-scene-wrap{height:178svh;position:relative;margin:0 calc(var(--gutter,5vw)*-1);}
-.rome-scene{position:sticky;top:0;height:100svh;min-height:520px;overflow:hidden;isolation:isolate;background:#17130f;}
-.rome-city{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 53%;transform:scale(1.06);filter:saturate(.78) brightness(.78) contrast(1.05);will-change:transform;}
-.rome-scene:after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(10,9,8,.04),rgba(10,9,8,.02) 48%,rgba(10,9,8,.44));}
-.rome-sculptor{position:absolute;z-index:2;left:50%;bottom:-24%;height:118%;width:auto;max-width:none;object-fit:contain;object-position:center bottom;transform:translate3d(-50%,58%,0);opacity:0;mix-blend-mode:screen;filter:grayscale(1) contrast(1.12) drop-shadow(0 8px 26px rgba(0,0,0,.24));will-change:transform,opacity;pointer-events:none;}
-.rome-caption{position:absolute;z-index:3;left:var(--gutter,5vw);right:var(--gutter,5vw);bottom:clamp(20px,4vw,52px);display:flex;align-items:center;justify-content:space-between;gap:20px;color:#f4f0e7;font:10px var(--mono);letter-spacing:.12em;text-transform:uppercase;opacity:.9;}
-.rome-caption span:last-child{text-align:right;}
+.rome-scene-wrap{
+  position:relative;width:100%;max-width:1600px;margin:clamp(10px,2.5vw,34px) auto 0;
+  height:clamp(610px,62vw,840px);overflow:visible;
+}
+.rome-scene{position:relative;width:100%;height:100%;overflow:visible;isolation:isolate;}
+.rome-city{
+  position:absolute;z-index:0;left:50%;top:56%;display:block;
+  width:min(88vw,1150px);height:auto;aspect-ratio:1536/866;
+  transform:translate3d(-50%,-50%,0) scale(1);
+  border-radius:clamp(16px,2.4vw,30px);object-fit:cover;object-position:center 53%;
+  filter:saturate(.82) brightness(.91) contrast(1.04);will-change:transform,filter;
+}
+.rome-sculptor{
+  position:absolute;z-index:2;left:50%;top:0;display:block;
+  height:clamp(740px,78vw,1030px);width:auto;max-width:none;object-fit:contain;object-position:center top;
+  transform:translate3d(-50%,40%,0);opacity:0;
+  mix-blend-mode:normal;filter:grayscale(1) contrast(1.08) drop-shadow(0 7px 18px rgba(0,0,0,.12));
+  will-change:transform,opacity;pointer-events:none;
+}
+.rome-caption{display:none;}
 @media(max-width:700px){
- .rome-build{padding:0 22px;}
- .rome-heading{height:clamp(240px,35svh,340px);align-items:center;}
- .rome-heading .eyebrow{top:26px;}
- .rome-title{font-size:clamp(46px,12.5vw,78px);line-height:.9;max-width:100%;margin-top:28px;}
- .rome-scene-wrap{height:150svh;margin:0 -22px;}
- .rome-scene{min-height:480px;}
- .rome-city{object-position:53% center;transform:scale(1.16);}
- .rome-sculptor{height:91%;bottom:-13%;max-width:120%;transform:translate3d(-50%,62%,0);}
- .rome-caption{left:22px;right:22px;bottom:22px;font-size:8px;letter-spacing:.07em;}
+  .rome-build{padding:0 22px 34px;}
+  .rome-heading{min-height:clamp(225px,60vw,300px);padding:66px 0 30px;}
+  .rome-heading .eyebrow{top:23px;}
+  .rome-title{font-size:clamp(45px,12.4vw,76px);line-height:.92;max-width:100%;margin-top:20px;}
+  .rome-scene-wrap{height:clamp(510px,135vw,650px);margin:8px -22px 0;width:calc(100% + 44px);}
+  .rome-city{width:91vw;top:53%;border-radius:16px;}
+  .rome-sculptor{height:clamp(620px,178vw,760px);}
 }
 @media(prefers-reduced-motion:reduce){
- .rome-sculptor{opacity:1!important;transform:translate3d(-50%,0,0)!important;}
- .rome-city{transform:none!important;}
+  .rome-sculptor{opacity:1!important;transform:translate3d(-50%,-5%,0)!important;}
+  .rome-city{transform:translate3d(-50%,-50%,0)!important;}
+}
+/* The Apple artwork supports touch scrolling. Dragging remains available with mouse, pen and keyboard. */
+.apple-philosophy .apple-stage,.apple-philosophy .apple-art{touch-action:pan-y!important;}
+
+
+/* Refined section rhythm and reliable scroll behavior */
+html{scroll-behavior:auto;scroll-padding-top:20px}
+body{overflow-x:hidden}
+html.intro-lock,body.intro-lock{overflow-x:hidden!important;overflow-y:auto!important;touch-action:pan-y!important;overscroll-behavior-y:auto!important}
+.rome-build{
+  background:#171612;
+  background-image:radial-gradient(ellipse at 50% 55%,rgba(128,82,42,.14),transparent 65%);
+  color:#f2eee6;
+  padding:clamp(68px,7vw,108px) var(--gutter,5vw) clamp(60px,7vw,100px);
+}
+.rome-heading{min-height:clamp(170px,22vw,270px);padding:clamp(45px,6vw,78px) 0 18px}
+.rome-heading .eyebrow{color:#b4a58e}
+.rome-title{color:#f2eee6}
+.rome-title .word-reveal{color:#4d4942;text-shadow:none}
+.rome-title .word-reveal.is-ink{color:#f2eee6}
+.rome-scene-wrap{height:clamp(450px,52vw,690px);margin:clamp(8px,1.5vw,22px) auto 0}
+.rome-city{width:min(84vw,1120px);top:51%;border:1px solid rgba(223,190,136,.18);box-shadow:0 26px 80px rgba(0,0,0,.26)}
+.rome-sculptor{height:clamp(650px,69vw,900px);filter:grayscale(1) contrast(1.08) drop-shadow(0 10px 24px rgba(0,0,0,.4))}
+.rome-caption{display:none}
+.contact h2{max-width:900px;font-size:clamp(48px,8vw,112px);line-height:.92;letter-spacing:-.095em}
+.contact h2 em{display:inline-block}
+@media(min-width:701px){
+  .intro,.apple-philosophy,.work,.manifesto,#about,.skills,.rome-build,.contact{min-height:100svh}
+  .intro{align-content:center}
+  .work,.skills{display:flex;flex-direction:column;justify-content:center}
+  .manifesto{display:flex;flex-direction:column;justify-content:center}
+  #about{display:flex;align-items:center}
+  .apple-philosophy{display:flex;flex-direction:column;justify-content:center}
+  .rome-build{display:flex;flex-direction:column;justify-content:center}
+  .rome-scene-wrap{height:min(53vw,650px)}
+  .rome-sculptor{height:min(70vw,880px)}
+  .contact{display:flex;flex-direction:column;justify-content:flex-end}
+}
+@media(max-width:700px){
+  .rome-build{padding:58px 22px 48px;background-color:#171612;background-image:radial-gradient(ellipse at 50% 55%,rgba(128,82,42,.14),transparent 65%)}
+  .rome-heading{min-height:clamp(190px,54vw,260px);padding:58px 0 22px}
+  .rome-title{font-size:clamp(43px,11.5vw,72px);line-height:.94}
+  .rome-scene-wrap{height:clamp(420px,120vw,590px);margin:0 -22px;width:calc(100% + 44px)}
+  .rome-city{width:94vw;top:48%;border-radius:15px}
+  .rome-sculptor{height:clamp(570px,158vw,720px)}
+  .contact h2{font-size:clamp(47px,11vw,74px);line-height:.95}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .rome-sculptor,.rome-city{transition:none!important}
 }
 
 </style>
 <noscript><style>html.intro-lock,body.intro-lock{overflow:auto!important;touch-action:auto!important}.intro-hidden{opacity:1!important;transform:none!important}.reveal{opacity:1!important;transform:none!important}</style></noscript>
 </head>
-<body class="intro-lock">
+<body>
 <a class="skip-link" href="#main-content">Skip to content</a>
 <header class="topbar intro-hidden"><a class="brand" href="/" aria-label="Nithan Najeeb home">NN<span aria-hidden="true">®</span></a><nav class="nav" aria-label="Main navigation"><a href="#work">Work</a><a href="#about">About</a><a href="#skills">Capabilities</a><a href="#contact">Contact ↗</a></nav><div class="availability"><span class="dot"></span> Building what's next</div></header>
 <main id="main-content">
@@ -462,19 +502,6 @@ body{overflow-x:clip}
   <div class="apple-philosophy-foot"><p>The hands never need to meet the apple. The space between them is the point: possibility, tension, and the moment before an idea becomes something real.</p><div class="signature">Make the idea matter.</div></div>
 </section>
 
-<section class="rome-build" id="rome" aria-labelledby="rome-title">
-  <div class="rome-heading">
-    <div class="eyebrow">03 / The long game</div>
-    <h2 class="rome-title" id="rome-title">Rome wasn’t<br>built in a <em>day.</em></h2>
-  </div>
-  <div class="rome-scene-wrap">
-    <div class="rome-scene" aria-label="A sculptor building toward something lasting above ancient Rome">
-      <img class="rome-city" src="rome-city.webp" alt="A panoramic view of ancient Rome at sunset" width="1536" height="866" loading="lazy" decoding="async">
-      <img class="rome-sculptor" src="roman-sculptor.webp" alt="A classical marble sculptor raising a hammer over stone" width="802" height="1536" loading="lazy" decoding="async">
-      <div class="rome-caption"><span>Built with patience.</span><span>Made to last.</span></div>
-    </div>
-  </div>
-</section>
 
 <section class="section work" id="work" aria-labelledby="work-title">
 <div class="section-head reveal"><div><div class="eyebrow">04 / Selected work</div><h2 id="work-title">Things I<br>create.</h2></div><p>Projects and experiments across knowledge systems, web infrastructure and local AI.</p></div>
@@ -486,9 +513,25 @@ body{overflow-x:clip}
 <a class="project reveal" href="/pdf-maker/" aria-label="Open PDF Maker"><div class="project-no">05</div><div><h3>PDF Maker</h3><p>A browser-based tool for arranging images and exporting them as a polished PDF.</p></div><div class="tags"><span class="tag">Web tool</span><span class="tag">Privacy-minded</span></div><span class="arrow" aria-hidden="true">↗</span></a>
 </div></section>
 <section class="manifesto"><div class="eyebrow reveal">A small philosophy</div><h2 class="reveal delay1">Less noise.<br>More <span>intention.</span><br>Make every detail<br>earn its <span>place.</span></h2><div class="manifesto-foot reveal delay2"><span>Design should feel obvious, not ordinary.</span><span>Concept / craft / iteration</span></div></section>
-<section class="section" id="about"><div class="about-grid"><div class="about-image reveal"><img src="rome-city.webp" alt="Ancient Rome at sunset" width="1536" height="866" loading="lazy" decoding="async"><span class="image-label">Rome / Built over time</span></div><div class="about-text reveal delay1"><div class="eyebrow">05 / A little about me</div><h2>Curious by nature.<br><em>Intentional</em> by design.</h2><p>I’m Nithan Najeeb, a B.Com student at MES College in Kerala, India, exploring the space between thoughtful design, practical technology and visual storytelling.</p><p>I enjoy understanding how systems work and turning ideas into useful things, from web interfaces and structured knowledge tools to experiments with locally run AI models. My approach is to stay curious, build deliberately and keep improving the details.</p><div class="facts"><div class="fact"><small>Also known as</small><strong>Rubin Stellar</strong></div><div class="fact"><small>Currently studying</small><strong>B.Com · MES College</strong></div><div class="fact"><small>Focus</small><strong>UI / UX &amp; web development</strong></div><div class="fact"><small>Researching</small><strong>Generative AI &amp; local LLMs</strong></div></div><div class="stack-list" aria-label="Tools and technologies"><span><b>Core</b> HTML5 · CSS3 · JavaScript</span><span><b>Motion</b> GSAP · Lottie · Canvas</span><span><b>R&amp;D</b> Ollama · Local LLMs</span></div></div></div></section>
-<section class="section skills" id="skills"><div class="section-head reveal"><div><div class="eyebrow">06 / Capabilities</div><h2>Where I<br>spend my curiosity.</h2></div><p>A growing toolkit across design, development and visual communication.</p></div><div class="skill-grid"><article class="skill reveal"><span class="num">01 / DESIGN</span><div><h3>UI / UX</h3><p>Information hierarchy, layout systems, responsive interfaces and interaction thinking.</p></div></article><article class="skill reveal delay1"><span class="num">02 / BUILD</span><div><h3>Web experiences</h3><p>Turning visual concepts into clean, responsive pages with purposeful motion.</p></div></article><article class="skill reveal delay2"><span class="num">03 / EXPLORE</span><div><h3>Generative AI</h3><p>Prompt engineering, reference-led image creation and iterative visual direction.</p></div></article><article class="skill reveal delay3"><span class="num">04 / SHAPE</span><div><h3>Visual storytelling</h3><p>Art direction, cinematic concepts, typography and personal brand expression.</p></div></article></div></section>
-<section class="contact" id="contact"><div class="contact-main"><div class="reveal"><div class="eyebrow">07 / Have something in mind?</div><h2>Let’s make<br>it <em>matter.</em></h2></div><div class="contact-side reveal delay1"><p>Open to thoughtful collaborations, creative experiments and opportunities to learn by building.</p><a class="contact-button" href="https://www.linkedin.com/in/nithannajeeb" target="_blank" rel="noopener noreferrer">Connect on LinkedIn <span aria-hidden="true">↗</span></a><div class="social-links" aria-label="Social profiles"><a href="https://instagram.com/nithannajeeb_" target="_blank" rel="noopener noreferrer">Instagram ↗</a><a href="https://www.threads.net/@nithannajeeb_" target="_blank" rel="noopener noreferrer">Threads ↗</a><a href="https://www.facebook.com/nithan.najeeb" target="_blank" rel="noopener noreferrer">Facebook ↗</a></div></div></div><footer class="footer"><span>© <span id="year"></span> Nithan Najeeb</span><nav class="footer-links" aria-label="More from Nithan"><a href="/mind-atlas.html">Mind Atlas</a><a href="/pdf-maker/">PDF Maker</a><a href="/MyDairy/">My Dairy</a></nav><a href="#top">Back to top ↑</a></footer></section>
+
+
+
+<section class="section" id="about"><div class="about-grid"><div class="about-image reveal"><img src="nithan.webp" alt="Black-and-white portrait of Nithan Najeeb" width="1216" height="1536" loading="lazy" decoding="async"><span class="image-label">Nithan Najeeb / Portrait</span></div><div class="about-text reveal delay1"><div class="eyebrow">06 / A little about me</div><h2>Curious by nature.<br><em>Intentional</em> by design.</h2><p>I’m Nithan Najeeb, a B.Com student at MES College in Kerala, India, exploring the space between thoughtful design, practical technology and visual storytelling.</p><p>I enjoy understanding how systems work and turning ideas into useful things, from web interfaces and structured knowledge tools to experiments with locally run AI models. My approach is to stay curious, build deliberately and keep improving the details.</p><div class="facts"><div class="fact"><small>Also known as</small><strong>Rubin Stellar</strong></div><div class="fact"><small>Currently studying</small><strong>B.Com · MES College</strong></div><div class="fact"><small>Focus</small><strong>UI / UX &amp; web development</strong></div><div class="fact"><small>Researching</small><strong>Generative AI &amp; local LLMs</strong></div></div><div class="stack-list" aria-label="Tools and technologies"><span><b>Core</b> HTML5 · CSS3 · JavaScript</span><span><b>Motion</b> GSAP · Lottie · Canvas</span><span><b>R&amp;D</b> Ollama · Local LLMs</span></div></div></div></section>
+<section class="section skills" id="skills"><div class="section-head reveal"><div><div class="eyebrow">07 / Capabilities</div><h2>Where I<br>spend my curiosity.</h2></div><p>A growing toolkit across design, development and visual communication.</p></div><div class="skill-grid"><article class="skill reveal"><span class="num">01 / DESIGN</span><div><h3>UI / UX</h3><p>Information hierarchy, layout systems, responsive interfaces and interaction thinking.</p></div></article><article class="skill reveal delay1"><span class="num">02 / BUILD</span><div><h3>Web experiences</h3><p>Turning visual concepts into clean, responsive pages with purposeful motion.</p></div></article><article class="skill reveal delay2"><span class="num">03 / EXPLORE</span><div><h3>Generative AI</h3><p>Prompt engineering, reference-led image creation and iterative visual direction.</p></div></article><article class="skill reveal delay3"><span class="num">04 / SHAPE</span><div><h3>Visual storytelling</h3><p>Art direction, cinematic concepts, typography and personal brand expression.</p></div></article></div></section>
+<section class="rome-build" id="rome" aria-labelledby="rome-title">
+  <div class="rome-heading">
+    <div class="eyebrow">08 / The long game</div>
+    <h2 class="rome-title" id="rome-title">Rome wasn’t<br>built in a <em>day.</em></h2>
+  </div>
+  <div class="rome-scene-wrap">
+    <div class="rome-scene" aria-label="A sculptor building toward something lasting above ancient Rome">
+      <img class="rome-city" src="rome-city.webp" alt="A panoramic view of ancient Rome at sunset" width="1536" height="866" loading="eager" decoding="async">
+      <img class="rome-sculptor" src="roman-sculptor.webp" alt="A classical marble sculptor raising a hammer over stone" width="802" height="1536" loading="eager" decoding="async">
+      <div class="rome-caption"><span>Built with patience.</span><span>Made to last.</span></div>
+    </div>
+  </div>
+</section>
+<section class="contact" id="contact"><div class="contact-main"><div class="reveal"><div class="eyebrow">08 / Have something in mind?</div><h2>Let’s build<br>something <em>that lasts.</em></h2></div><div class="contact-side reveal delay1"><p>Open to thoughtful collaborations, creative experiments and opportunities to learn by building.</p><a class="contact-button" href="https://www.linkedin.com/in/nithannajeeb" target="_blank" rel="noopener noreferrer">Connect on LinkedIn <span aria-hidden="true">↗</span></a><div class="social-links" aria-label="Social profiles"><a href="https://instagram.com/nithannajeeb_" target="_blank" rel="noopener noreferrer">Instagram ↗</a><a href="https://www.threads.net/@nithannajeeb_" target="_blank" rel="noopener noreferrer">Threads ↗</a><a href="https://www.facebook.com/nithan.najeeb" target="_blank" rel="noopener noreferrer">Facebook ↗</a></div></div></div><footer class="footer"><span>© <span id="year"></span> Nithan Najeeb</span><nav class="footer-links" aria-label="More from Nithan"><a href="/mind-atlas.html">Mind Atlas</a><a href="/pdf-maker/">PDF Maker</a><a href="/MyDairy/">My Dairy</a></nav><a href="#top">Back to top ↑</a></footer></section>
 </main>
 <script>
 const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('visible');observer.unobserve(entry.target)}}),{threshold:.12});document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));document.getElementById('year').textContent=new Date().getFullYear();
@@ -522,19 +565,19 @@ const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entr
   // 1. The repeating name sharpens into view.
   requestAnimationFrame(() => body.classList.add('intro-name-visible'));
   // 2. Portrait rises from below the cover.
-  window.setTimeout(() => portrait && portrait.classList.add('intro-rise'), 520);
+  window.setTimeout(() => portrait && portrait.classList.add('intro-rise'), 180);
   // 3. Name and supporting details settle in.
-  window.setTimeout(() => heroCopy && heroCopy.classList.add('intro-enter'), 1570);
+  window.setTimeout(() => heroCopy && heroCopy.classList.add('intro-enter'), 720);
   // 4. Navigation and scroll hint arrive last.
   window.setTimeout(() => {
     if (topbar) topbar.classList.add('intro-enter');
     if (scrollCue) scrollCue.classList.add('intro-enter');
-  }, 2110);
+  }, 1050);
   // Unlock after the sequence without changing the page's scroll position.
   window.setTimeout(() => {
     root.classList.remove('intro-lock');
     body.classList.remove('intro-lock');
-  }, 2920);
+  }, 1250);
 })();
 // Give the repeating name a tiny pointer-responsive drift on larger screens.
 const wall=document.querySelector('.typewall');let raf;window.addEventListener('pointermove',e=>{if(matchMedia('(pointer:fine)').matches){cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>wall.style.setProperty('--pointer-y',((e.clientY/innerHeight)-.5)*7+'px'));wall.style.transform=`translateY(${((e.clientY/innerHeight)-.5)*5}px)`}},{passive:true});
@@ -623,6 +666,35 @@ window.addEventListener('scroll', () => {
 window.addEventListener('resize', measureScrollEffects, { passive: true });
 measureScrollEffects();
 
+
+// Scroll-linked Roman scene: title fills first; the sculptor rises over a contained city panorama, then drifts upward.
+(function animateRomeComposition(){
+  const wrap = document.querySelector('.rome-scene-wrap');
+  const sculptor = document.querySelector('.rome-sculptor');
+  const city = document.querySelector('.rome-city');
+  if (!wrap || !sculptor || !city) return;
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let queued = false;
+  const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
+  const update = () => {
+    queued = false;
+    const rect = wrap.getBoundingClientRect();
+    // Animate over the scene's travel through the viewport instead of pinning it full-screen.
+    const progress = reduced ? 1 : clamp((window.innerHeight - rect.top) / (window.innerHeight + rect.height), 0, 1);
+    const rise = 40 - progress * 47;
+    const reveal = clamp((progress - .025) / .34, 0, 1);
+    sculptor.style.opacity = String(reveal);
+    sculptor.style.transform = `translate3d(-50%, ${rise.toFixed(2)}%, 0)`;
+    const scale = 1 + progress * .025;
+    const drift = progress * -7;
+    city.style.transform = `translate3d(-50%, calc(-50% + ${drift.toFixed(2)}px), 0) scale(${scale.toFixed(3)})`;
+    city.style.filter = `saturate(.82) brightness(${(.91 + Math.sin(progress * Math.PI) * .035).toFixed(3)}) contrast(1.04)`;
+  };
+  const schedule = () => { if (!queued) { queued = true; requestAnimationFrame(update); } };
+  window.addEventListener('scroll', schedule, {passive:true});
+  window.addEventListener('resize', schedule, {passive:true});
+  update();
+})();
 
 // Start the artwork entrance only when the philosophy section actually enters the viewport.
 (function activateAppleSection(){
