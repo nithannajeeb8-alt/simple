@@ -268,6 +268,108 @@ body{overflow-x:clip}
  .apple-fruit{scale:1!important;transform:translate3d(calc(-50% + var(--apple-x,0px)),calc(-50% + var(--apple-y,0px)),0)}
 }
 
+
+/* Final composition calibration from the supplied source artwork ratios:
+   left arm 2043×1294 (1.579:1), right arm 2416×1129 (2.139:1),
+   apple source 1272×1237 (1.028:1). Preserve image aspect ratios. */
+.apple-philosophy .apple-stage{
+  height:clamp(330px,34vw,470px);
+  max-width:1600px;
+  margin:clamp(24px,3.4vw,48px) auto 0;
+  overflow:hidden;
+}
+.apple-philosophy .apple-stage:before{
+  width:min(34vw,420px);
+  height:min(22vw,245px);
+  background:radial-gradient(ellipse,rgba(204,151,48,.19) 0%,rgba(204,151,48,.075) 36%,rgba(204,151,48,.018) 62%,transparent 76%);
+  filter:blur(9px);
+}
+.apple-philosophy .apple-hand-left,
+.apple-philosophy .apple-hand-right{
+  width:58%;
+  height:auto;
+  max-width:none;
+  object-fit:contain;
+  top:50%;
+  opacity:0;
+  animation:none;
+  transition:filter .25s ease;
+  will-change:transform,opacity;
+}
+.apple-philosophy .apple-hand-left{
+  left:-19%;
+  transform-origin:76% 53%;
+  transform:translate3d(-105%,-50%,0) rotate(var(--hand-left-angle,0deg));
+}
+.apple-philosophy .apple-hand-right{
+  right:-16%;
+  transform-origin:28% 53%;
+  transform:translate3d(105%,-50%,0) rotate(var(--hand-right-angle,0deg));
+}
+@keyframes ratio-hand-left-in{
+  from{opacity:0;transform:translate3d(-105%,-50%,0) rotate(0deg)}
+  to{opacity:1;transform:translate3d(0,-50%,0) rotate(var(--hand-left-angle,0deg))}
+}
+@keyframes ratio-hand-right-in{
+  from{opacity:0;transform:translate3d(105%,-50%,0) rotate(0deg)}
+  to{opacity:1;transform:translate3d(0,-50%,0) rotate(var(--hand-right-angle,0deg))}
+}
+.apple-philosophy .apple-fruit{
+  width:clamp(88px,8vw,122px);
+  height:auto;
+  aspect-ratio:1272 / 1237;
+  object-fit:contain;
+  left:50%;
+  top:50%;
+  opacity:0;
+  scale:.7;
+  transform:translate3d(calc(-50% + var(--apple-x,0px)),calc(-50% + var(--apple-y,0px)),0);
+  animation:none;
+  z-index:5;
+  filter:drop-shadow(0 7px 13px rgba(214,155,39,.17));
+}
+@keyframes ratio-apple-in{
+  0%{opacity:0;scale:.56}
+  72%{opacity:1;scale:1.04}
+  100%{opacity:1;scale:1}
+}
+.apple-philosophy.is-active .apple-fruit{
+  animation:ratio-apple-in .8s cubic-bezier(.2,.8,.2,1) .08s both;
+}
+.apple-philosophy.is-active .apple-hand-left{
+  animation:ratio-hand-left-in 1.12s cubic-bezier(.16,1,.3,1) .38s both;
+}
+.apple-philosophy.is-active .apple-hand-right{
+  animation:ratio-hand-right-in 1.12s cubic-bezier(.16,1,.3,1) .52s both;
+}
+.apple-philosophy .apple-stage-hint{position:relative;z-index:6}
+@media(max-width:700px){
+  .apple-philosophy .apple-stage{
+    height:clamp(270px,78vw,350px);
+    margin:20px -22px 0;
+  }
+  .apple-philosophy .apple-stage:before{width:68vw;height:45vw;max-height:190px}
+  .apple-philosophy .apple-hand-left,
+  .apple-philosophy .apple-hand-right{width:74%;top:50%}
+  .apple-philosophy .apple-hand-left{left:-42%;transform-origin:76% 53%}
+  .apple-philosophy .apple-hand-right{right:-35%;transform-origin:28% 53%}
+  .apple-philosophy .apple-fruit{width:clamp(70px,18vw,86px);height:auto}
+  .apple-philosophy .apple-stage-hint{margin:0 5vw;gap:12px;font-size:8px;letter-spacing:.07em}
+  .apple-philosophy .apple-stage-hint span:last-child{max-width:45%}
+}
+@media(min-width:1200px){
+  .apple-philosophy .apple-stage{height:clamp(390px,31vw,470px)}
+  .apple-philosophy .apple-hand-left{left:-19%}
+  .apple-philosophy .apple-hand-right{right:-16%}
+}
+@media(prefers-reduced-motion:reduce){
+  .apple-philosophy .apple-hand-left,
+  .apple-philosophy .apple-hand-right,
+  .apple-philosophy .apple-fruit{animation:none!important;opacity:1!important;scale:1!important}
+  .apple-philosophy .apple-hand-left{transform:translate3d(0,-50%,0) rotate(var(--hand-left-angle,0deg))}
+  .apple-philosophy .apple-hand-right{transform:translate3d(0,-50%,0) rotate(var(--hand-right-angle,0deg))}
+}
+
 </style>
 <noscript><style>html.intro-lock,body.intro-lock{overflow:auto!important;touch-action:auto!important}.intro-hidden{opacity:1!important;transform:none!important}.reveal{opacity:1!important;transform:none!important}</style></noscript>
 </head>
@@ -494,8 +596,8 @@ measureScrollEffects();
       const dy = event.clientY - start.pointerY;
       if (isApple(el)) {
         const bounds = stage.getBoundingClientRect();
-        p.x = Math.max(-bounds.width*.22, Math.min(bounds.width*.22, start.x + dx));
-        p.y = Math.max(-bounds.height*.28, Math.min(bounds.height*.28, start.y + dy));
+        p.x = Math.max(-bounds.width*.10, Math.min(bounds.width*.10, start.x + dx));
+        p.y = Math.max(-bounds.height*.20, Math.min(bounds.height*.20, start.y + dy));
       } else {
         // A vertical drag pivots the hand at the wrist; the forearm attachment stays in place.
         p.y = Math.max(-14, Math.min(14, start.y + dy * .18));
