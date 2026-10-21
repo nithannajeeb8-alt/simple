@@ -180,6 +180,49 @@ body{overflow-x:clip}
 }
 @media(prefers-reduced-motion:reduce){.type-row{animation:none!important}.scroll-cue:after{animation:none!important}.js .reveal{opacity:1;transform:none}}
 
+
+/* Golden-apple section refinement: larger artwork, smaller copy, focused glow and the site's reveal language. */
+.apple-philosophy{padding:clamp(68px,7.5vw,108px) var(--gutter,5vw) clamp(48px,6vw,78px);}
+.apple-philosophy-head{grid-template-columns:.9fr 1.1fr;gap:clamp(30px,6vw,92px);max-width:var(--content-width,1440px);}
+.apple-philosophy h2{font-size:clamp(38px,6.2vw,82px);max-width:560px;margin-top:18px;}
+.apple-philosophy-copy{padding-top:30px;max-width:520px;}
+.apple-philosophy-copy p{font-size:clamp(13px,1.05vw,15px);line-height:1.7;margin-bottom:12px;color:#bdb9b1;}
+.apple-stage{height:clamp(300px,34vw,490px);max-width:1600px;margin:clamp(20px,2.8vw,42px) auto 0;}
+.apple-stage:before{width:min(38vw,470px);height:min(19vw,220px);background:radial-gradient(ellipse,rgba(204,151,48,.20) 0%,rgba(204,151,48,.09) 25%,rgba(204,151,48,.035) 45%,transparent 68%);filter:blur(10px);}
+.apple-stage:after{left:42%;right:42%;opacity:.2;}
+.apple-hand-left{width:54%;height:100%;left:-2%;top:1%;object-position:left center;transform-origin:75% 54%;}
+.apple-hand-right{width:54%;height:100%;right:-2%;top:-2%;object-position:right center;transform-origin:25% 52%;}
+.apple-fruit{width:clamp(100px,9vw,132px);height:clamp(100px,9vw,132px);}
+.apple-stage-hint{font-size:8px;line-height:1.6;max-width:var(--content-width,1440px);margin:0 auto;padding-top:14px;}
+.apple-philosophy-foot{max-width:var(--content-width,1440px);gap:clamp(24px,5vw,72px);padding-top:20px;}
+.apple-philosophy-foot p{font-size:11px;line-height:1.75;max-width:390px;}
+.apple-philosophy-foot .signature{font-size:clamp(20px,2.4vw,30px);}
+/* The same soft reveal rhythm used throughout the portfolio also animates this section's text. */
+.js .apple-philosophy .reveal{opacity:0;transform:translateY(22px);transition:opacity .85s cubic-bezier(.2,.7,.2,1),transform .85s cubic-bezier(.2,.7,.2,1);}
+.js .apple-philosophy .reveal.visible{opacity:1;transform:translateY(0);}
+.apple-philosophy .delay1{transition-delay:.14s;}
+.apple-hand-left{animation:hand-enter-left 1.15s cubic-bezier(.16,1,.3,1) .58s both;}
+.apple-hand-right{animation:hand-enter-right 1.15s cubic-bezier(.16,1,.3,1) .78s both;}
+@media(max-width:700px){
+ .apple-philosophy{padding:64px 22px 42px;}
+ .apple-philosophy-head{grid-template-columns:1fr;gap:8px;}
+ .apple-philosophy h2{font-size:clamp(40px,10.5vw,64px);max-width:480px;margin-top:17px;}
+ .apple-philosophy-copy{padding-top:3px;max-width:410px;}
+ .apple-philosophy-copy p{font-size:12.5px;line-height:1.65;margin-bottom:9px;}
+ .apple-stage{height:clamp(265px,74vw,370px);margin:18px -22px 0;overflow:hidden;}
+ .apple-hand-left{width:76%;height:91%;left:-29%;top:5%;object-position:left center;transform-origin:76% 54%;}
+ .apple-hand-right{width:76%;height:91%;right:-29%;top:0;object-position:right center;transform-origin:24% 52%;}
+ .apple-fruit{width:clamp(82px,21vw,108px);height:clamp(82px,21vw,108px);}
+ .apple-stage:before{width:66vw;height:38vw;max-height:170px;}
+ .apple-stage:after{left:43%;right:43%;}
+ .apple-stage-hint{margin:0;font-size:7px;letter-spacing:.07em;}
+ .apple-philosophy-foot{grid-template-columns:1fr;gap:12px;padding-top:18px;}
+ .apple-philosophy-foot p{font-size:11px;max-width:390px;}
+ .apple-philosophy-foot .signature{justify-self:start;text-align:left;font-size:24px;}
+}
+@media(min-width:1200px){.apple-stage{height:clamp(390px,31vw,500px)}.apple-hand-left,.apple-hand-right{width:56%;}}
+@media(prefers-reduced-motion:reduce){.js .apple-philosophy .reveal{opacity:1;transform:none;transition:none}.apple-hand-left,.apple-hand-right{animation:none!important;opacity:1!important;transform:rotate(var(--hand-left-angle,0deg))}.apple-hand-right{transform:rotate(var(--hand-right-angle,0deg))}}
+
 </style>
 <noscript><style>html.intro-lock,body.intro-lock{overflow:auto!important;touch-action:auto!important}.intro-hidden{opacity:1!important;transform:none!important}.reveal{opacity:1!important;transform:none!important}</style></noscript>
 </head>
@@ -194,15 +237,15 @@ body{overflow-x:clip}
   <div class="apple-philosophy-head">
     <div class="reveal"><div class="eyebrow">02 / The philosophy</div><h2 id="apple-philosophy-title">Every era has <em>an apple.</em></h2></div>
     <div class="apple-philosophy-copy reveal delay1">
-      <p>One fruit became a story about <strong>curiosity, choice and consequence</strong>. In the familiar telling of Adam and Eve, the apple represents the moment knowledge changed everything, even though the biblical text never identifies the fruit as an apple.</p>
-      <p>Centuries later, an apple became part of the story told about Newton and gravity. Much later, Apple turned the same simple shape into a symbol of technology that could change how people live and create.</p>
-      <p>I’m drawn to that pattern: a small, clear idea can open a much larger door. I want to build digital things with the potential to start a new wave of change, not just add more noise.</p>
+      <p>From <strong>choice</strong> to discovery, the apple became a symbol of the moment knowledge changes everything.</p>
+      <p>Newton made it a story about asking why. Apple made it a symbol of technology reshaping everyday life.</p>
+      <p>I want to build the next kind of apple: a small idea with the power to begin a bigger change.</p>
     </div>
   </div>
   <div class="apple-stage" aria-label="Interactive golden apple between two reaching hands. Drag either hand vertically or move the apple in any direction.">
-    <img class="apple-art apple-hand-left" src="hand-left.png" alt="A sketched hand reaching in from the left" draggable="false" tabindex="0" role="img" aria-label="Left reaching hand. Drag up or down, or use the arrow keys." data-drag-kind="hand-left">
-    <img class="apple-art apple-hand-right" src="hand-right.png" alt="A sketched hand reaching in from the right, slightly higher" draggable="false" tabindex="0" role="img" aria-label="Right reaching hand. Drag up or down, or use the arrow keys." data-drag-kind="hand-right">
-    <img class="apple-art apple-fruit" src="golden-apple.png" alt="A polished golden apple, symbolising a transformative idea" draggable="false" tabindex="0" role="img" aria-label="Golden apple. Drag in any direction, or use the arrow keys.">
+    <img class="apple-art apple-hand-left" src="hand-left.webp" alt="A sketched hand reaching in from the left" draggable="false" tabindex="0" role="img" aria-label="Left reaching hand. Drag up or down, or use the arrow keys." data-drag-kind="hand-left">
+    <img class="apple-art apple-hand-right" src="hand-right.webp" alt="A sketched hand reaching in from the right, slightly higher" draggable="false" tabindex="0" role="img" aria-label="Right reaching hand. Drag up or down, or use the arrow keys." data-drag-kind="hand-right">
+    <img class="apple-art apple-fruit" src="golden-apple.webp" alt="A polished golden apple, symbolising a transformative idea" draggable="false" tabindex="0" role="img" aria-label="Golden apple. Drag in any direction, or use the arrow keys.">
   </div>
   <div class="apple-stage-hint"><span>Move the hands · Shift the idea</span><span>Touch, drag or use arrow keys</span></div>
   <div class="apple-philosophy-foot"><p>The hands never need to meet the apple. The space between them is the point: possibility, tension, and the moment before an idea becomes something real.</p><div class="signature">Make the idea matter.</div></div>
