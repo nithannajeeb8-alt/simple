@@ -24,7 +24,39 @@
 <meta name="twitter:image" content="https://nithan.in/nithanl.webp">
 <link rel="icon" href="/favicon.png" type="image/png" sizes="64x64">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
-<script>document.documentElement.classList.add('js');</script>
+<script>document.documentElement.classList.add('js');
+// Scroll-linked Roman composition. The statue rises from below, then drifts above the city as the scene passes.
+(function animateRomeScene(){
+  const section = document.querySelector('.rome-build');
+  const wrap = document.querySelector('.rome-scene-wrap');
+  const statue = document.querySelector('.rome-sculptor');
+  const city = document.querySelector('.rome-city');
+  if (!section || !wrap || !statue || !city) return;
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduced) { statue.style.opacity = '1'; statue.style.transform = 'translate3d(-50%,0,0)'; return; }
+  let queued = false;
+  const clamp = (n,min,max) => Math.max(min,Math.min(max,n));
+  const update = () => {
+    queued = false;
+    const rect = wrap.getBoundingClientRect();
+    const progress = clamp((window.innerHeight - rect.top) / Math.max(1, rect.height), 0, 1);
+    const reveal = clamp(progress / .22, 0, 1);
+    const y = 58 - progress * 80;
+    statue.style.opacity = String(reveal);
+    statue.style.transform = `translate3d(-50%, ${y.toFixed(2)}%, 0)`;
+    city.style.transform = `scale(${(1.06 + progress * .045).toFixed(3)}) translate3d(0, ${(progress * -1.8).toFixed(2)}%, 0)`;
+  };
+  const requestUpdate = () => {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(update);
+  };
+  window.addEventListener('scroll', requestUpdate, {passive:true});
+  window.addEventListener('resize', requestUpdate, {passive:true});
+  requestUpdate();
+})();
+
+</script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -82,7 +114,7 @@
 .apple-stage{position:relative;height:clamp(230px,29vw,390px);max-width:1500px;margin:clamp(28px,4vw,54px) auto 0;touch-action:pan-y;user-select:none;-webkit-user-select:none;isolation:isolate;}
 .apple-stage:before{content:"";position:absolute;z-index:0;left:50%;top:50%;width:min(54vw,620px);height:min(24vw,270px);transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(ellipse,rgba(204,151,48,.17) 0%,rgba(204,151,48,.075) 28%,rgba(204,151,48,.025) 48%,transparent 72%);filter:blur(12px);pointer-events:none}
 .apple-stage:after{content:"";position:absolute;z-index:1;left:38%;right:38%;top:50%;height:1px;background:linear-gradient(90deg,transparent,#c99b4566,transparent);opacity:.24;pointer-events:none}
-.apple-art{position:absolute;display:block;object-fit:contain;pointer-events:auto;cursor:ns-resize;touch-action:none;user-select:none;-webkit-user-drag:none;filter:contrast(1.04);will-change:transform,opacity;outline:none}.apple-art:focus-visible{filter:drop-shadow(0 0 5px #d5a64c)}
+.apple-art{position:absolute;display:block;object-fit:contain;pointer-events:auto;cursor:ns-resize;touch-action:pan-y;user-select:none;-webkit-user-drag:none;filter:contrast(1.04);will-change:transform,opacity;outline:none}.apple-art:focus-visible{filter:drop-shadow(0 0 5px #d5a64c)}
 .apple-hand-left{width:42%;height:90%;left:-1%;top:5%;object-position:left center;transform-origin:72% 53%;transform:rotate(var(--hand-left-angle,0deg));animation:hand-enter-left 1.05s cubic-bezier(.16,1,.3,1) .58s both;}
 .apple-hand-right{width:42%;height:90%;right:-1%;top:0;object-position:right center;transform-origin:29% 53%;transform:rotate(var(--hand-right-angle,0deg));animation:hand-enter-right 1.05s cubic-bezier(.16,1,.3,1) .72s both;}
 @keyframes hand-enter-left{from{opacity:0;transform:translateX(-105%) rotate(0deg)}to{opacity:1;transform:translateX(0) rotate(var(--hand-left-angle,0deg))}}
@@ -370,6 +402,38 @@ body{overflow-x:clip}
   .apple-philosophy .apple-hand-right{transform:translate3d(0,-50%,0) rotate(var(--hand-right-angle,0deg))}
 }
 
+
+/* Rome section: scroll-led title, panoramic city and sculptor rising through the frame. */
+.rome-build{position:relative;background:var(--paper);color:var(--ink);overflow:clip;padding:0 var(--gutter,5vw);}
+.rome-heading{height:clamp(260px,38vh,430px);display:flex;align-items:center;max-width:var(--content-width,1440px);margin:0 auto;position:relative;z-index:2;}
+.rome-heading .eyebrow{position:absolute;top:clamp(28px,5vw,64px);left:0;}
+.rome-title{font:800 clamp(48px,9.5vw,138px)/.88 var(--sans);letter-spacing:-.105em;max-width:1200px;margin:30px 0 0;}
+.rome-title em{font:italic 500 .92em var(--serif);letter-spacing:-.07em;}
+.rome-title .word-reveal{color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.03);}
+.rome-title .word-reveal.is-ink{color:#171612;}
+.rome-scene-wrap{height:178svh;position:relative;margin:0 calc(var(--gutter,5vw)*-1);}
+.rome-scene{position:sticky;top:0;height:100svh;min-height:520px;overflow:hidden;isolation:isolate;background:#17130f;}
+.rome-city{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 53%;transform:scale(1.06);filter:saturate(.78) brightness(.78) contrast(1.05);will-change:transform;}
+.rome-scene:after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(10,9,8,.04),rgba(10,9,8,.02) 48%,rgba(10,9,8,.44));}
+.rome-sculptor{position:absolute;z-index:2;left:50%;bottom:-24%;height:118%;width:auto;max-width:none;object-fit:contain;object-position:center bottom;transform:translate3d(-50%,58%,0);opacity:0;mix-blend-mode:screen;filter:grayscale(1) contrast(1.12) drop-shadow(0 8px 26px rgba(0,0,0,.24));will-change:transform,opacity;pointer-events:none;}
+.rome-caption{position:absolute;z-index:3;left:var(--gutter,5vw);right:var(--gutter,5vw);bottom:clamp(20px,4vw,52px);display:flex;align-items:center;justify-content:space-between;gap:20px;color:#f4f0e7;font:10px var(--mono);letter-spacing:.12em;text-transform:uppercase;opacity:.9;}
+.rome-caption span:last-child{text-align:right;}
+@media(max-width:700px){
+ .rome-build{padding:0 22px;}
+ .rome-heading{height:clamp(240px,35svh,340px);align-items:center;}
+ .rome-heading .eyebrow{top:26px;}
+ .rome-title{font-size:clamp(46px,12.5vw,78px);line-height:.9;max-width:100%;margin-top:28px;}
+ .rome-scene-wrap{height:150svh;margin:0 -22px;}
+ .rome-scene{min-height:480px;}
+ .rome-city{object-position:53% center;transform:scale(1.16);}
+ .rome-sculptor{height:91%;bottom:-13%;max-width:120%;transform:translate3d(-50%,62%,0);}
+ .rome-caption{left:22px;right:22px;bottom:22px;font-size:8px;letter-spacing:.07em;}
+}
+@media(prefers-reduced-motion:reduce){
+ .rome-sculptor{opacity:1!important;transform:translate3d(-50%,0,0)!important;}
+ .rome-city{transform:none!important;}
+}
+
 </style>
 <noscript><style>html.intro-lock,body.intro-lock{overflow:auto!important;touch-action:auto!important}.intro-hidden{opacity:1!important;transform:none!important}.reveal{opacity:1!important;transform:none!important}</style></noscript>
 </head>
@@ -397,8 +461,23 @@ body{overflow-x:clip}
   <div class="apple-stage-hint"><span>Move the hands · Shift the idea</span><span>Touch, drag or use arrow keys</span></div>
   <div class="apple-philosophy-foot"><p>The hands never need to meet the apple. The space between them is the point: possibility, tension, and the moment before an idea becomes something real.</p><div class="signature">Make the idea matter.</div></div>
 </section>
+
+<section class="rome-build" id="rome" aria-labelledby="rome-title">
+  <div class="rome-heading">
+    <div class="eyebrow">03 / The long game</div>
+    <h2 class="rome-title" id="rome-title">Rome wasn’t<br>built in a <em>day.</em></h2>
+  </div>
+  <div class="rome-scene-wrap">
+    <div class="rome-scene" aria-label="A sculptor building toward something lasting above ancient Rome">
+      <img class="rome-city" src="rome-city.webp" alt="A panoramic view of ancient Rome at sunset" width="1536" height="866" loading="lazy" decoding="async">
+      <img class="rome-sculptor" src="roman-sculptor.webp" alt="A classical marble sculptor raising a hammer over stone" width="802" height="1536" loading="lazy" decoding="async">
+      <div class="rome-caption"><span>Built with patience.</span><span>Made to last.</span></div>
+    </div>
+  </div>
+</section>
+
 <section class="section work" id="work" aria-labelledby="work-title">
-<div class="section-head reveal"><div><div class="eyebrow">02 / Selected work</div><h2 id="work-title">Things I<br>create.</h2></div><p>Projects and experiments across knowledge systems, web infrastructure and local AI.</p></div>
+<div class="section-head reveal"><div><div class="eyebrow">04 / Selected work</div><h2 id="work-title">Things I<br>create.</h2></div><p>Projects and experiments across knowledge systems, web infrastructure and local AI.</p></div>
 <div class="projects">
 <a class="project reveal" href="/mind-atlas.html" aria-label="Read about Mind Atlas"><div class="project-no">01</div><div><h3>Mind Atlas</h3><p>A personal knowledge system connecting ideas across science, code and structured notes.</p></div><div class="tags"><span class="tag">Knowledge systems</span><span class="tag">JavaScript</span></div><span class="arrow" aria-hidden="true">↗</span></a>
 <article class="project reveal"><div class="project-no">02</div><div><h3>Forenexa</h3><p>Storefront architecture designed around physical hardware and a focused shopping experience.</p></div><div class="tags"><span class="tag">E-commerce</span><span class="tag">Web architecture</span></div><span class="arrow" aria-hidden="true">·</span></article>
@@ -407,9 +486,9 @@ body{overflow-x:clip}
 <a class="project reveal" href="/pdf-maker/" aria-label="Open PDF Maker"><div class="project-no">05</div><div><h3>PDF Maker</h3><p>A browser-based tool for arranging images and exporting them as a polished PDF.</p></div><div class="tags"><span class="tag">Web tool</span><span class="tag">Privacy-minded</span></div><span class="arrow" aria-hidden="true">↗</span></a>
 </div></section>
 <section class="manifesto"><div class="eyebrow reveal">A small philosophy</div><h2 class="reveal delay1">Less noise.<br>More <span>intention.</span><br>Make every detail<br>earn its <span>place.</span></h2><div class="manifesto-foot reveal delay2"><span>Design should feel obvious, not ordinary.</span><span>Concept / craft / iteration</span></div></section>
-<section class="section" id="about"><div class="about-grid"><div class="about-image reveal"><img src="nithan.webp" alt="Black-and-white portrait of Nithan Najeeb" width="1216" height="1536" loading="lazy" decoding="async"><span class="image-label">Nithan Najeeb / Portrait</span></div><div class="about-text reveal delay1"><div class="eyebrow">03 / A little about me</div><h2>Curious by nature.<br><em>Intentional</em> by design.</h2><p>I’m Nithan Najeeb, a B.Com student at MES College in Kerala, India, exploring the space between thoughtful design, practical technology and visual storytelling.</p><p>I enjoy understanding how systems work and turning ideas into useful things, from web interfaces and structured knowledge tools to experiments with locally run AI models. My approach is to stay curious, build deliberately and keep improving the details.</p><div class="facts"><div class="fact"><small>Also known as</small><strong>Rubin Stellar</strong></div><div class="fact"><small>Currently studying</small><strong>B.Com · MES College</strong></div><div class="fact"><small>Focus</small><strong>UI / UX &amp; web development</strong></div><div class="fact"><small>Researching</small><strong>Generative AI &amp; local LLMs</strong></div></div><div class="stack-list" aria-label="Tools and technologies"><span><b>Core</b> HTML5 · CSS3 · JavaScript</span><span><b>Motion</b> GSAP · Lottie · Canvas</span><span><b>R&amp;D</b> Ollama · Local LLMs</span></div></div></div></section>
-<section class="section skills" id="skills"><div class="section-head reveal"><div><div class="eyebrow">04 / Capabilities</div><h2>Where I<br>spend my curiosity.</h2></div><p>A growing toolkit across design, development and visual communication.</p></div><div class="skill-grid"><article class="skill reveal"><span class="num">01 / DESIGN</span><div><h3>UI / UX</h3><p>Information hierarchy, layout systems, responsive interfaces and interaction thinking.</p></div></article><article class="skill reveal delay1"><span class="num">02 / BUILD</span><div><h3>Web experiences</h3><p>Turning visual concepts into clean, responsive pages with purposeful motion.</p></div></article><article class="skill reveal delay2"><span class="num">03 / EXPLORE</span><div><h3>Generative AI</h3><p>Prompt engineering, reference-led image creation and iterative visual direction.</p></div></article><article class="skill reveal delay3"><span class="num">04 / SHAPE</span><div><h3>Visual storytelling</h3><p>Art direction, cinematic concepts, typography and personal brand expression.</p></div></article></div></section>
-<section class="contact" id="contact"><div class="contact-main"><div class="reveal"><div class="eyebrow">05 / Have something in mind?</div><h2>Let’s make<br>it <em>matter.</em></h2></div><div class="contact-side reveal delay1"><p>Open to thoughtful collaborations, creative experiments and opportunities to learn by building.</p><a class="contact-button" href="https://www.linkedin.com/in/nithannajeeb" target="_blank" rel="noopener noreferrer">Connect on LinkedIn <span aria-hidden="true">↗</span></a><div class="social-links" aria-label="Social profiles"><a href="https://instagram.com/nithannajeeb_" target="_blank" rel="noopener noreferrer">Instagram ↗</a><a href="https://www.threads.net/@nithannajeeb_" target="_blank" rel="noopener noreferrer">Threads ↗</a><a href="https://www.facebook.com/nithan.najeeb" target="_blank" rel="noopener noreferrer">Facebook ↗</a></div></div></div><footer class="footer"><span>© <span id="year"></span> Nithan Najeeb</span><nav class="footer-links" aria-label="More from Nithan"><a href="/mind-atlas.html">Mind Atlas</a><a href="/pdf-maker/">PDF Maker</a><a href="/MyDairy/">My Dairy</a></nav><a href="#top">Back to top ↑</a></footer></section>
+<section class="section" id="about"><div class="about-grid"><div class="about-image reveal"><img src="rome-city.webp" alt="Ancient Rome at sunset" width="1536" height="866" loading="lazy" decoding="async"><span class="image-label">Rome / Built over time</span></div><div class="about-text reveal delay1"><div class="eyebrow">05 / A little about me</div><h2>Curious by nature.<br><em>Intentional</em> by design.</h2><p>I’m Nithan Najeeb, a B.Com student at MES College in Kerala, India, exploring the space between thoughtful design, practical technology and visual storytelling.</p><p>I enjoy understanding how systems work and turning ideas into useful things, from web interfaces and structured knowledge tools to experiments with locally run AI models. My approach is to stay curious, build deliberately and keep improving the details.</p><div class="facts"><div class="fact"><small>Also known as</small><strong>Rubin Stellar</strong></div><div class="fact"><small>Currently studying</small><strong>B.Com · MES College</strong></div><div class="fact"><small>Focus</small><strong>UI / UX &amp; web development</strong></div><div class="fact"><small>Researching</small><strong>Generative AI &amp; local LLMs</strong></div></div><div class="stack-list" aria-label="Tools and technologies"><span><b>Core</b> HTML5 · CSS3 · JavaScript</span><span><b>Motion</b> GSAP · Lottie · Canvas</span><span><b>R&amp;D</b> Ollama · Local LLMs</span></div></div></div></section>
+<section class="section skills" id="skills"><div class="section-head reveal"><div><div class="eyebrow">06 / Capabilities</div><h2>Where I<br>spend my curiosity.</h2></div><p>A growing toolkit across design, development and visual communication.</p></div><div class="skill-grid"><article class="skill reveal"><span class="num">01 / DESIGN</span><div><h3>UI / UX</h3><p>Information hierarchy, layout systems, responsive interfaces and interaction thinking.</p></div></article><article class="skill reveal delay1"><span class="num">02 / BUILD</span><div><h3>Web experiences</h3><p>Turning visual concepts into clean, responsive pages with purposeful motion.</p></div></article><article class="skill reveal delay2"><span class="num">03 / EXPLORE</span><div><h3>Generative AI</h3><p>Prompt engineering, reference-led image creation and iterative visual direction.</p></div></article><article class="skill reveal delay3"><span class="num">04 / SHAPE</span><div><h3>Visual storytelling</h3><p>Art direction, cinematic concepts, typography and personal brand expression.</p></div></article></div></section>
+<section class="contact" id="contact"><div class="contact-main"><div class="reveal"><div class="eyebrow">07 / Have something in mind?</div><h2>Let’s make<br>it <em>matter.</em></h2></div><div class="contact-side reveal delay1"><p>Open to thoughtful collaborations, creative experiments and opportunities to learn by building.</p><a class="contact-button" href="https://www.linkedin.com/in/nithannajeeb" target="_blank" rel="noopener noreferrer">Connect on LinkedIn <span aria-hidden="true">↗</span></a><div class="social-links" aria-label="Social profiles"><a href="https://instagram.com/nithannajeeb_" target="_blank" rel="noopener noreferrer">Instagram ↗</a><a href="https://www.threads.net/@nithannajeeb_" target="_blank" rel="noopener noreferrer">Threads ↗</a><a href="https://www.facebook.com/nithan.najeeb" target="_blank" rel="noopener noreferrer">Facebook ↗</a></div></div></div><footer class="footer"><span>© <span id="year"></span> Nithan Najeeb</span><nav class="footer-links" aria-label="More from Nithan"><a href="/mind-atlas.html">Mind Atlas</a><a href="/pdf-maker/">PDF Maker</a><a href="/MyDairy/">My Dairy</a></nav><a href="#top">Back to top ↑</a></footer></section>
 </main>
 <script>
 const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('visible');observer.unobserve(entry.target)}}),{threshold:.12});document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));document.getElementById('year').textContent=new Date().getFullYear();
@@ -467,7 +546,7 @@ const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matc
 
 // Reveal the intro paragraph and the main headings in the light sections word-by-word.
 const revealTargets = [...document.querySelectorAll(
-  '.intro-copy p:not(.small), .intro h2, .section-head h2, .about-text h2, .contact h2'
+  '.intro-copy p:not(.small), .intro h2, .section-head h2, .about-text h2, .contact h2, .rome-title'
 )];
 const revealGroups = [];
 function wrapTextNodes(node, spans) {
@@ -581,9 +660,12 @@ measureScrollEffects();
     else if (el.dataset.dragKind === 'hand-right') el.style.setProperty('--hand-right-angle', `${p.y}deg`);
     else { el.style.setProperty('--apple-x', `${p.x}px`); el.style.setProperty('--apple-y', `${p.y}px`); }
   };
+  window.addEventListener('blur', () => { active = null; start = null; });
   items.forEach(el => {
     el.addEventListener('pointerdown', event => {
       if (event.pointerType === 'mouse' && event.button !== 0) return;
+      // Touch input stays available to native page scrolling; mouse/pen and keyboard retain the artwork controls.
+      if (event.pointerType === 'touch') return;
       active = el;
       start = {pointerX:event.clientX, pointerY:event.clientY, ...positions.get(el)};
       el.setPointerCapture?.(event.pointerId);
