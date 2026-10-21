@@ -681,6 +681,24 @@ html.intro-lock,body.intro-lock{overflow-x:hidden!important;overflow-y:auto!impo
 @media(max-width:700px){.jack-card{animation-duration:1.35s!important}}
 @media(prefers-reduced-motion:reduce){.jack-card{animation:none!important}}
 
+
+/* Critical fix: let scroll progress control the sculpture even though the art-direction
+   rules use !important for responsive sizing. The old !important opacity/transform
+   declarations overrode JavaScript and left the sculpture permanently hidden. */
+.rome-sculptor{
+  opacity:var(--sculptor-opacity,0)!important;
+  transform:translate3d(-50%,var(--sculptor-rise,42%),0)!important;
+  transition:none!important;
+  -webkit-mask-image:none!important;
+  mask-image:none!important;
+}
+@media(prefers-reduced-motion:reduce){
+  .rome-sculptor{
+    opacity:1!important;
+    transform:translate3d(-50%,-4%,0)!important;
+  }
+}
+
 </style>
 <noscript><style>html.intro-lock,body.intro-lock{overflow:auto!important;touch-action:auto!important}.intro-hidden{opacity:1!important;transform:none!important}.reveal{opacity:1!important;transform:none!important}</style></noscript>
 </head>
@@ -900,8 +918,8 @@ measureScrollEffects();
     const progress = reduced ? 1 : clamp((window.innerHeight - rect.top) / span, 0, 1);
     const reveal = clamp(progress / .34, 0, 1);
     const rise = 42 - progress * 50;
-    sculptor.style.opacity = String(reveal);
-    sculptor.style.transform = `translate3d(-50%, ${rise.toFixed(2)}%, 0)`;
+    sculptor.style.setProperty('--sculptor-opacity', String(reveal));
+    sculptor.style.setProperty('--sculptor-rise', `${rise.toFixed(2)}%`);
     const scale = 1 + progress * .018;
     const drift = progress * -9;
     city.style.transform = `translate3d(-50%, calc(-50% + ${drift.toFixed(1)}px), 0) scale(${scale.toFixed(3)})`;
