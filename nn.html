@@ -699,6 +699,106 @@ html.intro-lock,body.intro-lock{overflow-x:hidden!important;overflow-y:auto!impo
   }
 }
 
+
+
+/* New direction: monochrome cloud field + a single scroll-driven foreground sculpture. */
+.sky-statue-section{
+  --statue-progress:0;
+  --statue-rise:62%;
+  position:relative!important;
+  min-height:165svh!important;
+  padding:0!important;
+  margin:0!important;
+  overflow:clip!important;
+  color:#171717!important;
+  background:#bdbdbd!important;
+  isolation:isolate!important;
+}
+.sky-statue-stage{
+  position:sticky!important;
+  top:0!important;
+  height:100svh!important;
+  min-height:560px!important;
+  overflow:hidden!important;
+  isolation:isolate!important;
+  background-image:linear-gradient(rgba(245,245,245,.12),rgba(225,225,225,.18)),url('sky-monochrome.webp')!important;
+  background-size:cover!important;
+  background-position:center center!important;
+  background-repeat:no-repeat!important;
+}
+.sky-statue-stage:before{
+  content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:linear-gradient(180deg,rgba(245,245,245,.08) 0%,transparent 45%,rgba(20,20,20,.10) 100%);
+}
+.rome-heading{
+  position:absolute!important;z-index:1!important;
+  top:clamp(70px,12vh,150px)!important;
+  left:50%!important;transform:translateX(-50%)!important;
+  width:min(92%,1400px)!important;min-height:0!important;
+  padding:0!important;margin:0!important;
+  display:flex!important;flex-direction:column!important;align-items:center!important;
+  text-align:center!important;pointer-events:none!important;
+}
+.rome-heading .eyebrow{
+  position:static!important;top:auto!important;left:auto!important;
+  margin-bottom:clamp(14px,2.4vh,28px)!important;
+  color:rgba(20,20,20,.7)!important;
+  letter-spacing:.22em!important;font-size:10px!important;
+}
+.rome-title{
+  margin:0!important;max-width:100%!important;
+  color:#171717!important;
+  font-family:var(--sans)!important;
+  font-size:clamp(48px,9.6vw,142px)!important;
+  font-weight:850!important;letter-spacing:-.085em!important;
+  line-height:.86!important;text-wrap:balance!important;
+  text-shadow:0 1px 0 rgba(255,255,255,.13)!important;
+}
+.rome-title em{
+  font-family:var(--serif)!important;font-weight:500!important;
+  font-style:italic!important;letter-spacing:-.075em!important;
+  color:#f3f1eb!important;
+  -webkit-text-stroke:.45px rgba(20,20,20,.65)!important;
+  text-shadow:0 2px 12px rgba(0,0,0,.12)!important;
+}
+.rome-sculptor{
+  position:absolute!important;z-index:3!important;
+  left:50%!important;bottom:-10%!important;top:auto!important;
+  width:auto!important;height:min(112svh,1200px)!important;max-width:none!important;
+  object-fit:contain!important;object-position:center bottom!important;
+  opacity:clamp(0,var(--statue-progress),1)!important;
+  transform:translate3d(-50%,var(--statue-rise),0)!important;
+  transform-origin:center bottom!important;
+  filter:grayscale(1) contrast(1.13) brightness(1.02) drop-shadow(0 22px 24px rgba(0,0,0,.22))!important;
+  transition:none!important;will-change:transform,opacity!important;
+  pointer-events:none!important;
+  -webkit-mask-image:none!important;mask-image:none!important;
+}
+.sky-statue-grain{
+  position:absolute;inset:0;z-index:4;pointer-events:none;opacity:.12;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.24'/%3E%3C/svg%3E");
+  mix-blend-mode:multiply;
+}
+@media(min-width:1000px){
+  .sky-statue-section{min-height:165svh!important}
+  .rome-heading{top:clamp(72px,13vh,155px)!important}
+  .rome-title{font-size:clamp(90px,10vw,158px)!important}
+  .rome-sculptor{height:min(125svh,1450px)!important;bottom:-13%!important}
+}
+@media(max-width:700px){
+  .sky-statue-section{min-height:155svh!important}
+  .sky-statue-stage{min-height:600px!important;background-position:center center!important}
+  .rome-heading{top:clamp(92px,15vh,145px)!important;width:94%!important}
+  .rome-heading .eyebrow{font-size:8px!important;margin-bottom:17px!important}
+  .rome-title{font-size:clamp(43px,11.8vw,78px)!important;line-height:.9!important;letter-spacing:-.08em!important}
+  .rome-title em{color:#f2f0ea!important}
+  .rome-sculptor{height:92svh!important;max-height:850px!important;bottom:-8%!important;left:50%!important}
+}
+@media(prefers-reduced-motion:reduce){
+  .sky-statue-section{--statue-progress:1!important;--statue-rise:0%!important}
+  .rome-sculptor{opacity:1!important;transform:translate3d(-50%,0,0)!important;will-change:auto!important}
+}
+
 </style>
 <noscript><style>html.intro-lock,body.intro-lock{overflow:auto!important;touch-action:auto!important}.intro-hidden{opacity:1!important;transform:none!important}.reveal{opacity:1!important;transform:none!important}</style></noscript>
 </head>
@@ -753,17 +853,14 @@ html.intro-lock,body.intro-lock{overflow-x:hidden!important;overflow-y:auto!impo
 
 <section class="section" id="about"><div class="about-grid"><div class="about-image reveal"><img src="nithan.webp" alt="Black-and-white portrait of Nithan Najeeb" width="1216" height="1536" loading="lazy" decoding="async"><span class="image-label">Nithan Najeeb / Portrait</span></div><div class="about-text reveal delay1"><div class="eyebrow">06 / A little about me</div><h2>Curious by nature.<br><em>Intentional</em> by design.</h2><p>I’m Nithan Najeeb, a B.Com student at MES College in Kerala, India, exploring the space between thoughtful design, practical technology and visual storytelling.</p><p>I enjoy understanding how systems work and turning ideas into useful things, from web interfaces and structured knowledge tools to experiments with locally run AI models. My approach is to stay curious, build deliberately and keep improving the details.</p><div class="facts"><div class="fact"><small>Also known as</small><strong>Rubin Stellar</strong></div><div class="fact"><small>Currently studying</small><strong>B.Com · MES College</strong></div><div class="fact"><small>Focus</small><strong>UI / UX &amp; web development</strong></div><div class="fact"><small>Researching</small><strong>Generative AI &amp; local LLMs</strong></div></div><div class="stack-list" aria-label="Tools and technologies"><span><b>Core</b> HTML5 · CSS3 · JavaScript</span><span><b>Motion</b> GSAP · Lottie · Canvas</span><span><b>R&amp;D</b> Ollama · Local LLMs</span></div></div></div></section>
 <section class="section skills" id="skills"><div class="section-head reveal"><div><div class="eyebrow">07 / Capabilities</div><h2>Where I<br>spend my curiosity.</h2></div><p>A growing toolkit across design, development and visual communication.</p></div><div class="skill-grid"><article class="skill reveal"><span class="num">01 / DESIGN</span><div><h3>UI / UX</h3><p>Information hierarchy, layout systems, responsive interfaces and interaction thinking.</p></div></article><article class="skill reveal delay1"><span class="num">02 / BUILD</span><div><h3>Web experiences</h3><p>Turning visual concepts into clean, responsive pages with purposeful motion.</p></div></article><article class="skill reveal delay2"><span class="num">03 / EXPLORE</span><div><h3>Generative AI</h3><p>Prompt engineering, reference-led image creation and iterative visual direction.</p></div></article><article class="skill reveal delay3"><span class="num">04 / SHAPE</span><div><h3>Visual storytelling</h3><p>Art direction, cinematic concepts, typography and personal brand expression.</p></div></article></div></section>
-<section class="rome-build" id="rome" aria-labelledby="rome-title">
-  <div class="rome-heading">
-    <div class="eyebrow">08 / The long game</div>
-    <h2 class="rome-title" id="rome-title">Rome wasn’t<br>built in a <em>day.</em></h2>
-  </div>
-  <div class="rome-scene-wrap">
-    <div class="rome-scene" aria-label="A sculptor rising in front of an ancient Roman city">
-      <img class="rome-city" src="rome-city.webp" alt="A panoramic view of ancient Rome at sunset" width="1536" height="866" loading="eager" decoding="async">
-      <img class="rome-sculptor" src="roman-sculptor.webp" alt="A classical marble sculptor raising a hammer over stone" width="802" height="1536" loading="eager" decoding="async">
-      <div class="rome-caption"><span>Built with patience.</span><span>Made to last.</span></div>
+<section class="rome-build sky-statue-section" id="rome" aria-labelledby="rome-title">
+  <div class="sky-statue-stage">
+    <div class="rome-heading">
+      <div class="eyebrow">08 / The long game</div>
+      <h2 class="rome-title" id="rome-title">Rome wasn’t<br>built in a <em>day.</em></h2>
     </div>
+    <img class="rome-sculptor" src="roman-sculptor.webp" alt="A classical marble sculptor raising a hammer" width="802" height="1536" loading="eager" decoding="async">
+    <div class="sky-statue-grain" aria-hidden="true"></div>
   </div>
 </section>
 <section class="contact" id="contact"><div class="contact-main"><div class="reveal"><div class="eyebrow">08 / Have something in mind?</div><h2>Let’s build<br>something <em>that lasts.</em></h2></div><div class="contact-side reveal delay1"><p>Open to thoughtful collaborations, creative experiments and opportunities to learn by building.</p><a class="contact-button" href="https://www.linkedin.com/in/nithannajeeb" target="_blank" rel="noopener noreferrer">Connect on LinkedIn <span aria-hidden="true">↗</span></a><div class="social-links" aria-label="Social profiles"><a href="https://instagram.com/nithannajeeb_" target="_blank" rel="noopener noreferrer">Instagram ↗</a><a href="https://www.threads.net/@nithannajeeb_" target="_blank" rel="noopener noreferrer">Threads ↗</a><a href="https://www.facebook.com/nithan.najeeb" target="_blank" rel="noopener noreferrer">Facebook ↗</a></div></div></div><footer class="footer"><span>© <span id="year"></span> Nithan Najeeb</span><nav class="footer-links" aria-label="More from Nithan"><a href="/mind-atlas.html">Mind Atlas</a><a href="/pdf-maker/">PDF Maker</a><a href="/MyDairy/">My Dairy</a></nav><a href="#top">Back to top ↑</a></footer></section>
@@ -902,31 +999,32 @@ window.addEventListener('resize', measureScrollEffects, { passive: true });
 measureScrollEffects();
 
 
-// Roman scene motion: passive scroll + one animation frame per paint. No pinning or scroll locks.
-(function animateRomeComposition(){
-  const wrap = document.querySelector('.rome-scene-wrap');
-  const sculptor = document.querySelector('.rome-sculptor');
-  const city = document.querySelector('.rome-city');
-  if (!wrap || !sculptor || !city) return;
+// Sky statue reveal: progress is tied to the section's center crossing the viewport center.
+// Scrolling back upward reverses the exact same motion instead of playing a one-way entrance.
+(function animateSkyStatue(){
+  const section = document.querySelector('.sky-statue-section');
+  const statue = section?.querySelector('.rome-sculptor');
+  if (!section || !statue) return;
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   let frame = 0;
   const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
   const update = () => {
     frame = 0;
-    const rect = wrap.getBoundingClientRect();
-    const span = window.innerHeight + rect.height;
-    const progress = reduced ? 1 : clamp((window.innerHeight - rect.top) / span, 0, 1);
-    const reveal = clamp(progress / .34, 0, 1);
-    const rise = 42 - progress * 50;
-    sculptor.style.setProperty('--sculptor-opacity', String(reveal));
-    sculptor.style.setProperty('--sculptor-rise', `${rise.toFixed(2)}%`);
-    const scale = 1 + progress * .018;
-    const drift = progress * -9;
-    city.style.transform = `translate3d(-50%, calc(-50% + ${drift.toFixed(1)}px), 0) scale(${scale.toFixed(3)})`;
+    if (reduced) {
+      section.style.setProperty('--statue-progress', '1');
+      section.style.setProperty('--statue-rise', '0%');
+      return;
+    }
+    const rect = section.getBoundingClientRect();
+    const vh = window.innerHeight;
+    const progress = clamp((vh * 0.5 - rect.top) / (rect.height * 0.5), 0, 1);
+    const rise = 62 * (1 - progress);
+    section.style.setProperty('--statue-progress', progress.toFixed(3));
+    section.style.setProperty('--statue-rise', `${rise.toFixed(2)}%`);
   };
   const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
-  window.addEventListener('scroll', schedule, {passive:true});
-  window.addEventListener('resize', schedule, {passive:true});
+  window.addEventListener('scroll', schedule, { passive: true });
+  window.addEventListener('resize', schedule, { passive: true });
   update();
 })();
 // Start the artwork entrance only when the philosophy section actually enters the viewport.
