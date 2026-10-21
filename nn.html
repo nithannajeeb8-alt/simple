@@ -73,16 +73,25 @@
 <style>
 :root{--paper:#f3f2ef;--ink:#111;--muted:#6e6c68;--line:rgba(17,17,17,.17);--serif:'Playfair Display',serif;--sans:'Manrope',sans-serif;--body:'DM Sans',sans-serif;--mono:'DM Mono',monospace}*{box-sizing:border-box}html{scroll-behavior:smooth}html.intro-lock,body.intro-lock{overflow:hidden!important;overscroll-behavior:none;touch-action:none}body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);-webkit-font-smoothing:antialiased}a{color:inherit;text-decoration:none}button{font:inherit}.topbar{position:absolute;top:0;left:0;width:100%;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:24px 5vw;color:#111}.brand{font:700 13px var(--mono);letter-spacing:-.04em}.nav{display:flex;gap:27px;font:11px var(--mono);text-transform:uppercase;letter-spacing:.08em}.nav a{opacity:.72;transition:opacity .25s}.nav a:hover{opacity:1}.availability{display:flex;align-items:center;gap:8px;font:10px var(--mono);text-transform:uppercase;letter-spacing:.06em}.dot{height:6px;width:6px;border-radius:50%;background:#58886a;box-shadow:0 0 0 4px #58886a20}.hero{position:relative;height:100vh;height:100svh;min-height:100vh;min-height:100svh;overflow:hidden;background:#e9e8e6;display:flex;align-items:flex-end;isolation:isolate}.typewall{position:absolute;inset:-7% -20%;z-index:0;overflow:hidden;display:flex;flex-direction:column;justify-content:space-around;pointer-events:none;opacity:.12}.type-row{font-family:var(--sans);font-weight:800;font-size:clamp(74px,13.8vw,205px);letter-spacing:-.105em;line-height:.82;white-space:nowrap;text-transform:uppercase;display:flex;width:max-content;will-change:transform}.type-row span{padding-right:.16em}.type-row:nth-child(odd){animation:marquee 39s linear infinite}.type-row:nth-child(even){animation:marquee-reverse 48s linear infinite}.type-row:nth-child(3n){animation-duration:57s}.type-row:nth-child(2){opacity:.72}.type-row:nth-child(4){opacity:.62}@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-30%)}}@keyframes marquee-reverse{from{transform:translateX(-22%)}to{transform:translateX(0)}}.hero-image{position:absolute;bottom:-2px;left:50%;transform:translate3d(-50%,var(--portrait-scroll,0px),0);will-change:transform;height:90%;width:min(84%,950px);object-fit:contain;object-position:center bottom;z-index:3;filter:grayscale(1);backface-visibility:hidden}.hero-shade{position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(243,242,239,.08) 0%,transparent 34%,transparent 70%,rgba(243,242,239,.18) 100%)}.hero-copy{position:absolute;z-index:4;left:5vw;right:5vw;bottom:35px;display:flex;align-items:flex-end;justify-content:space-between;gap:25px}.hero-kicker{font:10px var(--mono);letter-spacing:.12em;text-transform:uppercase;margin-bottom:15px;color:#fff;mix-blend-mode:difference;text-shadow:0 1px 4px rgba(0,0,0,.3);position:relative;z-index:5}.hero-title{font:800 clamp(42px,7vw,96px)/.92 var(--sans);letter-spacing:-.085em;margin:0;max-width:620px;color:#f0efec;text-shadow:0 2px 16px rgba(0,0,0,.32)}.hero-title em{font:italic 500 .94em var(--serif);letter-spacing:-.06em;color:#dedbd5}.hero-note{font:12px/1.65 var(--body);max-width:225px;color:#f2f0ec;text-shadow:0 1px 3px #000,0 2px 12px rgba(0,0,0,.9)}.scroll-cue{position:absolute;right:5vw;top:48%;z-index:5;writing-mode:vertical-rl;font:9px var(--mono);letter-spacing:.15em;text-transform:uppercase;display:flex;align-items:center;gap:12px}.scroll-cue:after{content:'';width:1px;height:45px;background:#111;animation:cue 1.7s ease-in-out infinite}@keyframes cue{0%,100%{transform:scaleY(.4);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}}.section{padding:120px 5vw}.eyebrow{font:10px var(--mono);text-transform:uppercase;letter-spacing:.12em;color:var(--muted);display:flex;align-items:center;gap:12px}.eyebrow:before{content:'';width:24px;height:1px;background:currentColor}.intro{display:grid;grid-template-columns:1fr 1.45fr;gap:8vw;align-items:start}.intro h2{font:600 clamp(30px,4vw,56px)/1.12 var(--sans);letter-spacing:-.065em;margin:20px 0 0;max-width:440px}.intro h2 em{font:italic 500 1em var(--serif)}.intro-copy{padding-top:36px;max-width:640px}.intro-copy p{font-size:clamp(17px,1.8vw,23px);line-height:1.65;letter-spacing:-.025em;margin:0 0 22px}.intro-copy .small{font-size:13px;line-height:1.8;color:var(--muted);max-width:520px}.text-link{display:inline-flex;gap:18px;align-items:center;border-bottom:1px solid var(--ink);padding:12px 0;font:10px var(--mono);text-transform:uppercase;letter-spacing:.1em;margin-top:15px}.text-link span{font-size:17px;transition:transform .25s}.text-link:hover span{transform:translate(4px,-4px)}.work{background:#e9e8e5}.section-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:48px;gap:24px}.section-head h2{font:700 clamp(40px,7vw,90px)/.9 var(--sans);letter-spacing:-.09em;margin:18px 0 0}.section-head p{font:11px/1.7 var(--mono);max-width:220px;color:var(--muted)}.projects{border-top:1px solid var(--line)}.project{display:grid;grid-template-columns:72px minmax(0,1fr) minmax(150px, .6fr) 30px;gap:22px;align-items:center;padding:28px 0;border-bottom:1px solid var(--line);transition:padding .3s}.project:hover{padding-left:12px;padding-right:12px}.project-no{font:10px var(--mono);color:var(--muted)}.project h3{font:600 clamp(21px,3vw,36px)/1.1 var(--sans);letter-spacing:-.06em;margin:0 0 8px}.project p{margin:0;color:var(--muted);font-size:12px;line-height:1.6}.tags{display:flex;flex-wrap:wrap;gap:7px}.tag{border:1px solid var(--line);padding:7px 9px;border-radius:30px;font:9px var(--mono);text-transform:uppercase;letter-spacing:.04em}.arrow{font-size:22px;transition:transform .25s}.project:hover .arrow{transform:translate(3px,-3px)}.manifesto{padding:140px 5vw 155px;background:#171716;color:#f4f2ed;overflow:hidden}.manifesto .eyebrow{color:#a7a49e}.manifesto h2{font:700 clamp(38px,7.7vw,105px)/.98 var(--sans);letter-spacing:-.09em;max-width:1150px;margin:50px 0 0}.manifesto h2 span{font:italic 500 1em var(--serif);color:#c8c4bb}.manifesto-foot{display:flex;justify-content:space-between;gap:30px;margin-top:70px;padding-top:20px;border-top:1px solid #ffffff35;font:10px var(--mono);text-transform:uppercase;letter-spacing:.08em;color:#b6b3ad}.about-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:10vw}.about-image{position:relative;min-height:460px;background:#e1e0dd;overflow:hidden}.about-image img{width:100%;height:100%;position:absolute;inset:0;object-fit:cover;object-position:center 22%;filter:grayscale(1);mix-blend-mode:multiply}.about-image .image-label{position:absolute;bottom:17px;left:18px;font:9px var(--mono);text-transform:uppercase;letter-spacing:.1em;z-index:2}.about-text h2{font:700 clamp(40px,6vw,74px)/.95 var(--sans);letter-spacing:-.085em;margin:17px 0 30px}.about-text h2 em{font:italic 500 1em var(--serif)}.about-text p{font-size:15px;line-height:1.9;color:#484743;max-width:570px}.facts{display:grid;grid-template-columns:1fr 1fr;gap:0 22px;margin-top:38px;border-top:1px solid var(--line)}.fact{padding:16px 0;border-bottom:1px solid var(--line)}.fact small{display:block;font:9px var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:8px}.fact strong{font-size:13px;font-weight:600}.skills{background:#e9e8e5}.skill-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:50px}.skill{min-height:180px;padding:22px;border:1px solid var(--line);display:flex;flex-direction:column;justify-content:space-between;transition:background .25s,transform .25s}.skill:hover{background:var(--paper);transform:translateY(-5px)}.skill .num{font:10px var(--mono);color:var(--muted)}.skill h3{font:600 20px/1.1 var(--sans);letter-spacing:-.05em;margin:0 0 9px}.skill p{font-size:11px;line-height:1.6;color:var(--muted);margin:0}.contact{padding:120px 5vw 35px}.contact-main{display:flex;justify-content:space-between;align-items:flex-end;gap:35px;padding-bottom:80px}.contact h2{font:700 clamp(48px,9vw,125px)/.85 var(--sans);letter-spacing:-.1em;margin:28px 0 0}.contact h2 em{font:italic 500 .9em var(--serif)}.contact-side{max-width:280px}.contact-side p{font-size:13px;line-height:1.8;color:var(--muted)}.contact-button{display:inline-flex;align-items:center;gap:35px;border-radius:99px;background:#111;color:white;padding:17px 22px;font:10px var(--mono);text-transform:uppercase;letter-spacing:.1em;transition:transform .25s,background .25s}.contact-button:hover{transform:translateY(-3px);background:#333}.footer{border-top:1px solid var(--line);padding:20px 0;display:flex;justify-content:space-between;gap:20px;font:9px var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}.word-reveal{color:#fff;transition:color .11s linear}.word-reveal.is-ink{color:#111}.reveal{opacity:0;transform:translateY(24px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}.reveal.visible{opacity:1;transform:translateY(0)}.delay1{transition-delay:.12s}.delay2{transition-delay:.22s}.delay3{transition-delay:.32s}::selection{background:#111;color:#fff}
 
-/* Golden apple philosophy: restrained, tactile, and built for pointer or touch. */
-.apple-philosophy{position:relative;isolation:isolate;overflow:hidden;background:#090909;color:#f3f2ef;padding:clamp(76px,10vw,145px) 5vw 70px;}
-.apple-philosophy:before{content:"";position:absolute;inset:0;pointer-events:none;z-index:-1;background:radial-gradient(ellipse at 50% 53%,rgba(185,129,35,.105),transparent 38%),linear-gradient(180deg,#090909,#11100e 58%,#090909);}
-.apple-philosophy .eyebrow{color:#a7a49e}.apple-philosophy-head{display:grid;grid-template-columns:.9fr 1.1fr;gap:7vw;align-items:end;position:relative;z-index:2;max-width:1200px;margin:0 auto;}
+/* Golden apple philosophy: anchored arms, a smaller central apple, and a focused glow. */
+.apple-philosophy{position:relative;isolation:isolate;overflow:hidden;background:#080808;color:#f3f2ef;padding:clamp(70px,8vw,112px) 5vw 64px;}
+.apple-philosophy:before{content:"";position:absolute;inset:0;pointer-events:none;z-index:-1;background:#080808;}
+.apple-philosophy .eyebrow{color:#a7a49e}.apple-philosophy-head{display:grid;grid-template-columns:.85fr 1.15fr;gap:7vw;align-items:start;position:relative;z-index:2;max-width:1200px;margin:0 auto;}
 .apple-philosophy h2{font:700 clamp(42px,7.2vw,96px)/.92 var(--sans);letter-spacing:-.09em;margin:24px 0 0;max-width:620px}.apple-philosophy h2 em{font:italic 500 1em var(--serif);color:#d8b46a;letter-spacing:-.065em}
-.apple-philosophy-copy{padding:0 0 4px;max-width:420px}.apple-philosophy-copy p{font-size:clamp(15px,1.5vw,20px);line-height:1.65;color:#c3c0b8;margin:0}.apple-philosophy-copy strong{color:#f4f2ed;font-weight:600}.apple-stage{position:relative;height:clamp(260px,34vw,470px);max-width:1500px;margin:clamp(38px,6vw,84px) auto 0;touch-action:pan-y;user-select:none;-webkit-user-select:none;}
-.apple-stage:after{content:"";position:absolute;left:32%;right:32%;top:50%;height:1px;background:linear-gradient(90deg,transparent,#c99b45aa,transparent);opacity:.38;pointer-events:none}
-.apple-art{position:absolute;display:block;object-fit:contain;pointer-events:auto;cursor:ns-resize;touch-action:none;user-select:none;-webkit-user-drag:none;filter:contrast(1.04);transition:filter .25s;will-change:transform;outline:none}.apple-art:focus-visible{filter:drop-shadow(0 0 5px #d5a64c)}.apple-hand-left{width:40%;height:100%;left:-1%;top:4%;transform:translate3d(0,var(--hand-left-y,0px),0);object-position:left center}.apple-hand-right{width:40%;height:100%;right:-1%;top:0;transform:translate3d(0,var(--hand-right-y,0px),0);object-position:right center}.apple-art:active{cursor:grabbing}.apple-fruit{width:clamp(120px,17vw,238px);height:clamp(120px,17vw,238px);left:50%;top:50%;transform:translate3d(calc(-50% + var(--apple-x,0px)),calc(-50% + var(--apple-y,0px)),0);z-index:3;cursor:grab;filter:drop-shadow(0 12px 30px rgba(214,155,39,.22));}.apple-fruit:active{filter:drop-shadow(0 16px 36px rgba(214,155,39,.32))}.apple-stage-hint{display:flex;justify-content:space-between;gap:18px;border-top:1px solid #ffffff28;padding-top:17px;color:#8f8b83;font:9px var(--mono);letter-spacing:.11em;text-transform:uppercase}.apple-stage-hint span:last-child{text-align:right}.apple-philosophy-foot{max-width:1200px;margin:8px auto 0;display:grid;grid-template-columns:1.6fr .4fr;gap:5vw;padding-top:26px;border-top:1px solid #ffffff24}.apple-story{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(16px,3vw,38px)}.apple-philosophy-foot p{margin:0;color:#a7a49e;font-size:12px;line-height:1.75;max-width:310px}.apple-story strong{display:inline-block;margin-bottom:7px;color:#d8b46a;font:9px var(--mono);letter-spacing:.12em;text-transform:uppercase}.apple-philosophy-foot .signature{font:italic 500 clamp(22px,3vw,36px)/1.2 var(--serif);color:#d8b46a;justify-self:end;align-self:end;text-align:right}
-@media(max-width:700px){.apple-philosophy{padding:76px 5vw 44px}.apple-philosophy-head{grid-template-columns:1fr;gap:16px}.apple-philosophy h2{font-size:clamp(43px,12vw,72px);max-width:500px;margin-top:20px}.apple-philosophy-copy{padding-top:0;max-width:340px}.apple-philosophy-copy p{font-size:14px;line-height:1.7}.apple-stage{height:clamp(230px,70vw,330px);margin:26px -5vw 0;overflow:hidden}.apple-hand-left{width:56%;left:-12%;height:82%;top:8%;object-position:left center}.apple-hand-right{width:56%;right:-12%;height:82%;top:0;object-position:right center}.apple-fruit{width:clamp(108px,31vw,160px);height:clamp(108px,31vw,160px)}.apple-stage:after{left:36%;right:36%;top:52%}.apple-stage-hint{margin:0 5vw;font-size:8px}.apple-philosophy-foot{grid-template-columns:1fr;gap:20px;padding-top:20px}.apple-story{grid-template-columns:1fr;gap:14px}.apple-philosophy-foot p{max-width:460px;font-size:12px;line-height:1.65}.apple-philosophy-foot .signature{justify-self:start;text-align:left}.apple-stage-hint span:last-child{max-width:45%}}
-@media(prefers-reduced-motion:reduce){.apple-art{transition:none}}
+.apple-philosophy-copy{padding-top:38px;max-width:600px}.apple-philosophy-copy p{font-size:clamp(14px,1.35vw,18px);line-height:1.75;color:#c3c0b8;margin:0 0 17px}.apple-philosophy-copy strong{color:#f4f2ed;font-weight:600}
+.apple-stage{position:relative;height:clamp(230px,29vw,390px);max-width:1500px;margin:clamp(28px,4vw,54px) auto 0;touch-action:pan-y;user-select:none;-webkit-user-select:none;isolation:isolate;}
+.apple-stage:before{content:"";position:absolute;z-index:0;left:50%;top:50%;width:min(54vw,620px);height:min(24vw,270px);transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(ellipse,rgba(204,151,48,.17) 0%,rgba(204,151,48,.075) 28%,rgba(204,151,48,.025) 48%,transparent 72%);filter:blur(12px);pointer-events:none}
+.apple-stage:after{content:"";position:absolute;z-index:1;left:38%;right:38%;top:50%;height:1px;background:linear-gradient(90deg,transparent,#c99b4566,transparent);opacity:.24;pointer-events:none}
+.apple-art{position:absolute;display:block;object-fit:contain;pointer-events:auto;cursor:ns-resize;touch-action:none;user-select:none;-webkit-user-drag:none;filter:contrast(1.04);will-change:transform,opacity;outline:none}.apple-art:focus-visible{filter:drop-shadow(0 0 5px #d5a64c)}
+.apple-hand-left{width:42%;height:90%;left:-1%;top:5%;object-position:left center;transform-origin:72% 53%;transform:rotate(var(--hand-left-angle,0deg));animation:hand-enter-left 1.05s cubic-bezier(.16,1,.3,1) .58s both;}
+.apple-hand-right{width:42%;height:90%;right:-1%;top:0;object-position:right center;transform-origin:29% 53%;transform:rotate(var(--hand-right-angle,0deg));animation:hand-enter-right 1.05s cubic-bezier(.16,1,.3,1) .72s both;}
+@keyframes hand-enter-left{from{opacity:0;transform:translateX(-105%) rotate(0deg)}to{opacity:1;transform:translateX(0) rotate(var(--hand-left-angle,0deg))}}
+@keyframes hand-enter-right{from{opacity:0;transform:translateX(105%) rotate(0deg)}to{opacity:1;transform:translateX(0) rotate(var(--hand-right-angle,0deg))}}
+.apple-art:active{cursor:grabbing}.apple-fruit{width:clamp(92px,11vw,156px);height:clamp(92px,11vw,156px);left:50%;top:50%;transform:translate3d(calc(-50% + var(--apple-x,0px)),calc(-50% + var(--apple-y,0px)),0);scale:.82;opacity:0;z-index:3;cursor:grab;filter:drop-shadow(0 8px 16px rgba(214,155,39,.16));animation:apple-arrive .72s cubic-bezier(.2,.8,.2,1) .12s forwards;}
+@keyframes apple-arrive{0%{opacity:0;scale:.45}65%{opacity:1;scale:1.04}100%{opacity:1;scale:.82}}
+.apple-fruit:active{filter:drop-shadow(0 10px 22px rgba(214,155,39,.24))}.apple-stage-hint{display:flex;justify-content:space-between;gap:18px;border-top:1px solid #ffffff28;padding-top:17px;color:#8f8b83;font:9px var(--mono);letter-spacing:.11em;text-transform:uppercase}.apple-stage-hint span:last-child{text-align:right}.apple-philosophy-foot{max-width:1200px;margin:8px auto 0;display:grid;grid-template-columns:1fr 1fr;gap:7vw;padding-top:24px}.apple-philosophy-foot p{margin:0;color:#a7a49e;font-size:12px;line-height:1.8;max-width:430px}.apple-philosophy-foot .signature{font:italic 500 clamp(22px,3vw,36px)/1.2 var(--serif);color:#d8b46a;justify-self:end;align-self:end;text-align:right}
+@media(max-width:700px){.apple-philosophy{padding:70px 5vw 44px}.apple-philosophy-head{grid-template-columns:1fr;gap:8px}.apple-philosophy h2{font-size:clamp(43px,12vw,72px);max-width:500px;margin-top:20px}.apple-philosophy-copy{padding-top:5px;max-width:340px}.apple-philosophy-copy p{font-size:14px;line-height:1.7}.apple-stage{height:clamp(220px,62vw,290px);margin:18px -5vw 0;overflow:hidden}.apple-hand-left{width:62%;left:-17%;height:82%;top:8%;object-position:left center;transform-origin:72% 53%}.apple-hand-right{width:62%;right:-17%;height:82%;top:0;object-position:right center;transform-origin:29% 53%}.apple-fruit{width:clamp(86px,25vw,116px);height:clamp(86px,25vw,116px)}.apple-stage:before{width:78vw;height:44vw;max-height:190px}.apple-stage:after{left:40%;right:40%;top:52%}.apple-stage-hint{margin:0 5vw;font-size:8px}.apple-philosophy-foot{grid-template-columns:1fr;gap:16px;padding-top:22px}.apple-philosophy-foot .signature{justify-self:start;text-align:left}.apple-stage-hint span:last-child{max-width:45%}}
+@media(prefers-reduced-motion:reduce){.apple-art{animation:none!important;opacity:1!important;scale:1!important}.apple-hand-left,.apple-hand-right{transform:rotate(var(--hand-left-angle,0deg))}.apple-fruit{transform:translate3d(calc(-50% + var(--apple-x,0px)),calc(-50% + var(--apple-y,0px)),0)}}
 
 @media(max-width:700px){.topbar{padding:18px 5vw}.nav{gap:13px}.nav a{font-size:9px}.availability{display:none}.hero{height:100vh;height:100svh;min-height:100vh;min-height:100svh}.hero-image{height:78%;width:125%;max-width:none;object-position:center bottom}.type-row{font-size:clamp(67px,17vw,115px)}.hero-copy{bottom:23px;display:block}.hero-title{font-size:clamp(44px,12vw,76px)}.hero-note{margin-top:15px;max-width:230px;font-size:11px}.scroll-cue{right:5vw;top:39%}.section{padding:82px 5vw}.intro,.about-grid{grid-template-columns:1fr;gap:30px}.intro-copy{padding-top:0}.section-head{align-items:flex-start;flex-direction:column;margin-bottom:32px}.section-head p{margin:0}.project{grid-template-columns:28px minmax(0,1fr) 20px;gap:12px;padding:23px 0}.project .tags{grid-column:2;grid-row:2}.project .arrow{grid-column:3;grid-row:1}.project h3{font-size:25px}.manifesto{padding:90px 5vw}.manifesto h2{margin-top:35px}.manifesto-foot{margin-top:45px;flex-direction:column;gap:10px}.about-image{min-height:430px;max-height:550px}.skill-grid{grid-template-columns:1fr 1fr}.skill{min-height:160px;padding:16px}.contact{padding:85px 5vw 25px}.contact-main{display:block;padding-bottom:55px}.contact-side{margin-top:40px}.contact h2{font-size:clamp(58px,14vw,95px)}.footer{flex-wrap:wrap;font-size:8px}.project:hover{padding-left:0;padding-right:0}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.reveal{opacity:1;transform:none}.word-reveal{color:var(--ink)!important;transition:none!important}}
@@ -183,30 +192,20 @@ body{overflow-x:clip}
 <section class="section intro"><div class="reveal"><div class="eyebrow">01 / The introduction</div><h2>Digital work with <em>clarity, character</em> and a reason to exist.</h2></div><div class="intro-copy reveal delay1"><p>I build considered digital experiences where visual identity and interaction work together, not against each other.</p><p class="small">My interests span UI/UX design, front-end experiences, generative AI workflows and creative direction. I’m interested in making digital products feel as intentional as they are functional.</p><a class="text-link" href="#work">Explore selected work <span>↗</span></a></div></section>
 <section class="apple-philosophy" id="philosophy" aria-labelledby="apple-philosophy-title">
   <div class="apple-philosophy-head">
-    <div class="reveal">
-      <div class="eyebrow">02 / The philosophy</div>
-      <h2 id="apple-philosophy-title">Every era has <em>an apple.</em></h2>
-    </div>
+    <div class="reveal"><div class="eyebrow">02 / The philosophy</div><h2 id="apple-philosophy-title">Every era has <em>an apple.</em></h2></div>
     <div class="apple-philosophy-copy reveal delay1">
-      <p>An apple can mean more than a fruit. It can mark the moment a familiar world changes.</p>
+      <p>One fruit became a story about <strong>curiosity, choice and consequence</strong>. In the familiar telling of Adam and Eve, the apple represents the moment knowledge changed everything, even though the biblical text never identifies the fruit as an apple.</p>
+      <p>Centuries later, an apple became part of the story told about Newton and gravity. Much later, Apple turned the same simple shape into a symbol of technology that could change how people live and create.</p>
+      <p>I’m drawn to that pattern: a small, clear idea can open a much larger door. I want to build digital things with the potential to start a new wave of change, not just add more noise.</p>
     </div>
   </div>
-
   <div class="apple-stage" aria-label="Interactive golden apple between two reaching hands. Drag either hand vertically or move the apple in any direction.">
-    <img class="apple-art apple-hand-left" src="hand-left.webp" alt="A sketched hand reaching in from the left" draggable="false" tabindex="0" role="img" aria-label="Left reaching hand. Drag up or down, or use the arrow keys." data-drag-kind="hand-left">
-    <img class="apple-art apple-hand-right" src="hand-right.webp" alt="A sketched hand reaching in from the right, slightly higher" draggable="false" tabindex="0" role="img" aria-label="Right reaching hand, slightly higher than the left. Drag up or down, or use the arrow keys." data-drag-kind="hand-right">
-    <img class="apple-art apple-fruit" src="golden-apple.webp" alt="A polished golden apple, symbolising a transformative idea" draggable="false" tabindex="0" role="img" aria-label="Golden apple. Drag in any direction, or use the arrow keys." data-drag-kind="apple">
+    <img class="apple-art apple-hand-left" src="hand-left.png" alt="A sketched hand reaching in from the left" draggable="false" tabindex="0" role="img" aria-label="Left reaching hand. Drag up or down, or use the arrow keys." data-drag-kind="hand-left">
+    <img class="apple-art apple-hand-right" src="hand-right.png" alt="A sketched hand reaching in from the right, slightly higher" draggable="false" tabindex="0" role="img" aria-label="Right reaching hand. Drag up or down, or use the arrow keys." data-drag-kind="hand-right">
+    <img class="apple-art apple-fruit" src="golden-apple.png" alt="A polished golden apple, symbolising a transformative idea" draggable="false" tabindex="0" role="img" aria-label="Golden apple. Drag in any direction, or use the arrow keys.">
   </div>
   <div class="apple-stage-hint"><span>Move the hands · Shift the idea</span><span>Touch, drag or use arrow keys</span></div>
-
-  <div class="apple-philosophy-foot">
-    <div class="apple-story">
-      <p><strong>01 / Choice</strong><br>In the story of Adam and Eve, the fruit became a symbol of curiosity and consequence. The Bible never names it as an apple.</p>
-      <p><strong>02 / Discovery</strong><br>Newton’s famous apple story made a simple object stand for a question that changed how we understand the world.</p>
-      <p><strong>03 / Possibility</strong><br>Apple turned the shape into a symbol of technology. I want to build ideas that do more than add noise: ideas that begin a new wave of change.</p>
-    </div>
-    <div class="signature">Make the idea matter.</div>
-  </div>
+  <div class="apple-philosophy-foot"><p>The hands never need to meet the apple. The space between them is the point: possibility, tension, and the moment before an idea becomes something real.</p><div class="signature">Make the idea matter.</div></div>
 </section>
 <section class="section work" id="work" aria-labelledby="work-title">
 <div class="section-head reveal"><div><div class="eyebrow">02 / Selected work</div><h2 id="work-title">Things I<br>create.</h2></div><p>Projects and experiments across knowledge systems, web infrastructure and local AI.</p></div>
@@ -356,24 +355,26 @@ window.addEventListener('resize', measureScrollEffects, { passive: true });
 measureScrollEffects();
 
 
-// The golden apple is deliberately tactile: each hand moves vertically, while the apple can move freely.
+// Hands rotate around a fixed wrist pivot, so the arm stays visually anchored while the hand tilts up/down.
 (function enableAppleStage(){
   const stage = document.querySelector('.apple-stage');
   if (!stage) return;
-  const items = [...stage.querySelectorAll('[data-drag-kind], .apple-fruit')];
+  const items = [...stage.querySelectorAll('[data-drag-kind]')];
   const positions = new Map(items.map(el => [el, {x:0, y:0}]));
   let active = null;
   let start = null;
-  const apply = (el) => {
+  const isApple = el => el.dataset.dragKind === 'apple';
+  const apply = el => {
     const p = positions.get(el);
-    if (el.classList.contains('apple-hand-left')) el.style.setProperty('--hand-left-y', `${p.y}px`);
-    else if (el.classList.contains('apple-hand-right')) el.style.setProperty('--hand-right-y', `${p.y}px`);
+    if (el.dataset.dragKind === 'hand-left') el.style.setProperty('--hand-left-angle', `${p.y}deg`);
+    else if (el.dataset.dragKind === 'hand-right') el.style.setProperty('--hand-right-angle', `${p.y}deg`);
     else { el.style.setProperty('--apple-x', `${p.x}px`); el.style.setProperty('--apple-y', `${p.y}px`); }
   };
   items.forEach(el => {
     el.addEventListener('pointerdown', event => {
       if (event.pointerType === 'mouse' && event.button !== 0) return;
-      active = el; start = {pointerX:event.clientX, pointerY:event.clientY, ...positions.get(el)};
+      active = el;
+      start = {pointerX:event.clientX, pointerY:event.clientY, ...positions.get(el)};
       el.setPointerCapture?.(event.pointerId);
       event.preventDefault();
     });
@@ -382,30 +383,33 @@ measureScrollEffects();
       const p = positions.get(el);
       const dx = event.clientX - start.pointerX;
       const dy = event.clientY - start.pointerY;
-      if (el.classList.contains('apple-fruit')) {
+      if (isApple(el)) {
         const bounds = stage.getBoundingClientRect();
-        p.x = Math.max(-bounds.width*.25, Math.min(bounds.width*.25, start.x + dx));
-        p.y = Math.max(-bounds.height*.35, Math.min(bounds.height*.35, start.y + dy));
+        p.x = Math.max(-bounds.width*.22, Math.min(bounds.width*.22, start.x + dx));
+        p.y = Math.max(-bounds.height*.28, Math.min(bounds.height*.28, start.y + dy));
       } else {
-        const max = stage.getBoundingClientRect().height * .34;
-        p.y = Math.max(-max, Math.min(max, start.y + dy));
+        // A vertical drag pivots the hand at the wrist; the forearm attachment stays in place.
+        p.y = Math.max(-14, Math.min(14, start.y + dy * .18));
       }
       apply(el);
     });
     const end = () => { if (active === el) { active = null; start = null; } };
-    el.addEventListener('pointerup', end); el.addEventListener('pointercancel', end); el.addEventListener('lostpointercapture', end);
+    el.addEventListener('pointerup', end);
+    el.addEventListener('pointercancel', end);
+    el.addEventListener('lostpointercapture', end);
     el.addEventListener('keydown', event => {
-      const p = positions.get(el); const step = event.shiftKey ? 18 : 7;
+      const p = positions.get(el);
+      const step = event.shiftKey ? 3 : 1;
       if (!['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Home'].includes(event.key)) return;
       event.preventDefault();
       if (event.key === 'Home') { p.x = 0; p.y = 0; }
-      else if (event.key === 'ArrowUp') p.y -= step;
-      else if (event.key === 'ArrowDown') p.y += step;
-      else if (el.classList.contains('apple-fruit') && event.key === 'ArrowLeft') p.x -= step;
-      else if (el.classList.contains('apple-fruit') && event.key === 'ArrowRight') p.x += step;
+      else if (event.key === 'ArrowUp') p.y += isApple(el) ? -8 : -step;
+      else if (event.key === 'ArrowDown') p.y += isApple(el) ? 8 : step;
+      else if (isApple(el) && event.key === 'ArrowLeft') p.x -= 8;
+      else if (isApple(el) && event.key === 'ArrowRight') p.x += 8;
       const bounds = stage.getBoundingClientRect();
-      p.y = Math.max(-bounds.height*.35, Math.min(bounds.height*.35, p.y));
-      p.x = Math.max(-bounds.width*.25, Math.min(bounds.width*.25, p.x));
+      p.y = isApple(el) ? Math.max(-bounds.height*.28, Math.min(bounds.height*.28, p.y)) : Math.max(-14, Math.min(14, p.y));
+      p.x = Math.max(-bounds.width*.22, Math.min(bounds.width*.22, p.x));
       apply(el);
     });
   });
