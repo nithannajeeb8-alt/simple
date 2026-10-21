@@ -223,6 +223,51 @@ body{overflow-x:clip}
 @media(min-width:1200px){.apple-stage{height:clamp(390px,31vw,500px)}.apple-hand-left,.apple-hand-right{width:56%;}}
 @media(prefers-reduced-motion:reduce){.js .apple-philosophy .reveal{opacity:1;transform:none;transition:none}.apple-hand-left,.apple-hand-right{animation:none!important;opacity:1!important;transform:rotate(var(--hand-left-angle,0deg))}.apple-hand-right{transform:rotate(var(--hand-right-angle,0deg))}}
 
+
+/* Philosophy stage: larger reaching hands, protected negative space, section-triggered entrance. */
+.apple-philosophy{background:#080808;position:relative}
+.apple-philosophy:before{inset:auto;left:50%;top:50%;width:min(100%,980px);height:min(78%,680px);transform:translate(-50%,-42%);background:radial-gradient(ellipse at center,rgba(190,137,35,.055) 0%,rgba(190,137,35,.025) 34%,transparent 68%);z-index:-1}
+.apple-stage{height:clamp(310px,35vw,480px);margin:clamp(26px,4vw,56px) auto 0;overflow:hidden}
+.apple-stage:before{width:min(48vw,520px);height:min(20vw,220px);background:radial-gradient(ellipse,rgba(204,151,48,.18) 0%,rgba(204,151,48,.075) 32%,rgba(204,151,48,.018) 58%,transparent 74%);filter:blur(10px)}
+.apple-stage:after{left:43%;right:43%;opacity:.12}
+.apple-hand-left,.apple-hand-right{width:64%;height:100%;top:0;opacity:0;animation:none;transition:filter .25s;will-change:transform,opacity}
+.apple-hand-left{left:-9%;object-position:left center;transform-origin:76% 54%;transform:translateX(-105%) rotate(var(--hand-left-angle,0deg))}
+.apple-hand-right{right:-9%;object-position:right center;transform-origin:24% 52%;transform:translateX(105%) rotate(var(--hand-right-angle,0deg))}
+.apple-fruit{width:clamp(100px,8.5vw,128px);height:clamp(100px,8.5vw,128px);opacity:0;scale:.72;animation:none;z-index:4}
+.apple-philosophy.is-active .apple-fruit{animation:apple-arrive .8s cubic-bezier(.2,.8,.2,1) .08s both}
+.apple-philosophy.is-active .apple-hand-left{animation:hand-enter-left 1.05s cubic-bezier(.16,1,.3,1) .35s both}
+.apple-philosophy.is-active .apple-hand-right{animation:hand-enter-right 1.05s cubic-bezier(.16,1,.3,1) .48s both}
+.apple-philosophy .apple-philosophy-head .reveal{transition-delay:0s}
+.apple-philosophy .apple-philosophy-copy.reveal{transition-delay:.16s}
+.apple-philosophy-foot{position:relative}
+.apple-philosophy-foot p{max-width:430px}
+@media(min-width:1200px){
+ .apple-stage{height:clamp(420px,34vw,520px)}
+ .apple-hand-left,.apple-hand-right{width:61%}
+ .apple-hand-left{left:-7%}
+ .apple-hand-right{right:-7%}
+ .apple-fruit{width:clamp(112px,8vw,140px);height:clamp(112px,8vw,140px)}
+}
+@media(max-width:700px){
+ .apple-philosophy{padding:64px 22px 42px}
+ .apple-stage{height:clamp(300px,82vw,390px);margin:22px -22px 0;overflow:hidden}
+ /* Bigger forearms stay cropped at the edges; the fingertips stop well before the apple. */
+ .apple-hand-left,.apple-hand-right{width:86%;height:88%;top:6%}
+ .apple-hand-left{left:-34%;transform-origin:76% 54%}
+ .apple-hand-right{right:-34%;transform-origin:24% 52%}
+ .apple-fruit{width:clamp(82px,20vw,104px);height:clamp(82px,20vw,104px)}
+ .apple-stage:before{width:70vw;height:42vw;max-height:180px}
+ .apple-stage:after{left:44%;right:44%}
+ .apple-stage-hint{margin:0;font-size:7px;letter-spacing:.055em}
+ .apple-philosophy-foot{padding-top:18px}
+}
+@media(prefers-reduced-motion:reduce){
+ .apple-philosophy .apple-art{animation:none!important;opacity:1!important}
+ .apple-hand-left{transform:rotate(var(--hand-left-angle,0deg))!important}
+ .apple-hand-right{transform:rotate(var(--hand-right-angle,0deg))!important}
+ .apple-fruit{scale:1!important;transform:translate3d(calc(-50% + var(--apple-x,0px)),calc(-50% + var(--apple-y,0px)),0)}
+}
+
 </style>
 <noscript><style>html.intro-lock,body.intro-lock{overflow:auto!important;touch-action:auto!important}.intro-hidden{opacity:1!important;transform:none!important}.reveal{opacity:1!important;transform:none!important}</style></noscript>
 </head>
@@ -245,7 +290,7 @@ body{overflow-x:clip}
   <div class="apple-stage" aria-label="Interactive golden apple between two reaching hands. Drag either hand vertically or move the apple in any direction.">
     <img class="apple-art apple-hand-left" src="hand-left.webp" alt="A sketched hand reaching in from the left" draggable="false" tabindex="0" role="img" aria-label="Left reaching hand. Drag up or down, or use the arrow keys." data-drag-kind="hand-left">
     <img class="apple-art apple-hand-right" src="hand-right.webp" alt="A sketched hand reaching in from the right, slightly higher" draggable="false" tabindex="0" role="img" aria-label="Right reaching hand. Drag up or down, or use the arrow keys." data-drag-kind="hand-right">
-    <img class="apple-art apple-fruit" src="golden-apple.webp" alt="A polished golden apple, symbolising a transformative idea" draggable="false" tabindex="0" role="img" aria-label="Golden apple. Drag in any direction, or use the arrow keys.">
+    <img class="apple-art apple-fruit" src="golden-apple.webp" alt="A polished golden apple, symbolising a transformative idea" draggable="false" tabindex="0" role="img" aria-label="Golden apple. Drag in any direction, or use the arrow keys." data-drag-kind="apple">
   </div>
   <div class="apple-stage-hint"><span>Move the hands · Shift the idea</span><span>Touch, drag or use arrow keys</span></div>
   <div class="apple-philosophy-foot"><p>The hands never need to meet the apple. The space between them is the point: possibility, tension, and the moment before an idea becomes something real.</p><div class="signature">Make the idea matter.</div></div>
@@ -397,6 +442,27 @@ window.addEventListener('scroll', () => {
 window.addEventListener('resize', measureScrollEffects, { passive: true });
 measureScrollEffects();
 
+
+// Start the artwork entrance only when the philosophy section actually enters the viewport.
+(function activateAppleSection(){
+  const section = document.querySelector('.apple-philosophy');
+  if (!section) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    section.classList.add('is-active');
+    return;
+  }
+  if (!('IntersectionObserver' in window)) {
+    section.classList.add('is-active');
+    return;
+  }
+  const entranceObserver = new IntersectionObserver(entries => {
+    if (entries.some(entry => entry.isIntersecting)) {
+      section.classList.add('is-active');
+      entranceObserver.disconnect();
+    }
+  }, { threshold: 0.22 });
+  entranceObserver.observe(section);
+})();
 
 // Hands rotate around a fixed wrist pivot, so the arm stays visually anchored while the hand tilts up/down.
 (function enableAppleStage(){
