@@ -590,6 +590,97 @@ html.intro-lock,body.intro-lock{overflow-x:hidden!important;overflow-y:auto!impo
   .rome-city{transform:translate3d(-50%,-50%,0)!important}
 }
 
+
+/* Final art direction: warm limestone, Roman picture-window, sculptor emerging through it. */
+.rome-build{
+  color:#211e19!important;
+  background:
+    radial-gradient(ellipse at 50% 58%,rgba(194,157,102,.13),transparent 44%),
+    linear-gradient(180deg,#f1eee7 0%,#e9e3d8 100%)!important;
+  padding:clamp(52px,7vw,100px) var(--gutter,5vw) clamp(30px,5vw,70px)!important;
+  overflow:hidden!important;
+}
+.rome-build:before{
+  opacity:.14!important;
+  background:
+    linear-gradient(90deg,transparent 0 7%,rgba(112,92,63,.08) 7.1%,transparent 7.25% 92%,rgba(112,92,63,.08) 92.1%,transparent 92.25%),
+    repeating-linear-gradient(0deg,rgba(96,80,59,.018) 0 1px,transparent 1px 5px)!important;
+  mask-image:linear-gradient(to bottom,transparent,#000 12%,#000 86%,transparent)!important;
+}
+.rome-heading{
+  min-height:clamp(250px,31vw,410px)!important;
+  padding:clamp(72px,8vw,105px) 0 clamp(32px,5vw,70px)!important;
+  align-items:center!important;
+}
+.rome-heading .eyebrow{color:#766b5b!important}
+.rome-title{
+  color:#211e19!important;
+  font-size:clamp(50px,8.6vw,122px)!important;
+  line-height:.91!important;
+  max-width:1240px!important;
+  text-wrap:balance;
+}
+.rome-title em{color:#8d6b3f!important}
+.rome-title .word-reveal{color:#c8c0b2!important;text-shadow:none!important;transition:color .12s linear!important}
+.rome-title .word-reveal.is-ink{color:#211e19!important}
+.rome-scene-wrap{
+  height:clamp(680px,78vw,1120px)!important;
+  margin:clamp(8px,1.5vw,22px) auto 0!important;
+  max-width:1600px!important;
+}
+.rome-scene{isolation:isolate!important}
+.rome-city{
+  z-index:0!important;
+  width:min(91%,1320px)!important;
+  top:30%!important;
+  border-radius:clamp(12px,1.8vw,26px)!important;
+  filter:saturate(.68) brightness(.9) contrast(1.08)!important;
+  box-shadow:0 24px 55px rgba(61,47,29,.17),0 0 0 1px rgba(111,88,57,.18)!important;
+}
+.rome-sculptor{
+  z-index:3!important;
+  height:clamp(830px,94vw,1320px)!important;
+  top:clamp(20px,4vw,70px)!important;
+  filter:grayscale(1) contrast(1.12) drop-shadow(0 24px 24px rgba(38,31,23,.2))!important;
+  transform:translate3d(-50%,42%,0)!important;
+  opacity:0!important;
+  -webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 91%,rgba(0,0,0,.98) 95%,transparent 100%);
+  mask-image:linear-gradient(to bottom,#000 0%,#000 91%,rgba(0,0,0,.98) 95%,transparent 100%);
+}
+@media(min-width:1000px){
+  .rome-heading{min-height:clamp(330px,34vw,460px)!important}
+  .rome-scene-wrap{height:clamp(850px,75vw,1200px)!important}
+  .rome-city{width:min(86%,1350px)!important;top:31%!important}
+  .rome-sculptor{height:clamp(1050px,83vw,1450px)!important;top:clamp(15px,3vw,55px)!important}
+}
+@media(max-width:700px){
+  .rome-build{padding:48px 20px 22px!important}
+  .rome-heading{min-height:clamp(270px,75vw,360px)!important;padding:66px 0 34px!important}
+  .rome-heading .eyebrow{top:22px!important}
+  .rome-title{font-size:clamp(47px,12.2vw,76px)!important;line-height:.94!important;margin-top:8px!important}
+  .rome-scene-wrap{height:clamp(650px,168vw,850px)!important;margin:0 -20px 0!important;width:calc(100% + 40px)!important}
+  .rome-city{width:92%!important;top:26%!important;border-radius:15px!important}
+  .rome-sculptor{height:clamp(760px,196vw,960px)!important;top:3px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  .rome-sculptor{opacity:1!important;transform:translate3d(-50%,-3%,0)!important}
+}
+/* Faster, more legible thrown-card loop: a full spin while crossing the band. */
+.jack-card{
+  animation:jack-card-throw 1.65s cubic-bezier(.16,.78,.24,1) infinite!important;
+}
+@keyframes jack-card-throw{
+  0%{transform:translate3d(-18vw,-50%,0) rotate(-50deg) scale(.72)}
+  12%{transform:translate3d(5vw,-59%,0) rotate(35deg) scale(1.02)}
+  28%{transform:translate3d(31vw,-42%,0) rotate(190deg) scale(1.08)}
+  46%{transform:translate3d(62vw,-57%,0) rotate(390deg) scale(1)}
+  64%{transform:translate3d(95vw,-45%,0) rotate(590deg) scale(.92)}
+  78%{transform:translate3d(120vw,-50%,0) rotate(740deg) scale(.78)}
+  100%{transform:translate3d(120vw,-50%,0) rotate(740deg) scale(.78)}
+}
+@media(max-width:700px){.jack-card{animation-duration:1.35s!important}}
+@media(prefers-reduced-motion:reduce){.jack-card{animation:none!important}}
+
 </style>
 <noscript><style>html.intro-lock,body.intro-lock{overflow:auto!important;touch-action:auto!important}.intro-hidden{opacity:1!important;transform:none!important}.reveal{opacity:1!important;transform:none!important}</style></noscript>
 </head>
@@ -805,10 +896,10 @@ measureScrollEffects();
   const update = () => {
     frame = 0;
     const rect = wrap.getBoundingClientRect();
-    const span = window.innerHeight + rect.height * .72;
+    const span = window.innerHeight + rect.height;
     const progress = reduced ? 1 : clamp((window.innerHeight - rect.top) / span, 0, 1);
-    const reveal = clamp(progress / .27, 0, 1);
-    const rise = 28 - progress * 43;
+    const reveal = clamp(progress / .34, 0, 1);
+    const rise = 42 - progress * 50;
     sculptor.style.opacity = String(reveal);
     sculptor.style.transform = `translate3d(-50%, ${rise.toFixed(2)}%, 0)`;
     const scale = 1 + progress * .018;
