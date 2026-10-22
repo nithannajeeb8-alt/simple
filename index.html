@@ -74,26 +74,6 @@
 <style>
 :root{--paper:#f3f2ef;--ink:#111;--muted:#6e6c68;--line:rgba(17,17,17,.17);--serif:'Playfair Display',serif;--sans:'Manrope',sans-serif;--body:'DM Sans',sans-serif;--mono:'DM Mono',monospace}*{box-sizing:border-box}html{scroll-behavior:smooth}html.intro-lock,body.intro-lock{overflow-x:hidden!important;overflow-y:auto!important;overscroll-behavior-y:auto!important;touch-action:pan-y!important}body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);-webkit-font-smoothing:antialiased}a{color:inherit;text-decoration:none}button{font:inherit}.topbar{position:absolute;top:0;left:0;width:100%;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:24px 5vw;color:#111}.brand{font:700 13px var(--mono);letter-spacing:-.04em}.nav{display:flex;gap:27px;font:11px var(--mono);text-transform:uppercase;letter-spacing:.08em}.nav a{opacity:.72;transition:opacity .25s}.nav a:hover{opacity:1}.availability{display:flex;align-items:center;gap:8px;font:10px var(--mono);text-transform:uppercase;letter-spacing:.06em}.dot{height:6px;width:6px;border-radius:50%;background:#58886a;box-shadow:0 0 0 4px #58886a20}.hero{position:relative;height:100vh;height:100svh;min-height:100vh;min-height:100svh;overflow:hidden;background:#e9e8e6;display:flex;align-items:flex-end;isolation:isolate}.typewall{position:absolute;inset:-7% -20%;z-index:0;overflow:hidden;display:flex;flex-direction:column;justify-content:space-around;pointer-events:none;opacity:.12}.type-row{font-family:var(--sans);font-weight:800;font-size:clamp(74px,13.8vw,205px);letter-spacing:-.105em;line-height:.82;white-space:nowrap;text-transform:uppercase;display:flex;width:max-content;will-change:transform}.type-row span{padding-right:.16em}.type-row:nth-child(odd){animation:marquee 39s linear infinite}.type-row:nth-child(even){animation:marquee-reverse 48s linear infinite}.type-row:nth-child(3n){animation-duration:57s}.type-row:nth-child(2){opacity:.72}.type-row:nth-child(4){opacity:.62}@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-30%)}}@keyframes marquee-reverse{from{transform:translateX(-22%)}to{transform:translateX(0)}}.hero-image{position:absolute;bottom:-2px;left:50%;transform:translate3d(-50%,var(--portrait-scroll,0px),0);will-change:transform;height:90%;width:min(84%,950px);object-fit:contain;object-position:center bottom;z-index:3;filter:grayscale(1);backface-visibility:hidden}.hero-shade{position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(243,242,239,.08) 0%,transparent 34%,transparent 70%,rgba(243,242,239,.18) 100%)}.hero-copy{position:absolute;z-index:4;left:5vw;right:5vw;bottom:35px;display:flex;align-items:flex-end;justify-content:space-between;gap:25px}.hero-kicker{font:10px var(--mono);letter-spacing:.12em;text-transform:uppercase;margin-bottom:15px;color:#fff;mix-blend-mode:difference;text-shadow:0 1px 4px rgba(0,0,0,.3);position:relative;z-index:5}.hero-title{font:800 clamp(42px,7vw,96px)/.92 var(--sans);letter-spacing:-.085em;margin:0;max-width:620px;color:#f0efec;text-shadow:0 2px 16px rgba(0,0,0,.32)}.hero-title em{font:italic 500 .94em var(--serif);letter-spacing:-.06em;color:#dedbd5}.hero-note{font:12px/1.65 var(--body);max-width:225px;color:#f2f0ec;text-shadow:0 1px 3px #000,0 2px 12px rgba(0,0,0,.9)}.scroll-cue{position:absolute;right:5vw;top:48%;z-index:5;writing-mode:vertical-rl;font:9px var(--mono);letter-spacing:.15em;text-transform:uppercase;display:flex;align-items:center;gap:12px}.scroll-cue:after{content:'';width:1px;height:45px;background:#111;animation:cue 1.7s ease-in-out infinite}@keyframes cue{0%,100%{transform:scaleY(.4);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}}.section{padding:120px 5vw}.eyebrow{font:10px var(--mono);text-transform:uppercase;letter-spacing:.12em;color:var(--muted);display:flex;align-items:center;gap:12px}.eyebrow:before{content:'';width:24px;height:1px;background:currentColor}.intro{display:grid;grid-template-columns:1fr 1.45fr;gap:8vw;align-items:start}.intro h2{font:600 clamp(30px,4vw,56px)/1.12 var(--sans);letter-spacing:-.065em;margin:20px 0 0;max-width:440px}.intro h2 em{font:italic 500 1em var(--serif)}.intro-copy{padding-top:36px;max-width:640px}.intro-copy p{font-size:clamp(17px,1.8vw,23px);line-height:1.65;letter-spacing:-.025em;margin:0 0 22px}.intro-copy .small{font-size:13px;line-height:1.8;color:var(--muted);max-width:520px}.text-link{display:inline-flex;gap:18px;align-items:center;border-bottom:1px solid var(--ink);padding:12px 0;font:10px var(--mono);text-transform:uppercase;letter-spacing:.1em;margin-top:15px}.text-link span{font-size:17px;transition:transform .25s}.text-link:hover span{transform:translate(4px,-4px)}.work{background:#e9e8e5}.section-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:48px;gap:24px}.section-head h2{font:700 clamp(40px,7vw,90px)/.9 var(--sans);letter-spacing:-.09em;margin:18px 0 0}.section-head p{font:11px/1.7 var(--mono);max-width:220px;color:var(--muted)}.projects{border-top:1px solid var(--line)}.project{display:grid;grid-template-columns:72px minmax(0,1fr) minmax(150px, .6fr) 30px;gap:22px;align-items:center;padding:28px 0;border-bottom:1px solid var(--line);transition:padding .3s}.project:hover{padding-left:12px;padding-right:12px}.project-no{font:10px var(--mono);color:var(--muted)}.project h3{font:600 clamp(21px,3vw,36px)/1.1 var(--sans);letter-spacing:-.06em;margin:0 0 8px}.project p{margin:0;color:var(--muted);font-size:12px;line-height:1.6}.tags{display:flex;flex-wrap:wrap;gap:7px}.tag{border:1px solid var(--line);padding:7px 9px;border-radius:30px;font:9px var(--mono);text-transform:uppercase;letter-spacing:.04em}.arrow{font-size:22px;transition:transform .25s}.project:hover .arrow{transform:translate(3px,-3px)}.manifesto{padding:140px 5vw 155px;background:#171716;color:#f4f2ed;overflow:hidden}.manifesto .eyebrow{color:#a7a49e}.manifesto h2{font:700 clamp(38px,7.7vw,105px)/.98 var(--sans);letter-spacing:-.09em;max-width:1150px;margin:50px 0 0}.manifesto h2 span{font:italic 500 1em var(--serif);color:#c8c4bb}.manifesto-foot{display:flex;justify-content:space-between;gap:30px;margin-top:70px;padding-top:20px;border-top:1px solid #ffffff35;font:10px var(--mono);text-transform:uppercase;letter-spacing:.08em;color:#b6b3ad}.about-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:10vw}.about-image{position:relative;min-height:460px;background:#e1e0dd;overflow:hidden}.about-image img{width:100%;height:100%;position:absolute;inset:0;object-fit:cover;object-position:center 22%;filter:grayscale(1);mix-blend-mode:multiply}.about-image .image-label{position:absolute;bottom:17px;left:18px;font:9px var(--mono);text-transform:uppercase;letter-spacing:.1em;z-index:2}.about-text h2{font:700 clamp(40px,6vw,74px)/.95 var(--sans);letter-spacing:-.085em;margin:17px 0 30px}.about-text h2 em{font:italic 500 1em var(--serif)}.about-text p{font-size:15px;line-height:1.9;color:#484743;max-width:570px}.facts{display:grid;grid-template-columns:1fr 1fr;gap:0 22px;margin-top:38px;border-top:1px solid var(--line)}.fact{padding:16px 0;border-bottom:1px solid var(--line)}.fact small{display:block;font:9px var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:8px}.fact strong{font-size:13px;font-weight:600}.skills{background:#e9e8e5}.skill-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:50px}.skill{min-height:180px;padding:22px;border:1px solid var(--line);display:flex;flex-direction:column;justify-content:space-between;transition:background .25s,transform .25s}.skill:hover{background:var(--paper);transform:translateY(-5px)}.skill .num{font:10px var(--mono);color:var(--muted)}.skill h3{font:600 20px/1.1 var(--sans);letter-spacing:-.05em;margin:0 0 9px}.skill p{font-size:11px;line-height:1.6;color:var(--muted);margin:0}.contact{padding:120px 5vw 35px}.contact-main{display:flex;justify-content:space-between;align-items:flex-end;gap:35px;padding-bottom:80px}.contact h2{font:700 clamp(48px,9vw,125px)/.85 var(--sans);letter-spacing:-.1em;margin:28px 0 0}.contact h2 em{font:italic 500 .9em var(--serif)}.contact-side{max-width:280px}.contact-side p{font-size:13px;line-height:1.8;color:var(--muted)}.contact-button{display:inline-flex;align-items:center;gap:35px;border-radius:99px;background:#111;color:white;padding:17px 22px;font:10px var(--mono);text-transform:uppercase;letter-spacing:.1em;transition:transform .25s,background .25s}.contact-button:hover{transform:translateY(-3px);background:#333}.footer{border-top:1px solid var(--line);padding:20px 0;display:flex;justify-content:space-between;gap:20px;font:9px var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}.word-reveal{color:#fff;transition:color .11s linear}.word-reveal.is-ink{color:#111}.reveal{opacity:0;transform:translateY(24px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}.reveal.visible{opacity:1;transform:translateY(0)}.delay1{transition-delay:.12s}.delay2{transition-delay:.22s}.delay3{transition-delay:.32s}::selection{background:#111;color:#fff}
 
-/* Golden apple philosophy: anchored arms, a smaller central apple, and a focused glow. */
-.apple-philosophy{position:relative;isolation:isolate;overflow:hidden;background:#080808;color:#f3f2ef;padding:clamp(70px,8vw,112px) 5vw 64px;}
-.apple-philosophy:before{content:"";position:absolute;inset:0;pointer-events:none;z-index:-1;background:#080808;}
-.apple-philosophy .eyebrow{color:#a7a49e}.apple-philosophy-head{display:grid;grid-template-columns:.85fr 1.15fr;gap:7vw;align-items:start;position:relative;z-index:2;max-width:1200px;margin:0 auto;}
-.apple-philosophy h2{font:700 clamp(42px,7.2vw,96px)/.92 var(--sans);letter-spacing:-.09em;margin:24px 0 0;max-width:620px}.apple-philosophy h2 em{font:italic 500 1em var(--serif);color:#d8b46a;letter-spacing:-.065em;margin-left:.12em}
-.apple-philosophy-copy{padding-top:38px;max-width:600px}.apple-philosophy-copy p{font-size:clamp(14px,1.35vw,18px);line-height:1.75;color:#c3c0b8;margin:0 0 17px}.apple-philosophy-copy strong{color:#f4f2ed;font-weight:600}
-.apple-stage{position:relative;height:clamp(230px,29vw,390px);max-width:1500px;margin:clamp(28px,4vw,54px) auto 0;touch-action:pan-y;user-select:none;-webkit-user-select:none;isolation:isolate;}
-.apple-stage:before{content:"";position:absolute;z-index:0;left:50%;top:50%;width:min(54vw,620px);height:min(24vw,270px);transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(ellipse,rgba(204,151,48,.17) 0%,rgba(204,151,48,.075) 28%,rgba(204,151,48,.025) 48%,transparent 72%);filter:blur(12px);pointer-events:none}
-.apple-stage:after{content:"";position:absolute;z-index:1;left:38%;right:38%;top:50%;height:1px;background:linear-gradient(90deg,transparent,#c99b4566,transparent);opacity:.24;pointer-events:none}
-.apple-art{position:absolute;display:block;object-fit:contain;pointer-events:auto;cursor:ns-resize;touch-action:pan-y;user-select:none;-webkit-user-drag:none;filter:contrast(1.04);will-change:transform,opacity;outline:none}.apple-art:focus-visible{filter:drop-shadow(0 0 5px #d5a64c)}
-.apple-hand-left{width:42%;height:90%;left:-1%;top:5%;object-position:left center;transform-origin:72% 53%;transform:rotate(var(--hand-left-angle,0deg));animation:hand-enter-left 1.05s cubic-bezier(.16,1,.3,1) .58s both;}
-.apple-hand-right{width:42%;height:90%;right:-1%;top:0;object-position:right center;transform-origin:29% 53%;transform:rotate(var(--hand-right-angle,0deg));animation:hand-enter-right 1.05s cubic-bezier(.16,1,.3,1) .72s both;}
-@keyframes hand-enter-left{from{opacity:0;transform:translateX(-105%) rotate(0deg)}to{opacity:1;transform:translateX(0) rotate(var(--hand-left-angle,0deg))}}
-@keyframes hand-enter-right{from{opacity:0;transform:translateX(105%) rotate(0deg)}to{opacity:1;transform:translateX(0) rotate(var(--hand-right-angle,0deg))}}
-.apple-art:active{cursor:grabbing}.apple-fruit{width:clamp(92px,11vw,156px);height:clamp(92px,11vw,156px);left:50%;top:50%;transform:translate3d(calc(-50% + var(--apple-x,0px)),calc(-50% + var(--apple-y,0px)),0);scale:.82;opacity:0;z-index:3;cursor:grab;filter:drop-shadow(0 8px 16px rgba(214,155,39,.16));animation:apple-arrive .72s cubic-bezier(.2,.8,.2,1) .12s forwards;}
-@keyframes apple-arrive{0%{opacity:0;scale:.45}65%{opacity:1;scale:1.04}100%{opacity:1;scale:.82}}
-.apple-fruit:active{filter:drop-shadow(0 10px 22px rgba(214,155,39,.24))}.apple-stage-hint{display:flex;justify-content:space-between;gap:18px;border-top:1px solid #ffffff28;padding-top:17px;color:#8f8b83;font:9px var(--mono);letter-spacing:.11em;text-transform:uppercase}.apple-stage-hint span:last-child{text-align:right}.apple-philosophy-foot{max-width:1200px;margin:8px auto 0;display:grid;grid-template-columns:1fr 1fr;gap:7vw;padding-top:24px}.apple-philosophy-foot p{margin:0;color:#a7a49e;font-size:12px;line-height:1.8;max-width:430px}.apple-philosophy-foot .signature{font:italic 500 clamp(22px,3vw,36px)/1.2 var(--serif);color:#d8b46a;justify-self:end;align-self:end;text-align:right}
-@media(max-width:700px){.apple-philosophy{padding:70px 5vw 44px}.apple-philosophy-head{grid-template-columns:1fr;gap:8px}.apple-philosophy h2{font-size:clamp(43px,12vw,72px);max-width:500px;margin-top:20px}.apple-philosophy-copy{padding-top:5px;max-width:340px}.apple-philosophy-copy p{font-size:14px;line-height:1.7}.apple-stage{height:clamp(220px,62vw,290px);margin:18px -5vw 0;overflow:hidden}.apple-hand-left{width:62%;left:-17%;height:82%;top:8%;object-position:left center;transform-origin:72% 53%}.apple-hand-right{width:62%;right:-17%;height:82%;top:0;object-position:right center;transform-origin:29% 53%}.apple-fruit{width:clamp(86px,25vw,116px);height:clamp(86px,25vw,116px)}.apple-stage:before{width:78vw;height:44vw;max-height:190px}.apple-stage:after{left:40%;right:40%;top:52%}.apple-stage-hint{margin:0 5vw;font-size:8px}.apple-philosophy-foot{grid-template-columns:1fr;gap:16px;padding-top:22px}.apple-philosophy-foot .signature{justify-self:start;text-align:left}.apple-stage-hint span:last-child{max-width:45%}}
-@media(prefers-reduced-motion:reduce){.apple-art{animation:none!important;opacity:1!important;scale:1!important}.apple-hand-left,.apple-hand-right{transform:rotate(var(--hand-left-angle,0deg))}.apple-fruit{transform:translate3d(calc(-50% + var(--apple-x,0px)),calc(-50% + var(--apple-y,0px)),0)}}
-
 @media(max-width:700px){.topbar{padding:18px 5vw}.nav{gap:13px}.nav a{font-size:9px}.availability{display:none}.hero{height:100vh;height:100svh;min-height:100vh;min-height:100svh}.hero-image{height:78%;width:125%;max-width:none;object-position:center bottom}.type-row{font-size:clamp(67px,17vw,115px)}.hero-copy{bottom:23px;display:block}.hero-title{font-size:clamp(44px,12vw,76px)}.hero-note{margin-top:15px;max-width:230px;font-size:11px}.scroll-cue{right:5vw;top:39%}.section{padding:82px 5vw}.intro,.about-grid{grid-template-columns:1fr;gap:30px}.intro-copy{padding-top:0}.section-head{align-items:flex-start;flex-direction:column;margin-bottom:32px}.section-head p{margin:0}.project{grid-template-columns:28px minmax(0,1fr) 20px;gap:12px;padding:23px 0}.project .tags{grid-column:2;grid-row:2}.project .arrow{grid-column:3;grid-row:1}.project h3{font-size:25px}.manifesto{padding:90px 5vw}.manifesto h2{margin-top:35px}.manifesto-foot{margin-top:45px;flex-direction:column;gap:10px}.about-image{min-height:430px;max-height:550px}.skill-grid{grid-template-columns:1fr 1fr}.skill{min-height:160px;padding:16px}.contact{padding:85px 5vw 25px}.contact-main{display:block;padding-bottom:55px}.contact-side{margin-top:40px}.contact h2{font-size:clamp(58px,14vw,95px)}.footer{flex-wrap:wrap;font-size:8px}.project:hover{padding-left:0;padding-right:0}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.reveal{opacity:1;transform:none}.word-reveal{color:var(--ink)!important;transition:none!important}}
 
@@ -182,196 +162,6 @@ body{overflow-x:clip}
 @media(prefers-reduced-motion:reduce){.type-row{animation:none!important}.scroll-cue:after{animation:none!important}.js .reveal{opacity:1;transform:none}}
 
 
-/* Golden-apple section refinement: larger artwork, smaller copy, focused glow and the site's reveal language. */
-.apple-philosophy{padding:clamp(68px,7.5vw,108px) var(--gutter,5vw) clamp(48px,6vw,78px);}
-.apple-philosophy-head{grid-template-columns:.9fr 1.1fr;gap:clamp(30px,6vw,92px);max-width:var(--content-width,1440px);}
-.apple-philosophy h2{font-size:clamp(38px,6.2vw,82px);max-width:560px;margin-top:18px;}
-.apple-philosophy-copy{padding-top:30px;max-width:520px;}
-.apple-philosophy-copy p{font-size:clamp(13px,1.05vw,15px);line-height:1.7;margin-bottom:12px;color:#bdb9b1;}
-.apple-stage{height:clamp(300px,34vw,490px);max-width:1600px;margin:clamp(20px,2.8vw,42px) auto 0;}
-.apple-stage:before{width:min(38vw,470px);height:min(19vw,220px);background:radial-gradient(ellipse,rgba(204,151,48,.20) 0%,rgba(204,151,48,.09) 25%,rgba(204,151,48,.035) 45%,transparent 68%);filter:blur(10px);}
-.apple-stage:after{left:42%;right:42%;opacity:.2;}
-.apple-hand-left{width:54%;height:100%;left:-2%;top:1%;object-position:left center;transform-origin:75% 54%;}
-.apple-hand-right{width:54%;height:100%;right:-2%;top:-2%;object-position:right center;transform-origin:25% 52%;}
-.apple-fruit{width:clamp(100px,9vw,132px);height:clamp(100px,9vw,132px);}
-.apple-stage-hint{font-size:8px;line-height:1.6;max-width:var(--content-width,1440px);margin:0 auto;padding-top:14px;}
-.apple-philosophy-foot{max-width:var(--content-width,1440px);gap:clamp(24px,5vw,72px);padding-top:20px;}
-.apple-philosophy-foot p{font-size:11px;line-height:1.75;max-width:390px;}
-.apple-philosophy-foot .signature{font-size:clamp(20px,2.4vw,30px);}
-/* The same soft reveal rhythm used throughout the portfolio also animates this section's text. */
-.js .apple-philosophy .reveal{opacity:0;transform:translateY(22px);transition:opacity .85s cubic-bezier(.2,.7,.2,1),transform .85s cubic-bezier(.2,.7,.2,1);}
-.js .apple-philosophy .reveal.visible{opacity:1;transform:translateY(0);}
-.apple-philosophy .delay1{transition-delay:.14s;}
-.apple-hand-left{animation:hand-enter-left 1.15s cubic-bezier(.16,1,.3,1) .58s both;}
-.apple-hand-right{animation:hand-enter-right 1.15s cubic-bezier(.16,1,.3,1) .78s both;}
-@media(max-width:700px){
- .apple-philosophy{padding:64px 22px 42px;}
- .apple-philosophy-head{grid-template-columns:1fr;gap:8px;}
- .apple-philosophy h2{font-size:clamp(40px,10.5vw,64px);max-width:480px;margin-top:17px;}
- .apple-philosophy-copy{padding-top:3px;max-width:410px;}
- .apple-philosophy-copy p{font-size:12.5px;line-height:1.65;margin-bottom:9px;}
- .apple-stage{height:clamp(265px,74vw,370px);margin:18px -22px 0;overflow:hidden;}
- .apple-hand-left{width:76%;height:91%;left:-29%;top:5%;object-position:left center;transform-origin:76% 54%;}
- .apple-hand-right{width:76%;height:91%;right:-29%;top:0;object-position:right center;transform-origin:24% 52%;}
- .apple-fruit{width:clamp(82px,21vw,108px);height:clamp(82px,21vw,108px);}
- .apple-stage:before{width:66vw;height:38vw;max-height:170px;}
- .apple-stage:after{left:43%;right:43%;}
- .apple-stage-hint{margin:0;font-size:7px;letter-spacing:.07em;}
- .apple-philosophy-foot{grid-template-columns:1fr;gap:12px;padding-top:18px;}
- .apple-philosophy-foot p{font-size:11px;max-width:390px;}
- .apple-philosophy-foot .signature{justify-self:start;text-align:left;font-size:24px;}
-}
-@media(min-width:1200px){.apple-stage{height:clamp(390px,31vw,500px)}.apple-hand-left,.apple-hand-right{width:56%;}}
-@media(prefers-reduced-motion:reduce){.js .apple-philosophy .reveal{opacity:1;transform:none;transition:none}.apple-hand-left,.apple-hand-right{animation:none!important;opacity:1!important;transform:rotate(var(--hand-left-angle,0deg))}.apple-hand-right{transform:rotate(var(--hand-right-angle,0deg))}}
-
-
-/* Philosophy stage: larger reaching hands, protected negative space, section-triggered entrance. */
-.apple-philosophy{background:#080808;position:relative}
-.apple-philosophy:before{inset:auto;left:50%;top:50%;width:min(100%,980px);height:min(78%,680px);transform:translate(-50%,-42%);background:radial-gradient(ellipse at center,rgba(190,137,35,.055) 0%,rgba(190,137,35,.025) 34%,transparent 68%);z-index:-1}
-.apple-stage{height:clamp(310px,35vw,480px);margin:clamp(26px,4vw,56px) auto 0;overflow:hidden}
-.apple-stage:before{width:min(48vw,520px);height:min(20vw,220px);background:radial-gradient(ellipse,rgba(204,151,48,.18) 0%,rgba(204,151,48,.075) 32%,rgba(204,151,48,.018) 58%,transparent 74%);filter:blur(10px)}
-.apple-stage:after{left:43%;right:43%;opacity:.12}
-.apple-hand-left,.apple-hand-right{width:64%;height:100%;top:0;opacity:0;animation:none;transition:filter .25s;will-change:transform,opacity}
-.apple-hand-left{left:-9%;object-position:left center;transform-origin:76% 54%;transform:translateX(-105%) rotate(var(--hand-left-angle,0deg))}
-.apple-hand-right{right:-9%;object-position:right center;transform-origin:24% 52%;transform:translateX(105%) rotate(var(--hand-right-angle,0deg))}
-.apple-fruit{width:clamp(100px,8.5vw,128px);height:clamp(100px,8.5vw,128px);opacity:0;scale:.72;animation:none;z-index:4}
-.apple-philosophy.is-active .apple-fruit{animation:apple-arrive .8s cubic-bezier(.2,.8,.2,1) .08s both}
-.apple-philosophy.is-active .apple-hand-left{animation:hand-enter-left 1.05s cubic-bezier(.16,1,.3,1) .35s both}
-.apple-philosophy.is-active .apple-hand-right{animation:hand-enter-right 1.05s cubic-bezier(.16,1,.3,1) .48s both}
-.apple-philosophy .apple-philosophy-head .reveal{transition-delay:0s}
-.apple-philosophy .apple-philosophy-copy.reveal{transition-delay:.16s}
-.apple-philosophy-foot{position:relative}
-.apple-philosophy-foot p{max-width:430px}
-@media(min-width:1200px){
- .apple-stage{height:clamp(420px,34vw,520px)}
- .apple-hand-left,.apple-hand-right{width:61%}
- .apple-hand-left{left:-7%}
- .apple-hand-right{right:-7%}
- .apple-fruit{width:clamp(112px,8vw,140px);height:clamp(112px,8vw,140px)}
-}
-@media(max-width:700px){
- .apple-philosophy{padding:64px 22px 42px}
- .apple-stage{height:clamp(300px,82vw,390px);margin:22px -22px 0;overflow:hidden}
- /* Bigger forearms stay cropped at the edges; the fingertips stop well before the apple. */
- .apple-hand-left,.apple-hand-right{width:86%;height:88%;top:6%}
- .apple-hand-left{left:-34%;transform-origin:76% 54%}
- .apple-hand-right{right:-34%;transform-origin:24% 52%}
- .apple-fruit{width:clamp(82px,20vw,104px);height:clamp(82px,20vw,104px)}
- .apple-stage:before{width:70vw;height:42vw;max-height:180px}
- .apple-stage:after{left:44%;right:44%}
- .apple-stage-hint{margin:0;font-size:7px;letter-spacing:.055em}
- .apple-philosophy-foot{padding-top:18px}
-}
-@media(prefers-reduced-motion:reduce){
- .apple-philosophy .apple-art{animation:none!important;opacity:1!important}
- .apple-hand-left{transform:rotate(var(--hand-left-angle,0deg))!important}
- .apple-hand-right{transform:rotate(var(--hand-right-angle,0deg))!important}
- .apple-fruit{scale:1!important;transform:translate3d(calc(-50% + var(--apple-x,0px)),calc(-50% + var(--apple-y,0px)),0)}
-}
-
-
-/* Final composition calibration from the supplied source artwork ratios:
-   left arm 2043×1294 (1.579:1), right arm 2416×1129 (2.139:1),
-   apple source 1272×1237 (1.028:1). Preserve image aspect ratios. */
-.apple-philosophy .apple-stage{
-  height:clamp(330px,34vw,470px);
-  max-width:1600px;
-  margin:clamp(24px,3.4vw,48px) auto 0;
-  overflow:hidden;
-}
-.apple-philosophy .apple-stage:before{
-  width:min(34vw,420px);
-  height:min(22vw,245px);
-  background:radial-gradient(ellipse,rgba(204,151,48,.19) 0%,rgba(204,151,48,.075) 36%,rgba(204,151,48,.018) 62%,transparent 76%);
-  filter:blur(9px);
-}
-.apple-philosophy .apple-hand-left,
-.apple-philosophy .apple-hand-right{
-  width:58%;
-  height:auto;
-  max-width:none;
-  object-fit:contain;
-  top:50%;
-  opacity:0;
-  animation:none;
-  transition:filter .25s ease;
-  will-change:transform,opacity;
-}
-.apple-philosophy .apple-hand-left{
-  left:-19%;
-  transform-origin:76% 53%;
-  transform:translate3d(-105%,-50%,0) rotate(var(--hand-left-angle,0deg));
-}
-.apple-philosophy .apple-hand-right{
-  right:-16%;
-  transform-origin:28% 53%;
-  transform:translate3d(105%,-50%,0) rotate(var(--hand-right-angle,0deg));
-}
-@keyframes ratio-hand-left-in{
-  from{opacity:0;transform:translate3d(-105%,-50%,0) rotate(0deg)}
-  to{opacity:1;transform:translate3d(0,-50%,0) rotate(var(--hand-left-angle,0deg))}
-}
-@keyframes ratio-hand-right-in{
-  from{opacity:0;transform:translate3d(105%,-50%,0) rotate(0deg)}
-  to{opacity:1;transform:translate3d(0,-50%,0) rotate(var(--hand-right-angle,0deg))}
-}
-.apple-philosophy .apple-fruit{
-  width:clamp(88px,8vw,122px);
-  height:auto;
-  aspect-ratio:1272 / 1237;
-  object-fit:contain;
-  left:50%;
-  top:50%;
-  opacity:0;
-  scale:.7;
-  transform:translate3d(calc(-50% + var(--apple-x,0px)),calc(-50% + var(--apple-y,0px)),0);
-  animation:none;
-  z-index:5;
-  filter:drop-shadow(0 7px 13px rgba(214,155,39,.17));
-}
-@keyframes ratio-apple-in{
-  0%{opacity:0;scale:.56}
-  72%{opacity:1;scale:1.04}
-  100%{opacity:1;scale:1}
-}
-.apple-philosophy.is-active .apple-fruit{
-  animation:ratio-apple-in .8s cubic-bezier(.2,.8,.2,1) .08s both;
-}
-.apple-philosophy.is-active .apple-hand-left{
-  animation:ratio-hand-left-in 1.12s cubic-bezier(.16,1,.3,1) .38s both;
-}
-.apple-philosophy.is-active .apple-hand-right{
-  animation:ratio-hand-right-in 1.12s cubic-bezier(.16,1,.3,1) .52s both;
-}
-.apple-philosophy .apple-stage-hint{position:relative;z-index:6}
-@media(max-width:700px){
-  .apple-philosophy .apple-stage{
-    height:clamp(270px,78vw,350px);
-    margin:20px -22px 0;
-  }
-  .apple-philosophy .apple-stage:before{width:68vw;height:45vw;max-height:190px}
-  .apple-philosophy .apple-hand-left,
-  .apple-philosophy .apple-hand-right{width:74%;top:50%}
-  .apple-philosophy .apple-hand-left{left:-42%;transform-origin:76% 53%}
-  .apple-philosophy .apple-hand-right{right:-35%;transform-origin:28% 53%}
-  .apple-philosophy .apple-fruit{width:clamp(70px,18vw,86px);height:auto}
-  .apple-philosophy .apple-stage-hint{margin:0 5vw;gap:12px;font-size:8px;letter-spacing:.07em}
-  .apple-philosophy .apple-stage-hint span:last-child{max-width:45%}
-}
-@media(min-width:1200px){
-  .apple-philosophy .apple-stage{height:clamp(390px,31vw,470px)}
-  .apple-philosophy .apple-hand-left{left:-19%}
-  .apple-philosophy .apple-hand-right{right:-16%}
-}
-@media(prefers-reduced-motion:reduce){
-  .apple-philosophy .apple-hand-left,
-  .apple-philosophy .apple-hand-right,
-  .apple-philosophy .apple-fruit{animation:none!important;opacity:1!important;scale:1!important}
-  .apple-philosophy .apple-hand-left{transform:translate3d(0,-50%,0) rotate(var(--hand-left-angle,0deg))}
-  .apple-philosophy .apple-hand-right{transform:translate3d(0,-50%,0) rotate(var(--hand-right-angle,0deg))}
-}
-
-
 /* Rome section: restrained title, generous dotted negative space, inset city card, oversized rising sculptor. */
 .rome-build{
   position:relative;isolation:isolate;overflow:hidden;color:var(--ink);
@@ -424,7 +214,6 @@ body{overflow-x:clip}
   .rome-city{transform:translate3d(-50%,-50%,0)!important;}
 }
 /* The Apple artwork supports touch scrolling. Dragging remains available with mouse, pen and keyboard. */
-.apple-philosophy .apple-stage,.apple-philosophy .apple-art{touch-action:pan-y!important;}
 
 
 /* Refined section rhythm and reliable scroll behavior */
@@ -449,12 +238,11 @@ html.intro-lock,body.intro-lock{overflow-x:hidden!important;overflow-y:auto!impo
 .contact h2{max-width:900px;font-size:clamp(48px,8vw,112px);line-height:.92;letter-spacing:-.095em}
 .contact h2 em{display:inline-block}
 @media(min-width:701px){
-  .intro,.apple-philosophy,.work,.manifesto,#about,.skills,.rome-build,.contact{min-height:100svh}
+  .intro,.work,.manifesto,#about,.skills,.rome-build,.contact{min-height:100svh}
   .intro{align-content:center}
   .work,.skills{display:flex;flex-direction:column;justify-content:center}
   .manifesto{display:flex;flex-direction:column;justify-content:center}
   #about{display:flex;align-items:center}
-  .apple-philosophy{display:flex;flex-direction:column;justify-content:center}
   .rome-build{display:flex;flex-direction:column;justify-content:center}
   .rome-scene-wrap{height:min(53vw,650px)}
   .rome-sculptor{height:min(70vw,880px)}
@@ -799,29 +587,136 @@ html.intro-lock,body.intro-lock{overflow-x:hidden!important;overflow-y:auto!impo
   .rome-sculptor{opacity:1!important;transform:translate3d(-50%,0,0)!important;will-change:auto!important}
 }
 
+
+
+/* ==========================================================================
+   Philosophy section: the single source of truth for the hands, apple and copy.
+   Mobile values first, laptop/desktop refinements at 701px and up.
+   Hands are sized from the stage width and centred vertically; their outer
+   ends overshoot the full-bleed stage so the arms always leave the screen edge.
+   ========================================================================== */
+.apple-philosophy{position:relative;isolation:isolate;overflow:hidden;background:#080808;color:#f3f2ef;padding:64px 22px 42px}
+.apple-philosophy:before{content:"";position:absolute;left:50%;top:50%;z-index:-1;width:min(100%,980px);height:min(78%,680px);transform:translate(-50%,-42%);background:radial-gradient(ellipse at center,rgba(190,137,35,.055) 0%,rgba(190,137,35,.025) 34%,transparent 68%);pointer-events:none}
+.apple-philosophy .eyebrow{color:#a7a49e}
+.apple-philosophy-head{display:grid;grid-template-columns:1fr;gap:8px;align-items:start;position:relative;z-index:2;max-width:var(--content-width,1440px);margin:0 auto}
+.apple-philosophy h2{font:700 clamp(40px,10.5vw,64px)/.92 var(--sans);letter-spacing:-.09em;margin:17px 0 0;max-width:480px}
+.apple-philosophy h2 em{font:italic 500 1em var(--serif);color:#d8b46a;letter-spacing:-.065em;margin-left:.12em}
+.apple-philosophy-copy{padding-top:3px;max-width:410px}
+.apple-philosophy-copy p{font-size:12.5px;line-height:1.65;margin:0 0 9px;color:#bdb9b1}
+.apple-philosophy-copy strong{color:#f4f2ed;font-weight:600}
+
+/* Text reveal uses the same soft rhythm as the rest of the site. */
+.js .apple-philosophy .reveal{opacity:0;transform:translateY(22px);transition:opacity .85s cubic-bezier(.2,.7,.2,1),transform .85s cubic-bezier(.2,.7,.2,1)}
+.js .apple-philosophy .reveal.visible{opacity:1;transform:translateY(0)}
+.apple-philosophy .apple-philosophy-copy.reveal{transition-delay:.16s}
+
+/* Stage */
+.apple-stage{position:relative;height:clamp(270px,78vw,350px);margin:20px -22px 0;overflow:hidden;isolation:isolate;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.apple-stage:before{content:"";position:absolute;z-index:0;left:50%;top:50%;width:68vw;height:45vw;max-height:190px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(ellipse,rgba(204,151,48,.19) 0%,rgba(204,151,48,.075) 36%,rgba(204,151,48,.018) 62%,transparent 76%);filter:blur(9px);pointer-events:none}
+.apple-stage:after{content:"";position:absolute;z-index:1;left:44%;right:44%;top:52%;height:1px;background:linear-gradient(90deg,transparent,#c99b4566,transparent);opacity:.12;pointer-events:none}
+
+/* Draggable artwork */
+.apple-art{position:absolute;display:block;object-fit:contain;pointer-events:auto;cursor:ns-resize;touch-action:pan-y;user-select:none;-webkit-user-select:none;-webkit-user-drag:none;filter:contrast(1.04);will-change:transform,opacity;outline:none}
+.apple-art:active{cursor:grabbing}
+.apple-art:focus-visible{outline:2px solid #d8b46a;outline-offset:5px;filter:drop-shadow(0 0 5px #d5a64c)}
+.apple-philosophy .apple-hand-left,.apple-philosophy .apple-hand-right{width:74%;height:auto;max-width:none;top:50%;transition:filter .25s ease}
+.apple-philosophy .apple-hand-left{left:-42%;transform-origin:76% 53%;transform:translate3d(0,-50%,0) rotate(var(--hand-left-angle,0deg))}
+.apple-philosophy .apple-hand-right{right:-35%;transform-origin:28% 53%;transform:translate3d(0,-50%,0) rotate(var(--hand-right-angle,0deg))}
+.apple-philosophy .apple-fruit{width:clamp(70px,18vw,86px);height:auto;aspect-ratio:1272/1237;left:50%;top:50%;z-index:5;cursor:grab;transform:translate3d(calc(-50% + var(--apple-x,0px)),calc(-50% + var(--apple-y,0px)),0);filter:drop-shadow(0 7px 13px rgba(214,155,39,.17))}
+.apple-philosophy .apple-fruit:active{filter:drop-shadow(0 10px 22px rgba(214,155,39,.24))}
+
+/* Entrance: artwork stays visible without JavaScript and starts hidden only when JS will reveal it. */
+.js .apple-philosophy:not(.is-active) .apple-art{opacity:0}
+.apple-philosophy.is-active .apple-hand-left{animation:ratio-hand-left-in 1.05s cubic-bezier(.16,1,.3,1) .24s both}
+.apple-philosophy.is-active .apple-hand-right{animation:ratio-hand-right-in 1.05s cubic-bezier(.16,1,.3,1) .36s both}
+.apple-philosophy.is-active .apple-fruit{animation:ratio-apple-in .72s cubic-bezier(.2,.8,.2,1) .08s both}
+@keyframes ratio-hand-left-in{from{opacity:0;transform:translate3d(-105%,-50%,0) rotate(0deg)}to{opacity:1;transform:translate3d(0,-50%,0) rotate(var(--hand-left-angle,0deg))}}
+@keyframes ratio-hand-right-in{from{opacity:0;transform:translate3d(105%,-50%,0) rotate(0deg)}to{opacity:1;transform:translate3d(0,-50%,0) rotate(var(--hand-right-angle,0deg))}}
+@keyframes ratio-apple-in{0%{opacity:0;scale:.56}72%{opacity:1;scale:1.04}100%{opacity:1;scale:1}}
+
+/* Foot */
+.apple-philosophy-foot{position:relative;max-width:var(--content-width,1440px);margin:8px auto 0;display:grid;grid-template-columns:1fr;gap:12px;padding-top:18px}
+.apple-philosophy-foot p{margin:0;color:#a7a49e;font-size:11px;line-height:1.75;max-width:430px}
+.apple-philosophy-foot .signature{font:italic 500 24px/1.2 var(--serif);color:#d8b46a;justify-self:start;align-self:end;text-align:left}
+
+@media(min-width:701px){
+  .apple-philosophy{padding:clamp(76px,7vw,112px) var(--gutter,5vw) clamp(54px,6vw,86px)}
+  .apple-philosophy-head{grid-template-columns:.9fr 1.1fr;gap:clamp(30px,6vw,92px)}
+  .apple-philosophy h2{font-size:clamp(38px,6.2vw,82px);margin-top:18px;max-width:560px}
+  .apple-philosophy-copy{padding-top:30px;max-width:520px}
+  .apple-philosophy-copy p{font-size:clamp(13px,1.05vw,15px);line-height:1.7;margin-bottom:12px}
+  /* Full-bleed stage: its clip edge is the screen edge, not the section padding. */
+  .apple-stage{width:100vw;max-width:none;height:clamp(330px,34vw,470px);margin:clamp(24px,3.4vw,48px) calc(50% - 50vw) 0}
+  .apple-stage:before{width:min(34vw,420px);height:min(22vw,245px);max-height:none}
+  .apple-stage:after{left:43%;right:43%;top:50%}
+  .apple-philosophy .apple-hand-left,.apple-philosophy .apple-hand-right{width:70%}
+  .apple-philosophy .apple-hand-left{left:-29%}
+  .apple-philosophy .apple-hand-right{right:-27%}
+  .apple-philosophy .apple-fruit{width:clamp(92px,8.5vw,124px)}
+  .apple-philosophy-foot{grid-template-columns:1fr 1fr;gap:clamp(24px,5vw,72px);padding-top:20px}
+  .apple-philosophy-foot .signature{font-size:clamp(20px,2.4vw,30px);justify-self:end;text-align:right}
+}
+@media(prefers-reduced-motion:reduce){
+  .js .apple-philosophy .reveal{opacity:1;transform:none;transition:none}
+  .apple-philosophy .apple-art{animation:none!important;opacity:1!important}
+}
+
+/* Other sections: let content set the height on laptops. */
+@media(min-width:701px){
+  .intro,.work,.manifesto,#about,.skills,.rome-build,.contact{min-height:0}
+  .intro{padding-top:clamp(100px,10vw,150px);padding-bottom:clamp(100px,10vw,150px)}
+  .work,.skills{display:block}
+  .manifesto,#about,.contact{display:block}
+}
+
+/* Rome: a neutral sky grey, never brown. Mobile Safari tints its top and bottom bars from these colours. */
+.sky-statue-section {
+  background: #727272 !important;
+  min-height: 125svh !important;
+}
+.sky-statue-stage {
+  background-color: #727272 !important;
+  background-image:
+    linear-gradient(180deg, rgba(18,18,18,.08), rgba(18,18,18,.2)),
+    url('sky-monochrome.webp') !important;
+  background-size: cover !important;
+  background-position: center center !important;
+}
+@media (min-width: 1000px) {
+  .sky-statue-section { min-height: 125svh !important; }
+  .sky-statue-stage { height: 100svh !important; }
+}
+@media (max-width: 700px) {
+  .sky-statue-section { min-height: 155svh !important; }
+}
 </style>
-<noscript><style>html.intro-lock,body.intro-lock{overflow:auto!important;touch-action:auto!important}.intro-hidden{opacity:1!important;transform:none!important}.reveal{opacity:1!important;transform:none!important}</style></noscript>
+<noscript><style>html.intro-lock,body.intro-lock{overflow:auto!important;touch-action:auto!important}.intro-hidden{opacity:1!important;transform:none!important}.reveal{opacity:1!important;transform:none!important}
+</style></noscript>
 </head>
 <body>
 <a class="skip-link" href="#main-content">Skip to content</a>
-<header class="topbar intro-hidden"><a class="brand" href="/" aria-label="Nithan Najeeb home">NN<span aria-hidden="true">®</span></a><nav class="nav" aria-label="Main navigation"><a href="#work">Work</a><a href="#about">About</a><a href="#skills">Capabilities</a><a href="#contact">Contact ↗</a></nav><div class="availability"><span class="dot"></span> Building what's next</div></header>
+<header class="topbar intro-hidden"><a class="brand" href="/" aria-label="Nithan Najeeb home">NN<span aria-hidden="true">®</span></a><nav class="nav" aria-label="Main navigation"><a href="#work">Work</a><a href="#about">About</a><a href="#skills">Capabilities</a><a href="#contact">Contact ↗</a></nav><div class="availability"><span class="dot"></span> Building what’s next</div></header>
 <main id="main-content">
 <div id="top" class="top-anchor" aria-hidden="true"></div>
 <section class="hero" aria-label="Nithan Najeeb portfolio introduction"><div class="typewall" aria-hidden="true"><div class="type-row"><span>NITHAN NAJEEB · NITHAN NAJEEB · </span><span>NITHAN NAJEEB · NITHAN NAJEEB · </span></div><div class="type-row"><span>NITHAN NAJEEB · NITHAN NAJEEB · </span><span>NITHAN NAJEEB · NITHAN NAJEEB · </span></div><div class="type-row"><span>NITHAN NAJEEB · NITHAN NAJEEB · </span><span>NITHAN NAJEEB · NITHAN NAJEEB · </span></div><div class="type-row"><span>NITHAN NAJEEB · NITHAN NAJEEB · </span><span>NITHAN NAJEEB · NITHAN NAJEEB · </span></div><div class="type-row"><span>NITHAN NAJEEB · NITHAN NAJEEB · </span><span>NITHAN NAJEEB · NITHAN NAJEEB · </span></div></div><picture class="hero-image intro-hidden" aria-label="Black and white portrait of Nithan Najeeb"><source media="(min-width: 701px)" srcset="nithanl.webp"><img src="nithan.webp" alt="Black-and-white portrait of Nithan Najeeb" width="1216" height="1536" fetchpriority="high" decoding="async"></picture><div class="hero-shade"></div><div class="scroll-cue intro-hidden">Scroll to explore</div><div class="hero-copy intro-hidden"><div><div class="hero-kicker">Independent mind · Digital craft</div><h1 class="hero-title">Nithan <em>Najeeb.</em></h1></div><p class="hero-note">Creative developer exploring the space between thoughtful design, useful technology and visual storytelling.</p></div></section>
-<section class="section intro"><div class="reveal"><div class="eyebrow">01 / The introduction</div><h2>Digital work with <em>clarity, character</em> and a reason to exist.</h2></div><div class="intro-copy reveal delay1"><p>I build considered digital experiences where visual identity and interaction work together, not against each other.</p><p class="small">My interests span UI/UX design, front-end experiences, generative AI workflows and creative direction. I’m interested in making digital products feel as intentional as they are functional.</p><a class="text-link" href="https://nithan.in/work.html">Explore My Work <span>↗</span></a></div></section>
+<section class="section intro"><div class="reveal"><div class="eyebrow">01 / The introduction</div><h2>Digital work with <em>clarity, character</em> and a reason to exist.</h2></div><div class="intro-copy reveal delay1"><p>I build considered digital experiences where visual identity and interaction work together, not against each other.</p><p class="small">My interests span UI/UX design, front-end experiences, generative AI workflows and creative direction. I’m interested in making digital products feel as intentional as they are functional.</p><a class="text-link" href="https://nithan.in/work.html">Explore my work <span>↗</span></a></div></section>
 <section class="apple-philosophy" id="philosophy" aria-labelledby="apple-philosophy-title">
   <div class="apple-philosophy-head">
     <div class="reveal"><div class="eyebrow">02 / The philosophy</div><h2 id="apple-philosophy-title">Every era has <em>an apple.</em></h2></div>
     <div class="apple-philosophy-copy reveal delay1">
-      <p>From <strong>choice</strong> to discovery, the apple became a symbol of the moment knowledge changes everything.</p>
+      <p>From <strong>choice</strong> to discovery, the apple has stood for the moment knowledge changes everything.</p>
       <p>Newton made it a story about asking why. Apple made it a symbol of technology reshaping everyday life.</p>
       <p>I want to build the next kind of apple: a small idea with the power to begin a bigger change.</p>
     </div>
   </div>
   <div class="apple-stage" aria-label="Interactive golden apple between two reaching hands. Drag either hand vertically or move the apple in any direction.">
-    <img class="apple-art apple-hand-left" src="hand-left.webp" alt="A sketched hand reaching in from the left" draggable="false" tabindex="0" role="img" aria-label="Left reaching hand. Drag up or down, or use the arrow keys." data-drag-kind="hand-left">
-    <img class="apple-art apple-hand-right" src="hand-right.webp" alt="A sketched hand reaching in from the right, slightly higher" draggable="false" tabindex="0" role="img" aria-label="Right reaching hand. Drag up or down, or use the arrow keys." data-drag-kind="hand-right">
-    <img class="apple-art apple-fruit" src="golden-apple.webp" alt="A polished golden apple, symbolising a transformative idea" draggable="false" tabindex="0" role="img" aria-label="Golden apple. Drag in any direction, or use the arrow keys." data-drag-kind="apple">
+    <img class="apple-art apple-hand-left" src="hand-left.webp" loading="lazy" decoding="async" alt="A sketched hand reaching in from the left" draggable="false" tabindex="0" role="img" aria-label="Left reaching hand. Drag up or down, or use the arrow keys." data-drag-kind="hand-left">
+    <img class="apple-art apple-hand-right" src="hand-right.webp" loading="lazy" decoding="async" alt="A sketched hand reaching in from the right, slightly higher" draggable="false" tabindex="0" role="img" aria-label="Right reaching hand. Drag up or down, or use the arrow keys." data-drag-kind="hand-right">
+    <img class="apple-art apple-fruit" src="golden-apple.webp" loading="lazy" decoding="async" alt="A polished golden apple, symbolising a transformative idea" draggable="false" tabindex="0" role="img" aria-label="Golden apple. Drag in any direction, or use the arrow keys." data-drag-kind="apple">
+  </div>
+  <div class="apple-philosophy-foot">
+    <p>The hands never need to meet the apple. The space between them is the point: possibility, tension and the moment before an idea becomes something real.</p>
+    <div class="signature">Make the idea matter.</div>
   </div>
 </section>
 
@@ -829,16 +724,16 @@ html.intro-lock,body.intro-lock{overflow-x:hidden!important;overflow-y:auto!impo
 <section class="section work" id="work" aria-labelledby="work-title">
 <div class="section-head reveal"><div><div class="eyebrow">03 / Selected work</div><h2 id="work-title">Things I<br>create.</h2></div><p>Projects and experiments across knowledge systems, web infrastructure and local AI.</p></div>
 <div class="projects">
-<article class="project reveal"><div class="project-no">01</div><div><h3>Mind Atlas</h3><p>A personal knowledge system connecting ideas across science, code and structured notes - (upcoming)</p></div><div class="tags"><span class="tag">Knowledge systems</span><span class="tag">JavaScript</span></div><span class="arrow" aria-hidden="true">·</span></article>
-<article class="project reveal"><div class="project-no">02</div><div><h3>Forenexa</h3><p>Storefront architecture designed around physical hardware and a focused shopping experience - (upcoming)</p></div><div class="tags"><span class="tag">E-commerce</span><span class="tag">Web architecture</span></div><span class="arrow" aria-hidden="true">·</span></article>
-<article class="project reveal"><div class="project-no">03</div><div><h3>Ollama Uplink</h3><p>Exploring how local AI models can connect to clean, responsive frontend interfaces - (upcoming)</p></div><div class="tags"><span class="tag">Local AI</span><span class="tag">Frontend</span></div><span class="arrow" aria-hidden="true">·</span></article>
-<a class="project reveal" href="/MyDairy/" aria-label="Open My Dairy"><div class="project-no">04</div><div><h3>My Dairy</h3><p>A personal journaling space for notes, memories and reflection, designed around privacy.</p></div><div class="tags"><span class="tag">Personal tool</span><span class="tag">Journal</span></div><span class="arrow" aria-hidden="true">↗</span></a>
+<article class="project reveal"><div class="project-no">01</div><div><h3>Mind Atlas</h3><p>A personal knowledge system connecting ideas across science, code and structured notes. Coming soon.</p></div><div class="tags"><span class="tag">Knowledge systems</span><span class="tag">JavaScript</span></div><span class="arrow" aria-hidden="true">·</span></article>
+<article class="project reveal"><div class="project-no">02</div><div><h3>Forenexa</h3><p>Storefront architecture designed around physical hardware and a focused shopping experience. Coming soon.</p></div><div class="tags"><span class="tag">E-commerce</span><span class="tag">Web architecture</span></div><span class="arrow" aria-hidden="true">·</span></article>
+<article class="project reveal"><div class="project-no">03</div><div><h3>Ollama Uplink</h3><p>Exploring how local AI models can connect to clean, responsive frontend interfaces. Coming soon.</p></div><div class="tags"><span class="tag">Local AI</span><span class="tag">Frontend</span></div><span class="arrow" aria-hidden="true">·</span></article>
+<a class="project reveal" href="/MyDairy/" aria-label="Open My Diary"><div class="project-no">04</div><div><h3>My Diary</h3><p>A personal journaling space for notes, memories and reflection, designed around privacy.</p></div><div class="tags"><span class="tag">Personal tool</span><span class="tag">Journal</span></div><span class="arrow" aria-hidden="true">↗</span></a>
 <a class="project reveal" href="/pdf-maker/" aria-label="Open PDF Maker"><div class="project-no">05</div><div><h3>PDF Maker</h3><p>A browser-based tool for arranging images and exporting them as a polished PDF.</p></div><div class="tags"><span class="tag">Web tool</span><span class="tag">Privacy-minded</span></div><span class="arrow" aria-hidden="true">↗</span></a>
 <a class="project reveal" href="https://nithan.in/PocketWise" aria-label="Open PocketWise"><div class="project-no">06</div><div><h3>PocketWise</h3><p>A personal finance app that logs spending straight from an iPhone Shortcut.</p></div><div class="tags"><span class="tag">Web app</span></div><span class="arrow" aria-hidden="true">↗</span></a>
 </div></section>
 
 <section class="jack-band" id="jack-band" aria-label="Jack of all trades">
-  <div class="jack-band-label"><span>Curiosity, in motion</span><span>04 — many disciplines</span></div>
+  <div class="jack-band-label"><span>Curiosity, in motion</span><span>Many disciplines</span></div>
   <div class="jack-track" aria-hidden="true">
     <div class="jack-track-run">
       <span>Jack of all trades</span><i>✳</i><span>Jack of all trades</span><i>✳</i><span>Jack of all trades</span><i>✳</i>
@@ -850,22 +745,22 @@ html.intro-lock,body.intro-lock{overflow-x:hidden!important;overflow-y:auto!impo
   <img class="jack-card" src="jack-card.webp" alt="" width="1087" height="1447" loading="lazy" decoding="async">
 </section>
 
-<section class="section" id="about"><div class="about-grid"><div class="about-image reveal"><img src="nithan.webp" alt="Black-and-white portrait of Nithan Najeeb" width="1216" height="1536" loading="lazy" decoding="async"><span class="image-label">Nithan Najeeb / Portrait</span></div><div class="about-text reveal delay1"><div class="eyebrow">05 / A little about me</div><h2>Curious by nature.<br><em>Intentional</em> by design.</h2><p>I’m Nithan Najeeb, a B.Com student at MES College in Kerala, India, exploring the space between thoughtful design, practical technology and visual storytelling.</p><p>I enjoy understanding how systems work and turning ideas into useful things, from web interfaces and structured knowledge tools to experiments with locally run AI models. My approach is to stay curious, build deliberately and keep improving the details.</p><div class="facts"><div class="fact"><small>Also known as</small><strong>Rubin Stellar</strong></div><div class="fact"><small>Currently studying</small><strong>B.Com · MES College</strong></div><div class="fact"><small>Focus</small><strong>UI / UX &amp; web development</strong></div><div class="fact"><small>Researching</small><strong>Generative AI &amp; local LLMs</strong></div></div><div class="stack-list" aria-label="Tools and technologies"><span><b>Core</b> HTML5 · CSS3 · JavaScript</span><span><b>Motion</b> GSAP · Lottie · Canvas</span><span><b>R&amp;D</b> Ollama · Local LLMs</span></div></div></div></section>
-<section class="section skills" id="skills"><div class="section-head reveal"><div><div class="eyebrow">06 / Capabilities</div><h2>Where I<br>spend my curiosity.</h2></div><p>A growing toolkit across design, development and visual communication.</p></div><div class="skill-grid"><article class="skill reveal"><span class="num">01 / DESIGN</span><div><h3>UI / UX</h3><p>Information hierarchy, layout systems, responsive interfaces and interaction thinking.</p></div></article><article class="skill reveal delay1"><span class="num">02 / BUILD</span><div><h3>Web experiences</h3><p>Turning visual concepts into clean, responsive pages with purposeful motion.</p></div></article><article class="skill reveal delay2"><span class="num">03 / EXPLORE</span><div><h3>Generative AI</h3><p>Prompt engineering, reference-led image creation and iterative visual direction.</p></div></article><article class="skill reveal delay3"><span class="num">04 / SHAPE</span><div><h3>Visual storytelling</h3><p>Art direction, cinematic concepts, typography and personal brand expression.</p></div></article></div></section>
+<section class="section" id="about"><div class="about-grid"><div class="about-image reveal"><img src="nithan.webp" alt="Black-and-white portrait of Nithan Najeeb" width="1216" height="1536" loading="lazy" decoding="async"><span class="image-label">Nithan Najeeb / Portrait</span></div><div class="about-text reveal delay1"><div class="eyebrow">04 / A little about me</div><h2>Curious by nature.<br><em>Intentional</em> by design.</h2><p>I’m Nithan Najeeb, a B.Com student at MES College in Kerala, India, exploring the space between thoughtful design, practical technology and visual storytelling.</p><p>I enjoy understanding how systems work and turning ideas into useful things, from web interfaces and structured knowledge tools to experiments with locally run AI models. My approach is to stay curious, build deliberately and keep improving the details.</p><div class="facts"><div class="fact"><small>Also known as</small><strong>Rubin Stellar</strong></div><div class="fact"><small>Currently studying</small><strong>B.Com · MES College</strong></div><div class="fact"><small>Focus</small><strong>UI / UX &amp; web development</strong></div><div class="fact"><small>Researching</small><strong>Generative AI &amp; local LLMs</strong></div></div><div class="stack-list" aria-label="Tools and technologies"><span><b>Core</b> HTML5 · CSS3 · JavaScript</span><span><b>Motion</b> GSAP · Lottie · Canvas</span><span><b>R&amp;D</b> Ollama · Local LLMs</span></div></div></div></section>
+<section class="section skills" id="skills"><div class="section-head reveal"><div><div class="eyebrow">05 / Capabilities</div><h2>Where I<br>spend my curiosity.</h2></div><p>A growing toolkit across design, development and visual communication.</p></div><div class="skill-grid"><article class="skill reveal"><span class="num">01 / DESIGN</span><div><h3>UI / UX</h3><p>Information hierarchy, layout systems, responsive interfaces and interaction thinking.</p></div></article><article class="skill reveal delay1"><span class="num">02 / BUILD</span><div><h3>Web experiences</h3><p>Turning visual concepts into clean, responsive pages with purposeful motion.</p></div></article><article class="skill reveal delay2"><span class="num">03 / EXPLORE</span><div><h3>Generative AI</h3><p>Prompt engineering, reference-led image creation and iterative visual direction.</p></div></article><article class="skill reveal delay3"><span class="num">04 / SHAPE</span><div><h3>Visual storytelling</h3><p>Art direction, cinematic concepts, typography and personal brand expression.</p></div></article></div></section>
 <section class="rome-build sky-statue-section" id="rome" aria-labelledby="rome-title">
   <div class="sky-statue-stage">
     <div class="rome-heading">
-      <div class="eyebrow">07 / The long game</div>
+      <div class="eyebrow">06 / The long game</div>
       <h2 class="rome-title" id="rome-title">Rome wasn’t<br>built in a <em>day.</em></h2>
     </div>
     <img class="rome-sculptor" src="roman-sculptor.webp" alt="A classical marble sculptor raising a hammer" width="802" height="1536" loading="eager" decoding="async">
     <div class="sky-statue-grain" aria-hidden="true"></div>
   </div>
 </section>
-<section class="contact" id="contact"><div class="contact-main"><div class="reveal"><div class="eyebrow">08 / Have something in mind?</div><h2>Let’s build<br>something <em>that lasts.</em></h2></div><div class="contact-side reveal delay1"><p>Open to thoughtful collaborations, creative experiments and opportunities to learn by building.</p><a class="contact-button" href="https://www.linkedin.com/in/nithannajeeb" target="_blank" rel="noopener noreferrer">Connect on LinkedIn <span aria-hidden="true">↗</span></a><div class="social-links" aria-label="Social profiles"><a href="https://instagram.com/nithannajeeb_" target="_blank" rel="noopener noreferrer">Instagram ↗</a><a href="https://www.threads.net/@nithannajeeb_" target="_blank" rel="noopener noreferrer">Threads ↗</a><a href="https://www.facebook.com/nithan.najeeb" target="_blank" rel="noopener noreferrer">Facebook ↗</a></div></div></div><footer class="footer"><span>© <span id="year"></span> Nithan Najeeb</span><nav class="footer-links" aria-label="More from Nithan"><a href="/mind-atlas.html">Mind Atlas</a><a href="/pdf-maker/">PDF Maker</a><a href="/MyDairy/">My Dairy</a></nav><a href="#top">Back to top ↑</a></footer></section>
+<section class="contact" id="contact"><div class="contact-main"><div class="reveal"><div class="eyebrow">07 / Have something in mind?</div><h2>Let’s build<br>something <em>that lasts.</em></h2></div><div class="contact-side reveal delay1"><p>Open to thoughtful collaborations, creative experiments and opportunities to learn by building.</p><a class="contact-button" href="https://www.linkedin.com/in/nithannajeeb" target="_blank" rel="noopener noreferrer">Connect on LinkedIn <span aria-hidden="true">↗</span></a><div class="social-links" aria-label="Social profiles"><a href="https://instagram.com/nithannajeeb_" target="_blank" rel="noopener noreferrer">Instagram ↗</a><a href="https://www.threads.net/@nithannajeeb_" target="_blank" rel="noopener noreferrer">Threads ↗</a><a href="https://www.facebook.com/nithan.najeeb" target="_blank" rel="noopener noreferrer">Facebook ↗</a></div></div></div><footer class="footer"><span>© <span id="year"></span> Nithan Najeeb</span><nav class="footer-links" aria-label="More from Nithan"><a href="/mind-atlas.html">Mind Atlas</a><a href="/pdf-maker/">PDF Maker</a><a href="/MyDairy/">My Diary</a></nav><a href="#top">Back to top ↑</a></footer></section>
 </main>
 <script>
-const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('visible');observer.unobserve(entry.target)}}),{threshold:.12});document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));document.getElementById('year').textContent=new Date().getFullYear();
+const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('visible');observer.unobserve(entry.target)}}),{threshold:.12});document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));const yearEl=document.getElementById('year');if(yearEl)yearEl.textContent=new Date().getFullYear();
 
 // A short opening choreography. Lock scrolling without fixing the body, which can cause mobile jump glitches.
 (function runOpeningSequence(){
@@ -911,7 +806,8 @@ const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entr
   }, 1250);
 })();
 // Give the repeating name a tiny pointer-responsive drift on larger screens.
-const wall=document.querySelector('.typewall');let raf;window.addEventListener('pointermove',e=>{if(matchMedia('(pointer:fine)').matches){cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>wall.style.setProperty('--pointer-y',((e.clientY/innerHeight)-.5)*7+'px'));wall.style.transform=`translateY(${((e.clientY/innerHeight)-.5)*5}px)`}},{passive:true});
+const wall=document.querySelector('.typewall');
+if(wall&&matchMedia('(pointer:fine)').matches&&!matchMedia('(prefers-reduced-motion:reduce)').matches){let raf=0,pointerY=0;window.addEventListener('pointermove',e=>{pointerY=e.clientY;if(raf||window.scrollY>innerHeight)return;raf=requestAnimationFrame(()=>{raf=0;wall.style.transform=`translateY(${((pointerY/innerHeight)-.5)*5}px)`})},{passive:true})}
 
 // Scroll-linked portrait motion is eased with requestAnimationFrame to avoid step-like jumps.
 const heroSection = document.querySelector('.hero');
