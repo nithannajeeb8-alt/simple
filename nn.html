@@ -844,7 +844,8 @@ html.intro-lock,body.intro-lock{overflow-x:hidden!important;overflow-y:auto!impo
 }
 
 
-/* Laptop artwork: retain the original reaching-hand composition and close only the outer-edge gaps. */
+/* Laptop artwork: preserve the original reaching pose. The visible rectangular forearm ends
+   are pushed beyond the stage edges, while the fingertips reach toward the centered apple. */
 @media (min-width: 701px) {
   .apple-philosophy {
     min-height: 0;
@@ -863,7 +864,7 @@ html.intro-lock,body.intro-lock{overflow-x:hidden!important;overflow-y:auto!impo
   }
   .apple-philosophy .apple-hand-left,
   .apple-philosophy .apple-hand-right {
-    width: 58%;
+    width: 70%;
     height: auto;
     max-height: none;
     top: 50%;
@@ -872,14 +873,14 @@ html.intro-lock,body.intro-lock{overflow-x:hidden!important;overflow-y:auto!impo
     animation: none;
     will-change: transform;
   }
-  /* Keep the familiar silhouette; extend the forearms past the stage edges so they don't look detached. */
+  /* Overscan hides the hard rectangular cut at each forearm's outer end. */
   .apple-philosophy .apple-hand-left {
-    left: -19%;
+    left: -29%;
     right: auto;
     transform: translate3d(0,-50%,0) rotate(var(--hand-left-angle,0deg));
   }
   .apple-philosophy .apple-hand-right {
-    right: -16%;
+    right: -27%;
     left: auto;
     transform: translate3d(0,-50%,0) rotate(var(--hand-right-angle,0deg));
   }
