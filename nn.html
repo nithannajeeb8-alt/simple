@@ -939,7 +939,27 @@ html.intro-lock,body.intro-lock{overflow-x:hidden!important;overflow-y:auto!impo
 }
 
 </style>
-<noscript><style>html.intro-lock,body.intro-lock{overflow:auto!important;touch-action:auto!important}.intro-hidden{opacity:1!important;transform:none!important}.reveal{opacity:1!important;transform:none!important}</style></noscript>
+<noscript><style>html.intro-lock,body.intro-lock{overflow:auto!important;touch-action:auto!important}.intro-hidden{opacity:1!important;transform:none!important}.reveal{opacity:1!important;transform:none!important}
+/* Definitive desktop artwork geometry: previous rules used 70% arms with offsets
+   that mathematically left a 16% stage-width gap (41% to 57%). Expand and overlap
+   the image boxes while keeping the apple centered. Mobile geometry is untouched. */
+@media (min-width: 701px) {
+  .apple-philosophy .apple-stage { overflow: hidden !important; }
+  .apple-philosophy .apple-hand-left {
+    width: 85% !important; height: auto !important;
+    left: -34% !important; right: auto !important; top: 50% !important;
+    transform: translate3d(0,-50%,0) rotate(var(--hand-left-angle,0deg)) !important;
+    opacity: 1 !important; animation: none !important;
+  }
+  .apple-philosophy .apple-hand-right {
+    width: 85% !important; height: auto !important;
+    right: -34% !important; left: auto !important; top: 50% !important;
+    transform: translate3d(0,-50%,0) rotate(var(--hand-right-angle,0deg)) !important;
+    opacity: 1 !important; animation: none !important;
+  }
+  .apple-philosophy .apple-fruit { left: 50% !important; top: 50% !important; z-index: 5 !important; }
+}
+</style></noscript>
 </head>
 <body>
 <a class="skip-link" href="#main-content">Skip to content</a>
