@@ -910,6 +910,35 @@ html.intro-lock,body.intro-lock{overflow-x:hidden!important;overflow-y:auto!impo
   #about { display: block; }
   .contact { display: block; }
 }
+/* Final artwork composition: bring both forearms inward so the apple feels within reach. */
+@media (min-width: 701px) {
+  .apple-philosophy .apple-stage { overflow: hidden; }
+  .apple-philosophy .apple-hand-left,
+  .apple-philosophy .apple-hand-right {
+    width: 68%;
+    max-height: 112%;
+    top: 50%;
+    object-fit: contain;
+  }
+  .apple-philosophy .apple-hand-left {
+    left: -8%;
+    right: auto;
+    transform: translate3d(0,-50%,0) rotate(var(--hand-left-angle,0deg));
+  }
+  .apple-philosophy .apple-hand-right {
+    right: -8%;
+    left: auto;
+    transform: translate3d(0,-50%,0) rotate(var(--hand-right-angle,0deg));
+  }
+  .apple-philosophy .apple-fruit {
+    width: clamp(96px, 8vw, 120px);
+    top: 50%; left: 50%;
+    transform: translate3d(calc(-50% + var(--apple-x,0px)),calc(-50% + var(--apple-y,0px)),0);
+  }
+}
+/* The marquee is a personal motto, not a group of people. */
+.jack-band-label span:last-child { white-space: nowrap; }
+
 /* Rome is an intentional cinematic transition, not an accidental grey spacer. */
 .sky-statue-section {
   background: #171612 !important;
@@ -983,14 +1012,14 @@ html.intro-lock,body.intro-lock{overflow-x:hidden!important;overflow-y:auto!impo
 <a class="project reveal" href="https://nithan.in/PocketWise" aria-label="Open PocketWise"><div class="project-no">06</div><div><h3>PocketWise</h3><p>A personal finance app that logs spending straight from an iPhone Shortcut.</p></div><div class="tags"><span class="tag">Web app</span></div><span class="arrow" aria-hidden="true">↗</span></a>
 </div></section>
 
-<section class="jack-band" id="jack-band" aria-label="Jacks of all trades">
+<section class="jack-band" id="jack-band" aria-label="Jack of all trades">
   <div class="jack-band-label"><span>Curiosity, in motion</span><span>01 — many disciplines</span></div>
   <div class="jack-track" aria-hidden="true">
     <div class="jack-track-run">
-      <span>Jacks of all trades</span><i>✳</i><span>Jacks of all trades</span><i>✳</i><span>Jacks of all trades</span><i>✳</i>
+      <span>Jack of all trades</span><i>✳</i><span>Jack of all trades</span><i>✳</i><span>Jack of all trades</span><i>✳</i>
     </div>
     <div class="jack-track-run">
-      <span>Jacks of all trades</span><i>✳</i><span>Jacks of all trades</span><i>✳</i><span>Jacks of all trades</span><i>✳</i>
+      <span>Jack of all trades</span><i>✳</i><span>Jack of all trades</span><i>✳</i><span>Jack of all trades</span><i>✳</i>
     </div>
   </div>
   <img class="jack-card" src="jack-card.webp" alt="" width="1087" height="1447" loading="lazy" decoding="async">
