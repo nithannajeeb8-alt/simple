@@ -506,7 +506,11 @@
     const snapshot=JSON.stringify(state);
     try{
       if(state.sample)ensurePersonalWorkspace();
-      const tx=addTransaction({type:d.type,amount,activityId:d.activityId,accountId:d.accountId,date:d.date||today(),note:d.note||'',paymentMethod:d.paymentMethod||'Cash',repeat:'none'});
+      const data={type:d.type,amount,activityId:d.activityId,accountId:d.accountId,date:d.date||today(),note:d.note||'',paymentMethod:d.paymentMethod||'Cash',repeat:'none'};
+      // Apply the same Smart Rules to Quick Add and Shortcut imports as the full transaction form.
+      // Previously this save path bypassed the rule engine, making rules appear broken for a common workflow.
+      const matchedRule=d.requestId?null:applySmartRule(data);
+      const tx=addTransaction(data);
       if(!tx)throw new Error('The transaction could not be created.');
       if(d.requestId)tx.shortcutRequestId=d.requestId;
       state.settings.lastQuickAddAccountId=d.accountId;state.settings.lastQuickAddPaymentMethod=d.paymentMethod||'Cash';
@@ -514,7 +518,7 @@
       try{await evaluateBudgetAlerts();}catch(e){console.warn('Quick Add saved, but alerts did not refresh.',e)}
       const savedTransaction=state.transactions.find(t=>t.id===tx.id)||tx;
       showTransactionReceipt(savedTransaction);
-      toast('Saved. Your receipt is ready.');
+      toast(matchedRule ? `Smart rule applied: ${matchedRule.name || matchedRule.keyword}.` : 'Saved. Your receipt is ready.');
     }catch(error){state=JSON.parse(snapshot);renderAll();console.error('Quick Add save failed.',error);toast(error.message||'Could not save. Your previous records were restored.','error');}
   }
   function addTransaction(data){const tx={id:uid('tx'),type:data.type,amount:Number(data.amount),activityId:data.activityId||'other',accountId:data.accountId||state.accounts[0]?.id,date:data.date||today(),note:(data.note||'').trim(),paymentMethod:data.paymentMethod||'Cash',createdAt:new Date().toISOString()};if(data.type==='transfer'){tx.toAccountId=data.toAccountId;if(!tx.toAccountId||tx.toAccountId===tx.accountId){toast('Choose two different accounts.','error');return false;}}if(data.repeat&&data.repeat!=='none'){let due=dateFrom(data.date||today());const anchorDay=due.getDate();if(['weekly','monthly','yearly','year'].includes(data.repeat)){let next=localDate(due),guard=0;while(next<=today()&&guard++<120)next=addCalendarInterval(next,data.repeat,anchorDay);due=dateFrom(next);}state.reminders.push({id:uid('rem'),name:data.note||activityById(data.activityId).name,amount:tx.amount,date:localDate(due),anchorDay,accountId:tx.accountId,repeat:data.repeat,active:true,note:'Reminder created from a transaction; confirm payment manually'});}state.transactions.push(tx);return tx;}
