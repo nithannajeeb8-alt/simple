@@ -555,3 +555,48 @@ img,svg,canvas{max-width:100%}
   .review-observations>div{flex-direction:column;gap:4px}
   .review-observations strong{max-width:100%;text-align:left}
 }
+
+/* 2.1.1 — planner controls: icon buttons sized for the wrapped icon, calendar header stacks on phones */
+.mini-button .icon-wrap{width:16px;height:16px}
+.mini-button .icon-wrap i{font-size:15px}
+.mini-button .icon-fallback{width:16px;height:16px}
+.mini-button{flex:none}
+.money-figure,[data-money],.balance-number,.entity-value,.metric-card strong{font-variant-numeric:tabular-nums}
+@media(max-width:720px){
+  .planner-section-header{flex-direction:column;align-items:stretch}
+  .planner-section-header>div:first-child{flex:none;width:100%}
+  .planner-section-header .calendar-controls{justify-content:space-between;width:100%}
+  .planner-section-header .calendar-controls strong{flex:1;font-size:13px}
+}
+
+
+/* PocketWise 2.2 refinement: consistent density, accessible controls, and calmer activity rows. */
+:root {
+  --pw-focus-ring: 0 0 0 3px color-mix(in srgb, var(--blue, #4e7fd2) 22%, transparent);
+}
+button, input, select, textarea, [role="button"] { -webkit-tap-highlight-color: transparent; }
+:where(button, input, select, textarea, a, [tabindex]):focus-visible {
+  outline: 2px solid var(--blue, #4e7fd2);
+  outline-offset: 3px;
+}
+.icon-wrap { position: relative; align-items: center; justify-content: center; flex: 0 0 auto; }
+.icon-wrap > i { display: none; }
+.bi-loaded .icon-wrap > i { display: inline-block; }
+.icon-wrap > .icon-fallback { display: inline-block; }
+.bi-loaded .icon-wrap > .icon-fallback { display: none !important; }
+.settings-section-title > .settings-icon { display: grid; place-items: center; flex: 0 0 38px; width: 38px; height: 38px; border-radius: 12px; }
+.settings-section-title > .settings-icon .icon-wrap { width: 20px; height: 20px; }
+.settings-section-title > .settings-icon .icon-wrap > i { font-size: 18px; }
+.transaction-row, .activity-row, .transaction-item { transition: background-color .16s ease, transform .16s ease; }
+.transaction-row:active, .activity-row:active, .transaction-item:active { transform: scale(.995); }
+.legend-item { min-width: 0; }
+.legend-item > span:nth-child(2) { overflow-wrap: anywhere; }
+.pw-ocr-status { line-height: 1.5; }
+@media (max-width: 520px) {
+  .settings-section-title { gap: 12px; }
+  .settings-section-title > .settings-icon { flex-basis: 34px; width: 34px; height: 34px; border-radius: 11px; }
+  .transaction-row, .activity-row, .transaction-item { min-height: 58px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
