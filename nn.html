@@ -938,6 +938,17 @@ html.intro-lock,body.intro-lock{overflow-x:hidden!important;overflow-y:auto!impo
   }
 }
 
+
+/* Full-bleed philosophy stage: the stage's clip edge must be the screen edge,
+   otherwise the arms end in a visible vertical cut inside the section padding. */
+@media (min-width: 701px) {
+  .apple-philosophy .apple-stage {
+    width: 100vw !important;
+    max-width: none !important;
+    margin-left: calc(50% - 50vw) !important;
+    margin-right: calc(50% - 50vw) !important;
+  }
+}
 </style>
 <noscript><style>html.intro-lock,body.intro-lock{overflow:auto!important;touch-action:auto!important}.intro-hidden{opacity:1!important;transform:none!important}.reveal{opacity:1!important;transform:none!important}
 /* Definitive desktop artwork geometry: previous rules used 70% arms with offsets
