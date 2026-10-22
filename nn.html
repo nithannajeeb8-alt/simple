@@ -801,58 +801,29 @@ html.intro-lock,body.intro-lock{overflow-x:hidden!important;overflow-y:auto!impo
 
 
 
-/* Final Apple-stage fix: trigger on entry, preserve image ratios, and keep the settled hands fully inside the viewport. */
-.apple-philosophy .apple-stage{
-  width:calc(100% + 2 * var(--gutter, 5vw));
-  max-width:none;
-  margin-left:calc(-1 * var(--gutter, 5vw));
-  margin-right:calc(-1 * var(--gutter, 5vw));
-  overflow:hidden;
-}
-.apple-philosophy .apple-hand-left,
-.apple-philosophy .apple-hand-right{
-  width:54%;
-  height:auto;
-  max-width:none;
-  top:50%;
-  object-fit:contain;
-}
-.apple-philosophy .apple-hand-left{
-  left:0;
-  transform:translate3d(-105%,-50%,0) rotate(var(--hand-left-angle,0deg));
-}
-.apple-philosophy .apple-hand-right{
-  right:0;
-  transform:translate3d(105%,-50%,0) rotate(var(--hand-right-angle,0deg));
-}
-@media(max-width:700px){
-  .apple-philosophy .apple-stage{
-    width:calc(100% + 44px);
-    margin-left:-22px;
-    margin-right:-22px;
-    height:clamp(270px,78vw,350px);
-    overflow:hidden;
+/* Laptop/desktop-only hand spacing fix. The existing mobile composition is untouched. */
+@media (min-width: 701px) {
+  .apple-philosophy .apple-stage {
+    overflow: hidden;
   }
-  .apple-philosophy .apple-hand-left,
-  .apple-philosophy .apple-hand-right{
-    width:64%;
-    height:auto;
-    top:50%;
-  }
-  .apple-philosophy .apple-hand-left{left:-7%;}
-  .apple-philosophy .apple-hand-right{right:-7%;}
-  .apple-philosophy .apple-fruit{width:clamp(76px,19vw,94px);height:auto;}
-}
-@media(min-width:1200px){
-  .apple-philosophy .apple-stage{height:clamp(390px,31vw,470px)}
-  .apple-philosophy .apple-hand-left,
-  .apple-philosophy .apple-hand-right{width:52%;}
-}
-@media(prefers-reduced-motion:reduce){
-  .apple-philosophy .apple-hand-left{transform:translate3d(0,-50%,0) rotate(var(--hand-left-angle,0deg))!important;}
-  .apple-philosophy .apple-hand-right{transform:translate3d(0,-50%,0) rotate(var(--hand-right-angle,0deg))!important;}
-}
 
+  .apple-philosophy .apple-hand-left {
+    width: 45%;
+    left: -11%;
+    right: auto;
+  }
+
+  .apple-philosophy .apple-hand-right {
+    width: 45%;
+    right: -10%;
+    left: auto;
+  }
+
+  .apple-philosophy .apple-fruit {
+    left: 50%;
+    z-index: 5;
+  }
+}
 </style>
 <noscript><style>html.intro-lock,body.intro-lock{overflow:auto!important;touch-action:auto!important}.intro-hidden{opacity:1!important;transform:none!important}.reveal{opacity:1!important;transform:none!important}</style></noscript>
 </head>
@@ -1084,24 +1055,25 @@ measureScrollEffects();
   window.addEventListener('resize', schedule, { passive: true });
   update();
 })();
-// Replay the hand-and-apple entrance when the artwork itself enters view.
-// Observing the stage (rather than the taller text section) works consistently on phones and laptops.
+// Start the artwork entrance only when the philosophy section actually enters the viewport.
 (function activateAppleSection(){
   const section = document.querySelector('.apple-philosophy');
-  const stage = section?.querySelector('.apple-stage');
-  if (!section || !stage) return;
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (reduced || !('IntersectionObserver' in window)) {
+  if (!section) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    section.classList.add('is-active');
+    return;
+  }
+  if (!('IntersectionObserver' in window)) {
     section.classList.add('is-active');
     return;
   }
   const entranceObserver = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) section.classList.add('is-active');
-      else section.classList.remove('is-active');
-    });
-  }, { threshold: 0.12, rootMargin: '-6% 0px -6% 0px' });
-  entranceObserver.observe(stage);
+    if (entries.some(entry => entry.isIntersecting)) {
+      section.classList.add('is-active');
+      entranceObserver.disconnect();
+    }
+  }, { threshold: 0.22 });
+  entranceObserver.observe(section);
 })();
 
 // Hands rotate around a fixed wrist pivot, so the arm stays visually anchored while the hand tilts up/down.
