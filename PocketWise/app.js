@@ -200,15 +200,6 @@
       error.cause = indexedError || localError;
       throw error;
     }
-    // Native Android wrapper bridge: keep the home-screen widget derived from the same local ledger.
-    try {
-      if (window.PocketWiseNative && typeof window.PocketWiseNative.updateWidget === 'function') {
-        const available = (state.accounts || []).reduce((sum, account) => sum + balanceForAccount(account.id), 0);
-        const cutoff = new Date(); cutoff.setHours(0,0,0,0); cutoff.setDate(cutoff.getDate()-6);
-        const weekSpend = (state.transactions || []).filter(t => ['expense','refund'].includes(t.type) && dateFrom(t.date) >= cutoff && t.date <= today()).reduce((sum,t) => sum + (t.type === 'refund' ? -1 : 1) * (Number(t.amount)||0),0);
-        window.PocketWiseNative.updateWidget(money(available), `7-day spending · ${money(Math.max(0,weekSpend))}`);
-      }
-    } catch (error) { console.warn('PocketWise widget update skipped.', error); }
     return { indexedDB: indexedSaved, localStorage: localSaved };
   }
   async function initialise(){
@@ -293,7 +284,7 @@
   }
   function applyTheme(){
     const pref=state.settings.theme||'light';let actual=pref;if(pref==='system')actual=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
-    document.documentElement.dataset.theme=actual;const meta=$('meta[name="theme-color"]');if(meta)meta.content=actual==='dark'?'#111411':'#f6f8f5';$('#theme-label').textContent=pref==='system'?'System appearance':`${pref[0].toUpperCase()+pref.slice(1)} appearance`;
+    document.documentElement.dataset.theme=actual;const meta=$('meta[name="theme-color"]');if(meta)meta.content=actual==='dark'?'#101425':'#4e55d9';$('#theme-label').textContent=pref==='system'?'System appearance':`${pref[0].toUpperCase()+pref.slice(1)} appearance`;
     $$('#theme-choice button').forEach(b=>b.classList.toggle('selected',b.dataset.theme===pref));
     if($('#hide-setting'))$('#hide-setting').checked=!!state.settings.hideBalances;
   }
