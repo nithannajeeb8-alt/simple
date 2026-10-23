@@ -1,6 +1,0 @@
-PocketWise v3.0.0 deployment
-
-Upload the contents of this folder to the existing PocketWise GitHub Pages path.
-Do not change the site's base path or localStorage keys.
-Before replacing the live files, export a full PocketWise backup from Settings/Profile.
-The service-worker shell cache is versioned as pocketwise-shell-v3.0.0.
