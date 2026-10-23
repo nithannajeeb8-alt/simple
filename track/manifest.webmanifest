@@ -1,9 +1,0 @@
-{
-  "name": "Pocketwise — Private Finance",
-  "short_name": "Pocketwise",
-  "start_url": "./",
-  "display": "standalone",
-  "background_color": "#0b0a16",
-  "theme_color": "#0b0a16",
-  "description": "A private, local-first personal finance manager."
-}
