@@ -1,0 +1,1322 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#103b2d">
+  <title>Pocketwise · Tactile Retro-Modern Money Console</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.2/font/bootstrap-icons.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800&family=JetBrains+Mono:wght@500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+    :root {
+      color-scheme: light;
+      --bg: #f3efe6;
+      --surface: #fffdf8;
+      --surface-2: #eae4d7;
+      --surface-3: #ded7c6;
+      --ink: #141815;
+      --muted: #5a625b;
+      --subtle: #848d85;
+      --line: #141815;
+      --line-soft: #cfc8b6;
+      --green: #148556;
+      --green-deep: #0b5c39;
+      --green-soft: #d7f4e4;
+      --red: #d94336;
+      --red-soft: #ffe2de;
+      --blue: #2d5be3;
+      --blue-soft: #dfe8ff;
+      --amber: #d47a00;
+      --amber-soft: #fff0cf;
+      --shadow: 4px 4px 0px #141815;
+      --shadow-sm: 2px 2px 0px #141815;
+      --shadow-lg: 8px 8px 0px #141815;
+      --radius: 18px;
+      --sidebar: 262px;
+      --font: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+      --display: 'Fraunces', Georgia, serif;
+      --mono: 'JetBrains Mono', ui-monospace, monospace;
+    }
+
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #0d110e;
+      --surface: #151b17;
+      --surface-2: #1d2520;
+      --surface-3: #26312a;
+      --ink: #f2f5f0;
+      --muted: #9aa69c;
+      --subtle: #6e7a70;
+      --line: #3b4d41;
+      --line-soft: #26312a;
+      --green: #38e091;
+      --green-deep: #6cf0b0;
+      --green-soft: #143526;
+      --red: #ff6e61;
+      --red-soft: #3b1c1a;
+      --blue: #6e9bff;
+      --blue-soft: #1b2847;
+      --amber: #ffb545;
+      --amber-soft: #3a2a11;
+      --shadow: 4px 4px 0px #040604;
+      --shadow-sm: 2px 2px 0px #040604;
+      --shadow-lg: 8px 8px 0px #040604;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background-color: var(--bg);
+      background-image: radial-gradient(color-mix(in srgb, var(--ink) 12%, transparent) 1px, transparent 1px);
+      background-size: 18px 18px;
+      color: var(--ink);
+      font-family: var(--font);
+      font-size: 15px;
+      line-height: 1.45;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    button, input, select, textarea {
+      font: inherit;
+      font-size: 15px;
+      max-width: 100%;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* CLICKY MECHANICAL KEYCAP PHYSICS */
+    button {
+      cursor: pointer;
+      min-height: 44px;
+      user-select: none;
+      transition: transform 0.06s cubic-bezier(0.2, 0.9, 0.2, 1), box-shadow 0.06s cubic-bezier(0.2, 0.9, 0.2, 1), background-color 0.12s ease;
+    }
+    button:active:not(:disabled),
+    .quick-action:active,
+    .filter-pill:active,
+    .activity-chip:active {
+      transform: translate(2px, 2px) !important;
+      box-shadow: 0px 0px 0px var(--line) !important;
+    }
+
+    [data-money], .mono-num, .balance-number, .money-stats strong, .budget-numbers strong, .metric-card strong, .transaction-amount strong, .entity-value {
+      font-family: var(--mono);
+      font-variant-numeric: tabular-nums lining-nums;
+    }
+
+    /* SIDEBAR CONSOLE */
+    .sidebar {
+      position: fixed;
+      inset: 0 auto 0 0;
+      width: var(--sidebar);
+      padding: 22px 18px;
+      background: var(--surface);
+      border-right: 2px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      z-index: 30;
+    }
+    .brand {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      text-decoration: none;
+      color: var(--ink);
+      padding: 11px 12px;
+      margin-bottom: 24px;
+      background: var(--surface-2);
+      border: 2px solid var(--line);
+      border-radius: 14px;
+      box-shadow: var(--shadow-sm);
+    }
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      background: #103b2d;
+      color: #b9f3d2;
+      border: 2px solid var(--line);
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      flex: none;
+    }
+    .brand strong { display: block; font-family: var(--display); font-size: 18px; font-weight: 800; letter-spacing: -0.4px; }
+    .brand small { display: block; font-family: var(--mono); font-size: 9px; font-weight: 700; color: var(--muted); letter-spacing: 0.08em; margin-top: 2px; }
+
+    .side-label, .section-kicker, .eyebrow {
+      font-family: var(--mono);
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    .side-label { padding: 0 10px; margin-bottom: 10px; }
+
+    .nav-list { display: flex; flex-direction: column; gap: 8px; }
+    .nav-item {
+      width: 100%;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 14px;
+      border: 2px solid transparent;
+      border-radius: 12px;
+      background: transparent;
+      color: var(--muted);
+      text-align: left;
+      font-weight: 700;
+    }
+    .nav-item:hover { background: var(--surface-2); color: var(--ink); border-color: var(--line); }
+    .nav-item.active {
+      background: var(--green);
+      color: #fff;
+      border-color: var(--line);
+      box-shadow: var(--shadow-sm);
+    }
+    html[data-theme="dark"] .nav-item.active { color: #06130c; }
+    .nav-count {
+      margin-left: auto;
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--ink);
+      background: var(--surface-2);
+      border: 1.5px solid var(--line);
+      padding: 2px 7px;
+      border-radius: 6px;
+    }
+
+    .sidebar-bottom { margin-top: auto; }
+    .privacy-mini {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      padding: 11px 12px;
+      background: var(--surface-2);
+      border: 2px solid var(--line);
+      border-radius: 12px;
+    }
+    .privacy-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--green) 28%, transparent);
+      flex: none;
+    }
+    .privacy-mini strong { display: block; font-family: var(--mono); font-size: 10px; }
+    .privacy-mini small { display: block; font-size: 11px; color: var(--muted); }
+
+    .profile-chip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      border: 2px solid var(--line);
+      border-radius: 14px;
+      padding: 9px 11px;
+      background: var(--surface);
+      color: var(--ink);
+      box-shadow: var(--shadow-sm);
+      text-align: left;
+    }
+    .avatar {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      border: 2px solid var(--line);
+      background: #148556;
+      color: #fff;
+      font-family: var(--mono);
+      font-weight: 800;
+      flex: none;
+    }
+    .profile-copy { flex: 1; min-width: 0; }
+    .profile-copy strong { display: block; font-size: 12px; }
+    .profile-copy small { display: block; font-family: var(--mono); font-size: 10px; color: var(--muted); }
+
+    /* MAIN DECK */
+    .main-content {
+      margin-left: var(--sidebar);
+      padding: 26px clamp(18px, 3vw, 42px) 60px;
+      max-width: 1640px;
+    }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 2px dashed var(--line-soft);
+    }
+    .page-heading h1 {
+      font-family: var(--display);
+      font-size: clamp(26px, 2.6vw, 36px);
+      letter-spacing: -0.8px;
+      margin: 5px 0;
+      font-weight: 800;
+    }
+    .page-heading p { margin: 0; color: var(--muted); font-size: 14px; font-weight: 500; }
+    .top-actions { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+
+    /* KEYCAP BUTTONS */
+    .icon-button, .round-subtle {
+      display: inline-grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      border: 2px solid var(--line);
+      background: var(--surface);
+      border-radius: 12px;
+      color: var(--ink);
+      box-shadow: var(--shadow-sm);
+    }
+    .primary-button, .secondary-button, .soft-button, .danger-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border-radius: 12px;
+      padding: 10px 16px;
+      min-height: 44px;
+      font-weight: 700;
+      font-size: 13px;
+      border: 2px solid var(--line);
+      box-shadow: var(--shadow-sm);
+      white-space: nowrap;
+    }
+    .primary-button { background: var(--green); color: #fff; }
+    html[data-theme="dark"] .primary-button { color: #06130c; }
+    .secondary-button { background: var(--surface); color: var(--ink); }
+    .soft-button { background: var(--green-soft); color: var(--green-deep); }
+    .danger-button { background: var(--red-soft); color: var(--red); }
+    .full-width { width: 100%; }
+    .text-button {
+      border: 0;
+      background: transparent;
+      color: var(--green-deep);
+      font-family: var(--mono);
+      font-weight: 800;
+      font-size: 11px;
+      padding: 6px 8px;
+      text-transform: uppercase;
+    }
+
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* BENTO CARDS */
+    .card {
+      background: var(--surface);
+      border: 2px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      min-width: 0;
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(300px, 1fr);
+      gap: 18px;
+    }
+    .card-topline, .row-between, .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .section-header { margin-bottom: 14px; }
+    .section-header h2 {
+      font-family: var(--display);
+      font-size: 20px;
+      margin: 4px 0 0;
+      font-weight: 800;
+    }
+    .balance-number {
+      font-size: clamp(32px, 3.3vw, 44px);
+      font-weight: 800;
+      letter-spacing: -1.5px;
+      margin-top: 8px;
+    }
+    .radial-area { width: min(100%, 440px); margin: 10px auto 0; text-align: center; }
+    .radial-area svg { width: 100%; height: auto; overflow: visible; }
+    .arc-track, .arc-income, .arc-expense {
+      fill: none;
+      stroke-width: 18;
+      stroke-linecap: round;
+      transition: stroke-dasharray 0.5s ease;
+    }
+    .arc-track { stroke: var(--surface-3); }
+    .arc-income { stroke: var(--green); stroke-dasharray: 0 100; }
+    .arc-expense { stroke: var(--red); stroke-dasharray: 0 100; }
+    .arc-legend {
+      display: flex;
+      justify-content: center;
+      gap: 18px;
+      margin: 6px 0 14px;
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .legend-dot { display: inline-block; width: 9px; height: 9px; border-radius: 3px; border: 1.5px solid var(--line); margin-right: 5px; }
+
+    .money-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+    .money-stats > div {
+      padding: 11px 12px;
+      background: var(--surface-2);
+      border: 1.5px solid var(--line);
+      border-radius: 12px;
+    }
+    .money-stats span { display: block; font-family: var(--mono); font-size: 10px; color: var(--muted); font-weight: 700; text-transform: uppercase; }
+    .money-stats strong { font-size: 18px; margin-top: 3px; display: block; }
+
+    .spendable-summary {
+      padding: 16px;
+      background: var(--green-soft);
+      border: 2px solid var(--line);
+      border-radius: 14px;
+      box-shadow: var(--shadow-sm);
+      margin: 14px 0;
+    }
+    .spendable-summary > span { display: block; font-family: var(--mono); font-size: 10px; font-weight: 800; color: var(--green-deep); }
+    .spendable-summary > strong { display: block; font-size: 28px; font-weight: 800; margin: 4px 0; }
+    .spendable-summary > small { font-size: 11px; color: var(--muted); font-weight: 600; }
+
+    .progress-track {
+      height: 10px;
+      background: var(--surface-2);
+      border: 1.5px solid var(--line);
+      border-radius: 99px;
+      overflow: hidden;
+      margin: 8px 0;
+    }
+    .progress-track span { display: block; height: 100%; width: 0; background: var(--green); transition: width 0.3s ease; }
+
+    /* QUICK ACTION KEYS */
+    .quick-actions-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin: 18px 0;
+    }
+    .quick-action {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 13px;
+      border-radius: 16px;
+      background: var(--surface);
+      border: 2px solid var(--line);
+      box-shadow: var(--shadow);
+      color: var(--ink);
+      text-align: left;
+    }
+    .quick-icon {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      border: 2px solid var(--line);
+      font-size: 18px;
+      flex: none;
+    }
+    .expense-bg { background: var(--red-soft); color: var(--red); }
+    .income-bg { background: var(--green-soft); color: var(--green-deep); }
+    .transfer-bg { background: var(--blue-soft); color: var(--blue); }
+    .debt-bg { background: var(--amber-soft); color: var(--amber); }
+    .quick-action strong { display: block; font-size: 14px; }
+    .quick-action small { display: block; font-family: var(--mono); font-size: 10px; color: var(--muted); text-transform: uppercase; }
+
+    .home-lower-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(290px, 0.9fr);
+      gap: 18px;
+      margin-top: 18px;
+    }
+    .chart-canvas {
+      width: 100%;
+      height: 200px;
+      display: block;
+      background: var(--surface-2);
+      border: 1.5px solid var(--line);
+      border-radius: 12px;
+      margin-top: 10px;
+    }
+
+    /* TRANSACTION TAPE */
+    .transaction-list { display: flex; flex-direction: column; }
+    .transaction-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 8px;
+      border-bottom: 1.5px dashed var(--line-soft);
+      cursor: pointer;
+      border-radius: 10px;
+    }
+    .transaction-row:hover { background: var(--surface-2); }
+    .transaction-row:last-child { border-bottom: 0; }
+    .transaction-icon {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      border: 2px solid var(--line);
+      background: var(--surface-2);
+      flex: none;
+    }
+    .transaction-main { flex: 1; min-width: 0; }
+    .transaction-main strong { display: block; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .transaction-main small { display: block; font-family: var(--mono); font-size: 11px; color: var(--muted); }
+    .transaction-amount { text-align: right; }
+    .transaction-amount strong { display: block; font-size: 14px; }
+    .transaction-amount small { font-family: var(--mono); font-size: 10px; color: var(--muted); }
+    .amount-positive { color: var(--green); }
+
+    /* SEARCH & PILLS */
+    .page-tools { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 0 13px;
+      background: var(--surface);
+      border: 2px solid var(--line);
+      border-radius: 12px;
+      box-shadow: var(--shadow-sm);
+      flex: 1;
+    }
+    .search-box input { border: 0; background: transparent; outline: none; width: 100%; font-family: var(--mono); font-size: 13px; color: var(--ink); }
+    .filter-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+    .filter-pill {
+      border: 2px solid var(--line);
+      background: var(--surface);
+      color: var(--ink);
+      border-radius: 10px;
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 7px 12px;
+      box-shadow: var(--shadow-sm);
+    }
+    .filter-pill.active { background: var(--green); color: #fff; }
+    html[data-theme="dark"] .filter-pill.active { color: #06130c; }
+
+    /* INSIGHTS & CALENDAR */
+    .insight-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 18px; }
+    .metric-card strong { display: block; font-size: 22px; margin: 6px 0 4px; }
+    .insights-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    .insight-wide { grid-column: 1 / -1; }
+    .forecast-calendar { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; margin-top: 12px; }
+    .forecast-weekday { text-align: center; font-family: var(--mono); font-size: 10px; font-weight: 800; color: var(--muted); }
+    .forecast-day {
+      min-height: 40px;
+      border: 1.5px solid var(--line-soft);
+      border-radius: 9px;
+      background: var(--surface-2);
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .forecast-day.is-today { border: 2px solid var(--green); box-shadow: var(--shadow-sm); }
+    .forecast-day.has-events { background: var(--green-soft); border-color: var(--line); }
+
+    /* SETTINGS */
+    .settings-card { margin-bottom: 16px; }
+    .setting-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 13px 0;
+      border-bottom: 1.5px dashed var(--line-soft);
+    }
+    .setting-row:last-child { border-bottom: 0; }
+
+    /* MODAL DIALOG */
+    dialog.app-modal {
+      padding: 0;
+      border: 2px solid var(--line);
+      border-radius: 20px;
+      background: var(--surface);
+      color: var(--ink);
+      width: min(540px, calc(100% - 24px));
+      box-shadow: var(--shadow-lg);
+    }
+    dialog.app-modal::backdrop { background: rgba(12, 16, 13, 0.58); backdrop-filter: blur(3px); }
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      background: var(--surface-2);
+      border-bottom: 2px solid var(--line);
+    }
+    .modal-head h2 { font-family: var(--display); font-size: 21px; margin: 4px 0 0; }
+    .modal-body { padding: 20px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-field { display: flex; flex-direction: column; gap: 5px; }
+    .form-field.full { grid-column: 1 / -1; }
+    .form-field label { font-family: var(--mono); font-size: 10px; font-weight: 800; color: var(--muted); text-transform: uppercase; }
+    .form-field input, .form-field select, .form-field textarea {
+      padding: 10px 12px;
+      background: var(--surface-2);
+      border: 2px solid var(--line);
+      border-radius: 10px;
+      color: var(--ink);
+    }
+    .amount-input {
+      font-family: var(--mono) !important;
+      font-size: 32px !important;
+      font-weight: 800;
+      border: 0 !important;
+      border-bottom: 2px solid var(--line) !important;
+      border-radius: 0 !important;
+      background: transparent !important;
+      padding: 6px 0 !important;
+    }
+
+    /* TOASTS */
+    .toast-region { position: fixed; right: 20px; bottom: 24px; z-index: 100; display: flex; flex-direction: column; gap: 8px; }
+    .toast {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 15px;
+      background: var(--ink);
+      color: var(--surface);
+      border: 2px solid var(--line);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    /* MOBILE TABBAR */
+    .mobile-tabbar { display: none; }
+    @media (max-width: 760px) {
+      .sidebar { display: none; }
+      .main-content { margin: 0; padding: 16px 14px 96px; }
+      .hero-grid, .home-lower-grid, .insights-grid, .form-grid { grid-template-columns: 1fr; }
+      .quick-actions-row, .insight-metrics { grid-template-columns: repeat(2, 1fr); }
+      .mobile-tabbar {
+        position: fixed;
+        left: 0; right: 0; bottom: 0;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        padding: 8px;
+        background: var(--surface);
+        border-top: 2px solid var(--line);
+        z-index: 40;
+      }
+      .mobile-tab { border: 0; background: transparent; color: var(--muted); font-family: var(--mono); font-size: 10px; font-weight: 800; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+      .mobile-tab.active { color: var(--green-deep); }
+      .mobile-add { width: 50px; height: 50px; border-radius: 14px; border: 2px solid var(--line); background: var(--green); color: #fff; font-size: 22px; box-shadow: var(--shadow-sm); transform: translateY(-6px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <a class="brand" href="#home">
+        <span class="brand-mark"><i class="bi bi-wallet2" style="font-size:20px"></i></span>
+        <span><strong>Pocketwise</strong><small>TACTILE LEDGER v3.0</small></span>
+      </a>
+      <div class="side-label">CONSOLE DECK</div>
+      <nav class="nav-list">
+        <button class="nav-item active" data-page="home"><i class="bi bi-house-door"></i><span>Deck · Home</span></button>
+        <button class="nav-item" data-page="activity"><i class="bi bi-arrow-left-right"></i><span>Tape · Activity</span><span class="nav-count" id="nav-tx-count">0</span></button>
+        <button class="nav-item" data-page="insights"><i class="bi bi-bar-chart-line"></i><span>Radar · Insights</span></button>
+        <button class="nav-item" data-page="settings"><i class="bi bi-sliders"></i><span>Rig · Settings</span></button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="privacy-mini"><span class="privacy-dot"></span><div><strong>ZERO-SERVER VAULT</strong><small>100% On-Device Memory</small></div></div>
+        <button class="profile-chip" id="theme-toggle">
+          <span class="avatar" id="sidebar-avatar">O</span>
+          <span class="profile-copy"><strong id="sidebar-name">Operator Deck</strong><small id="theme-label">Daylight CRT</small></span>
+          <i class="bi bi-moon-stars"></i>
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN WORKSPACE -->
+    <main class="main-content">
+      <header class="topbar">
+        <div class="page-heading">
+          <span class="eyebrow">LIVE TELEMETRY · MECHANICAL AUDIO ARMED</span>
+          <h1 id="page-title">Ready on deck.</h1>
+          <p id="page-subtitle">Crisp numbers. Clicky switches. Zero cloud noise.</p>
+        </div>
+        <div class="top-actions">
+          <button class="icon-button" id="sound-btn" title="Toggle Mechanical Click Audio"><i class="bi bi-volume-up" id="sound-icon"></i></button>
+          <button class="icon-button" id="stealth-btn" title="Stealth Mode (Hide Balances)"><i class="bi bi-eye"></i></button>
+          <button class="secondary-button" id="sms-import-btn"><i class="bi bi-qr-code-scan"></i> Scan / Paste SMS</button>
+          <button class="primary-button" id="punch-btn"><i class="bi bi-plus-lg"></i> Punch Entry</button>
+        </div>
+      </header>
+
+      <!-- PAGE 1: HOME DECK -->
+      <section class="page active" id="page-home">
+        <div class="hero-grid">
+          <article class="card">
+            <div class="card-topline">
+              <span class="section-kicker">01 // NET LIQUIDITY</span>
+              <span class="section-kicker" id="days-left-badge">CYCLE ACTIVE</span>
+            </div>
+            <div class="balance-number" data-money="balance">₹0</div>
+            <div class="radial-area">
+              <svg viewBox="0 0 360 175">
+                <path class="arc-track" d="M 35 150 A 145 145 0 0 1 325 150" pathLength="100"/>
+                <path class="arc-income" id="arc-inc" d="M 35 150 A 145 145 0 0 1 325 150" pathLength="100"/>
+                <path class="arc-expense" id="arc-exp" d="M 35 150 A 145 145 0 0 1 325 150" pathLength="100"/>
+              </svg>
+              <div class="arc-legend">
+                <span><i class="legend-dot" style="background:var(--green)"></i>INFLOW <strong data-money="income">₹0</strong></span>
+                <span><i class="legend-dot" style="background:var(--red)"></i>BURN <strong data-money="expense">₹0</strong></span>
+              </div>
+            </div>
+            <div class="money-stats">
+              <div><span>Net Delta (Cycle)</span><strong data-money="net">₹0</strong></div>
+              <div><span>Safe Dry Powder</span><strong data-money="safe">₹0</strong></div>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card-topline">
+              <span class="section-kicker">02 // BURN GOVERNOR</span>
+              <button class="text-button" id="tune-budget-btn">Tune Cap ↗</button>
+            </div>
+            <div class="spendable-summary">
+              <span>CLEARED FOR DEPLOYMENT</span>
+              <strong data-money="safe">₹0</strong>
+              <small>Remaining monthly burn allowance before tripwire</small>
+            </div>
+            <div class="row-between">
+              <span class="section-kicker">MONTHLY CAP</span>
+              <strong class="mono-num" data-money="budget">₹18,000</strong>
+            </div>
+            <div class="progress-track"><span id="budget-bar"></span></div>
+            <div class="row-between" style="font-family:var(--mono);font-size:11px;color:var(--muted)">
+              <span id="budget-spent-label">0% burned</span>
+              <span id="budget-status-label">NOMINAL</span>
+            </div>
+            <div style="margin-top:16px">
+              <button class="soft-button full-width" id="quick-sms-demo-btn"><i class="bi bi-lightning-charge"></i> Test Instant SBI SMS Parser</button>
+            </div>
+          </article>
+        </div>
+
+        <div class="quick-actions-row">
+          <button class="quick-action" data-quick="expense"><span class="quick-icon expense-bg">↙</span><span><strong>Log Spend</strong><small>Capital Out</small></span></button>
+          <button class="quick-action" data-quick="income"><span class="quick-icon income-bg">↗</span><span><strong>Log Drop</strong><small>Capital In</small></span></button>
+          <button class="quick-action" data-quick="transfer"><span class="quick-icon transfer-bg">⇄</span><span><strong>Shift Funds</strong><small>Vault to Vault</small></span></button>
+          <button class="quick-action" id="open-iou-btn"><span class="quick-icon debt-bg">⚑</span><span><strong>IOU Street Tab</strong><small>Lent &amp; Borrowed</small></span></button>
+        </div>
+
+        <div class="home-lower-grid">
+          <article class="card">
+            <div class="section-header">
+              <div><span class="section-kicker">03 // OSCILLOSCOPE</span><h2>7-Day Burn Velocity</h2></div>
+              <strong class="mono-num" id="week-burn-total">₹0</strong>
+            </div>
+            <canvas id="home-chart" class="chart-canvas" height="200"></canvas>
+          </article>
+
+          <article class="card">
+            <div class="section-header">
+              <div><span class="section-kicker">04 // FRESH PUNCHES</span><h2>Recent Tape</h2></div>
+              <button class="text-button" data-page="activity">Full Tape →</button>
+            </div>
+            <div class="transaction-list" id="recent-list"></div>
+          </article>
+        </div>
+      </section>
+
+      <!-- PAGE 2: ACTIVITY TAPE -->
+      <section class="page" id="page-activity">
+        <div class="page-tools">
+          <div class="search-box">
+            <i class="bi bi-search"></i>
+            <input id="search-input" type="search" placeholder="Natural query: 'over ₹300', 'food', 'UPI', 'income'…">
+          </div>
+          <button class="secondary-button" id="dump-csv-btn"><i class="bi bi-download"></i> Dump CSV</button>
+        </div>
+        <div class="filter-row" id="filter-pills">
+          <button class="filter-pill active" data-filter="all">All Tape</button>
+          <button class="filter-pill" data-filter="expense">Outflows</button>
+          <button class="filter-pill" data-filter="income">Inflows</button>
+          <button class="filter-pill" data-filter="transfer">Vault Shifts</button>
+        </div>
+        <article class="card">
+          <div class="section-header">
+            <div><span class="section-kicker">CHRONOLOGICAL ARCHIVE</span><h2>Master Ledger Tape</h2></div>
+            <small class="section-kicker">Click any row for Thermal Receipt</small>
+          </div>
+          <div class="transaction-list" id="activity-list"></div>
+        </article>
+      </section>
+
+      <!-- PAGE 3: INSIGHTS & PLANNING RADAR -->
+      <section class="page" id="page-insights">
+        <div class="insight-metrics">
+          <article class="card metric-card"><span class="section-kicker">GROSS INFLOW</span><strong data-money="income">₹0</strong><small class="muted">Captured this cycle</small></article>
+          <article class="card metric-card"><span class="section-kicker">GROSS BURN</span><strong data-money="expense">₹0</strong><small class="muted">Deployed this cycle</small></article>
+          <article class="card metric-card"><span class="section-kicker">NET VELOCITY</span><strong data-money="net">₹0</strong><small class="muted">Inflow minus burn</small></article>
+          <article class="card metric-card"><span class="section-kicker">ACTIVE IOUs</span><strong id="iou-net-metric" class="mono-num">₹0</strong><small class="muted">Net street tab</small></article>
+        </div>
+
+        <div class="insights-grid">
+          <article class="card insight-wide">
+            <div class="section-header">
+              <div><span class="section-kicker">FORWARD RADAR</span><h2>Cash-Flow Calendar (Current Cycle)</h2></div>
+              <span class="section-kicker">Green = Active Days</span>
+            </div>
+            <div class="forecast-calendar" id="calendar-grid"></div>
+          </article>
+
+          <article class="card">
+            <div class="section-header"><div><span class="section-kicker">CHANNEL ALLOCATION</span><h2>Top Burn Channels</h2></div></div>
+            <div id="channel-breakdown"></div>
+          </article>
+
+          <article class="card">
+            <div class="section-header"><div><span class="section-kicker">AUTO-ROUTER</span><h2>Smart Keyword Rules</h2></div></div>
+            <p class="muted" style="font-size:13px;margin-top:0">Automatically tags new punches when the memo matches your keyword.</p>
+            <div id="rules-list" style="margin-bottom:12px"></div>
+            <button class="soft-button full-width" id="add-rule-btn">+ Mint Smart Rule</button>
+          </article>
+        </div>
+      </section>
+
+      <!-- PAGE 4: SETTINGS RIG -->
+      <section class="page" id="page-settings">
+        <article class="card settings-card">
+          <div class="section-header"><div><span class="section-kicker">CHASSIS &amp; ACOUSTICS</span><h2>Hardware Switchboard</h2></div></div>
+          <div class="setting-row">
+            <div><strong>Display CRT Mode</strong><div class="muted" style="font-size:12px">Toggle between Warm Paper Daylight and Phosphor Obsidian Dark</div></div>
+            <button class="secondary-button" id="settings-theme-btn">Flip Theme</button>
+          </div>
+          <div class="setting-row">
+            <div><strong>Mechanical Keycap Synthesizer</strong><div class="muted" style="font-size:12px">Web Audio tactile click on every button &amp; switch</div></div>
+            <button class="secondary-button" id="settings-sound-btn">Sound: ON</button>
+          </div>
+          <div class="setting-row">
+            <div><strong>Mint JSON Vault Cartridge</strong><div class="muted" style="font-size:12px">Export your complete local ledger to a portable JSON file</div></div>
+            <button class="primary-button" id="export-json-btn"><i class="bi bi-download"></i> Mint Cartridge</button>
+          </div>
+          <div class="setting-row">
+            <div><strong>Format Local Workspace</strong><div class="muted" style="font-size:12px">Reset demo records and start with a blank tape</div></div>
+            <button class="danger-button" id="reset-vault-btn">Format Vault</button>
+          </div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <!-- MOBILE BOTTOM BAR -->
+  <nav class="mobile-tabbar">
+    <button class="mobile-tab active" data-page="home"><i class="bi bi-house-door" style="font-size:18px"></i><span>Deck</span></button>
+    <button class="mobile-tab" data-page="activity"><i class="bi bi-arrow-left-right" style="font-size:18px"></i><span>Tape</span></button>
+    <button class="mobile-add" id="mobile-punch-btn">+</button>
+    <button class="mobile-tab" data-page="insights"><i class="bi bi-bar-chart-line" style="font-size:18px"></i><span>Radar</span></button>
+    <button class="mobile-tab" data-page="settings"><i class="bi bi-sliders" style="font-size:18px"></i><span>Rig</span></button>
+  </nav>
+
+  <!-- UNIVERSAL MODAL DIALOG -->
+  <dialog class="app-modal" id="app-modal">
+    <div class="modal-head">
+      <div><span class="section-kicker" id="modal-kicker">CONSOLE INPUT</span><h2 id="modal-title">Punch Entry</h2></div>
+      <button class="icon-button" id="modal-close"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </dialog>
+
+  <div class="toast-region" id="toast-region"></div>
+
+  <script>
+    (() => {
+      'use strict';
+      const STORAGE_KEY = 'pocketwise-singlefile-v3';
+      const today = () => new Date().toISOString().slice(0, 10);
+
+      const defaultState = () => ({
+        theme: 'light',
+        sound: true,
+        stealth: false,
+        budget: 18000,
+        rules: [
+          { keyword: 'swiggy', channel: 'Food & Cafe' },
+          { keyword: 'uber', channel: 'Transport' }
+        ],
+        ious: [
+          { id: 'd1', person: 'Safwan K', dir: 'lent', amount: 1500, note: 'Concert tickets' },
+          { id: 'd2', person: 'Aarav', dir: 'borrowed', amount: 900, note: 'Router split' }
+        ],
+        transactions: [
+          { id: 't1', type: 'income', amount: 32000, date: today(), channel: 'Salary Drop', vault: 'Bank / UPI', note: 'Monthly credit drop' },
+          { id: 't2', type: 'expense', amount: 440, date: today(), channel: 'Food & Cafe', vault: 'Bank / UPI', note: 'Filter coffee & roast dosa' },
+          { id: 't3', type: 'expense', amount: 1250, date: today(), channel: 'Groceries', vault: 'Bank / UPI', note: 'Fresh market run' },
+          { id: 't4', type: 'expense', amount: 310, date: today(), channel: 'Transport', vault: 'Cash Wallet', note: 'Metro & auto hop' }
+        ]
+      });
+
+      let state = defaultState();
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) state = { ...defaultState(), ...JSON.parse(saved) };
+      } catch (_) {}
+
+      const save = () => {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (_) {}
+      };
+
+      // CLICKY HARDWARE SYNTHESIZER (WEB AUDIO API)
+      let audioCtx = null;
+      function playClick(type = 'tap') {
+        if (!state.sound) return;
+        try {
+          const Ctx = window.AudioContext || window.webkitAudioContext;
+          if (!Ctx) return;
+          if (!audioCtx) audioCtx = new Ctx();
+          if (audioCtx.state === 'suspended') audioCtx.resume();
+          const now = audioCtx.currentTime;
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          if (type === 'coin') {
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(987.77, now);
+            osc.frequency.setValueAtTime(1318.51, now + 0.05);
+            gain.gain.setValueAtTime(0.09, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.17);
+            osc.start(now); osc.stop(now + 0.17);
+          } else {
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(460, now);
+            osc.frequency.exponentialRampToValueAtTime(130, now + 0.025);
+            gain.gain.setValueAtTime(0.07, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.028);
+            osc.start(now); osc.stop(now + 0.028);
+          }
+        } catch (_) {}
+      }
+
+      document.addEventListener('pointerdown', (e) => {
+        if (e.target.closest('button, .quick-action, .filter-pill')) playClick('tap');
+      }, { passive: true });
+
+      const money = (val) => {
+        if (state.stealth) return '₹••••';
+        const n = Number(val) || 0;
+        return (n < 0 ? '-₹' : '₹') + Math.abs(n).toLocaleString('en-IN');
+      };
+
+      function toast(msg) {
+        const reg = document.getElementById('toast-region');
+        const el = document.createElement('div');
+        el.className = 'toast';
+        el.innerHTML = `<i class="bi bi-terminal" style="color:var(--green)"></i><span>${msg}</span>`;
+        reg.appendChild(el);
+        setTimeout(() => el.remove(), 3600);
+      }
+
+      // MODAL CONTROLLER
+      const modal = document.getElementById('app-modal');
+      function openModal(kicker, title, html) {
+        document.getElementById('modal-kicker').textContent = kicker;
+        document.getElementById('modal-title').textContent = title;
+        document.getElementById('modal-body').innerHTML = html;
+        if (!modal.open) modal.showModal();
+      }
+      function closeModal() { if (modal.open) modal.close(); }
+      document.getElementById('modal-close').addEventListener('click', closeModal);
+
+      // PUNCH TRANSACTION MODAL
+      function openPunchModal(initialType = 'expense') {
+        openModal('CONSOLE INPUT', 'Punch Ledger Entry', `
+          <form id="punch-form" class="form-grid">
+            <div class="form-field full">
+              <label>Amount (INR)</label>
+              <input class="amount-input" name="amount" type="number" step="0.01" required placeholder="0" autofocus>
+            </div>
+            <div class="form-field">
+              <label>Direction</label>
+              <select name="type">
+                <option value="expense" ${initialType==='expense'?'selected':''}>Outflow (Expense)</option>
+                <option value="income" ${initialType==='income'?'selected':''}>Inflow (Income)</option>
+                <option value="transfer" ${initialType==='transfer'?'selected':''}>Vault Shift (Transfer)</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Channel Tag</label>
+              <select name="channel">
+                <option>Food &amp; Cafe</option>
+                <option>Groceries</option>
+                <option>Transport</option>
+                <option>Bills &amp; Utilities</option>
+                <option>Shopping</option>
+                <option>Salary Drop</option>
+                <option>Freelance</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Vault</label>
+              <select name="vault"><option>Bank / UPI</option><option>Cash Wallet</option></select>
+            </div>
+            <div class="form-field">
+              <label>Date</label>
+              <input name="date" type="date" value="${today()}">
+            </div>
+            <div class="form-field full">
+              <label>Memo / Counterparty (Smart Rules auto-check this)</label>
+              <input name="note" placeholder="e.g. Filter coffee, Uber ride, Swiggy…">
+            </div>
+            <div class="form-field full" style="margin-top:8px">
+              <button type="submit" class="primary-button full-width">Commit to Tape ✓</button>
+            </div>
+          </form>
+        `);
+        document.getElementById('punch-form').addEventListener('submit', (e) => {
+          e.preventDefault();
+          const fd = new FormData(e.target);
+          const amount = Number(fd.get('amount'));
+          if (!amount || amount <= 0) return;
+          let channel = String(fd.get('channel'));
+          const note = String(fd.get('note') || '').trim();
+          const matched = state.rules.find((r) => note.toLowerCase().includes(r.keyword.toLowerCase()));
+          if (matched) channel = matched.channel;
+
+          state.transactions.unshift({
+            id: 'tx-' + Date.now(),
+            type: String(fd.get('type')),
+            amount,
+            channel,
+            vault: String(fd.get('vault')),
+            date: String(fd.get('date') || today()),
+            note: note || channel
+          });
+          playClick('coin');
+          save();
+          renderAll();
+          closeModal();
+          toast(matched ? `Auto-routed via rule "${matched.keyword}" → ${channel}` : 'Punched to ledger tape');
+        });
+      }
+
+      // BANK SMS PARSER MODAL
+      function openSmsParserModal(prefill = '') {
+        openModal('SMART TELEMETRY PARSER', 'Parse Bank / UPI SMS', `
+          <div class="form-grid">
+            <div class="form-field full">
+              <label>Paste Raw Bank or UPI Alert Text</label>
+              <textarea id="sms-raw" rows="4" placeholder="e.g. Dear UPI user A/C X7085 debited by 135.00 on date 08Oct26 trf to SAFWAN K Refno 628122138757">${prefill}</textarea>
+            </div>
+            <div class="form-field full">
+              <button type="button" class="primary-button full-width" id="parse-sms-exec">Extract &amp; Punch →</button>
+            </div>
+          </div>
+        `);
+        document.getElementById('parse-sms-exec').addEventListener('click', () => {
+          const raw = document.getElementById('sms-raw').value.trim();
+          const m = raw.match(/\b(?:debited|credited|paid|sent|received|by|rs\.?|inr|₹)\s*(?:by\s*)?(?:rs\.?|inr|₹)?\s*(\d+(?:,\d+)*(?:\.\d{1,2})?)/i);
+          if (!m) { toast('No clear INR figure detected in text'); return; }
+          const amt = Number(m[1].replace(/,/g, ''));
+          const isIncome = /\b(?:credited|received)\b/i.test(raw) && !/\bdebited\b/i.test(raw);
+          const partyMatch = raw.match(/\b(?:trf to|paid to|to|from)\s+([A-Za-z0-9\s]{2,24}?)(?=\s+(?:on|ref|if|$))/i);
+          const party = partyMatch ? partyMatch[1].trim() : 'UPI Counterparty';
+          state.transactions.unshift({
+            id: 'tx-' + Date.now(),
+            type: isIncome ? 'income' : 'expense',
+            amount: amt,
+            channel: isIncome ? 'Salary Drop' : 'Food & Cafe',
+            vault: 'Bank / UPI',
+            date: today(),
+            note: `${isIncome ? 'From' : 'To'} ${party} (SMS Import)`
+          });
+          playClick('coin');
+          save();
+          renderAll();
+          closeModal();
+          toast(`Parsed ${money(amt)} (${party}) → Committed`);
+        });
+      }
+
+      // THERMAL RECEIPT VOUCHER
+      function openReceiptModal(tx) {
+        openModal('THERMAL VOUCHER', 'Verified Record', `
+          <div style="border:2px solid var(--line);border-radius:14px;padding:18px;background:var(--surface-2);font-family:var(--mono)">
+            <div class="row-between"><strong>POCKETWISE // VOUCHER</strong><span>#${tx.id.slice(-5)}</span></div>
+            <hr style="border:0;border-top:2px dashed var(--line);margin:12px 0">
+            <div style="font-size:28px;font-weight:800;margin:8px 0">${tx.type==='income'?'+':'-'}${money(tx.amount)}</div>
+            <div style="font-size:13px;margin-bottom:12px">${tx.note}</div>
+            <div class="row-between" style="font-size:11px;color:var(--muted)"><span>CHANNEL</span><strong>${tx.channel}</strong></div>
+            <div class="row-between" style="font-size:11px;color:var(--muted);margin-top:6px"><span>VAULT</span><strong>${tx.vault}</strong></div>
+            <div class="row-between" style="font-size:11px;color:var(--muted);margin-top:6px"><span>DATE</span><strong>${tx.date}</strong></div>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:14px">
+            <button type="button" class="danger-button full-width" id="del-tx-btn">Nix Record from Tape</button>
+          </div>
+        `);
+        document.getElementById('del-tx-btn').addEventListener('click', () => {
+          state.transactions = state.transactions.filter((t) => t.id !== tx.id);
+          save();
+          renderAll();
+          closeModal();
+          toast('Record nixed from tape');
+        });
+      }
+
+      // RENDER ENGINE
+      let activeFilter = 'all';
+      function renderAll() {
+        document.documentElement.setAttribute('data-theme', state.theme);
+        document.getElementById('theme-label').textContent = state.theme === 'dark' ? 'Obsidian CRT' : 'Daylight CRT';
+        document.getElementById('settings-sound-btn').textContent = `Sound: ${state.sound ? 'ON' : 'MUTED'}`;
+        document.getElementById('sound-icon').className = state.sound ? 'bi bi-volume-up' : 'bi bi-volume-mute';
+
+        const income = state.transactions.filter((t) => t.type === 'income').reduce((s, t) => s + t.amount, 0);
+        const expense = state.transactions.filter((t) => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+        const balance = 20700 + income - expense;
+        const net = income - expense;
+        const safe = Math.max(0, state.budget - expense);
+
+        document.querySelectorAll('[data-money="balance"]').forEach((el) => { el.textContent = money(balance); });
+        document.querySelectorAll('[data-money="income"]').forEach((el) => { el.textContent = money(income); });
+        document.querySelectorAll('[data-money="expense"]').forEach((el) => { el.textContent = money(expense); });
+        document.querySelectorAll('[data-money="net"]').forEach((el) => { el.textContent = money(net); });
+        document.querySelectorAll('[data-money="safe"]').forEach((el) => { el.textContent = money(safe); });
+        document.querySelectorAll('[data-money="budget"]').forEach((el) => { el.textContent = money(state.budget); });
+
+        const totalFlow = Math.max(1, income + expense);
+        document.getElementById('arc-inc').style.strokeDasharray = `${Math.round((income / totalFlow) * 100)} 100`;
+        document.getElementById('arc-exp').style.strokeDasharray = `${Math.round((expense / totalFlow) * 100)} 100`;
+
+        const pct = Math.min(100, Math.round((expense / Math.max(1, state.budget)) * 100));
+        const bar = document.getElementById('budget-bar');
+        bar.style.width = pct + '%';
+        bar.style.background = pct > 85 ? 'var(--red)' : 'var(--green)';
+        document.getElementById('budget-spent-label').textContent = `${pct}% burned (${money(expense)})`;
+        document.getElementById('budget-status-label').textContent = pct > 85 ? 'HIGH BURN' : 'NOMINAL';
+
+        document.getElementById('nav-tx-count').textContent = state.transactions.length;
+
+        const rowHtml = (tx) => `
+          <div class="transaction-row" data-id="${tx.id}">
+            <span class="transaction-icon">${tx.type === 'income' ? '↗' : tx.type === 'transfer' ? '⇄' : '↙'}</span>
+            <div class="transaction-main">
+              <strong>${tx.note}</strong>
+              <small>${tx.channel} · ${tx.vault}</small>
+            </div>
+            <div class="transaction-amount">
+              <strong class="${tx.type === 'income' ? 'amount-positive' : ''}">${tx.type === 'income' ? '+' : '-'}${money(tx.amount)}</strong>
+              <small>${tx.date}</small>
+            </div>
+          </div>
+        `;
+
+        const recEl = document.getElementById('recent-list');
+        recEl.innerHTML = state.transactions.slice(0, 4).map(rowHtml).join('');
+        recEl.querySelectorAll('.transaction-row').forEach((r) => {
+          r.addEventListener('click', () => openReceiptModal(state.transactions.find((t) => t.id === r.dataset.id)));
+        });
+
+        const q = (document.getElementById('search-input')?.value || '').toLowerCase();
+        const overM = q.match(/over\s*₹?\s*(\d+)/);
+        const filtered = state.transactions.filter((t) => {
+          if (activeFilter !== 'all' && t.type !== activeFilter) return false;
+          if (overM && !(t.amount > Number(overM[1]))) return false;
+          const cleanQ = q.replace(/over\s*₹?\s*\d+/, '').trim();
+          if (cleanQ && !`${t.note} ${t.channel} ${t.vault} ${t.type}`.toLowerCase().includes(cleanQ)) return false;
+          return true;
+        });
+
+        const actEl = document.getElementById('activity-list');
+        actEl.innerHTML = filtered.map(rowHtml).join('') || `<p class="muted">No matching records on tape.</p>`;
+        actEl.querySelectorAll('.transaction-row').forEach((r) => {
+          r.addEventListener('click', () => openReceiptModal(state.transactions.find((t) => t.id === r.dataset.id)));
+        });
+
+        // DRAW 7-DAY CANVAS CHART
+        const canvas = document.getElementById('home-chart');
+        if (canvas && canvas.getContext) {
+          const ctx = canvas.getContext('2d');
+          const w = canvas.width = canvas.clientWidth || 420;
+          const h = canvas.height = 200;
+          ctx.clearRect(0, 0, w, h);
+          const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Today'];
+          const vals = [320, 640, 180, 920, 410, 530, expense];
+          document.getElementById('week-burn-total').textContent = money(vals.reduce((a, b) => a + b, 0));
+          const max = Math.max(1000, ...vals);
+          const step = (w - 32) / days.length;
+          vals.forEach((v, i) => {
+            const bh = Math.max(8, (v / max) * (h - 52));
+            const x = 16 + i * step + step * 0.2;
+            const bw = step * 0.6;
+            ctx.fillStyle = i === 6 ? '#148556' : '#2d5be3';
+            ctx.fillRect(x, h - 28 - bh, bw, bh);
+            ctx.fillStyle = '#6c756d';
+            ctx.font = '700 10px "JetBrains Mono", monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText(days[i], x + bw / 2, h - 10);
+          });
+        }
+
+        // INSIGHTS CALENDAR & CHANNELS
+        const cal = document.getElementById('calendar-grid');
+        if (cal) {
+          const wk = ['M','T','W','T','F','S','S'].map((d) => `<div class="forecast-weekday">${d}</div>`).join('');
+          let cells = wk;
+          const curDay = new Date().getDate();
+          for (let d = 1; d <= 30; d++) {
+            cells += `<div class="forecast-day ${d === curDay ? 'is-today has-events' : ''}">${d}</div>`;
+          }
+          cal.innerHTML = cells;
+        }
+
+        const byChan = {};
+        state.transactions.filter((t) => t.type === 'expense').forEach((t) => {
+          byChan[t.channel] = (byChan[t.channel] || 0) + t.amount;
+        });
+        document.getElementById('channel-breakdown').innerHTML = Object.entries(byChan).map(([k, v]) => `
+          <div style="margin-bottom:10px">
+            <div class="row-between" style="font-size:12px"><strong>${k}</strong><span class="mono-num">${money(v)}</span></div>
+            <div class="progress-track"><span style="width:${Math.min(100, Math.round((v / Math.max(1, expense)) * 100))}%"></span></div>
+          </div>
+        `).join('');
+
+        document.getElementById('rules-list').innerHTML = state.rules.map((r) => `
+          <div class="row-between" style="padding:7px 10px;background:var(--surface-2);border:1.5px solid var(--line);border-radius:9px;margin-bottom:6px;font-family:var(--mono);font-size:11px">
+            <span>"${r.keyword}"</span><strong>→ ${r.channel}</strong>
+          </div>
+        `).join('');
+
+        const iouNet = state.ious.reduce((s, d) => s + (d.dir === 'lent' ? d.amount : -d.amount), 0);
+        document.getElementById('iou-net-metric').textContent = money(iouNet);
+      }
+
+      // NAVIGATION & BUTTON WIRING
+      document.querySelectorAll('[data-page]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const target = btn.getAttribute('data-page');
+          document.querySelectorAll('.page').forEach((p) => p.classList.toggle('active', p.id === `page-${target}`));
+          document.querySelectorAll('[data-page]').forEach((b) => b.classList.toggle('active', b.getAttribute('data-page') === target));
+          renderAll();
+        });
+      });
+
+      document.getElementById('punch-btn').addEventListener('click', () => openPunchModal('expense'));
+      document.getElementById('mobile-punch-btn').addEventListener('click', () => openPunchModal('expense'));
+      document.querySelectorAll('[data-quick]').forEach((b) => {
+        b.addEventListener('click', () => openPunchModal(b.getAttribute('data-quick')));
+      });
+
+      document.getElementById('sms-import-btn').addEventListener('click', () => openSmsParserModal(''));
+      document.getElementById('quick-sms-demo-btn').addEventListener('click', () => {
+        openSmsParserModal('Dear UPI user A/C X7085 debited by 135.00 on date 08Oct26 trf to SAFWAN K Refno 628122138757');
+      });
+
+      document.getElementById('tune-budget-btn').addEventListener('click', () => {
+        openModal('BURN GOVERNOR', 'Set Monthly Cap', `
+          <form id="cap-form" class="form-grid">
+            <div class="form-field full"><label>Monthly Burn Limit (INR)</label><input class="amount-input" name="cap" type="number" value="${state.budget}"></div>
+            <div class="form-field full"><button type="submit" class="primary-button full-width">Lock Cap</button></div>
+          </form>
+        `);
+        document.getElementById('cap-form').addEventListener('submit', (e) => {
+          e.preventDefault();
+          state.budget = Math.max(1000, Number(new FormData(e.target).get('cap')) || 18000);
+          save(); renderAll(); closeModal(); toast('Monthly burn cap locked');
+        });
+      });
+
+      document.getElementById('open-iou-btn').addEventListener('click', () => {
+        openModal('STREET TAB', 'IOU & Lending Ledger', `
+          <div>${state.ious.map((d) => `<div class="row-between" style="padding:10px;background:var(--surface-2);border:1.5px solid var(--line);border-radius:10px;margin-bottom:8px"><div><strong>${d.person}</strong><div class="muted" style="font-size:11px">${d.dir === 'lent' ? 'Owes you' : 'You owe'} · ${d.note}</div></div><strong class="mono-num">${money(d.amount)}</strong></div>`).join('')}</div>
+        `);
+      });
+
+      document.getElementById('add-rule-btn').addEventListener('click', () => {
+        openModal('AUTO-ROUTER', 'Mint Smart Keyword Rule', `
+          <form id="rule-form" class="form-grid">
+            <div class="form-field"><label>Keyword</label><input name="kw" required placeholder="e.g. Zomato"></div>
+            <div class="form-field"><label>Target Channel</label><input name="ch" required value="Food & Cafe"></div>
+            <div class="form-field full"><button type="submit" class="primary-button full-width">Save Rule</button></div>
+          </form>
+        `);
+        document.getElementById('rule-form').addEventListener('submit', (e) => {
+          e.preventDefault();
+          const fd = new FormData(e.target);
+          state.rules.push({ keyword: String(fd.get('kw')).trim(), channel: String(fd.get('ch')).trim() });
+          save(); renderAll(); closeModal(); toast('Smart rule armed');
+        });
+      });
+
+      const flipTheme = () => { state.theme = state.theme === 'dark' ? 'light' : 'dark'; save(); renderAll(); };
+      document.getElementById('theme-toggle').addEventListener('click', flipTheme);
+      document.getElementById('settings-theme-btn').addEventListener('click', flipTheme);
+
+      const flipSound = () => { state.sound = !state.sound; if (state.sound) playClick('coin'); save(); renderAll(); toast(state.sound ? 'Mechanical audio ARMED' : 'Audio MUTED'); };
+      document.getElementById('sound-btn').addEventListener('click', flipSound);
+      document.getElementById('settings-sound-btn').addEventListener('click', flipSound);
+
+      document.getElementById('stealth-btn').addEventListener('click', () => {
+        state.stealth = !state.stealth; save(); renderAll(); toast(state.stealth ? 'Stealth shutters CLOSED' : 'Stealth shutters OPEN');
+      });
+
+      document.getElementById('search-input').addEventListener('input', renderAll);
+      document.querySelectorAll('#filter-pills .filter-pill').forEach((pill) => {
+        pill.addEventListener('click', () => {
+          document.querySelectorAll('#filter-pills .filter-pill').forEach((p) => p.classList.remove('active'));
+          pill.classList.add('active');
+          activeFilter = pill.getAttribute('data-filter');
+          renderAll();
+        });
+      });
+
+      document.getElementById('dump-csv-btn').addEventListener('click', () => {
+        const csv = 'Date,Type,Amount,Channel,Vault,Note\n' + state.transactions.map((t) => `${t.date},${t.type},${t.amount},"${t.channel}","${t.vault}","${t.note}"`).join('\n');
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+        a.download = `pocketwise-tape-${today()}.csv`;
+        a.click();
+        toast('CSV table dumped');
+      });
+
+      document.getElementById('export-json-btn').addEventListener('click', () => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' }));
+        a.download = `pocketwise-cartridge-${today()}.json`;
+        a.click();
+        toast('JSON vault cartridge minted');
+      });
+
+      document.getElementById('reset-vault-btn').addEventListener('click', () => {
+        state = defaultState();
+        state.transactions = [];
+        save(); renderAll();
+        toast('Vault formatted clean');
+      });
+
+      window.addEventListener('resize', renderAll);
+      renderAll();
+    })();
+  </script>
+</body>
+</html>
