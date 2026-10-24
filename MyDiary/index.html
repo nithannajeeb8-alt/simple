@@ -1,209 +1,190 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="sky">
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; font-src 'self' https://cdn.jsdelivr.net https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://cdn.jsdelivr.net blob:; worker-src 'self' blob: https://cdn.jsdelivr.net; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'">
-  <meta name="referrer" content="no-referrer">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#000000">
-  <meta name="description" content="A private, offline-first personal finance companion for everyday money, budgets and lending.">
-  <title>Pocketwise · Money, made clearer</title>
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="assets/icons/icon-192.PNG">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#e8f2fa">
+  <meta name="description" content="A quiet, private diary with a thoughtful on-device AI companion.">
+  <meta name="color-scheme" content="light dark">
+  <title>Quiet Pages — A little room for you</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icons/icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.2/font/bootstrap-icons.min.css">
-  <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-  <div class="app-shell">
-    <aside class="sidebar" aria-label="Main navigation">
-      <a class="brand" href="#home" aria-label="Pocketwise home">
-        <span class="brand-mark"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M7 13a4 4 0 0 1 4-4h21v5H11a4 4 0 0 0-4 4v-5Z" fill="currentColor" opacity=".72"/><path d="M7 18a4 4 0 0 1 4-4h22v16a4 4 0 0 1-4 4H11a4 4 0 0 1-4-4V18Z" fill="currentColor"/><path d="M25 20h7a3 3 0 0 1 3 3v3a3 3 0 0 1-3 3h-7a3 3 0 0 1-3-3v-3a3 3 0 0 1 3-3Z" fill="#000000"/><circle cx="26.5" cy="24.5" r="1.2" fill="currentColor"/></svg></span>
-        <span><strong>Pocketwise</strong><small>money, made clearer</small></span>
+  <div class="app-shell" id="appShell">
+    <header class="topbar">
+      <a class="brand" href="#diary" aria-label="Quiet Pages home" data-nav="diary">
+        <span class="brand-mark">q.</span>
+        <span class="brand-name">quiet pages</span>
       </a>
-      <div class="side-label">WORKSPACE</div>
-      <nav class="nav-list" id="side-nav">
-        <button class="nav-item active" data-page="home"><span class="icon-wrap"><i class="bi bi-house-door"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z"/></svg></span><span>Home</span></button>
-        <button class="nav-item" data-page="activity"><span class="icon-wrap"><i class="bi bi-arrow-left-right"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M4 7h15m-4-4 4 4-4 4M20 17H5m4 4-4-4 4-4"/></svg></span><span>Activity</span><span class="nav-count" id="activity-count">0</span></button>
-        <button class="nav-item" data-page="insights"><span class="icon-wrap"><i class="bi bi-bar-chart-line"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M4 20V11M10 20V4M16 20v-7M22 20H2"/></svg></span><span>Insights</span></button>
-        <button class="nav-item" data-page="settings"><span class="icon-wrap"><i class="bi bi-sliders"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16M8 3v6m8 0v6m-8 0v6"/></svg></span><span>Settings</span></button>
-      </nav>
-      <div class="sidebar-bottom">
-        <div class="privacy-mini"><span class="privacy-dot"></span><div><strong>Your money stays yours</strong><small>Stored on this device</small></div></div>
-        <button class="profile-chip" id="theme-toggle" aria-label="Switch theme"><span class="avatar" id="profile-avatar">P</span><span class="profile-copy"><strong id="profile-sidebar-name">Personal space</strong><small id="theme-label">Light appearance</small></span><span class="icon-wrap"><i class="bi bi-moon-stars"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M20 15.5A8.5 8.5 0 0 1 8.5 4 8.5 8.5 0 1 0 20 15.5Z"/></svg></span></button>
+      <div class="topbar-actions">
+        <button class="icon-button" id="searchToggle" aria-label="Search diary" title="Search diary"><i class="bi bi-search"></i></button>
+        <button class="avatar-button" id="settingsShortcut" aria-label="Open settings" title="Settings"><i class="bi bi-sliders2"></i></button>
       </div>
-    </aside>
+    </header>
 
-    <main class="main-content">
-      <header class="topbar">
-        <div class="mobile-brand"><span class="brand-mark small-mark"><svg viewBox="0 0 40 40"><path d="M20 4 34 12v16L20 36 6 28V12Z" fill="currentColor" opacity=".14"/><path d="M12 21.5 18 27l11-14" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><strong>Pocketwise</strong></div>
-        <div class="page-heading"><span class="eyebrow" id="date-eyebrow">YOUR MONEY, IN CONTEXT</span><h1 id="page-title">Overview</h1><p id="page-subtitle">Your money at a glance.</p></div>
-        <div class="top-actions">
-          <button class="icon-button" id="hide-balances" aria-label="Hide balances" title="Hide balances"><span class="icon-wrap"><i class="bi bi-eye"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></span></button>
-          <button class="icon-button notification-button" id="open-notifications" aria-label="Notifications" title="Notifications"><span class="icon-wrap"><i class="bi bi-bell"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg></span><span class="notification-dot" id="notification-dot" hidden></span></button>
-          <button class="primary-button top-add" id="top-add"><span class="icon-wrap"><i class="bi bi-plus-lg"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span> Add transaction</button>
-        </div>
-      </header>
-
-      <section class="page active" id="page-home" data-page-panel="home">
-        <div class="hero-grid">
-          <article class="card money-card">
-            <div class="card-topline"><span class="section-kicker">TOTAL BALANCE</span><button class="text-button" data-action="accounts">All accounts <span class="icon-wrap"><i class="bi bi-arrow-up-right"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M7 17 17 7M7 7h10v10"/></svg></span></button></div>
-            <div class="balance-number" data-money="balance">₹0</div>
-            <div class="balance-context"><span class="positive-dot"></span><span id="balance-caption">Across your tracked accounts</span></div>
-            <div class="radial-area">
-              <svg id="money-arc" viewBox="0 0 360 190" role="img" aria-label="Income, expenses, elapsed days and remaining days">
-                <path class="arc-track" fill="none" d="M 35 155 A 145 145 0 0 1 325 155" pathLength="100"/>
-                <path class="arc-income" fill="none" d="M 35 155 A 145 145 0 0 1 325 155" pathLength="100"/>
-                <path class="arc-expense" fill="none" d="M 35 155 A 145 145 0 0 1 325 155" pathLength="100"/>
-                <path class="mobile-inner-track" fill="none" d="M 75 155 A 105 105 0 0 1 285 155" pathLength="100"/>
-                <path class="mobile-inner-progress" fill="none" d="M 75 155 A 105 105 0 0 1 285 155" pathLength="100"/>
-              </svg>
-              <div class="mobile-arc-center"><span>BALANCE LEFT</span><strong data-money="balance">₹0</strong><small>Available balance</small></div>
-              <div class="arc-legend"><span><i class="legend-dot income-color"></i>Income <strong data-money="income">₹0</strong></span><span><i class="legend-dot expense-color"></i>Expense <strong data-money="expense">₹0</strong></span><span class="mobile-days-legend"><i class="legend-dot days-color"></i>Days elapsed</span><span class="mobile-days-legend"><i class="legend-dot remaining-color"></i>Remaining</span></div>
-            </div>
-            <div class="days-block">
-              <div class="days-block-label"><span class="section-kicker">DAYS IN THIS PERIOD</span><span class="days-key"><i></i>Elapsed</span></div>
-              <div class="period-arc-wrap">
-                <svg id="days-arc" viewBox="0 0 300 124" role="img" aria-label="Days elapsed and days remaining">
-                  <path class="days-track" d="M 44 108 A 106 106 0 0 1 256 108" pathLength="100"/>
-                  <path class="days-progress" d="M 44 108 A 106 106 0 0 1 256 108" pathLength="100"/>
-                </svg>
-                <div class="days-center"><strong id="days-left">0</strong><span>days left</span></div>
-              </div>
-              <p class="muted centered tiny" id="period-caption">Your month at a glance</p>
-            </div>
-            <div class="card-separator"></div>
-            <div class="money-stats"><div><span>Net this month</span><strong data-money="net">₹0</strong></div><div><span>Available to spend</span><strong data-money="safe">₹0</strong></div></div>
-          </article>
-
-          <article class="card period-card">
-            <div class="card-topline"><span class="section-kicker">YOUR MONTH</span><button class="round-subtle" data-action="budget" aria-label="Edit budget"><span class="icon-wrap"><i class="bi bi-sliders2"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16M8 3v6m8 0v6m-8 0v6"/></svg></span></button></div>
-            <div class="spendable-summary"><span>AVAILABLE TO SPEND</span><strong data-money="safe">₹0</strong><small>After your current budget and planned commitments</small></div>
-            <div class="budget-mini"><div class="row-between"><span>Monthly spending budget</span><button class="inline-link" data-action="budget">Edit</button></div><div class="row-between budget-numbers"><strong data-money="budget">Not set</strong><span id="budget-percent">Set a limit</span></div><div class="progress-track"><span id="budget-progress"></span></div><div class="row-between budget-foot"><span id="budget-spent-text">Set a budget to begin</span><span id="budget-left-text"></span></div></div>
-            <div class="category-budget-preview" id="budget-category-list"></div>
-            <button class="soft-button full-width" data-action="budget"><span class="icon-wrap"><i class="bi bi-plus-lg"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span> Prepare my budget</button>
-          </article>
-        </div>
-
-        <div class="quick-actions-row">
-          <button class="quick-action" data-add-type="expense"><span class="quick-icon expense-bg"><span class="icon-wrap"><i class="bi bi-arrow-down-left"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M7 7 17 17M17 8v9H8"/></svg></span></span><span><strong>Expense</strong><small>Money out</small></span><span class="quick-chevron">›</span></button>
-          <button class="quick-action" data-add-type="income"><span class="quick-icon income-bg"><span class="icon-wrap"><i class="bi bi-arrow-up-right"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M7 17 17 7M7 7h10v10"/></svg></span></span><span><strong>Income</strong><small>Money in</small></span><span class="quick-chevron">›</span></button>
-          <button class="quick-action" data-add-type="transfer"><span class="quick-icon transfer-bg"><span class="icon-wrap"><i class="bi bi-arrow-left-right"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M4 7h15m-4-4 4 4-4 4M20 17H5m4 4-4-4 4-4"/></svg></span></span><span><strong>Transfer</strong><small>Move money</small></span><span class="quick-chevron">›</span></button>
-          <button class="quick-action" data-action="debts"><span class="quick-icon debt-bg"><span class="icon-wrap"><i class="bi bi-people"></i><svg class="icon-fallback" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2M17 5a3 3 0 0 1 0 6m2 3a5 5 0 0 1 3 4v2"/></svg></span></span><span><strong>Debts</strong><small>Owed & lent</small></span><span class="quick-chevron">›</span></button>
-        </div>
-
-        <div class="home-lower-grid">
-          <article class="card chart-card">
-            <div class="section-header"><div><span class="section-kicker">SPENDING PATTERN</span><h2>Your week</h2></div><select id="home-chart-mode" class="compact-select" aria-label="Spending graph period"><option value="week">This week</option><option value="month">This month</option><option value="year">This year</option></select></div>
-            <div class="chart-summary"><strong id="week-total" data-money="week">₹0</strong><span id="week-comparison">Recorded spending</span></div>
-            <canvas id="home-spending-chart" class="chart-canvas" height="210" aria-label="Spending graph"></canvas>
-          </article>
-          <article class="card alerts-card">
-            <div class="section-header"><div><span class="section-kicker">A LITTLE HEADS-UP</span><h2>Worth a look</h2></div><button class="text-button" id="view-alerts">View all <span>→</span></button></div>
-            <div id="home-alerts" class="alert-list"></div>
-          </article>
-        </div>
-
-        <div class="bottom-home-grid">
-          <article class="card recent-card">
-            <div class="section-header"><div><span class="section-kicker">YOUR LATEST</span><h2>Recent activity</h2></div><button class="text-button" data-page="activity">View activity <span>→</span></button></div>
-            <div class="transaction-list compact-list" id="recent-transactions"></div>
-          </article>
-          <article class="card debt-summary-card">
-            <div class="section-header"><div><span class="section-kicker">BETWEEN FRIENDS</span><h2>Debts & lending</h2></div><button class="round-subtle" data-action="debts" aria-label="Open debts"><span class="icon-wrap"><i class="bi bi-arrow-up-right"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M7 17 17 7M7 7h10v10"/></svg></span></button></div>
-            <div class="debt-summaries"><div><span class="debt-mini-icon owes-you"><span class="icon-wrap"><i class="bi bi-arrow-down-left"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M7 7 17 17M17 8v9H8"/></svg></span></span><div><small>Owed to you</small><strong data-money="receivable">₹0</strong></div></div><div><span class="debt-mini-icon you-owe"><span class="icon-wrap"><i class="bi bi-arrow-up-right"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M7 17 17 7M7 7h10v10"/></svg></span></span><div><small>You owe</small><strong data-money="payable">₹0</strong></div></div></div>
-            <button class="soft-button full-width" data-action="new-debt"><span class="icon-wrap"><i class="bi bi-plus-lg"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span> Add a debt record</button>
-          </article>
-        </div>
-
-        <div class="sample-banner" id="sample-banner"><span class="icon-wrap"><i class="bi bi-info-circle"></i><svg class="icon-fallback" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01"/></svg></span><span><strong>Preview data</strong><small>These example records help you explore the app. Clear them before adding your own finances.</small></span><button class="text-button" id="clear-sample">Clear sample</button></div>
-      </section>
-
-      <section class="page" id="page-activity" data-page-panel="activity">
-        <div class="activity-search-row"><div class="search-box"><span class="icon-wrap"><i class="bi bi-search"></i><svg class="icon-fallback" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg></span><input id="activity-search" type="search" placeholder="Try ₹500, yesterday, food, from Safwan…" aria-label="Search transactions"></div></div>
-        <div class="activity-toolbar"><button class="secondary-button" id="export-csv"><span class="icon-wrap"><i class="bi bi-download"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 18v3h16v-3"/></svg></span> Export CSV</button><select id="activity-period" class="compact-select" aria-label="Activity date range"><option value="month">This month</option><option value="all">All time</option><option value="year">This year</option></select></div>
-        <div class="filter-row" id="activity-filters" aria-label="Filter activity"><button class="filter-pill active" data-filter="all">All activity</button><button class="filter-pill" data-filter="expense">Expenses</button><button class="filter-pill" data-filter="income">Income</button><button class="filter-pill" data-filter="transfer">Transfers</button><button class="filter-pill" data-filter="debt">Debt activity</button><button class="filter-pill" data-filter="refund">Refunds</button></div>
-        <article class="card activity-card"><div class="section-header"><div><span class="section-kicker">THE FULL PICTURE</span><h2>Transaction history <span class="subtle-count" id="transaction-total">0</span></h2></div><button class="icon-button" id="activity-add" aria-label="Add transaction"><span class="icon-wrap"><i class="bi bi-plus-lg"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span></button></div><div id="all-transactions" class="transaction-list"></div></article>
-        <article class="card activities-manager"><div class="section-header"><div><span class="section-kicker">YOUR SHORTCUTS</span><h2>Most-used activities</h2><p class="muted small">Your frequent choices rise to the top automatically.</p></div><button class="secondary-button" id="manage-activities"><span class="icon-wrap"><i class="bi bi-tags"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="m3 3 8 0 10 10-8 8L3 11Z"/><circle cx="7" cy="7" r="1"/></svg></span> Add activity</button></div><div id="frequent-activities" class="activity-chip-list"></div></article>
-      </section>
-
-      <section class="page" id="page-insights" data-page-panel="insights">
-        <div class="insights-controls"><div><span class="section-kicker">YOUR MONEY, OVER TIME</span><h2>Insights that make sense</h2><p class="muted">Every chart opens into the records behind it.</p></div><div class="insights-actions"><button class="secondary-button" id="goals-jump">Savings goals</button><select id="insights-period" class="compact-select"><option value="month">This month</option><option value="last-month">Last month</option><option value="year">This year</option><option value="all">All records</option></select></div></div>
-        <div class="insight-metrics"><article class="card metric-card"><span class="metric-label">Income</span><strong data-money="insight-income">₹0</strong><span class="metric-foot positive-text">Money received</span></article><article class="card metric-card"><span class="metric-label">Expenses</span><strong data-money="insight-expense">₹0</strong><span class="metric-foot">Money spent</span></article><article class="card metric-card"><span class="metric-label">Net cash flow</span><strong data-money="insight-net">₹0</strong><span class="metric-foot">Income minus spending</span></article><article class="card metric-card"><span class="metric-label">Daily average</span><strong data-money="daily-average">₹0</strong><span class="metric-foot">For selected period</span></article></div>
-        <section class="planning-grid insights-grid" aria-label="Money planning tools">
-          <article class="card insight-wide planner-calendar-card">
-            <div class="section-header planner-section-header"><div><span class="section-kicker">LOOK AHEAD</span><h2>Cash-flow calendar</h2><p class="muted small">Upcoming bills, subscriptions, expected income and debt due dates.</p></div><div class="calendar-controls"><button class="mini-button" id="forecast-prev" type="button" aria-label="Previous month"><span class="icon-wrap" aria-hidden="true"><i class="bi bi-chevron-left"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></span></button><strong id="forecast-month">This month</strong><button class="mini-button" id="forecast-next" type="button" aria-label="Next month"><span class="icon-wrap" aria-hidden="true"><i class="bi bi-chevron-right"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></span></button></div></div>
-            <div class="forecast-summary" id="forecast-summary"></div>
-            <div class="forecast-calendar" id="forecast-calendar" aria-label="Cash-flow calendar dates"></div>
-            <div class="forecast-agenda"><div class="row-between"><strong id="forecast-agenda-title">Upcoming events</strong><small>Projected, not bank-confirmed</small></div><div id="forecast-events" class="forecast-event-list"></div></div>
-          </article>
-          <article class="card planner-tool-card">
-            <div class="section-header"><div><span class="section-kicker">A WEEK AT A TIME</span><h2>Weekly allowance</h2></div><button class="mini-button" id="weekly-allowance-edit" type="button" title="Edit weekly allowance" aria-label="Edit weekly allowance"><span class="icon-wrap" aria-hidden="true"><i class="bi bi-sliders"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16M8 3v6m8 0v6m-8 0v6"/></svg></span></button></div>
-            <div id="weekly-allowance-panel"></div>
-          </article>
-          <article class="card planner-tool-card">
-            <div class="section-header"><div><span class="section-kicker">RECURRING COSTS</span><h2>Subscriptions</h2></div><button class="mini-button" id="subscriptions-manage" type="button" title="Manage subscriptions and bills" aria-label="Manage subscriptions"><span class="icon-wrap" aria-hidden="true"><i class="bi bi-arrow-up-right"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M7 17 17 7M7 7h10v10"/></svg></span></button></div>
-            <div id="subscriptions-panel"></div>
-          </article>
-          <article class="card planner-tool-card">
-            <div class="section-header"><div><span class="section-kicker">LESS REPETITION</span><h2>Smart rules</h2></div><button class="mini-button" id="smart-rules-manage" type="button" title="Manage smart rules" aria-label="Manage smart transaction rules"><span class="icon-wrap" aria-hidden="true"><i class="bi bi-gear"></i><svg class="icon-fallback" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="m19 13.5 2 1.2-2 3.5-2.2-1a7 7 0 0 1-2 1.2L14.5 21h-4l-.3-2.6a7 7 0 0 1-2-1.2l-2.2 1L4 14.7l2-1.2a7 7 0 0 1 0-2.4l-2-1.2L6 6.4l2.2 1a7 7 0 0 1 2-1.2l.3-2.6h4l.3 2.6a7 7 0 0 1 2 1.2l2.2-1 2 3.5-2 1.2a7 7 0 0 1 0 2.4Z"/></svg></span></button></div>
-            <div id="smart-rules-panel"></div>
-          </article>
-          <article class="card planner-tool-card">
-            <div class="section-header"><div><span class="section-kicker">A CLEAR WAY OUT</span><h2>Debt payoff planner</h2></div><button class="mini-button" id="debt-plan-edit" type="button" title="Configure payoff plan" aria-label="Configure debt payoff plan"><span class="icon-wrap" aria-hidden="true"><i class="bi bi-sliders"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16M8 3v6m8 0v6m-8 0v6"/></svg></span></button></div>
-            <div id="debt-planner-panel"></div>
-          </article>
-          <article class="card planner-tool-card monthly-review-card">
-            <div class="section-header"><div><span class="section-kicker">MONTH-END CLARITY</span><h2>Monthly money review</h2></div><button class="mini-button" id="monthly-review-export" type="button" title="Export this review" aria-label="Export monthly review"><span class="icon-wrap" aria-hidden="true"><i class="bi bi-download"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 18v3h16v-3"/></svg></span></button></div>
-            <div id="monthly-review-panel"></div>
-          </article>
+    <main id="mainContent" tabindex="-1">
+      <section class="screen active" id="screen-diary" data-screen="diary">
+        <section class="memory-stories" id="memoryStories" aria-label="Photo stories">
+          <div class="story-rail" id="storyRail" aria-label="Your photo memories"></div>
         </section>
-        <div class="insights-grid">
-          <article class="card insight-wide"><div class="section-header"><div><span class="section-kicker">TRENDS</span><h2>Money over time</h2></div><select id="trend-type" class="compact-select" aria-label="Choose trend chart"><option value="line">Line chart</option><option value="area">Area chart</option><option value="bar">Bar chart</option><option value="stacked">Stacked bar</option><option value="waterfall">Waterfall</option><option value="histogram">Amount histogram</option><option value="scatter">Scatter plot</option></select></div><canvas id="trend-chart" class="chart-canvas" height="260" aria-label="Financial trends chart"></canvas></article>
-          <article class="card"><div class="section-header"><div><span class="section-kicker">WHERE IT GOES</span><h2>Spending mix</h2></div><button class="round-subtle" id="mix-view-toggle" aria-label="Switch spending mix chart"><span class="icon-wrap"><i class="bi bi-bar-chart"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M4 20V11M10 20V4M16 20v-7M22 20H2"/></svg></span></button></div><canvas id="category-chart" class="chart-canvas" height="240" aria-label="Spending categories chart"></canvas><div id="category-legend" class="legend-list"></div></article>
-          <article class="card"><div class="section-header"><div><span class="section-kicker">WEEKLY RHYTHM</span><h2>Spending calendar</h2></div><span class="muted tiny">By day</span></div><div id="heatmap" class="heatmap"></div><div class="heatmap-key"><span>Less</span><i class="heat-cell heat-0"></i><i class="heat-cell heat-1"></i><i class="heat-cell heat-2"></i><i class="heat-cell heat-3"></i><i class="heat-cell heat-4"></i><span>More</span></div></article>
-          <article class="card insight-wide"><div class="section-header"><div><span class="section-kicker">COMPARE</span><h2>Income vs. expenses</h2></div><span class="muted tiny">Monthly</span></div><canvas id="comparison-chart" class="chart-canvas" height="235" aria-label="Monthly income compared with expenses"></canvas></article>
-          <article class="card insight-wide"><div class="section-header"><div><span class="section-kicker">THE LONG VIEW</span><h2>Year-by-year archive</h2><p class="muted small">A durable view of your financial history, not just the last month.</p></div><button class="secondary-button" id="archive-export">Export backup</button></div><div id="yearly-archive" class="yearly-archive"></div></article>
-          <article class="card insight-wide"><div class="section-header"><div><span class="section-kicker">ACTIVITY RANKING</span><h2>Where spending adds up</h2></div><select id="ranking-mode" class="compact-select"><option value="amount">By amount</option><option value="count">By frequency</option></select></div><div id="category-ranking" class="ranking-list"></div></article>
-          <article class="card goal-card"><div class="section-header"><div><span class="section-kicker">SMALL STEPS COUNT</span><h2>Savings goals</h2></div><button class="round-subtle" id="add-goal" aria-label="Add savings goal"><span class="icon-wrap"><i class="bi bi-plus-lg"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span></button></div><div id="goals-list"></div></article>
-          <article class="card debt-insight-card"><div class="section-header"><div><span class="section-kicker">BETWEEN PEOPLE</span><h2>Debts snapshot</h2></div><button class="text-button" data-action="debts">Details →</button></div><div class="debt-insight-rows" id="insight-debts"></div></article>
+        <div class="home-intro">
+          <div class="eyebrow"><span class="eyebrow-dot"></span><span id="todayLabel">A little note for today</span></div>
+          <h1 class="ai-greeting" id="homeSubheading" aria-live="polite">A little room for whatever is on your mind.</h1>
         </div>
-        <div class="annual-report-banner"><span class="annual-icon"><span class="icon-wrap"><i class="bi bi-file-earmark-bar-graph"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M5 3h9l5 5v13H5Z M14 3v5h5M8 16l3-3 2 2 3-4"/></svg></span></span><div><strong>Keep your story, year after year</strong><p>Export a full backup or create a CSV for spreadsheets. Restore your records on a new device when needed.</p></div><button class="secondary-button" id="insights-backup">Export backup</button></div>
+        <div class="search-panel hidden" id="searchPanel">
+          <label class="sr-only" for="searchInput">Search entries</label>
+          <i class="bi bi-search"></i><input type="search" id="searchInput" placeholder="Search your memories…" autocomplete="off">
+          <button class="icon-button compact" id="closeSearch" aria-label="Close search"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <div class="section-heading">
+          <div><span class="section-kicker">YOUR JOURNAL</span><h2 id="entriesHeading">Recent pages</h2></div>
+          <span class="subtle-count" id="entryCount">0 pages</span>
+        </div>
+        <div id="entryStack" class="entry-stack"></div>
+        <div id="emptyState" class="empty-state hidden">
+          <div class="empty-art" aria-hidden="true"><i class="bi bi-pencil"></i></div>
+          <h3>Your first page is waiting.</h3>
+          <p>Start with one small thing: what stayed with you today?</p>
+          <button class="primary-button" data-action="new-entry"><i class="bi bi-plus-lg"></i> Write your first entry</button>
+        </div>
+        <div class="bottom-note"><i class="bi bi-shield-lock"></i><span>Your pages stay on this device by default.</span></div>
       </section>
 
-      <section class="page" id="page-settings" data-page-panel="settings">
-        <div class="settings-layout">
-          <div class="settings-intro"><span class="section-kicker">YOUR APP, YOUR RULES</span><h2>Preferences</h2><p class="muted">Keep things comfortable, useful and private.</p></div>
-          <article class="card settings-card"><div class="settings-section-title"><span class="settings-icon"><span class="icon-wrap"><i class="bi bi-person-circle"></i><svg class="icon-fallback" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span></span><div><h3>Your profile</h3><p>A name and color to make this space yours. Kept on this device.</p></div></div><div class="profile-settings-preview"><span class="avatar profile-avatar-preview" id="settings-profile-avatar">P</span><div><strong id="settings-profile-name">Personal space</strong><small>Initial avatar · customizable color</small></div><button class="secondary-button" id="edit-profile">Edit profile</button></div></article>
-          <article class="card settings-card"><div class="settings-section-title"><span class="settings-icon"><span class="icon-wrap"><i class="bi bi-palette"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18h1.5a2.5 2.5 0 0 0 1.5-4.5 1.5 1.5 0 0 1 1-2.5H19a2 2 0 0 0 2-2 9 9 0 0 0-9-9Z"/><circle cx="7.5" cy="10" r=".8"/><circle cx="10" cy="6.5" r=".8"/></svg></span></span><div><h3>Appearance</h3><p>Choose Light, Dark or follow your device automatically.</p></div></div><div class="setting-row"><div><strong>Theme</strong><small>Choose how Pocketwise looks</small></div><div class="segmented" id="theme-choice"><button class="selected" data-theme="light">Light</button><button data-theme="dark">Dark</button><button data-theme="system">Auto</button></div></div><div class="setting-row"><div><strong>Hide amounts</strong><small>Keep balances private at a glance</small></div><label class="switch"><input type="checkbox" id="hide-setting"><span></span></label></div></article>
-          <article class="card settings-card"><div class="settings-section-title"><span class="settings-icon"><span class="icon-wrap"><i class="bi bi-bell"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg></span></span><div><h3>Reminders & alerts</h3><p>Useful nudges, never noise.</p></div></div><div class="setting-row"><div><strong>Budget warnings</strong><small>At <span id="threshold-copy">90%</span> of a category limit</small></div><div class="setting-inline"><input type="range" id="alert-threshold" min="50" max="100" step="5" value="90"><output id="alert-output">90%</output></div></div><div class="setting-row"><div><strong>Budget alerts</strong><small>Approaching limits and overspending</small></div><label class="switch"><input type="checkbox" id="notify-budget" checked><span></span></label></div><div class="setting-row"><div><strong>Encouragement</strong><small>Celebrate goals met and staying on track</small></div><label class="switch"><input type="checkbox" id="notify-positive" checked><span></span></label></div><div class="setting-row"><div><strong>Bills & subscriptions</strong><small>Upcoming payments and renewals</small></div><label class="switch"><input type="checkbox" id="notify-bills" checked><span></span></label></div><div class="setting-row"><div><strong>Debt reminders</strong><small>Expected repayments and collections</small></div><label class="switch"><input type="checkbox" id="notify-debts" checked><span></span></label></div><div class="setting-row"><div><strong>Weekly summary</strong><small>A calm recap of the week's spending</small></div><label class="switch"><input type="checkbox" id="notify-weekly" checked><span></span></label></div><div class="setting-row"><div><strong>Quiet hours</strong><small>Pause non-essential reminders overnight</small></div><div class="quiet-hours"><input aria-label="Quiet hours start" id="quiet-start" type="time" value="21:00"><span>to</span><input aria-label="Quiet hours end" id="quiet-end" type="time" value="08:00"></div></div><div class="setting-row"><div><strong>Phone notifications</strong><small id="notification-permission">System alerts; background reminders need an optional push server.</small></div><button class="secondary-button" id="enable-notifications">Enable</button></div></article>
-          <article class="card settings-card"><div class="settings-section-title"><span class="settings-icon"><span class="icon-wrap"><i class="bi bi-tags"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="m3 3 8 0 10 10-8 8L3 11Z"/><circle cx="7" cy="7" r="1"/></svg></span></span><div><h3>Activities & categories</h3><p>Your most-used choices move to the top automatically.</p></div></div><div class="setting-row"><div><strong>Manage activity list</strong><small>Add your own categories and quick-add activities</small></div><button class="secondary-button" id="settings-activities">Manage</button></div><div class="setting-row"><div><strong>Accounts</strong><small>Cash, bank, UPI and custom accounts</small></div><button class="secondary-button" id="settings-accounts">Manage</button></div><div class="setting-row"><div><strong>Budgets</strong><small>Set category limits and a total budget</small></div><button class="secondary-button" data-action="budget">Manage</button></div><div class="setting-row"><div><strong>Reminders</strong><small>Recurring bills and planned payments</small></div><button class="secondary-button" id="manage-reminders">Manage</button></div></article>
-          <article class="card settings-card"><div class="settings-section-title"><span class="settings-icon"><span class="icon-wrap"><i class="bi bi-shield-lock"></i><svg class="icon-fallback" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></svg></span></span><div><h3>Privacy & device shortcuts</h3><p>Keep control of your records and the way you open the app.</p></div></div><div class="setting-row"><div><strong>How to use PocketWise</strong><small>Replay the guided tour and learn the main features.</small></div><button class="secondary-button" id="replay-app-tour" type="button">Start tour</button></div><div class="setting-row"><div><strong>Privacy policy & data controls</strong><small>Read what stays on this device, what browser storage means, and your options.</small></div><button class="secondary-button" id="open-privacy">Privacy page</button></div><div class="setting-row"><div><strong>Local-first storage</strong><small>Core records stay in this browser on this device</small></div><span class="status-pill success-pill"><i></i> On device</span></div><div class="setting-row"><div><strong>Request persistent storage</strong><small>Ask the browser to reduce automatic data eviction where supported</small></div><button class="secondary-button" id="persistent-storage">Request</button></div><div class="setting-row" id="apple-shortcut-setting"><div><strong>Apple Shortcut · website/PWA only</strong><small>Use this shared Shortcut with PocketWise in Safari or as a Home Screen PWA. It does not connect to native finance apps.</small></div><a class="secondary-button shortcut-link-button" href="https://www.icloud.com/shortcuts/aef8264bd14e43079b7e4550dc9e4f66" target="_blank" rel="noopener noreferrer">Get Shortcut ↗</a></div><div class="setting-row" id="shortcut-import-setting"><div><strong>Paste transaction from Shortcut</strong><small>Local-only fallback when iOS opens PocketWise but drops the URL data. Copy the transaction JSON to your clipboard first.</small></div><button class="secondary-button" id="paste-shortcut-settings">Paste now</button></div><div class="setting-row" id="backtap-setting"><div><strong>Back Tap instructions</strong><small>After adding it, choose it in Accessibility settings.</small></div><button class="secondary-button" id="backtap-guide">Setup guide</button></div><div class="setting-row"><div><strong>Install as an app</strong><small>Home Screen and supported Android app shortcuts</small></div><button class="secondary-button" id="install-guide">How to install</button></div></article>
-          <article class="card settings-card data-card"><div class="settings-section-title"><span class="settings-icon"><span class="icon-wrap"><i class="bi bi-database-check"></i><svg class="icon-fallback" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg></span></span><div><h3>Your data, for the long run</h3><p>Keep years of financial records portable and recoverable.</p></div></div><div class="backup-status"><div class="backup-file-icon"><span class="icon-wrap"><i class="bi bi-file-earmark-zip"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M5 3h9l5 5v13H5Z M14 3v5h5M12 11v7m-3-3 3 3 3-3"/></svg></span></div><div><strong>Full financial backup</strong><small id="last-backup">Never exported on this device</small></div><span class="backup-spacer"></span></div><div class="backup-buttons"><button class="primary-button" id="export-backup"><span class="icon-wrap"><i class="bi bi-download"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 18v3h16v-3"/></svg></span> Export full backup</button><button class="secondary-button" id="import-backup"><span class="icon-wrap"><i class="bi bi-upload"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M12 16V4m-5 5 5-5 5 5M4 18v3h16v-3"/></svg></span> Restore backup</button><button class="secondary-button" id="export-settings-csv">Export CSV</button><input id="backup-file-input" type="file" accept=".json,application/json" hidden></div><p class="fine-print">A backup is the safest way to preserve your records. Browser storage and this device are not a substitute for a backup. Files are not uploaded to a server.</p></article>
-          <article class="card danger-card"><div><h3>Reset this workspace</h3><p>This removes stored records from this app on this device. Export a backup first.</p></div><button class="danger-button" id="reset-data">Clear all records</button></article>
+      <section class="screen" id="screen-companion" data-screen="companion">
+        <div class="page-intro compact-intro">
+          <div class="eyebrow"><span class="eyebrow-dot"></span>YOUR QUIET COMPANION</div>
+          <h1>A little space<br><em>to untangle.</em></h1>
+          <p>Ask about your past pages, collect important things, or think out loud. No judgement, no rush.</p>
         </div>
+        <div class="companion-status" id="companionStatus"><span class="status-dot"></span><span>Local journal memory is ready · AI model not loaded</span></div>
+        <div class="chat-card">
+          <div class="chat-header"><div class="assistant-avatar"><i class="bi bi-stars"></i></div><div><strong>Little by little</strong><span>Your private companion</span></div><span class="local-pill"><i class="bi bi-lock"></i> Local</span></div>
+          <div id="chatMessages" class="chat-messages" aria-live="polite"></div>
+          <div class="prompt-chips" id="promptChips">
+            <button class="prompt-chip" data-prompt="What have I been thinking about lately?">What’s on my mind?</button>
+            <button class="prompt-chip" data-prompt="Help me reflect on this month using my diary entries.">Reflect on this month</button>
+            <button class="prompt-chip" data-prompt="What goals or intentions have I mentioned?">My goals</button>
+          </div>
+          <form id="chatForm" class="chat-form">
+            <label class="sr-only" for="chatInput">Write a message</label>
+            <textarea id="chatInput" rows="1" maxlength="3000" placeholder="Write what’s on your mind…"></textarea>
+            <button class="send-button" type="submit" aria-label="Send message"><i class="bi bi-arrow-up"></i></button>
+          </form>
+          <p class="privacy-hint"><i class="bi bi-shield-check"></i> Your diary context is processed in this browser. The optional model runtime and model files are downloaded from their providers.</p>
+        </div>
+        <section class="memory-section">
+          <div class="section-heading"><div><span class="section-kicker">THINGS TO REMEMBER</span><h2>Your memory shelf</h2></div><button class="text-button" id="addMemoryButton"><i class="bi bi-plus-lg"></i> Add</button></div>
+          <p class="section-description">Keep the facts you want your companion to remember. You can edit or delete them anytime.</p>
+          <form id="memoryForm" class="memory-form hidden">
+            <label for="memoryText">A detail worth keeping</label>
+            <textarea id="memoryText" maxlength="800" rows="3" placeholder="A goal, preference, important date, or something you want to remember…" required></textarea>
+            <div class="form-row end"><button type="button" class="secondary-button" id="cancelMemory">Cancel</button><button type="submit" class="primary-button small-button">Save memory</button></div>
+          </form>
+          <div id="memoryList" class="memory-list"></div>
+          <div id="memoryEmpty" class="mini-empty">Your memory shelf is empty. Add something you would like to keep in mind.</div>
+        </section>
       </section>
 
-      <footer class="app-footer"><span>Made for real life, not perfect spreadsheets.</span><span><span class="privacy-dot"></span> Local-first · <span id="storage-status">Offline-ready shell</span></span></footer>
+      <section class="screen" id="screen-calendar" data-screen="calendar">
+        <div class="page-intro compact-intro">
+          <div class="eyebrow"><span class="eyebrow-dot"></span>YOUR DAYS, KEPT</div>
+          <h1>Time, in little<br><em>pieces.</em></h1>
+          <p>Every dot is a page you chose to keep.</p>
+        </div>
+        <div class="calendar-card">
+          <div class="calendar-toolbar"><button class="icon-button" id="prevMonth" aria-label="Previous month"><i class="bi bi-chevron-left"></i></button><div><h2 id="calendarMonth">October 2026</h2><button class="text-button today-button" id="goToday">Today</button></div><button class="icon-button" id="nextMonth" aria-label="Next month"><i class="bi bi-chevron-right"></i></button></div>
+          <div class="calendar-weekdays" aria-hidden="true"><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span><span>SUN</span></div>
+          <div class="calendar-grid" id="calendarGrid" role="grid" aria-label="Diary calendar"></div>
+          <div class="calendar-legend"><span><i class="legend-dot"></i> A page was written</span><span><i class="legend-today"></i> Today</span></div>
+        </div>
+        <div class="calendar-day-section"><div class="section-heading"><div><span class="section-kicker" id="selectedDateLabel">SELECTED DAY</span><h2 id="selectedDateHeading">Choose a day</h2></div><button class="text-button" id="newForSelectedDate"><i class="bi bi-plus-lg"></i> Write</button></div><div id="selectedDayEntries" class="day-entries"></div></div>
+      </section>
+
+      <section class="screen" id="screen-settings" data-screen="settings">
+        <div class="page-intro compact-intro">
+          <div class="eyebrow"><span class="eyebrow-dot"></span>MAKE IT YOURS</div>
+          <h1>Your space,<br><em>your rules.</em></h1>
+          <p>Small adjustments that make this place feel like yours.</p>
+        </div>
+        <section class="settings-group">
+          <div class="settings-heading"><span class="setting-icon"><i class="bi bi-palette2"></i></span><div><h2>Appearance</h2><p>Colors and the feeling of each page.</p></div></div>
+          <p class="theme-section-label">Light palettes</p>
+          <div class="theme-grid" id="themeGrid">
+            <button class="theme-choice active" data-theme-choice="sky"><span class="theme-swatch sky-swatch"></span><strong>Sky</strong><small>Calm & clear</small></button>
+            <button class="theme-choice" data-theme-choice="coral"><span class="theme-swatch coral-swatch"></span><strong>Coral</strong><small>Warm & open</small></button>
+            <button class="theme-choice" data-theme-choice="mint"><span class="theme-swatch mint-swatch"></span><strong>Mint</strong><small>Fresh & bright</small></button>
+            <button class="theme-choice" data-theme-choice="lavender"><span class="theme-swatch lavender-swatch"></span><strong>Lavender</strong><small>Soft & dreamy</small></button>
+            <button class="theme-choice dynamic-choice" data-theme-choice="dynamic"><span class="theme-swatch dynamic-swatch"><i class="bi bi-stars"></i></span><strong>Dynamic</strong><small>Changes each day</small></button>
+          </div>
+          <p class="theme-section-label dark-palette-label">Dark palettes <span>Made for dim rooms and LCD screens</span></p>
+          <div class="theme-grid dark-theme-grid" aria-label="Dark color themes">
+            <button class="theme-choice" data-theme-choice="midnight"><span class="theme-swatch midnight-swatch"></span><strong>Midnight</strong><small>Ink & blue</small></button>
+            <button class="theme-choice" data-theme-choice="ember"><span class="theme-swatch ember-swatch"></span><strong>Ember</strong><small>Warm charcoal</small></button>
+            <button class="theme-choice" data-theme-choice="forest"><span class="theme-swatch forest-swatch"></span><strong>Forest</strong><small>Deep green</small></button>
+            <button class="theme-choice" data-theme-choice="plum"><span class="theme-swatch plum-swatch"></span><strong>Plum</strong><small>Quiet violet</small></button>
+          </div>
+          <div class="setting-row"><div><strong>Comfortable text</strong><p>Increase the text size across the app.</p></div><select id="textScale" aria-label="Text size"><option value="normal">Standard</option><option value="large">Large</option><option value="xlarge">Extra large</option></select></div>
+          <label class="setting-row"><div><strong>Reduce motion</strong><p>Use fewer transitions and animations.</p></div><input type="checkbox" id="reduceMotion" class="toggle-input"></label>
+        </section>
+        <section class="settings-group">
+          <div class="settings-heading"><span class="setting-icon"><i class="bi bi-cpu"></i></span><div><h2>Your local companion</h2><p>Download a compatible model to generate responses on this device.</p></div></div>
+          <div class="model-panel">
+            <div class="model-status-line"><span class="model-orb"><i class="bi bi-stars"></i></span><div class="model-status-copy"><strong id="modelStatusTitle">AI model not loaded</strong><p id="modelStatusText">The diary works without AI. Loading a model requires WebGPU, memory, and a model download.</p></div></div>
+            <div class="model-controls"><button class="secondary-button" id="checkModelsButton"><i class="bi bi-cloud-download"></i> Find compatible models</button><select id="modelSelect" aria-label="Select AI model" class="hidden"><option value="">Choose a supported model</option></select><button class="primary-button hidden" id="loadModelButton"><i class="bi bi-download"></i> Download &amp; load</button><button class="secondary-button hidden" id="unloadModelButton"><i class="bi bi-eject"></i> Unload</button></div>
+            <div class="model-progress hidden" id="modelProgressWrap"><div class="progress-track"><span id="modelProgressBar"></span></div><p id="modelProgressText">Preparing the local model…</p></div>
+            <p class="model-disclaimer"><i class="bi bi-info-circle"></i> We check the runtime's actual built-in model catalogue. Qwen3 1.7B is not guaranteed to be supported; unsupported models are not offered. The first download can be large.</p>
+          </div>
+        </section>
+        <section class="settings-group">
+          <div class="settings-heading"><span class="setting-icon"><i class="bi bi-database-lock"></i></span><div><h2>Privacy &amp; your data</h2><p>Your pages are saved in browser storage on this device.</p></div></div>
+          <div class="privacy-card"><i class="bi bi-shield-lock"></i><div><strong>No account. No diary server.</strong><p>Quiet Pages does not send your entries to a diary backend. Export backups regularly because browser storage can be cleared by the operating system or browser.</p></div></div>
+          <div class="settings-actions"><button class="action-row" id="exportButton"><span><i class="bi bi-box-arrow-up-right"></i></span><div><strong>Export a backup</strong><small>Save entries, memories, settings and photos.</small></div><i class="bi bi-chevron-right"></i></button><button class="action-row" id="importButton"><span><i class="bi bi-box-arrow-in-down-left"></i></span><div><strong>Restore a backup</strong><small>Import a previously exported JSON file.</small></div><i class="bi bi-chevron-right"></i></button><input type="file" id="importFile" accept="application/json,.json" class="hidden">
+            <button class="action-row danger-row" id="clearDataButton"><span><i class="bi bi-trash3"></i></span><div><strong>Delete all local data</strong><small>Remove diary entries and memories from this browser.</small></div><i class="bi bi-chevron-right"></i></button></div>
+        </section>
+        <footer class="settings-footer"><span class="brand-mark mini-mark">q.</span><p>Quiet Pages · A little room for you</p><small>Private by default, imperfect by design. Please keep a backup.</small></footer>
+      </section>
+
+      <section class="screen" id="screen-detail" data-screen="detail"></section>
+      <section class="screen" id="screen-editor" data-screen="editor"></section>
     </main>
+
+    <button class="floating-add" id="floatingAdd" aria-label="Write a new diary entry" title="Write a new entry"><i class="bi bi-plus-lg"></i></button>
+
+    <nav class="bottom-nav" aria-label="Main navigation">
+      <button class="nav-item active" data-nav="diary" aria-label="Diary"><i class="bi bi-journal-bookmark"></i><span>Diary</span></button>
+      <button class="nav-item" data-nav="companion" aria-label="Companion"><i class="bi bi-chat-heart"></i><span>Companion</span></button>
+      <button class="nav-item" data-nav="calendar" aria-label="Calendar"><i class="bi bi-calendar3"></i><span>Calendar</span></button>
+      <button class="nav-item" data-nav="settings" aria-label="Settings"><i class="bi bi-sliders"></i><span>Settings</span></button>
+    </nav>
   </div>
 
-  <nav class="mobile-tabbar" aria-label="Main navigation">
-    <button class="mobile-tab active" data-page="home"><span class="icon-wrap"><i class="bi bi-house-door"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z"/></svg></span><small>Home</small></button>
-    <button class="mobile-tab" data-page="activity"><span class="icon-wrap"><i class="bi bi-arrow-left-right"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M4 7h15m-4-4 4 4-4 4M20 17H5m4 4-4-4 4-4"/></svg></span><small>Activity</small></button>
-    <button class="mobile-add" id="mobile-add" aria-label="Quick add"><span class="icon-wrap"><i class="bi bi-plus-lg"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span></button>
-    <button class="mobile-tab" data-page="insights"><span class="icon-wrap"><i class="bi bi-bar-chart-line"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M4 20V11M10 20V4M16 20v-7M22 20H2"/></svg></span><small>Insights</small></button>
-    <button class="mobile-tab" data-page="settings"><span class="icon-wrap"><i class="bi bi-sliders"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16M8 3v6m8 0v6m-8 0v6"/></svg></span><small>Settings</small></button>
-  </nav>
 
-  <div class="toast-region" id="toast-region" aria-live="polite" aria-atomic="true"></div>
+  <div class="story-viewer hidden" id="storyViewer" role="dialog" aria-modal="true" aria-label="Photo memory" aria-hidden="true">
+    <div class="story-viewer-backdrop" data-story-close></div>
+    <section class="story-stage">
+      <div class="story-progress" id="storyProgress" aria-hidden="true"></div>
+      <header class="story-viewer-header"><span class="story-viewer-brand"><i class="bi bi-journal-heart"></i> A moment, kept</span><button class="story-close" type="button" data-story-close aria-label="Close memory"><i class="bi bi-x-lg"></i></button></header>
+      <div class="story-viewer-photo-wrap"><img id="storyViewerImage" alt="Saved diary memory"></div>
+      <div class="story-viewer-copy"><span class="story-viewer-kicker" id="storyViewerKicker">PHOTO MEMORY</span><h2 id="storyViewerTitle">A moment, kept</h2><p class="story-viewer-date" id="storyViewerDate"></p><p class="story-viewer-excerpt" id="storyViewerExcerpt"></p><button class="story-open-entry" type="button" id="storyOpenEntry" data-story-open-entry><i class="bi bi-journal-text"></i> Open diary page <i class="bi bi-arrow-up-right"></i></button></div>
+      <div class="story-viewer-nav"><button type="button" data-story-prev aria-label="Previous memory"><i class="bi bi-chevron-left"></i></button><span id="storyPosition">1 of 1</span><button type="button" data-story-next aria-label="Next memory"><i class="bi bi-chevron-right"></i></button></div>
+    </section>
+  </div>
 
-  <dialog class="app-modal" id="app-modal" aria-labelledby="modal-title"><div class="modal-head"><div><span class="section-kicker" id="modal-kicker">QUICK ADD</span><h2 id="modal-title">Add transaction</h2></div><button class="icon-button" id="modal-close" aria-label="Close dialog"><span class="icon-wrap"><i class="bi bi-x-lg"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></svg></span></button></div><div id="modal-content"></div></dialog>
-
-  <dialog class="app-modal small-modal" id="notifications-modal" aria-labelledby="notifications-title"><div class="modal-head"><div><span class="section-kicker">STAY IN THE LOOP</span><h2 id="notifications-title">Notifications</h2></div><button class="icon-button" data-close-notifications aria-label="Close notifications"><span class="icon-wrap"><i class="bi bi-x-lg"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></svg></span></button></div><div id="notifications-content" class="notifications-content"></div></dialog>
-  <script src="pwa.js"></script>
-  <script src="app.js"></script>
-  <script src="onboarding.js"></script>
+  <div class="toast-region" id="toastRegion" aria-live="polite" aria-atomic="true"></div>
+  <dialog class="confirm-dialog" id="confirmDialog"><div class="dialog-icon"><i class="bi bi-question-lg"></i></div><h2 id="dialogTitle">Are you sure?</h2><p id="dialogMessage">This action cannot be undone.</p><div class="dialog-actions"><button class="secondary-button" id="dialogCancel">Cancel</button><button class="primary-button danger-button" id="dialogConfirm">Continue</button></div></dialog>
+  <script src="./app.js" defer></script>
+  <script>
+    // Register offline support only on HTTPS or localhost. Relative path works in GitHub Pages subdirectories.
+    if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+      window.addEventListener('load', () => navigator.serviceWorker.register(new URL('./sw.js', document.baseURI)).catch(() => {}));
+    }
+  </script>
 </body>
 </html>
