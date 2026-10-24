@@ -46,14 +46,21 @@
   }
   async function analyzePDF(file,token){
     setStatus('Loading the local PDF reader…');const pdfjs=await import('https://cdn.jsdelivr.net/npm/pdfjs-dist@6.4.299/build/pdf.mjs');pdfjs.GlobalWorkerOptions.workerSrc='https://cdn.jsdelivr.net/npm/pdfjs-dist@6.4.299/build/pdf.worker.min.mjs';
-    const doc=await pdfjs.getDocument({data:new Uint8Array(await file.arrayBuffer()),isEvalSupported:false}).promise;if(doc.numPages>150){await doc.destroy();throw new Error('This PDF has more than 150 pages. Export the statement in smaller date ranges to protect device memory.');}
-    let anyText=false,matrices=[],textOnlyLines=[];
-    try{for(let pageNo=1;pageNo<=doc.numPages;pageNo++){if(token!==parseToken)return {error:'Analysis cancelled.'};setStatus(`Reading PDF page ${pageNo} of ${doc.numPages}…`);const pageObj=await doc.getPage(pageNo);const content=await pageObj.getTextContent({includeMarkedContent:false});const lines=parser().pdfItemsToLines(content.items);if(lines.some(l=>l.items.length))anyText=true;textOnlyLines.push(...lines.map(l=>l.text));const table=parser().pdfPageToMatrix(lines);if(table.rows)matrices.push(table);pageObj.cleanup();}
-    }finally{await doc.destroy();}
-    if(!anyText)throw new Error('This looks like a scanned/image-only PDF. For reliable amounts, export a CSV statement or download a searchable/text PDF from your bank. PocketWise will not guess digits from a scan.');
-    if(!matrices.length)throw new Error('Text was found, but the PDF table headings could not be mapped safely. Download a CSV statement from your bank or use a clearly structured text PDF.');
-    const headers=matrices[0].rows[0];const rows=[headers];for(const table of matrices){const th=table.rows[0];const idx=headers.map(h=>th.findIndex(x=>parser().norm(x)===parser().norm(h)));for(const row of table.rows.slice(1)){rows.push(headers.map((_,i)=>idx[i]>=0?(row[idx[i]]||''):''));}}
-    matrix=rows;mapping=parser().mapHeaders(headers);let result=parser().parseMatrix(rows,mapping);result.sourcePages=doc.numPages;result.sourceName=file.name;return result;
+    const loadingTask=pdfjs.getDocument({data:new Uint8Array(await file.arrayBuffer()),isEvalSupported:false});let doc=null;
+    try{
+      doc=await loadingTask.promise;
+      if(doc.numPages>150)throw new Error('This PDF has more than 150 pages. Export the statement in smaller date ranges to protect device memory.');
+      let anyText=false,matrices=[],textOnlyLines=[];
+      for(let pageNo=1;pageNo<=doc.numPages;pageNo++){if(token!==parseToken)return {error:'Analysis cancelled.'};setStatus(`Reading PDF page ${pageNo} of ${doc.numPages}…`);const pageObj=await doc.getPage(pageNo);try{const content=await pageObj.getTextContent({includeMarkedContent:false});const lines=parser().pdfItemsToLines(content.items);if(lines.some(l=>l.items.length))anyText=true;textOnlyLines.push(...lines.map(l=>l.text));const table=parser().pdfPageToMatrix(lines);if(table.rows)matrices.push(table);}finally{if(typeof pageObj.cleanup==='function')pageObj.cleanup();}}
+      if(!anyText)throw new Error('This looks like a scanned/image-only PDF. For reliable amounts, export a CSV statement or download a searchable/text PDF from your bank. PocketWise will not guess digits from a scan.');
+      if(!matrices.length)throw new Error('Text was found, but the PDF table headings could not be mapped safely. Download a CSV statement from your bank or use a clearly structured text PDF.');
+      const headers=matrices[0].rows[0];const rows=[headers];for(const table of matrices){const th=table.rows[0];const idx=headers.map(h=>th.findIndex(x=>parser().norm(x)===parser().norm(h)));for(const row of table.rows.slice(1)){rows.push(headers.map((_,i)=>idx[i]>=0?(row[idx[i]]||''):''));}}
+      matrix=rows;mapping=parser().mapHeaders(headers);let result=parser().parseMatrix(rows,mapping);result.sourcePages=doc.numPages;result.sourceName=file.name;return result;
+    }finally{
+      // PDF.js exposes destruction on PDFDocumentLoadingTask, not consistently on PDFDocumentProxy.
+      // Guard the call for runtime/version compatibility and avoid masking the actual parse error.
+      try{if(typeof loadingTask.destroy==='function')await loadingTask.destroy();else if(typeof doc?.cleanup==='function')await doc.cleanup();}catch(cleanupError){console.warn('PDF reader cleanup failed:',cleanupError);}
+    }
   }
   function decorateRiskyRows(rows){for(const row of rows){const d=String(row.description||'');if(/\b(?:own account|self transfer|transfer to own|transfer from own|between own|internal transfer|credit card payment|credit card bill|cc payment|card bill payment|atm cash withdrawal)\b/i.test(d)){row.transferReview=true;row.originalType=row.type;row.type='review';row.selected=false;row.issue=row.issue||'Possible transfer, card settlement or cash movement. Choose how to classify it.';}}}
   function renderMappingControls(headers,suggested,message){
