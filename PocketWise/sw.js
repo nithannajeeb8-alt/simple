@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pocketwise-shell-v2.3.18';
+const CACHE_NAME = 'pocketwise-shell-v2.3.19';
 const BASE_URL = self.registration.scope;
 const asset = path => new URL(path, BASE_URL).href;
 const APP_SHELL = [
@@ -9,6 +9,7 @@ const APP_SHELL = [
   asset('statement-parser.js'),
   asset('local-ai.js'),
   asset('local-ai-worker.js'),
+  asset('local-ai-cache-recovery.js'),
   asset('statement-import.js'),
   asset('onboarding.js'),
   asset('pwa.js'),

@@ -29,7 +29,7 @@
         return;
       }
       if(msg.type==='error'){
-        loadState='error';const message=String(msg.message||'Local AI could not be loaded.').slice(0,500);
+        loadState='error';try{localStorage.removeItem(READY_KEY);}catch(_){}const message=String(msg.message||'Local AI could not be loaded.').slice(0,500);
         settingStatus(`Could not prepare local AI: ${message} Statement parsing and manual column mapping remain available.`);setActionButtons();
         if(loadPromise){const reject=loadPromise.reject;loadPromise=null;reject(new Error(message));}
         releaseWorker();return;
@@ -42,7 +42,7 @@
       }
     });
     worker.addEventListener('error',event=>{
-      const message=String(event.message||'The local AI worker failed.').slice(0,400);loadState='error';settingStatus(`Local AI unavailable: ${message} Manual column mapping remains available.`);setActionButtons();
+      const message=String(event.message||'The local AI worker failed.').slice(0,400);loadState='error';try{localStorage.removeItem(READY_KEY);}catch(_){}settingStatus(`Local AI unavailable: ${message} Manual column mapping remains available.`);setActionButtons();
       if(loadPromise){loadPromise.reject(new Error(message));loadPromise=null;}releaseWorker();
       for(const [id,request] of requests){if(request.timer)clearTimeout(request.timer);request.reject(new Error(message));requests.delete(id);}
     });

@@ -1,4 +1,5 @@
 /* Optional local WebLLM column mapper. The statement rows never enter this worker. */
+import './local-ai-cache-recovery.js';
 const MODEL_ID='Qwen2.5-1.5B-Instruct-q4f16_1-MLC';
 const WEBLLM_URL='https://esm.run/@mlc-ai/web-llm@0.2.86';
 const LEGACY_CACHE_NAMES=['pocketwise-qwen3-06b-v1','pocketwise-smollm2-135m-v1'];
@@ -16,9 +17,21 @@ async function ensureEngine(){
     if(!adapter)throw new Error('WebGPU is unavailable or no compatible GPU adapter was found. AI is disabled to protect the browser from a memory-heavy CPU fallback.');
     const lib=await getLibrary();
     post('status',{message:'Loading Qwen2.5-1.5B locally. First use may download about 880 MB; progress is shown here.'});
-    engine=await lib.CreateMLCEngine(MODEL_ID,{
+    const createEngine=()=>lib.CreateMLCEngine(MODEL_ID,{
       initProgressCallback:report=>post('progress',{detail:progressDetail(report)}),
       logLevel:'ERROR'
+    });
+    // WebLLM can encounter a corrupt/incomplete cached tensor shard (for example,
+    // a record range larger than a zero-byte shard). Purge only this model's WebLLM
+    // cache and retry once, rather than leaving the user stuck with the same error.
+    engine=await self.PocketwiseAICacheRecovery.loadWithCacheRecovery({
+      load:createEngine,
+      isCorruptCacheError:self.PocketwiseAICacheRecovery.isCorruptTensorCacheError,
+      onRecover:async()=>post('status',{message:'A damaged Qwen2.5 cache was detected. Removing only the local AI model cache and retrying once…'}),
+      clearCache:async()=>{
+        post('status',{message:'Repairing the Qwen2.5 model cache…'});
+        await lib.deleteModelAllInfoInCache(MODEL_ID,lib.prebuiltAppConfig);
+      }
     });
     return engine;
   })();
