@@ -12,8 +12,8 @@
     "minimal-ui"
   ],
   "orientation": "any",
-  "background_color": "#103b2d",
-  "theme_color": "#103b2d",
+  "background_color": "#000000",
+  "theme_color": "#000000",
   "categories": [
     "finance",
     "utilities"

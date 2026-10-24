@@ -5,7 +5,6 @@ const APP_SHELL = [
   BASE_URL,
   asset('index.html'),
   asset('styles.css'),
-  asset('pocketwise-2.css'),
   asset('app.js'),
   asset('onboarding.js'),
   asset('pwa.js'),
@@ -45,5 +44,34 @@ self.addEventListener('fetch', event => {
       if (req.destination === 'image') return caches.match(asset('assets/icons/icon.svg'));
       return new Response('Offline', { status: 503, statusText: 'Offline' });
     });
+  }));
+});
+
+
+// Push messages are delivered by a configured Web Push sender, including when the page is closed.
+self.addEventListener('push', event => {
+  let payload = {};
+  try { payload = event.data ? event.data.json() : {}; }
+  catch (_) { payload = { body: event.data ? event.data.text() : '' }; }
+  const title = String(payload.title || 'PocketWise');
+  const options = {
+    body: String(payload.body || 'You have an update in PocketWise.'),
+    icon: asset('assets/icons/icon-192.PNG'),
+    badge: asset('assets/icons/icon-192.PNG'),
+    tag: String(payload.tag || 'pocketwise-push'),
+    renotify: Boolean(payload.renotify),
+    data: { url: payload.url || BASE_URL }
+  };
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  const target = new URL(event.notification.data && event.notification.data.url || BASE_URL, BASE_URL).href;
+  event.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clients => {
+    for (const client of clients) {
+      if (client.url.startsWith(BASE_URL) && 'focus' in client) return client.focus();
+    }
+    return self.clients.openWindow ? self.clients.openWindow(target) : undefined;
   }));
 });
