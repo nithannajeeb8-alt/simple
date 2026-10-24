@@ -1218,7 +1218,7 @@ html[data-liquid-glass="on"] .danger-card {
   .page-heading .eyebrow { font-size: 11px; }
 }
 
-/* PocketWise 2.3.7 — refined white glass, coherent material layers, and a shared sliding selection. */
+/* PocketWise 2.3.8 — reliability fixes, refined white glass, and coherent material layers. */
 html[data-liquid-glass="on"] {
   --glass-card: rgba(255,255,255,.84);
   --glass-card-low: rgba(255,255,255,.74);
