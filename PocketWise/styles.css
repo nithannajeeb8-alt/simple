@@ -607,7 +607,7 @@ html[data-theme="dark"] body,
 html[data-theme="dark"] .app-shell,
 html[data-theme="dark"] .main-content,
 html[data-theme="dark"] .topbar,
-html[data-theme="dark"] .mobile-tabbar{background:#000000;}
+html[data-theme="dark"] .mobile-tabbar{background:color-mix(in srgb,var(--surface) 96%,transparent);}
 html[data-theme="dark"] .card,
 html[data-theme="dark"] .settings-card,
 html[data-theme="dark"] .metric-card,
@@ -744,7 +744,8 @@ html[data-theme="dark"] ::selection { background: #14532D; color: #FFFFFF; }
     gap: 2px;
     min-height: 72px;
     padding: 7px 10px calc(7px + env(safe-area-inset-bottom));
-    background: #000000;
+    background: color-mix(in srgb, var(--surface) 96%, transparent);
+    border-top-color: var(--line);
   }
   .mobile-tab {
     display: flex;
