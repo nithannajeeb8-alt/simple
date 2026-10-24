@@ -48,14 +48,15 @@
   }
   function countDelimiter(text,delimiter){let n=0,quoted=false;for(let i=0;i<text.length;i++){const c=text[i];if(c==='"'&&text[i+1]==='"'){i++;continue;}if(c==='"')quoted=!quoted;else if(c===delimiter&&!quoted)n++;}return n;}
   function headerType(value){
-    const h=norm(value);if(!h)return null;
+    const raw=clean(value);if(/^(?:ignored|other column|unmapped)\b/i.test(raw))return null;
+    const h=norm(raw);if(!h)return null;
     if(/^(?:transaction )?(?:date|txn date|value date|posting date|transaction date|date of transaction|txn dt|trans date|value dt)$/.test(h)||/\b(value date|transaction date|txn date|posting date|transaction dt)\b/.test(h))return 'date';
-    if(/\b(opening balance|closing balance|running balance|available balance|balance amount|balance|closing bal|balance rs)\b/.test(h))return 'balance';
-    if(/\b(withdrawal|withdrawals|debit|debits|debit amount|withdrawal amount|paid out|money out|dr amount|withdrawal amt)\b/.test(h))return 'debit';
-    if(/\b(deposit|deposits|credit|credits|credit amount|deposit amount|paid in|money in|cr amount|deposit amt)\b/.test(h))return 'credit';
-    if(/\b(particulars|description|narration|transaction details|transaction description|remarks|transaction particulars|payee|merchant|beneficiary|particular)\b/.test(h)||/^details$/.test(h)||/^details of transaction$/.test(h))return 'description';
-    if(/\b(reference|reference no|ref no|rrn|utr|cheque no|chq no|transaction id|txn id|instrument id)\b/.test(h))return 'reference';
-    if(/\b(amount|transaction amount|txn amount|value|amount rs|amount inr)\b/.test(h))return 'amount';
+    if(/\b(opening balance|closing balance|running balance|available balance|balance amount|balance|closing bal|balance rs|ledger balance|available bal)\b/.test(h))return 'balance';
+    if(/\b(withdrawal|withdrawals|withdrawn|debit|debits|debit amount|withdrawal amount|paid out|money out|dr amount|withdrawal amt|withdrawal dr|debit dr|outflow|money withdrawn)\b/.test(h)||/^(?:dr|amount dr|amt dr|dr amount|dr amt)$/.test(h))return 'debit';
+    if(/\b(deposit|deposits|deposited|credit|credits|credit amount|deposit amount|paid in|money in|cr amount|deposit amt|deposit cr|credit cr|inflow|money received)\b/.test(h)||/^(?:cr|amount cr|amt cr|cr amount|cr amt)$/.test(h))return 'credit';
+    if(/\b(particulars|description|narration|transaction details|transaction description|remarks|transaction particulars|payee|merchant|beneficiary|particular|transaction remarks|details of transaction|transaction narration)\b/.test(h)||/^details$/.test(h))return 'description';
+    if(/\b(reference|reference no|ref no|ref cheque|ref cheque no|rrn|utr|cheque no|cheque number|chq no|chq number|transaction id|txn id|instrument id|instrument no|utr no|bank reference|transaction reference)\b/.test(h)||/^ref$/.test(h)||/^ref cheque$/.test(h))return 'reference';
+    if(/\b(amount|transaction amount|txn amount|amount rs|amount inr|withdrawal amount|deposit amount|debit amount|credit amount|transaction value|txn value)\b/.test(h)||/^value$/.test(h))return 'amount';
     return null;
   }
   function mapHeaders(headers){
@@ -100,30 +101,126 @@
   // When a reference exists, it remains the primary idempotency key across repeated imports.
   function fingerprintKey(row,accountId){const reference=clean(row?.reference).toLowerCase();const identity=reference||norm(row?.description);return [String(accountId||''),String(row?.date||''),String(row?.type||''),Number(row?.amount).toFixed(2),identity].join('|');}
   function makeFingerprint(row,accountId,occurrence=1){const key=fingerprintKey(row,accountId);const input=clean(row?.reference)?key:`${key}|occurrence:${Math.max(1,Math.trunc(Number(occurrence)||1))}`;let hash=2166136261;for(let i=0;i<input.length;i++){hash^=input.charCodeAt(i);hash=Math.imul(hash,16777619);}return `stmt_${(hash>>>0).toString(16)}`;}
-  function pdfItemsToLines(items){const kept=(items||[]).filter(x=>x&&typeof x.str==='string'&&clean(x.str));const lines=[];for(const item of kept){const x=Number(item.transform?.[4]||0),y=Number(item.transform?.[5]||0);let line=lines.find(l=>Math.abs(l.y-y)<=2.5);if(!line){line={y,items:[]};lines.push(line);}line.items.push({x,y,text:clean(item.str)});}for(const line of lines){line.items.sort((a,b)=>a.x-b.x);line.text=line.items.map(x=>x.text).join(' ').replace(/\s+/g,' ').trim();}return lines.sort((a,b)=>b.y-a.y);}
-  function pdfPageToMatrix(lines){
-    let activeHeader=null;const output=[];const issues=[];
-    for(let li=0;li<lines.length;li++){
-      const line=lines[li];const itemLabels=line.items.map(it=>({it,kind:headerType(it.text)}));
-      const unique=new Map();for(const {it,kind} of itemLabels){if(kind&&!unique.has(kind))unique.set(kind,it.x);}
-      const lineHasHeader=unique.has('date')&&unique.has('description')&&(unique.has('amount')||unique.has('debit')||unique.has('credit'));
-      if(lineHasHeader){activeHeader=[...unique.entries()].map(([kind,x])=>({kind,x})).sort((a,b)=>a.x-b.x);continue;}
-      const dateCandidate=line.items.some(it=>parseDate(it.text));
-      if(activeHeader&&dateCandidate){
-        const bounds=activeHeader.map((col,i)=>({kind:col.kind,left:i===0?-Infinity:(activeHeader[i-1].x+col.x)/2,right:i===activeHeader.length-1?Infinity:(col.x+activeHeader[i+1].x)/2}));const cells=activeHeader.map(()=>[]);
-        for(const it of line.items){let idx=activeHeader.findIndex((col,i)=>it.x>=bounds[i].left&&it.x<bounds[i].right);if(idx<0)idx=activeHeader.length-1;cells[idx].push(it.text);}
-        const record={};activeHeader.forEach((col,i)=>record[col.kind]=cells[i].join(' ').trim());
-        const row=activeHeader.map(col=>record[col.kind]||'');output.push({row,activeHeader:activeHeader.map(c=>c.kind)});continue;
-      }
-      if(output.length&&!dateCandidate&&activeHeader){
-        const amountLike=line.items.some(it=>parseMoney(it.text).value!==null);
-        const descriptionTexts=line.items.filter(it=>it.x>=activeHeader.find(x=>x.kind==='description')?.x).map(it=>it.text).join(' ').trim();
-        if(descriptionTexts&&!amountLike&&!/page\s+\d+|continued|opening balance|closing balance|statement period/i.test(line.text)){const last=output[output.length-1];const idx=last.activeHeader.indexOf('description');if(idx>=0&&descriptionTexts.length<250)last.row[idx]=`${last.row[idx]} ${descriptionTexts}`.trim();}
-      }
+  function pdfItemsToLines(items){
+    const kept=(items||[]).filter(x=>x&&typeof x.str==='string'&&clean(x.str));
+    const lines=[];
+    for(const item of kept){
+      const x=Number(item.transform?.[4]||0),y=Number(item.transform?.[5]||0),text=clean(item.str);
+      const width=Math.max(0,Number(item.width)||text.length*4.2);
+      let line=lines.find(l=>Math.abs(l.y-y)<=2.5);
+      if(!line){line={y,items:[]};lines.push(line);}
+      line.items.push({x,y,width,right:x+width,text});
     }
-    if(!output.length)return {rows:null,lines:lines.map(l=>l.text),issues:['No recognizable table header was detected in the PDF.']};
-    const kinds=output[0].activeHeader;const rows=[kinds.map(k=>({date:'Date',description:'Description',debit:'Debit',credit:'Credit',amount:'Amount',balance:'Balance',reference:'Reference'}[k]||k))];for(const item of output){const obj={};item.activeHeader.forEach((k,i)=>obj[k]=item.row[i]||'');rows.push(kinds.map(k=>obj[k]||''));}
-    return {rows,lines:lines.map(l=>l.text),issues};
+    for(const line of lines){line.items.sort((a,b)=>a.x-b.x);line.text=line.items.map(x=>x.text).join(' ').replace(/\s+/g,' ').trim();}
+    return lines.sort((a,b)=>b.y-a.y);
+  }
+  function pdfHeaderSegments(items){
+    const sorted=(items||[]).slice().sort((a,b)=>a.x-b.x);const segments=[];
+    for(const item of sorted){
+      const prior=segments[segments.length-1];
+      const right=Number.isFinite(item.right)?item.right:item.x+Math.max(0,Number(item.width)||item.text.length*4.2);
+      const gap=prior?item.x-prior.right:Infinity;
+      // Column captions are often emitted as separate PDF text fragments, e.g. "Txn" + "Date".
+      // Merge close fragments before classifying them so "Value Date" cannot become an Amount column.
+      if(prior&&gap<=4){prior.text=`${prior.text} ${item.text}`.trim();prior.right=Math.max(prior.right,right);}
+      else segments.push({x:item.x,right,text:item.text});
+    }
+    return segments;
+  }
+  function pdfPageToMatrix(lines,previousLayout=null){
+    const allItems=(lines||[]).flatMap(line=>line.items||[]).sort((a,b)=>b.y-a.y||a.x-b.x);
+    let layout=null,headerY=null,hasHeader=false;
+    for(const line of (lines||[])){
+      // Some bank PDFs render a wrapped table caption (for example Ref/Cheque / No.) on
+      // neighboring baselines. Inspect a narrow band around each candidate header line.
+      const nearbyItems=(lines||[]).filter(other=>Math.abs(other.y-line.y)<=8).flatMap(other=>other.items||[]);
+      const rawSegments=pdfHeaderSegments(nearbyItems);
+      const labelled=rawSegments.map(segment=>({...segment,kind:headerType(segment.text)}));
+      const dateSegments=labelled.filter(s=>s.kind==='date');
+      const dateCaption=dateSegments.find(s=>/txn|trans|transaction|posting|entry/.test(norm(s.text))&&!/value date|effective date/.test(norm(s.text)))||dateSegments.find(s=>!/value date|effective date/.test(norm(s.text)))||dateSegments[0];
+      if(!dateCaption)continue;
+      const description=labelled.find(s=>s.kind==='description');
+      const money=labelled.some(s=>['amount','debit','credit'].includes(s.kind));
+      // If money captions are unfamiliar, allow a plausible 3+ column table through to preview/mapping.
+      // This lets an already-cached local AI or the user map unusual labels instead of hard failing.
+      if(!description||(!money&&labelled.length<3))continue;
+      // Preserve unknown header cells as physical boundaries too. Bank captions vary widely,
+      // and dropping a reference or instrument column can shift debit/credit data into the wrong cell.
+      const ordered=labelled.slice().sort((a,b)=>a.x-b.x);let assignedPrimary=false;
+      layout=ordered.map(segment=>{
+        let kind=segment.kind||'ignored';
+        if(kind==='date'){
+          const primary=segment===dateCaption&&!assignedPrimary;
+          if(primary){kind='date';assignedPrimary=true;}else kind='ignored';
+        }
+        return {kind,x:segment.x,label:segment.text};
+      });
+      // Duplicate semantic columns are left as separators rather than merged into adjacent cells.
+      // This particularly matters for statements with both Txn Date and Value Date.
+      const seen=new Set();layout=layout.map(col=>{
+        if(col.kind==='ignored')return col;
+        if(seen.has(col.kind))return {...col,kind:'ignored'};
+        seen.add(col.kind);return col;
+      });
+      headerY=line.y;hasHeader=true;break;
+    }
+    if(!layout&&Array.isArray(previousLayout)&&previousLayout.length>=3){
+      layout=previousLayout.map(c=>({...c}));
+    }
+    if(!layout)return {rows:null,lines:(lines||[]).map(l=>l.text),issues:['No recognizable table header was detected in the PDF.'],layout:null};
+    layout=layout.slice().sort((a,b)=>a.x-b.x);
+    const dateIndex=layout.findIndex(c=>c.kind==='date');
+    if(dateIndex<0)return {rows:null,lines:(lines||[]).map(l=>l.text),issues:['A transaction-date column could not be identified.'],layout};
+    const xBounds=layout.map((col,i)=>({kind:col.kind,left:i===0?-Infinity:(layout[i-1].x+col.x)/2,right:i===layout.length-1?Infinity:(col.x+layout[i+1].x)/2}));
+    // Narration/description cells are often much wider than the caption itself. Use the next
+    // reference boundary as the narration edge instead of the midpoint of the two caption starts.
+    const descIndex=layout.findIndex(c=>c.kind==='description');
+    if(descIndex>=0&&descIndex<layout.length-1){
+      const next=layout[descIndex+1];
+      if(next.kind==='reference')xBounds[descIndex].right=Math.max(xBounds[descIndex].right,next.x-3);
+      else xBounds[descIndex].right=Math.max(xBounds[descIndex].right,next.x-18);
+    }
+    const refIndex=layout.findIndex(c=>c.kind==='reference');
+    if(refIndex>=0&&refIndex<layout.length-1&&['debit','credit','amount','balance'].includes(layout[refIndex+1].kind)){
+      xBounds[refIndex].right=Math.max(xBounds[refIndex].right,(layout[refIndex].x+layout[refIndex+1].x)/2+10);
+    }
+    const inDateColumn=item=>item.x>=xBounds[dateIndex].left&&item.x<xBounds[dateIndex].right;
+    const dateAnchors=[];
+    for(const item of allItems){
+      if(hasHeader&&headerY!==null&&item.y>=headerY-2)continue;
+      if(!inDateColumn(item))continue;
+      const date=parseDate(item.text);if(!date)continue;
+      if(!dateAnchors.some(a=>Math.abs(a.y-item.y)<=2.5))dateAnchors.push({y:item.y,date,item});
+    }
+    dateAnchors.sort((a,b)=>b.y-a.y);
+    if(!dateAnchors.length)return {rows:null,lines:(lines||[]).map(l=>l.text),issues:['The table headings were found, but no transaction dates were found in the date column.'],layout};
+    const rows=[];
+    for(let ri=0;ri<dateAnchors.length;ri++){
+      const anchor=dateAnchors[ri],prev=dateAnchors[ri-1],next=dateAnchors[ri+1];
+      const gapAbove=prev?Math.abs(prev.y-anchor.y):next?Math.abs(anchor.y-next.y):24;
+      const gapBelow=next?Math.abs(anchor.y-next.y):prev?Math.abs(prev.y-anchor.y):24;
+      const top=prev?(prev.y+anchor.y)/2:anchor.y+Math.max(10,gapAbove/2);
+      const bottom=next?(anchor.y+next.y)/2:anchor.y-Math.max(10,gapBelow/2);
+      const cells=layout.map(()=>[]);
+      for(const item of allItems){
+        if(item.y>top+0.1||item.y<bottom-0.1)continue;
+        if(hasHeader&&headerY!==null&&item.y>=headerY-2)continue;
+        let col=xBounds.findIndex(b=>item.x>=b.left&&item.x<b.right);if(col<0)continue;
+        // Don't duplicate the anchor date if PDF text spans happen to overlap the column boundary.
+        cells[col].push(item);
+      }
+      const row=layout.map((col,i)=>{
+        const parts=cells[i].sort((a,b)=>b.y-a.y||a.x-b.x).map(item=>item.text).filter(Boolean);
+        let value=parts.join(' ').replace(/\s+/g,' ').trim();
+        if(col.kind==='date')value=anchor.date;
+        return value;
+      });
+      rows.push(row);
+    }
+    const nameFor=col=>{if(col.kind==='ignored')return `Ignored: ${col.label||'Other column'}`;return ({date:'Date',description:'Description',reference:'Reference',debit:'Debit',credit:'Credit',amount:'Amount',balance:'Balance'}[col.kind]||col.label||'Other column');};
+    const headers=layout.map(nameFor);
+    // Avoid turning blank visual spacers into duplicate headers; labels above represent real columns.
+    return {rows:[headers,...rows],lines:(lines||[]).map(l=>l.text),issues:[],layout:layout.map(c=>({...c})),headerDetected:hasHeader,rowCount:rows.length};
   }
   return {parseDate,parseMoney,parseCSV,headerType,mapHeaders,mappingUsable,findHeaderRow,validateMapping,parseMatrix,pdfItemsToLines,pdfPageToMatrix,fingerprintKey,makeFingerprint,norm,MAX_ROWS};
 });

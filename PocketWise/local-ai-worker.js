@@ -1,52 +1,70 @@
-/* Optional small on-device SmolLM2 worker for bank-column interpretation.
-   It receives only column labels. Financial rows are parsed and validated separately. */
-let tokenizerPromise=null,modelPromise=null,modelLoadPromise=null,modelId=null,deviceId=null;
-const MODEL_ID='onnx-community/SmolLM2-135M-Instruct-ONNX-MHA';
-const CACHE_KEY='pocketwise-smollm2-135m-v1';
+/* Optional local WebLLM column mapper. The statement rows never enter this worker. */
+const MODEL_ID='Qwen2.5-1.5B-Instruct-q4f16_1-MLC';
+const WEBLLM_URL='https://esm.run/@mlc-ai/web-llm@0.2.86';
+const LEGACY_CACHE_NAMES=['pocketwise-qwen3-06b-v1','pocketwise-smollm2-135m-v1'];
+let webllmPromise=null,engine=null,enginePromise=null;
 const post=(type,data={})=>self.postMessage({type,...data});
-function isMobileDevice(){
-  const ua=String(self.navigator?.userAgent||'');
-  const iPadOS=/Macintosh/i.test(ua)&&Number(self.navigator?.maxTouchPoints||0)>1;
-  return /Android|iPhone|iPad|iPod/i.test(ua)||iPadOS;
-}
-async function getModel(progress){
-  if(modelLoadPromise)return modelLoadPromise;
-  modelLoadPromise=(async()=>{
-    post('status',{message:'Loading the small local AI runtime…'});
-    const lib=await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@4.3.1');
-    const {AutoTokenizer,AutoModelForCausalLM,env}=lib;
-    env.useBrowserCache=true;env.useWasmCache=true;env.cacheKey=CACHE_KEY;env.allowRemoteModels=true;
-    // Sequential loading reduces the peak memory footprint during startup.
-    let adapter=null;
-    try{if(self.navigator?.gpu)adapter=await self.navigator.gpu.requestAdapter();}catch(_){adapter=null;}
-    const mobile=isMobileDevice();
-    if(mobile&&!adapter){
-      throw new Error('This mobile browser does not expose WebGPU. To protect PocketWise from a memory crash, local AI will not start on the CPU. Statement parsing and manual column mapping still work.');
-    }
-    let device='wasm',dtype='q4';
-    if(adapter){device='webgpu';dtype=adapter.features?.has('shader-f16')?'q4f16':'q4';}
-    if(device==='wasm'&&env.backends?.onnx?.wasm){env.backends.onnx.wasm.numThreads=1;}
-    post('status',{message:device==='webgpu'?`Preparing small SmolLM2 on the device GPU (${dtype==='q4f16'?'low-memory FP16':'quantized'} mode)…`:'Preparing small SmolLM2 on the desktop CPU…'});
-    const callback=info=>{if(!info||typeof info!=='object')return;const details={status:String(info.status||''),file:String(info.file||info.name||''),progress:Number.isFinite(info.progress)?info.progress:null,loaded:Number.isFinite(info.loaded)?info.loaded:null,total:Number.isFinite(info.total)?info.total:null};progress(details);};
-    const tokenizer=await AutoTokenizer.from_pretrained(MODEL_ID,{progress_callback:callback});
-    const model=await AutoModelForCausalLM.from_pretrained(MODEL_ID,{device,dtype,progress_callback:callback});
-    tokenizerPromise=Promise.resolve(tokenizer);modelPromise=Promise.resolve(model);modelId=MODEL_ID;deviceId=device;
-    post('ready',{model:MODEL_ID,device,dtype});
-    return [tokenizer,model];
+function progressDetail(report){return {text:String(report?.text||report?.progressText||report?.status||'Preparing local model…'),progress:Number.isFinite(report?.progress)?report.progress:null};}
+async function getLibrary(){if(!webllmPromise)webllmPromise=import(WEBLLM_URL);return webllmPromise;}
+async function ensureEngine(){
+  if(engine)return engine;
+  if(enginePromise)return enginePromise;
+  enginePromise=(async()=>{
+    post('status',{message:'Checking WebGPU support…'});
+    if(!self.navigator?.gpu)throw new Error('This browser does not expose WebGPU. For safety, Qwen2.5 will not run on CPU. Statement parsing and manual mapping still work.');
+    let adapter=null;try{adapter=await self.navigator.gpu.requestAdapter();}catch(_){}
+    if(!adapter)throw new Error('WebGPU is unavailable or no compatible GPU adapter was found. AI is disabled to protect the browser from a memory-heavy CPU fallback.');
+    const lib=await getLibrary();
+    post('status',{message:'Loading Qwen2.5-1.5B locally. First use may download about 880 MB; progress is shown here.'});
+    engine=await lib.CreateMLCEngine(MODEL_ID,{
+      initProgressCallback:report=>post('progress',{detail:progressDetail(report)}),
+      logLevel:'ERROR'
+    });
+    return engine;
   })();
-  try{return await modelLoadPromise;}
-  catch(error){tokenizerPromise=null;modelPromise=null;modelLoadPromise=null;throw error;}
+  try{return await enginePromise;}catch(error){engine=null;enginePromise=null;throw error;}
 }
-async function load(){try{await getModel(d=>post('progress',{detail:d}));post('loaded',{model:MODEL_ID,device:deviceId});}catch(error){post('error',{message:String(error?.message||error||'Unable to load the local AI model.')});}}
-function parseJsonObject(text){const s=String(text||'');const first=s.indexOf('{'),last=s.lastIndexOf('}');if(first<0||last<first)throw new Error('The local model did not return a usable column map.');return JSON.parse(s.slice(first,last+1));}
+async function unloadEngine(){const current=engine;engine=null;enginePromise=null;if(current){try{await current.unload();}catch(error){console.warn('WebLLM unload warning',error);}}}
+async function load(intent='prepare'){
+  try{
+    await ensureEngine();
+    if(intent!=='map')await unloadEngine();
+    post('loaded',{model:MODEL_ID,device:'webgpu'});
+  }catch(error){await unloadEngine();post('error',{message:String(error?.message||error||'Unable to prepare local AI model.')});}
+}
+function parseJsonObject(text){const s=String(text||'').replace(/<think>[\s\S]*?<\/think>/g,'').trim();const first=s.indexOf('{'),last=s.lastIndexOf('}');if(first<0||last<first)throw new Error('The local model did not return a usable column map.');return JSON.parse(s.slice(first,last+1));}
 async function mapColumns(headers){
-  if(!modelPromise||!tokenizerPromise)await getModel(d=>post('progress',{detail:d}));
-  const [tokenizer,model]=await Promise.all([tokenizerPromise,modelPromise]);
-  const safeHeaders=(headers||[]).slice(0,80).map((h,i)=>({index:i,label:String(h||'').slice(0,100)}));
-  const prompt='Map only these bank statement CSV column labels to the schema. Do not read or invent transaction records. Return JSON only, using zero-based numeric header indices or null: {"date":number|null,"description":number|null,"debit":number|null,"credit":number|null,"amount":number|null,"balance":number|null,"reference":number|null}. Prefer separate debit and credit columns when available. Never use a balance column as the transaction amount. If a field is not clear, use null. Headers: '+JSON.stringify(safeHeaders);
-  const inputs=tokenizer.apply_chat_template([{role:'system',content:'You are a strict CSV column-label mapper. Never infer from transaction values. Output a single JSON object and nothing else.'},{role:'user',content:prompt}],{add_generation_prompt:true,return_dict:true,enable_thinking:false});
-  const output=await model.generate({...inputs,max_new_tokens:120,do_sample:false});
-  const generated=tokenizer.decode(output[0].slice(inputs.input_ids.size(-1)),{skip_special_tokens:true});
-  post('map-complete',{length:generated.length});return parseJsonObject(generated);
+  const safeHeaders=(headers||[]).slice(0,80).map((label,index)=>({index,label:String(label||'').slice(0,100)}));
+  if(!safeHeaders.length)throw new Error('No column labels were supplied to the local model.');
+  const current=await ensureEngine();
+  try{
+    const response=await current.chat.completions.create({
+      model:MODEL_ID,
+      messages:[
+        {role:'system',content:'You are a strict bank-statement column-label mapper. You receive labels only, never transaction rows. Return only a JSON object. Never guess amounts, transaction directions, balances or data values. Use zero-based header indexes or null. Prefer distinct debit and credit fields when they exist. Never map a balance column as transaction amount.'},
+        {role:'user',content:'Map these bank statement column labels to exactly this schema: {"date": number|null, "description": number|null, "debit": number|null, "credit": number|null, "amount": number|null, "balance": number|null, "reference": number|null}. If label meanings are unclear, use null. Headers: '+JSON.stringify(safeHeaders)}
+      ],
+      temperature:0,
+      max_tokens:180,
+      response_format:{type:'json_object'}
+    });
+    const content=response?.choices?.[0]?.message?.content;
+    return parseJsonObject(content);
+  }finally{await unloadEngine();}
 }
-self.addEventListener('message',async event=>{const {id,type,headers}=event.data||{};try{if(type==='load'){await load();}else if(type==='mapColumns'){const mapping=await mapColumns(headers||[]);post('response',{id,mapping});}}catch(error){const message=String(error?.message||error||'Local AI mapping failed.');if(type==='load')post('error',{message});else post('response-error',{id,message});}});
+async function removeCache(){
+  try{
+    const lib=await getLibrary();
+    await lib.deleteModelAllInfoInCache(MODEL_ID,lib.prebuiltAppConfig);
+    if('caches'in self)await Promise.all(LEGACY_CACHE_NAMES.map(name=>self.caches.delete(name).catch(()=>false)));
+    post('cache-removed',{model:MODEL_ID});
+  }catch(error){post('error',{message:String(error?.message||error||'Could not clear the local AI model cache.')});}
+}
+self.addEventListener('message',async event=>{
+  const {id,type,headers,intent}=event.data||{};
+  try{
+    if(type==='load')await load(intent||'prepare');
+    else if(type==='mapColumns'){const mapping=await mapColumns(headers||[]);post('response',{id,mapping});}
+    else if(type==='removeCache')await removeCache();
+  }catch(error){const message=String(error?.message||error||'Local AI operation failed.');if(type==='load')post('error',{message});else if(type==='mapColumns')post('response-error',{id,message});else if(type==='removeCache')post('error',{message});}
+});
