@@ -41,8 +41,13 @@
       const day=Math.min(31,Math.max(1,Number(anchorDay)||d.getDate())); d.setDate(1); d.setMonth(d.getMonth()+1);
       d.setDate(Math.min(day,new Date(d.getFullYear(),d.getMonth()+1,0).getDate()));
     } else if (repeat === 'yearly' || repeat === 'year') {
-      const month=d.getMonth(), day=d.getDate(); d.setFullYear(d.getFullYear()+1);
-      if (d.getMonth()!==month) d.setDate(0);
+      // Keep the original anniversary day through non-leap years. A Feb 29
+      // reminder should fall on Feb 28 in common years and return to Feb 29
+      // in the next leap year instead of permanently drifting to the 28th.
+      const month=d.getMonth(), day=Math.min(31,Math.max(1,Number(anchorDay)||d.getDate()));
+      const year=d.getFullYear()+1;
+      const lastDay=new Date(year,month+1,0).getDate();
+      d.setFullYear(year,month,Math.min(day,lastDay));
     }
     return localDate(d);
   };
