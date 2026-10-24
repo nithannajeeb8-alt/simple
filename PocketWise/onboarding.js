@@ -22,7 +22,7 @@
     if(overlay)return;
     spotlight=document.createElement('div');spotlight.className='pw-tour-spotlight';spotlight.hidden=true;document.body.appendChild(spotlight);
     overlay=document.createElement('div');overlay.className='pw-tour-overlay';overlay.hidden=true;
-    overlay.innerHTML='<section class="pw-tour-card" role="dialog" aria-modal="true" aria-labelledby="pw-tour-title" tabindex="-1"><div class="pw-tour-visual"><img alt="" decoding="async" fetchpriority="low"></div><span class="pw-tour-kicker" id="pw-tour-kicker"></span><h2 id="pw-tour-title"></h2><p id="pw-tour-body"></p><div class="pw-tour-progress" aria-hidden="true"></div><div class="pw-tour-actions"><button type="button" class="pw-tour-skip" id="pw-tour-skip">Skip tour</button><button type="button" class="primary-button pw-tour-next" id="pw-tour-next">Next</button></div></section>';
+    overlay.innerHTML='<section class="pw-tour-card" role="dialog" aria-modal="true" aria-labelledby="pw-tour-title" tabindex="-1"><div class="pw-tour-content"><div class="pw-tour-visual"><img alt="" decoding="async" fetchpriority="low"></div><span class="pw-tour-kicker" id="pw-tour-kicker"></span><h2 id="pw-tour-title"></h2><p id="pw-tour-body"></p><div class="pw-tour-progress" aria-hidden="true"></div></div><div class="pw-tour-actions"><button type="button" class="pw-tour-skip" id="pw-tour-skip">Skip tour</button><button type="button" class="primary-button pw-tour-next" id="pw-tour-next">Next</button></div></section>';
     document.body.appendChild(overlay);
     // One delegated handler keeps the actions reliable even when the card is repositioned or rerendered.
     overlay.addEventListener('click',e=>{
@@ -38,6 +38,8 @@
     });
     window.addEventListener('resize',reposition);
     window.addEventListener('scroll',reposition,true);
+    window.visualViewport?.addEventListener('resize',reposition);
+    window.visualViewport?.addEventListener('scroll',reposition);
   }
   function clearTarget(){if(activeTarget){activeTarget.classList.remove('pw-tour-target');activeTarget=null;}if(spotlight)spotlight.hidden=true;}
   function findVisibleTarget(target){
@@ -68,37 +70,42 @@
   function positionCard(){
     if(!shown||!overlay)return;
     const card=overlay.querySelector('.pw-tour-card');
-    const vh=window.innerHeight,vw=window.innerWidth,margin=vw>=980?20:12,gap=16;
+    // Android browser chrome and the on-screen keyboard can change the visual
+    // viewport without changing the layout viewport. Keep the action row inside
+    // the area the user can actually see.
+    const vv=window.visualViewport;
+    const vh=Math.max(1,vv?.height||window.innerHeight),vw=Math.max(1,vv?.width||window.innerWidth);
+    const vx=vv?.offsetLeft||0,vy=vv?.offsetTop||0,margin=vw>=980?20:12,gap=16;
     const r=activeTarget?.getBoundingClientRect();
     const hasTarget=!!(r&&r.width>0&&r.height>0);
     const width=Math.max(0,Math.min(vw-margin*2,vw>=980?440:420));
     card.style.position='fixed';
     card.style.width=width+'px';
     card.style.maxHeight=Math.max(120,vh-margin*2)+'px';
-    card.style.overflowY='auto';
-    card.style.left=margin+'px';card.style.right='auto';card.style.top=margin+'px';card.style.bottom='auto';
+    card.style.left=(vx+margin)+'px';card.style.right='auto';card.style.top=(vy+margin)+'px';card.style.bottom='auto';
     const cardHeight=card.getBoundingClientRect().height;
-    const maxTop=Math.max(margin,vh-cardHeight-margin);
-    let left=margin,top=margin;
+    const minTop=vy+margin,maxTop=Math.max(minTop,vy+vh-cardHeight-margin);
+    let left=vx+margin,top=minTop;
     if(vw>=980){
       if(hasTarget){
         if(vw-r.right>=width+gap+margin)left=r.right+gap;
         else if(r.left>=width+gap+margin)left=r.left-width-gap;
-        else left=clamp(r.left+r.width/2-width/2,margin,Math.max(margin,vw-width-margin));
-        top=clamp(r.top+(r.height-cardHeight)/2,margin,maxTop);
+        else left=clamp(r.left+r.width/2-width/2,vx+margin,Math.max(vx+margin,vx+vw-width-margin));
+        top=clamp(vy+r.top+(r.height-cardHeight)/2,minTop,maxTop);
       }else{
-        left=vw-width-margin;
-        top=clamp(100,margin,maxTop);
+        left=vx+vw-width-margin;
+        top=clamp(vy+100,minTop,maxTop);
       }
     }else if(hasTarget){
       const above=Math.max(0,r.top-margin-gap),below=Math.max(0,vh-r.bottom-margin-gap);
       const preferBelow=below>=Math.min(cardHeight,280)||below>=above;
-      top=preferBelow?r.bottom+gap:r.top-cardHeight-gap;
-      top=clamp(top,margin,maxTop);
+      top=preferBelow?vy+r.bottom+gap:vy+r.top-cardHeight-gap;
+      top=clamp(top,minTop,maxTop);
     }else{
-      top=clamp((vh-cardHeight)/2,margin,maxTop);
+      top=clamp(vy+(vh-cardHeight)/2,minTop,maxTop);
     }
-    card.style.left=left+'px';card.style.top=top+'px';
+    card.style.left=clamp(left,vx+margin,Math.max(vx+margin,vx+vw-width-margin))+'px';
+    card.style.top=top+'px';
   }
   function reposition(){positionSpotlight();positionCard();}
   function render(){
@@ -107,12 +114,16 @@
     activeTarget=findVisibleTarget(step.target);
     if(activeTarget){
       activeTarget.classList.add('pw-tour-target');
-      try{activeTarget.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'center',inline:'nearest'});}catch{}
+      const rect=activeTarget.getBoundingClientRect();
+      const visualHeight=window.visualViewport?.height||window.innerHeight;
+      if(rect.top<0||rect.bottom>visualHeight){
+        try{activeTarget.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'nearest',inline:'nearest'});}catch{}
+      }
     }
     const illustration=art[step.icon]||art.welcome;
     const img=overlay.querySelector('.pw-tour-visual img');
-    img.style.display='block';img.alt=illustration.alt;img.onerror=()=>{img.style.display='none';overlay.querySelector('.pw-tour-visual').classList.add('image-unavailable');};
-    img.onload=()=>{img.style.display='block';overlay.querySelector('.pw-tour-visual').classList.remove('image-unavailable');};
+    img.style.display='block';img.alt=illustration.alt;img.onerror=()=>{img.style.display='none';overlay.querySelector('.pw-tour-visual').classList.add('image-unavailable');requestAnimationFrame(reposition);};
+    img.onload=()=>{img.style.display='block';overlay.querySelector('.pw-tour-visual').classList.remove('image-unavailable');requestAnimationFrame(reposition);};
     overlay.querySelector('#pw-tour-kicker').textContent=`POCKETWISE GUIDE · ${index+1} OF ${steps.length}`;
     overlay.querySelector('#pw-tour-title').textContent=step.title;
     overlay.querySelector('#pw-tour-body').textContent=step.body;

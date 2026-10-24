@@ -1720,3 +1720,76 @@ html[data-theme="light"][data-liquid-glass="on"] .transaction-delete-action{back
   .pw-tour-card p { font-size: 12px; line-height: 1.45; margin-bottom: 10px; }
   .pw-tour-progress { margin-bottom: 8px; }
 }
+
+
+/* v2.3.15: isolated bank-statement import and optional local AI controls */
+.pw-local-ai-setting{align-items:flex-start}
+.pw-local-ai-setting>div:first-child{min-width:0;flex:1}
+.pw-local-ai-setting small{overflow-wrap:anywhere}
+.pw-local-ai-actions{display:flex;align-items:center;justify-content:flex-end;gap:7px;flex-wrap:wrap;flex:0 1 auto}
+.pw-local-ai-actions button{white-space:normal;min-height:40px}
+#pw-local-ai-download:disabled,#pw-local-ai-remove:disabled{opacity:.6;cursor:wait}
+.pw-statement-import{display:flex;flex-direction:column;gap:14px}
+.pw-statement-import>p{line-height:1.6;margin:0}
+.pw-statement-back{align-self:flex-start}
+.pw-statement-filebox{display:flex;flex-direction:column;gap:8px;padding:14px;border:1px dashed var(--line);border-radius:16px;background:var(--surface-soft,var(--surface))}
+.pw-statement-filebox label,.pw-statement-map-grid label{font-size:11px;font-weight:800;letter-spacing:.04em;color:var(--muted)}
+.pw-statement-filebox input[type=file]{max-width:100%;width:100%;font-size:12px}
+.pw-statement-filebox small,.pw-statement-file-name{font-size:12px;line-height:1.5;color:var(--muted);overflow-wrap:anywhere}
+.pw-statement-privacy{display:flex;gap:10px;padding:12px 13px;border-radius:14px;background:var(--green-soft,var(--surface-soft));font-size:12px;line-height:1.5}
+.pw-statement-privacy strong{flex:0 0 auto;color:var(--ink)}
+.pw-statement-privacy span{color:var(--muted)}
+.pw-statement-mapping[hidden],#pw-statement-preview[hidden]{display:none!important}
+.pw-statement-map-card{border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:12px}
+.pw-statement-map-card>strong{font-size:14px}
+.pw-statement-map-card>p{font-size:12px;line-height:1.5;color:var(--muted);margin:0}
+.pw-statement-map-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.pw-statement-map-grid label{display:flex;flex-direction:column;gap:6px;min-width:0;letter-spacing:0}
+.pw-statement-map-grid select{width:100%;min-width:0;font-size:12px}
+.pw-statement-results{display:flex;flex-direction:column;gap:12px;margin-top:6px}
+.pw-statement-result-heading{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.pw-statement-result-heading strong{font-size:15px}
+.pw-statement-result-heading span{font-size:11px;color:var(--muted)}
+.pw-statement-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+.pw-statement-metrics>div{min-width:0;padding:10px 8px;border:1px solid var(--line);border-radius:12px}
+.pw-statement-metrics small,.pw-statement-metrics strong{display:block;overflow-wrap:anywhere}
+.pw-statement-metrics small{font-size:10px;color:var(--muted);margin-bottom:5px}
+.pw-statement-metrics strong{font-size:12px;font-variant-numeric:tabular-nums}
+.pw-statement-warning{display:flex;flex-direction:column;gap:6px;border:1px solid color-mix(in srgb,#c58a16 38%,var(--line));background:color-mix(in srgb,#c58a16 8%,var(--surface));border-radius:13px;padding:12px;font-size:12px;line-height:1.5}
+.pw-statement-warning>strong{font-size:12px}
+.pw-statement-warning details{margin-top:3px}
+.pw-statement-warning summary{cursor:pointer;font-weight:700}
+.pw-statement-warning ul{padding-left:20px;margin:6px 0 0}
+.pw-statement-table-wrap{max-width:100%;overflow:auto;border:1px solid var(--line);border-radius:13px;-webkit-overflow-scrolling:touch}
+.pw-statement-table{border-collapse:separate;border-spacing:0;width:100%;min-width:580px;font-size:11px}
+.pw-statement-table th,.pw-statement-table td{padding:9px 8px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+.pw-statement-table th{position:sticky;top:0;background:var(--surface);font-size:10px;letter-spacing:.03em;color:var(--muted);z-index:1}
+.pw-statement-table tr:last-child td{border-bottom:0}
+.pw-statement-table td:first-child{width:40px}
+.pw-statement-table td:first-child input{width:18px;height:18px;accent-color:var(--accent,#288a62)}
+.pw-statement-table td:nth-child(2){white-space:nowrap}
+.pw-statement-table td:nth-child(2) small,.pw-statement-table td:nth-child(3) small{display:block;max-width:260px;font-size:10px;line-height:1.45;color:var(--muted);margin-top:4px;white-space:normal}
+.pw-statement-description{display:block;min-width:150px;max-width:300px;overflow-wrap:anywhere;line-height:1.45}
+.pw-statement-row-warning{color:#946000!important}
+.pw-statement-amount{white-space:nowrap;font-variant-numeric:tabular-nums;font-weight:700}
+.pw-statement-table select{max-width:110px;min-width:100px;font-size:11px;padding:6px;border-radius:9px}
+.pw-statement-table tr.has-warning{background:color-mix(in srgb,#c58a16 4%,transparent)}
+.pw-statement-pagination{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:11px;color:var(--muted)}
+.pw-statement-pagination button{min-height:38px}
+.pw-statement-import-actions{display:flex;gap:8px;flex-wrap:wrap}
+.pw-statement-import-actions button{flex:1 1 145px;min-height:46px;white-space:normal}
+.pw-statement-import-actions button:disabled{opacity:.5;cursor:not-allowed}
+@media(max-width:520px){
+ .pw-local-ai-setting{display:block}
+ .pw-local-ai-actions{justify-content:flex-start;margin-top:10px}
+ .pw-local-ai-actions button{flex:1 1 125px}
+ .pw-statement-map-grid{grid-template-columns:minmax(0,1fr)}
+ .pw-statement-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .pw-statement-import-actions{flex-direction:column}
+ .pw-statement-import-actions button{width:100%;flex-basis:auto}
+ .pw-statement-privacy{flex-direction:column;gap:3px}
+}
+
+.pw-statement-entry{display:flex;align-items:center;justify-content:flex-start;gap:12px;width:100%;min-height:54px;margin:4px 0 14px;padding:12px 14px;text-align:left;white-space:normal}
+.pw-statement-entry>span:last-child{display:flex;flex-direction:column;align-items:flex-start;gap:3px;font-weight:750}
+.pw-statement-entry small{font-size:11px;font-weight:500;line-height:1.4;color:var(--muted)}
