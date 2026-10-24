@@ -133,7 +133,7 @@
   const daysAgo = n => { const d = new Date(); d.setDate(d.getDate()-n); return localDate(d); };
   const initialState = () => ({
     version:2, sample:false,
-    settings:{theme:'light',profileName:'',profileColor:'mint',profileComplete:false,hideBalances:false,alertThreshold:90,notifyBudget:true,notifyPositive:true,notifyBills:true,notifyDebts:true,notifyWeekly:true,quietStart:'21:00',quietEnd:'08:00',lastBackup:null,lastPositiveMonth:null,seenAlerts:[],notifications:[],categoryChart:'doughnut',weeklyAllowance:0,debtPayoffMonthly:0,debtStrategy:'snowball',smartRules:[]},
+    settings:{theme:'light',liquidGlass:false,profileName:'',profileColor:'mint',profileComplete:false,hideBalances:false,alertThreshold:90,notifyBudget:true,notifyPositive:true,notifyBills:true,notifyDebts:true,notifyWeekly:true,quietStart:'21:00',quietEnd:'08:00',lastBackup:null,lastPositiveMonth:null,seenAlerts:[],notifications:[],categoryChart:'doughnut',weeklyAllowance:0,debtPayoffMonthly:0,debtStrategy:'snowball',smartRules:[]},
     accounts:[{id:'cash',name:'Cash',type:'cash',openingBalance:0},{id:'bank',name:'Bank / UPI',type:'bank',openingBalance:0},{id:'card',name:'Card',type:'card',openingBalance:0}],
     activities: activityDefaults.map(a=>({...a})),
     budgets:{total:0,categories:{},note:''}, goals:[], reminders:[], debts:[], transactions:[]
@@ -293,9 +293,10 @@
   }
   function applyTheme(){
     const pref=state.settings.theme||'light';let actual=pref;if(pref==='system')actual=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
-    document.documentElement.dataset.theme=actual;const meta=$('meta[name="theme-color"]');if(meta)meta.content=actual==='dark'?'#000000':'#f6f8f5';$('#theme-label').textContent=pref==='system'?'System appearance':`${pref[0].toUpperCase()+pref.slice(1)} appearance`;
+    document.documentElement.dataset.theme=actual;document.documentElement.dataset.liquidGlass=state.settings.liquidGlass?'on':'off';const meta=$('meta[name="theme-color"]');if(meta)meta.content=actual==='dark'?'#000000':'#f6f8f5';$('#theme-label').textContent=pref==='system'?'System appearance':`${pref[0].toUpperCase()+pref.slice(1)} appearance`;
     $$('#theme-choice button').forEach(b=>b.classList.toggle('selected',b.dataset.theme===pref));
     if($('#hide-setting'))$('#hide-setting').checked=!!state.settings.hideBalances;
+    if($('#liquid-glass-setting'))$('#liquid-glass-setting').checked=!!state.settings.liquidGlass;
   }
   const profileColors={mint:'#2f8f67',ocean:'#3478c8',plum:'#8756b5',sunset:'#d46b43'};
   function renderProfile(){const name=String(state.settings.profileName||'').trim()||'Personal space';const initial=[...name][0]?.toLocaleUpperCase()||'P';const color=profileColors[state.settings.profileColor]||profileColors.mint;['#profile-avatar','#settings-profile-avatar'].forEach(sel=>{const el=$(sel);if(el){el.textContent=initial;el.style.background=color;el.style.color='#fff';}});const side=$('#profile-sidebar-name'),preview=$('#settings-profile-name');if(side)side.textContent=name;if(preview)preview.textContent=name;}
@@ -760,6 +761,7 @@
     $('#activity-search').addEventListener('input',renderActivity);$('#activity-period').addEventListener('change',()=>{currentYearFilter=null;renderActivity()});$('#insights-period').addEventListener('change',()=>{renderInsights();scheduleCharts()});$('#home-chart-mode').addEventListener('change',scheduleCharts);$('#trend-type').addEventListener('change',scheduleCharts);$('#ranking-mode').addEventListener('change',()=>renderRankings(chartPeriod()));
     $('#activity-filters').addEventListener('click',e=>{const b=e.target.closest('[data-filter]');if(!b)return;currentFilter=b.dataset.filter;renderActivity();});
     $('#hide-setting').addEventListener('change',async e=>{state.settings.hideBalances=e.target.checked;await persist();applyHiddenAmounts();renderAll();});
+    $('#liquid-glass-setting').addEventListener('change',async e=>{state.settings.liquidGlass=!!e.target.checked;await persist();applyTheme();scheduleCharts();toast(state.settings.liquidGlass?'Liquid Glass enabled.':'Liquid Glass disabled.');});
     ['alert-threshold','notify-budget','notify-positive','notify-bills','notify-debts','notify-weekly','quiet-start','quiet-end'].forEach(id=>{const el=$(`#${id}`);el.addEventListener('change',async()=>{const map={'alert-threshold':'alertThreshold','notify-budget':'notifyBudget','notify-positive':'notifyPositive','notify-bills':'notifyBills','notify-debts':'notifyDebts','notify-weekly':'notifyWeekly','quiet-start':'quietStart','quiet-end':'quietEnd'};state.settings[map[id]]=id==='alert-threshold'?Number(el.value):el.type==='checkbox'?el.checked:el.value;renderSettingsSummary();await persist();});});
     $('#backup-file-input').addEventListener('change',e=>importBackup(e.target.files?.[0]));
     $('#modal-content').addEventListener('click',e=>{if(e.target.closest('#voice-entry'))voiceDraft();});
