@@ -1217,3 +1217,243 @@ html[data-liquid-glass="on"] .danger-card {
   .page-heading h1 { font-size: 22px; }
   .page-heading .eyebrow { font-size: 11px; }
 }
+
+/* PocketWise 2.3.7 — refined white glass, coherent material layers, and a shared sliding selection. */
+html[data-liquid-glass="on"] {
+  --glass-card: rgba(255,255,255,.84);
+  --glass-card-low: rgba(255,255,255,.74);
+  --glass-control: rgba(255,255,255,.88);
+  --glass-control-hover: rgba(255,255,255,.97);
+  --glass-nav: rgba(255,255,255,.78);
+  --glass-border: rgba(255,255,255,.96);
+  --glass-edge: rgba(31,67,44,.11);
+  --glass-highlight: rgba(255,255,255,.99);
+  --glass-accent: rgba(226,245,234,.88);
+  --glass-card-shadow: 0 9px 26px rgba(34,57,42,.075);
+  --glass-float-shadow: 0 19px 48px rgba(31,49,37,.17), 0 3px 10px rgba(31,49,37,.06);
+  --glass-control-shadow: rgba(33,56,40,.075);
+  --glass-amount-top: rgba(255,255,255,.98);
+  --glass-amount-bottom: rgba(248,252,249,.94);
+}
+html[data-theme="dark"][data-liquid-glass="on"] {
+  --glass-card: rgba(2,5,3,.76);
+  --glass-card-low: rgba(0,0,0,.94);
+  --glass-control: rgba(0,0,0,.78);
+  --glass-control-hover: rgba(5,17,9,.88);
+  --glass-nav: rgba(0,0,0,.82);
+  --glass-border: rgba(234,255,241,.16);
+  --glass-edge: rgba(34,197,94,.15);
+  --glass-highlight: rgba(255,255,255,.15);
+  --glass-accent: rgba(13,53,29,.82);
+  --glass-card-shadow: 0 14px 38px rgba(0,0,0,.42), 0 0 0 1px rgba(34,197,94,.025);
+  --glass-float-shadow: 0 21px 56px rgba(0,0,0,.72), 0 4px 14px rgba(0,0,0,.30);
+  --glass-control-shadow: rgba(0,0,0,.30);
+  --glass-amount-top: rgba(5,8,6,.98);
+  --glass-amount-bottom: rgba(0,0,0,.96);
+}
+/* The page is the content layer. Keep it calm and let the controls provide the glass highlights. */
+html[data-liquid-glass="on"] body {
+  background: var(--bg);
+  background-attachment: fixed;
+}
+html[data-theme="light"][data-liquid-glass="on"] body {
+  background: #f6f8f5;
+}
+html[data-theme="light"][data-liquid-glass="on"] .app-modal {
+  background: linear-gradient(155deg,rgba(255,255,255,.96),rgba(249,252,250,.93));
+  border-color: rgba(255,255,255,.98);
+  box-shadow: 0 25px 66px rgba(30,49,36,.19), 0 5px 16px rgba(30,49,36,.07), inset 0 1px 0 rgba(255,255,255,.99), inset 0 -1px 0 rgba(33,66,44,.08);
+  -webkit-backdrop-filter: blur(32px) saturate(155%);
+  backdrop-filter: blur(32px) saturate(155%);
+}
+html[data-theme="light"][data-liquid-glass="on"] .app-modal::backdrop {
+  background: rgba(23,39,29,.20);
+  -webkit-backdrop-filter: blur(14px) saturate(115%);
+  backdrop-filter: blur(14px) saturate(115%);
+}
+html[data-theme="light"][data-liquid-glass="on"] .modal-head {
+  background: linear-gradient(155deg,rgba(255,255,255,.97),rgba(250,252,250,.90));
+  border-bottom-color: rgba(34,64,44,.09);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.99);
+}
+html[data-theme="light"][data-liquid-glass="on"] .quick-choice {
+  background: linear-gradient(155deg,rgba(255,255,255,.96),rgba(250,253,251,.88));
+  border-color: rgba(255,255,255,.98);
+  box-shadow: 0 4px 13px rgba(32,57,40,.055), inset 0 1px 0 rgba(255,255,255,.99), inset 0 -1px 0 rgba(32,68,44,.055);
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+html[data-theme="light"][data-liquid-glass="on"] .quick-choice:active {
+  transform: scale(.992);
+  box-shadow: 0 2px 7px rgba(32,57,40,.055), inset 0 1px 0 rgba(255,255,255,.99);
+}
+html[data-theme="dark"][data-liquid-glass="on"] .quick-choice {
+  background: linear-gradient(155deg,rgba(8,12,9,.96),rgba(0,0,0,.95));
+  border-color: rgba(235,255,242,.14);
+  box-shadow: 0 4px 13px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.09), inset 0 -1px 0 rgba(34,197,94,.055);
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+html[data-theme="dark"][data-liquid-glass="on"] .quick-choice:active {
+  transform: scale(.992);
+  box-shadow: 0 2px 7px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.09);
+}
+/* Amount fields are a dedicated, inset standard-material surface: not an oversized glowing textbox. */
+html[data-liquid-glass="on"] .form-field input.amount-input {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  height: 66px;
+  min-height: 66px !important;
+  margin: 0;
+  padding: 10px 15px !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 17px !important;
+  border-bottom: 1px solid var(--glass-edge) !important;
+  background: linear-gradient(155deg,var(--glass-amount-top),var(--glass-amount-bottom)) !important;
+  color: var(--ink) !important;
+  font-size: clamp(32px,8vw,39px) !important;
+  line-height: 1.12 !important;
+  letter-spacing: -.035em !important;
+  font-variant-numeric: tabular-nums;
+  box-shadow: inset 0 1px 0 var(--glass-highlight), inset 0 -1px 0 var(--glass-edge), 0 3px 10px var(--glass-control-shadow) !important;
+  -webkit-appearance: none;
+  appearance: none;
+}
+html[data-liquid-glass="on"] .form-field input.amount-input:focus {
+  border-color: color-mix(in srgb,var(--green) 46%,var(--glass-border)) !important;
+  box-shadow: inset 0 1px 0 var(--glass-highlight), inset 0 -1px 0 var(--glass-edge), 0 0 0 3px color-mix(in srgb,var(--green) 13%,transparent) !important;
+}
+html[data-liquid-glass="on"] .amount-helper {
+  margin: 7px 2px 0 !important;
+  line-height: 1.42;
+  font-size: 11px;
+  position: relative;
+}
+html[data-liquid-glass="on"] .quick-amount-wrap {
+  box-sizing: border-box;
+  min-height: 82px;
+  align-items: center;
+  gap: 12px;
+  margin: 18px 0 20px;
+  padding: 11px 16px;
+  border: 1px solid var(--glass-border);
+  border-bottom: 1px solid var(--glass-edge);
+  border-radius: 18px;
+  background: linear-gradient(155deg,var(--glass-amount-top),var(--glass-amount-bottom));
+  color: var(--muted);
+  box-shadow: inset 0 1px 0 var(--glass-highlight), inset 0 -1px 0 var(--glass-edge), 0 3px 10px var(--glass-control-shadow);
+}
+html[data-liquid-glass="on"] .quick-amount-wrap>span {
+  flex: 0 0 auto;
+  font-size: 27px;
+  line-height: 1;
+  color: var(--muted);
+}
+html[data-liquid-glass="on"] .quick-flow-value {
+  box-sizing: border-box;
+  min-width: 0;
+  width: 100%;
+  min-height: 58px !important;
+  height: auto !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--ink) !important;
+  font-size: clamp(41px,11vw,56px) !important;
+  line-height: 1.04 !important;
+  letter-spacing: -.055em;
+  font-variant-numeric: tabular-nums;
+}
+/* One shared, shape-aware indicator moves between segmented options. The controls remain semantic buttons. */
+html[data-liquid-glass="on"] .type-switch,
+html[data-liquid-glass="on"] #theme-choice,
+html[data-liquid-glass="on"] #activity-filters {
+  position: relative;
+  isolation: isolate;
+}
+html[data-theme="light"][data-liquid-glass="on"] .type-switch {
+  background: rgba(237,243,239,.82);
+  border: 1px solid rgba(255,255,255,.92);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.98), inset 0 -1px 0 rgba(31,65,43,.06);
+}
+html[data-theme="dark"][data-liquid-glass="on"] .type-switch {
+  background: rgba(9,11,9,.94);
+  border: 1px solid rgba(238,255,244,.12);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08), inset 0 -1px 0 rgba(34,197,94,.04);
+}
+html[data-liquid-glass="on"] #theme-choice {
+  background: color-mix(in srgb,var(--surface-2) 68%,transparent);
+  border: 1px solid var(--glass-border);
+  box-shadow: inset 0 1px 0 var(--glass-highlight), inset 0 -1px 0 var(--glass-edge);
+}
+html[data-liquid-glass="on"] .glass-segment-indicator {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 0;
+  display: block;
+  pointer-events: none;
+  border-radius: 999px;
+  background: linear-gradient(155deg,rgba(255,255,255,.98),rgba(246,251,248,.88));
+  border: 1px solid rgba(255,255,255,.99);
+  box-shadow: 0 3px 9px rgba(34,57,42,.075), inset 0 1px 0 rgba(255,255,255,.99), inset 0 -1px 0 rgba(34,68,45,.075);
+  will-change: transform,width,height;
+}
+html[data-theme="dark"][data-liquid-glass="on"] .glass-segment-indicator {
+  background: linear-gradient(155deg,rgba(14,20,16,.98),rgba(3,7,4,.94));
+  border-color: rgba(238,255,244,.17);
+  box-shadow: 0 3px 10px rgba(0,0,0,.36), inset 0 1px 0 rgba(255,255,255,.11), inset 0 -1px 0 rgba(34,197,94,.09);
+}
+html[data-liquid-glass="on"] .glass-segments-ready .glass-segment-indicator {
+  transition: transform .32s cubic-bezier(.2,.82,.22,1), width .28s cubic-bezier(.2,.82,.22,1), height .20s ease, border-radius .20s ease;
+}
+html[data-liquid-glass="on"] .type-switch > .glass-segment-indicator { border-radius: 10px; }
+html[data-liquid-glass="on"] #theme-choice > .glass-segment-indicator { border-radius: 9px; }
+html[data-liquid-glass="on"] .type-switch button,
+html[data-liquid-glass="on"] #theme-choice button,
+html[data-liquid-glass="on"] #activity-filters .filter-pill {
+  position: relative;
+  z-index: 1;
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  transition: color .20s ease, transform .20s ease;
+}
+html[data-liquid-glass="on"] .type-switch button:active,
+html[data-liquid-glass="on"] #theme-choice button:active,
+html[data-liquid-glass="on"] #activity-filters .filter-pill:active { transform: scale(.975); }
+html[data-theme="light"][data-liquid-glass="on"] .type-switch button.selected,
+html[data-theme="light"][data-liquid-glass="on"] #theme-choice button.selected,
+html[data-theme="light"][data-liquid-glass="on"] #activity-filters .filter-pill.active { color: #215B3C; }
+html[data-theme="dark"][data-liquid-glass="on"] .type-switch button.selected,
+html[data-theme="dark"][data-liquid-glass="on"] #theme-choice button.selected,
+html[data-theme="dark"][data-liquid-glass="on"] #activity-filters .filter-pill.active { color: #43E98A; }
+html[data-liquid-glass="on"] #activity-filters .filter-pill { flex-shrink: 0; }
+/* Keep every control's drop shadow within its own silhouette instead of making a square gray halo. */
+html[data-liquid-glass="on"] .icon-button,
+html[data-liquid-glass="on"] .round-subtle,
+html[data-liquid-glass="on"] .secondary-button,
+html[data-liquid-glass="on"] .mini-button,
+html[data-liquid-glass="on"] .activity-toolbar #activity-period,
+html[data-liquid-glass="on"] .form-field select,
+html[data-liquid-glass="on"] .form-field textarea,
+html[data-liquid-glass="on"] .search-box,
+html[data-liquid-glass="on"] .detail-cell,
+html[data-liquid-glass="on"] .note-box {
+  box-shadow: inset 0 1px 0 var(--glass-highlight), inset 0 -1px 0 var(--glass-edge), 0 3px 9px var(--glass-control-shadow);
+}
+html[data-theme="light"][data-liquid-glass="on"] .filter-pill,
+html[data-theme="light"][data-liquid-glass="on"] .type-switch button { color: #737D75; }
+html[data-theme="dark"][data-liquid-glass="on"] .filter-pill,
+html[data-theme="dark"][data-liquid-glass="on"] .type-switch button { color: #A6AEA8; }
+@media (max-width: 720px) {
+  html[data-liquid-glass="on"] .form-field input.amount-input { height: 62px; min-height: 62px !important; font-size: 32px !important; }
+  html[data-liquid-glass="on"] .quick-amount-wrap { min-height: 78px; margin: 16px 0 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-liquid-glass="on"] .glass-segments-ready .glass-segment-indicator,
+  html[data-liquid-glass="on"] .type-switch button,
+  html[data-liquid-glass="on"] #theme-choice button,
+  html[data-liquid-glass="on"] #activity-filters .filter-pill { transition: none !important; }
+}
