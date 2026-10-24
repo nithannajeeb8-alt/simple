@@ -1,208 +1,1010 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; font-src 'self' https://cdn.jsdelivr.net https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://cdn.jsdelivr.net blob:; worker-src 'self' blob: https://cdn.jsdelivr.net; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'">
-  <meta name="referrer" content="no-referrer">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#000000">
-  <meta name="description" content="A private, offline-first personal finance companion for everyday money, budgets and lending.">
-  <title>Pocketwise · Money, made clearer</title>
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="assets/icons/icon-192.PNG">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.2/font/bootstrap-icons.min.css">
-  <link rel="stylesheet" href="styles.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f3f2ef">
+<meta name="color-scheme" content="light">
+<meta name="author" content="Nithan Najeeb">
+<meta name="description" content="Nithan Najeeb is a creative developer in Kerala, India, exploring UI/UX design, web development, AI-powered tools and thoughtful digital experiences.">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://nithan.in/">
+<title>Nithan Najeeb | Creative Developer &amp; UI/UX</title>
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Nithan Najeeb">
+<meta property="og:title" content="Nithan Najeeb | Creative Developer &amp; UI/UX">
+<meta property="og:description" content="Explore the work, experiments and digital projects of Nithan Najeeb, a creative developer based in Kerala, India.">
+<meta property="og:url" content="https://nithan.in/">
+<meta property="og:image" content="https://nithan.in/nithanl.webp">
+<meta property="og:image:alt" content="Black-and-white portrait of Nithan Najeeb">
+<meta property="og:locale" content="en_IN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Nithan Najeeb | Creative Developer &amp; UI/UX">
+<meta name="twitter:description" content="Creative development, UI/UX, web experiments and AI-powered tools by Nithan Najeeb.">
+<meta name="twitter:image" content="https://nithan.in/nithanl.webp">
+<link rel="icon" href="/favicon.png" type="image/png" sizes="64x64">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
+<script>document.documentElement.classList.add('js');</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://nithan.in/#website",
+      "url": "https://nithan.in/",
+      "name": "Nithan Najeeb",
+      "alternateName": "Nithan",
+      "inLanguage": "en-IN",
+      "publisher": {"@id": "https://nithan.in/#person"}
+    },
+    {
+      "@type": "ProfilePage",
+      "@id": "https://nithan.in/#profile",
+      "url": "https://nithan.in/",
+      "name": "Nithan Najeeb | Creative Developer & UI/UX",
+      "isPartOf": {"@id": "https://nithan.in/#website"},
+      "mainEntity": {"@id": "https://nithan.in/#person"},
+      "inLanguage": "en-IN"
+    },
+    {
+      "@type": "Person",
+      "@id": "https://nithan.in/#person",
+      "name": "Nithan Najeeb",
+      "alternateName": ["Nithan", "Rubin Stellar"],
+      "url": "https://nithan.in/",
+      "image": "https://nithan.in/nithanl.webp",
+      "description": "Creative developer and commerce student exploring UI/UX design, web development, AI-powered tools and digital experiences.",
+      "homeLocation": {"@type": "Place", "name": "Kerala, India"},
+      "sameAs": [
+        "https://instagram.com/nithannajeeb_",
+        "https://www.threads.net/@nithannajeeb_",
+        "https://www.linkedin.com/in/nithannajeeb",
+        "https://www.facebook.com/nithan.najeeb"
+      ],
+      "knowsAbout": ["UI/UX design", "Web development", "JavaScript", "Generative AI", "Creative technology", "Digital product design"],
+      "affiliation": {"@type": "EducationalOrganization", "name": "MES College"}
+    }
+  ]
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@1,500&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#f3f2ef;--ink:#111;--muted:#6e6c68;--line:rgba(17,17,17,.17);--serif:'Playfair Display',serif;--sans:'Manrope',sans-serif;--body:'DM Sans',sans-serif;--mono:'DM Mono',monospace}*{box-sizing:border-box}html{scroll-behavior:smooth}html.intro-lock,body.intro-lock{overflow-x:hidden!important;overflow-y:auto!important;overscroll-behavior-y:auto!important;touch-action:pan-y!important}body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);-webkit-font-smoothing:antialiased}a{color:inherit;text-decoration:none}button{font:inherit}.topbar{position:absolute;top:0;left:0;width:100%;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:24px 5vw;color:#111}.brand{font:700 13px var(--mono);letter-spacing:-.04em}.nav{display:flex;gap:27px;font:11px var(--mono);text-transform:uppercase;letter-spacing:.08em}.nav a{opacity:.72;transition:opacity .25s}.nav a:hover{opacity:1}.availability{display:flex;align-items:center;gap:8px;font:10px var(--mono);text-transform:uppercase;letter-spacing:.06em}.dot{height:6px;width:6px;border-radius:50%;background:#58886a;box-shadow:0 0 0 4px #58886a20}.hero{position:relative;height:100vh;height:100svh;min-height:100vh;min-height:100svh;overflow:hidden;background:#e9e8e6;display:flex;align-items:flex-end;isolation:isolate}.typewall{position:absolute;inset:-7% -20%;z-index:0;overflow:hidden;display:flex;flex-direction:column;justify-content:space-around;pointer-events:none;opacity:.12}.type-row{font-family:var(--sans);font-weight:800;font-size:clamp(74px,13.8vw,205px);letter-spacing:-.105em;line-height:.82;white-space:nowrap;text-transform:uppercase;display:flex;width:max-content;will-change:transform}.type-row span{padding-right:.16em}.type-row:nth-child(odd){animation:marquee 39s linear infinite}.type-row:nth-child(even){animation:marquee-reverse 48s linear infinite}.type-row:nth-child(3n){animation-duration:57s}.type-row:nth-child(2){opacity:.72}.type-row:nth-child(4){opacity:.62}@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-30%)}}@keyframes marquee-reverse{from{transform:translateX(-22%)}to{transform:translateX(0)}}.hero-image{position:absolute;bottom:-2px;left:50%;transform:translate3d(-50%,var(--portrait-scroll,0px),0);will-change:transform;height:90%;width:min(84%,950px);object-fit:contain;object-position:center bottom;z-index:3;filter:grayscale(1);backface-visibility:hidden}.hero-shade{position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(243,242,239,.08) 0%,transparent 34%,transparent 70%,rgba(243,242,239,.18) 100%)}.hero-copy{position:absolute;z-index:4;left:5vw;right:5vw;bottom:35px;display:flex;align-items:flex-end;justify-content:space-between;gap:25px}.hero-kicker{font:10px var(--mono);letter-spacing:.12em;text-transform:uppercase;margin-bottom:15px;color:#fff;mix-blend-mode:difference;text-shadow:0 1px 4px rgba(0,0,0,.3);position:relative;z-index:5}.hero-title{font:800 clamp(42px,7vw,96px)/.92 var(--sans);letter-spacing:-.085em;margin:0;max-width:620px;color:#f0efec;text-shadow:0 2px 16px rgba(0,0,0,.32)}.hero-title em{font:italic 500 .94em var(--serif);letter-spacing:-.06em;color:#dedbd5}.hero-note{font:12px/1.65 var(--body);max-width:225px;color:#f2f0ec;text-shadow:0 1px 3px #000,0 2px 12px rgba(0,0,0,.9)}.scroll-cue{position:absolute;right:5vw;top:48%;z-index:5;writing-mode:vertical-rl;font:9px var(--mono);letter-spacing:.15em;text-transform:uppercase;display:flex;align-items:center;gap:12px}.scroll-cue:after{content:'';width:1px;height:45px;background:#111;animation:cue 1.7s ease-in-out infinite}@keyframes cue{0%,100%{transform:scaleY(.4);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}}.section{padding:120px 5vw}.eyebrow{font:10px var(--mono);text-transform:uppercase;letter-spacing:.12em;color:var(--muted);display:flex;align-items:center;gap:12px}.eyebrow:before{content:'';width:24px;height:1px;background:currentColor}.intro{display:grid;grid-template-columns:1fr 1.45fr;gap:8vw;align-items:start}.intro h2{font:600 clamp(30px,4vw,56px)/1.12 var(--sans);letter-spacing:-.065em;margin:20px 0 0;max-width:440px}.intro h2 em{font:italic 500 1em var(--serif)}.intro-copy{padding-top:36px;max-width:640px}.intro-copy p{font-size:clamp(17px,1.8vw,23px);line-height:1.65;letter-spacing:-.025em;margin:0 0 22px}.intro-copy .small{font-size:13px;line-height:1.8;color:var(--muted);max-width:520px}.text-link{display:inline-flex;gap:18px;align-items:center;border-bottom:1px solid var(--ink);padding:12px 0;font:10px var(--mono);text-transform:uppercase;letter-spacing:.1em;margin-top:15px}.text-link span{font-size:17px;transition:transform .25s}.text-link:hover span{transform:translate(4px,-4px)}.work{background:#e9e8e5}.section-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:48px;gap:24px}.section-head h2{font:700 clamp(40px,7vw,90px)/.9 var(--sans);letter-spacing:-.09em;margin:18px 0 0}.section-head p{font:11px/1.7 var(--mono);max-width:220px;color:var(--muted)}.projects{border-top:1px solid var(--line)}.project{display:grid;grid-template-columns:72px minmax(0,1fr) minmax(150px, .6fr) 30px;gap:22px;align-items:center;padding:28px 0;border-bottom:1px solid var(--line);transition:padding .3s}.project:hover{padding-left:12px;padding-right:12px}.project-no{font:10px var(--mono);color:var(--muted)}.project h3{font:600 clamp(21px,3vw,36px)/1.1 var(--sans);letter-spacing:-.06em;margin:0 0 8px}.project p{margin:0;color:var(--muted);font-size:12px;line-height:1.6}.tags{display:flex;flex-wrap:wrap;gap:7px}.tag{border:1px solid var(--line);padding:7px 9px;border-radius:30px;font:9px var(--mono);text-transform:uppercase;letter-spacing:.04em}.arrow{font-size:22px;transition:transform .25s}.project:hover .arrow{transform:translate(3px,-3px)}.manifesto{padding:140px 5vw 155px;background:#171716;color:#f4f2ed;overflow:hidden}.manifesto .eyebrow{color:#a7a49e}.manifesto h2{font:700 clamp(38px,7.7vw,105px)/.98 var(--sans);letter-spacing:-.09em;max-width:1150px;margin:50px 0 0}.manifesto h2 span{font:italic 500 1em var(--serif);color:#c8c4bb}.manifesto-foot{display:flex;justify-content:space-between;gap:30px;margin-top:70px;padding-top:20px;border-top:1px solid #ffffff35;font:10px var(--mono);text-transform:uppercase;letter-spacing:.08em;color:#b6b3ad}.about-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:10vw}.about-image{position:relative;min-height:460px;background:#e1e0dd;overflow:hidden}.about-image img{width:100%;height:100%;position:absolute;inset:0;object-fit:cover;object-position:center 22%;filter:grayscale(1);mix-blend-mode:multiply}.about-image .image-label{position:absolute;bottom:17px;left:18px;font:9px var(--mono);text-transform:uppercase;letter-spacing:.1em;z-index:2}.about-text h2{font:700 clamp(40px,6vw,74px)/.95 var(--sans);letter-spacing:-.085em;margin:17px 0 30px}.about-text h2 em{font:italic 500 1em var(--serif)}.about-text p{font-size:15px;line-height:1.9;color:#484743;max-width:570px}.facts{display:grid;grid-template-columns:1fr 1fr;gap:0 22px;margin-top:38px;border-top:1px solid var(--line)}.fact{padding:16px 0;border-bottom:1px solid var(--line)}.fact small{display:block;font:9px var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:8px}.fact strong{font-size:13px;font-weight:600}.skills{background:#e9e8e5}.skill-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:50px}.skill{min-height:180px;padding:22px;border:1px solid var(--line);display:flex;flex-direction:column;justify-content:space-between;transition:background .25s,transform .25s}.skill:hover{background:var(--paper);transform:translateY(-5px)}.skill .num{font:10px var(--mono);color:var(--muted)}.skill h3{font:600 20px/1.1 var(--sans);letter-spacing:-.05em;margin:0 0 9px}.skill p{font-size:11px;line-height:1.6;color:var(--muted);margin:0}.contact{padding:120px 5vw 35px}.contact-main{display:flex;justify-content:space-between;align-items:flex-end;gap:35px;padding-bottom:80px}.contact h2{font:700 clamp(48px,9vw,125px)/.85 var(--sans);letter-spacing:-.1em;margin:28px 0 0}.contact h2 em{font:italic 500 .9em var(--serif)}.contact-side{max-width:280px}.contact-side p{font-size:13px;line-height:1.8;color:var(--muted)}.contact-button{display:inline-flex;align-items:center;gap:35px;border-radius:99px;background:#111;color:white;padding:17px 22px;font:10px var(--mono);text-transform:uppercase;letter-spacing:.1em;transition:transform .25s,background .25s}.contact-button:hover{transform:translateY(-3px);background:#333}.footer{border-top:1px solid var(--line);padding:20px 0;display:flex;justify-content:space-between;gap:20px;font:9px var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}.word-reveal{color:#fff;transition:color .11s linear}.word-reveal.is-ink{color:#111}.reveal{opacity:0;transform:translateY(24px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}.reveal.visible{opacity:1;transform:translateY(0)}.delay1{transition-delay:.12s}.delay2{transition-delay:.22s}.delay3{transition-delay:.32s}::selection{background:#111;color:#fff}
+
+@media(max-width:700px){.topbar{padding:18px 5vw}.nav{gap:13px}.nav a{font-size:9px}.availability{display:none}.hero{height:100vh;height:100svh;min-height:100vh;min-height:100svh}.hero-image{height:78%;width:125%;max-width:none;object-position:center bottom}.type-row{font-size:clamp(67px,17vw,115px)}.hero-copy{bottom:23px;display:block}.hero-title{font-size:clamp(44px,12vw,76px)}.hero-note{margin-top:15px;max-width:230px;font-size:11px}.scroll-cue{right:5vw;top:39%}.section{padding:82px 5vw}.intro,.about-grid{grid-template-columns:1fr;gap:30px}.intro-copy{padding-top:0}.section-head{align-items:flex-start;flex-direction:column;margin-bottom:32px}.section-head p{margin:0}.project{grid-template-columns:28px minmax(0,1fr) 20px;gap:12px;padding:23px 0}.project .tags{grid-column:2;grid-row:2}.project .arrow{grid-column:3;grid-row:1}.project h3{font-size:25px}.manifesto{padding:90px 5vw}.manifesto h2{margin-top:35px}.manifesto-foot{margin-top:45px;flex-direction:column;gap:10px}.about-image{min-height:430px;max-height:550px}.skill-grid{grid-template-columns:1fr 1fr}.skill{min-height:160px;padding:16px}.contact{padding:85px 5vw 25px}.contact-main{display:block;padding-bottom:55px}.contact-side{margin-top:40px}.contact h2{font-size:clamp(58px,14vw,95px)}.footer{flex-wrap:wrap;font-size:8px}.project:hover{padding-left:0;padding-right:0}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.reveal{opacity:1;transform:none}.word-reveal{color:var(--ink)!important;transition:none!important}}
+
+/* Opening sequence: typography first, portrait second, hero copy and navigation last. */
+body.intro-lock{width:100%;overflow:hidden!important;overscroll-behavior:none;touch-action:none;}html.intro-lock{overflow:hidden!important;overscroll-behavior:none;}
+body.intro-lock .typewall{opacity:0;filter:blur(9px);transform:scale(1.025);transition:opacity .8s ease,filter .9s ease,transform 1.1s cubic-bezier(.2,.7,.2,1)}
+body.intro-name-visible .typewall{opacity:.12;filter:blur(0);transform:scale(1)}
+.hero-image.intro-hidden{transform:translate3d(-50%,calc(100% + 35px),0);opacity:0;transition:transform 1.15s cubic-bezier(.16,1,.3,1),opacity .45s ease;}
+.hero-image.intro-rise{transform:translate3d(-50%,var(--portrait-scroll,0px),0);opacity:1}
+.hero-copy.intro-hidden{opacity:0;transform:translate3d(0,28px,0);}
+.hero-copy.intro-enter{opacity:1;transform:translate3d(0,0,0);transition:opacity .8s ease,transform .9s cubic-bezier(.2,.7,.2,1)}
+.topbar.intro-hidden,.scroll-cue.intro-hidden{opacity:0;transform:translateY(-12px)}
+.topbar.intro-enter,.scroll-cue.intro-enter{opacity:1;transform:translateY(0);transition:opacity .65s ease,transform .75s cubic-bezier(.2,.7,.2,1)}
+@media(prefers-reduced-motion:reduce){html.intro-lock,body.intro-lock{overflow:auto!important;touch-action:auto}.hero-image.intro-hidden,.hero-copy.intro-hidden,.topbar.intro-hidden,.scroll-cue.intro-hidden{opacity:1;transform:none}.hero-image.intro-hidden{transition:none}body.intro-lock .typewall{opacity:.12;filter:none;transform:none;transition:none}}
+
+
+.hero-image{display:block}
+.hero-image img{display:block;width:100%;height:100%;object-fit:contain;object-position:center bottom}
+/* Desktop contrast and navigation clarity */
+@media(min-width:701px){
+  .topbar{padding:24px 4.5vw;align-items:center;gap:18px}
+  .brand{display:inline-flex;align-items:center;justify-content:center;min-width:48px;min-height:42px;padding:0 12px;border-radius:999px;background:#111;color:#f7f6f2;letter-spacing:-.03em}
+  .nav{gap:4px;padding:5px;background:rgba(17,17,17,.94);color:#f7f6f2;border:1px solid rgba(255,255,255,.16);border-radius:999px;box-shadow:0 8px 24px rgba(0,0,0,.10);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+  .nav a{display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:0 13px;border-radius:999px;color:#f7f6f2;opacity:.9;transition:background .2s ease,opacity .2s ease}
+  .nav a:hover,.nav a:focus-visible{background:#f7f6f2;color:#111;opacity:1;outline:none}
+  .availability{min-height:38px;padding:0 13px;border:1px solid rgba(17,17,17,.18);border-radius:999px;background:rgba(255,255,255,.88);color:#222;white-space:nowrap}
+  .typewall{opacity:.17}
+  .hero-kicker{display:table;padding:8px 11px;margin:0 0 13px;border-radius:4px;background:rgba(17,17,17,.78);color:#fff;mix-blend-mode:normal;text-shadow:none;letter-spacing:.13em}
+  .hero-note{padding:14px 16px;border-radius:10px;background:rgba(17,17,17,.78);color:#fff;text-shadow:none;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.15)}
+  .scroll-cue{padding:10px 8px;border-radius:999px;background:rgba(255,255,255,.88);color:#111;box-shadow:0 4px 18px rgba(0,0,0,.06)}
+  .tag{border-color:rgba(17,17,17,.32);color:#20201e}
+  .text-link{border-bottom-width:2px}
+  .contact-button{min-height:52px;padding:17px 24px;font-size:11px}
+}
+
+/* Consistent layout system inspired by Apple's current HIG: clear hierarchy, calm spacing, useful controls. */
+:root{--gutter:clamp(22px,5vw,80px);--section-space:clamp(76px,9vw,144px);--content-width:1440px;--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:24px;--space-6:32px;--space-7:48px;--space-8:64px}
+html{scroll-padding-top:24px;scroll-behavior:smooth}
+body{overflow-x:clip}
+.skip-link{position:fixed;left:16px;top:12px;z-index:1000;transform:translateY(-180%);padding:12px 16px;border-radius:999px;background:#111;color:#fff;font:12px var(--mono);box-shadow:0 6px 24px #0002}
+.skip-link:focus{transform:translateY(0)}
+.top-anchor{height:0;scroll-margin-top:24px}
+:focus-visible{outline:3px solid #9b282d!important;outline-offset:4px!important}
+.section{padding:var(--section-space) var(--gutter)}
+.section>*{width:100%;max-width:var(--content-width);margin-left:auto;margin-right:auto}
+.intro{column-gap:clamp(32px,7vw,112px)}
+.section-head{margin-bottom:clamp(30px,4vw,56px)}
+.projects{margin-top:var(--space-5)}
+.project{gap:clamp(12px,2vw,24px);min-height:112px}
+.project h3{line-height:1.15}
+.project p{max-width:48ch}
+.project:focus-visible{padding-left:12px;padding-right:12px}.project:not(a) .arrow{color:var(--muted);font-size:18px}
+.tag{line-height:1.25;white-space:normal}
+.about-image{border-radius:4px}
+.about-text p+p{margin-top:var(--space-4)}
+.facts{margin-top:var(--space-6)}
+.stack-list{display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:28px;padding-top:20px;border-top:1px solid var(--line);font:10px/1.7 var(--mono);color:var(--muted)}
+.stack-list span{display:block}
+.stack-list b{color:var(--ink);font-weight:500;margin-right:7px}
+.skill-grid{gap:clamp(10px,1.4vw,18px)}
+.skill{border-radius:4px}
+.contact{padding:var(--section-space) var(--gutter) 28px}
+.contact-main,.footer{max-width:var(--content-width);margin-left:auto;margin-right:auto}
+.contact-main{padding-bottom:clamp(52px,7vw,96px)}
+.contact-button{min-height:48px;justify-content:center}
+.social-links{display:flex;flex-wrap:wrap;gap:12px 20px;margin-top:22px;font:10px var(--mono);color:var(--muted)}
+.social-links a,.footer-links a{padding:8px 0;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:4px;transition:text-decoration-color .2s,color .2s}
+.social-links a:hover,.footer-links a:hover{color:var(--ink);text-decoration-color:currentColor}
+.footer{align-items:center;flex-wrap:wrap;row-gap:12px}
+.footer-links{display:flex;flex-wrap:wrap;gap:10px 22px}
+/* Progressive enhancement: content remains visible when JavaScript is unavailable. */
+.reveal{opacity:1;transform:none}
+.js .reveal{opacity:0;transform:translateY(20px)}
+.js .reveal.visible{opacity:1;transform:none}
+@media(min-width:1200px){.hero-copy{left:var(--gutter);right:var(--gutter);bottom:clamp(30px,4vw,56px)}.hero-note{max-width:300px;font-size:13px}.hero-title{font-size:clamp(72px,7vw,108px)}}
+@media(max-width:700px){
+  :root{--gutter:22px;--section-space:76px}
+  .section{padding-left:var(--gutter);padding-right:var(--gutter)}
+  .project{min-height:0}
+  .project .tags{max-width:100%}
+  .stack-list{gap:8px 14px}
+  .contact{padding:76px var(--gutter) 24px}
+  .social-links{gap:8px 18px}
+  .footer-links{width:100%;order:3}
+}
+@media(prefers-reduced-motion:reduce){.type-row{animation:none!important}.scroll-cue:after{animation:none!important}.js .reveal{opacity:1;transform:none}}
+
+
+/* Rome section: restrained title, generous dotted negative space, inset city card, oversized rising sculptor. */
+.rome-build{
+  position:relative;isolation:isolate;overflow:hidden;color:var(--ink);
+  padding:0 var(--gutter,5vw) clamp(28px,5vw,72px);
+  background-color:var(--paper);
+  background-image:radial-gradient(circle,rgba(156,161,175,.36) 1.65px,transparent 2.15px);
+  background-size:34px 34px;background-position:0 1px;
+}
+.rome-heading{
+  min-height:clamp(230px,25vw,340px);display:flex;align-items:center;
+  max-width:var(--content-width,1440px);margin:0 auto;position:relative;z-index:3;
+  padding:clamp(72px,8vw,108px) 0 clamp(24px,3vw,42px);
+}
+.rome-heading .eyebrow{position:absolute;top:clamp(24px,3vw,42px);left:0;}
+.rome-title{font:800 clamp(48px,9vw,124px)/.9 var(--sans);letter-spacing:-.105em;max-width:1200px;margin:15px 0 0;}
+.rome-title em{font:italic 500 .92em var(--serif);letter-spacing:-.07em;}
+.rome-title .word-reveal{color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.035);transition:color .11s linear;}
+.rome-title .word-reveal.is-ink{color:#171612;}
+.rome-scene-wrap{
+  position:relative;width:100%;max-width:1600px;margin:clamp(10px,2.5vw,34px) auto 0;
+  height:clamp(610px,62vw,840px);overflow:visible;
+}
+.rome-scene{position:relative;width:100%;height:100%;overflow:visible;isolation:isolate;}
+.rome-city{
+  position:absolute;z-index:0;left:50%;top:56%;display:block;
+  width:min(88vw,1150px);height:auto;aspect-ratio:1536/866;
+  transform:translate3d(-50%,-50%,0) scale(1);
+  border-radius:clamp(16px,2.4vw,30px);object-fit:cover;object-position:center 53%;
+  filter:saturate(.82) brightness(.91) contrast(1.04);will-change:transform,filter;
+}
+.rome-sculptor{
+  position:absolute;z-index:2;left:50%;top:0;display:block;
+  height:clamp(740px,78vw,1030px);width:auto;max-width:none;object-fit:contain;object-position:center top;
+  transform:translate3d(-50%,40%,0);opacity:0;
+  mix-blend-mode:normal;filter:grayscale(1) contrast(1.08) drop-shadow(0 7px 18px rgba(0,0,0,.12));
+  will-change:transform,opacity;pointer-events:none;
+}
+.rome-caption{display:none;}
+@media(max-width:700px){
+  .rome-build{padding:0 22px 34px;}
+  .rome-heading{min-height:clamp(225px,60vw,300px);padding:66px 0 30px;}
+  .rome-heading .eyebrow{top:23px;}
+  .rome-title{font-size:clamp(45px,12.4vw,76px);line-height:.92;max-width:100%;margin-top:20px;}
+  .rome-scene-wrap{height:clamp(510px,135vw,650px);margin:8px -22px 0;width:calc(100% + 44px);}
+  .rome-city{width:91vw;top:53%;border-radius:16px;}
+  .rome-sculptor{height:clamp(620px,178vw,760px);}
+}
+@media(prefers-reduced-motion:reduce){
+  .rome-sculptor{opacity:1!important;transform:translate3d(-50%,-5%,0)!important;}
+  .rome-city{transform:translate3d(-50%,-50%,0)!important;}
+}
+/* The Apple artwork supports touch scrolling. Dragging remains available with mouse, pen and keyboard. */
+
+
+/* Refined section rhythm and reliable scroll behavior */
+html{scroll-behavior:auto;scroll-padding-top:20px}
+body{overflow-x:hidden}
+html.intro-lock,body.intro-lock{overflow-x:hidden!important;overflow-y:auto!important;touch-action:pan-y!important;overscroll-behavior-y:auto!important}
+.rome-build{
+  background:#171612;
+  background-image:radial-gradient(ellipse at 50% 55%,rgba(128,82,42,.14),transparent 65%);
+  color:#f2eee6;
+  padding:clamp(68px,7vw,108px) var(--gutter,5vw) clamp(60px,7vw,100px);
+}
+.rome-heading{min-height:clamp(170px,22vw,270px);padding:clamp(45px,6vw,78px) 0 18px}
+.rome-heading .eyebrow{color:#b4a58e}
+.rome-title{color:#f2eee6}
+.rome-title .word-reveal{color:#4d4942;text-shadow:none}
+.rome-title .word-reveal.is-ink{color:#f2eee6}
+.rome-scene-wrap{height:clamp(450px,52vw,690px);margin:clamp(8px,1.5vw,22px) auto 0}
+.rome-city{width:min(84vw,1120px);top:51%;border:1px solid rgba(223,190,136,.18);box-shadow:0 26px 80px rgba(0,0,0,.26)}
+.rome-sculptor{height:clamp(650px,69vw,900px);filter:grayscale(1) contrast(1.08) drop-shadow(0 10px 24px rgba(0,0,0,.4))}
+.rome-caption{display:none}
+.contact h2{max-width:900px;font-size:clamp(48px,8vw,112px);line-height:.92;letter-spacing:-.095em}
+.contact h2 em{display:inline-block}
+@media(min-width:701px){
+  .intro,.work,.manifesto,#about,.skills,.rome-build,.contact{min-height:100svh}
+  .intro{align-content:center}
+  .work,.skills{display:flex;flex-direction:column;justify-content:center}
+  .manifesto{display:flex;flex-direction:column;justify-content:center}
+  #about{display:flex;align-items:center}
+  .rome-build{display:flex;flex-direction:column;justify-content:center}
+  .rome-scene-wrap{height:min(53vw,650px)}
+  .rome-sculptor{height:min(70vw,880px)}
+  .contact{display:flex;flex-direction:column;justify-content:flex-end}
+}
+@media(max-width:700px){
+  .rome-build{padding:58px 22px 48px;background-color:#171612;background-image:radial-gradient(ellipse at 50% 55%,rgba(128,82,42,.14),transparent 65%)}
+  .rome-heading{min-height:clamp(190px,54vw,260px);padding:58px 0 22px}
+  .rome-title{font-size:clamp(43px,11.5vw,72px);line-height:.94}
+  .rome-scene-wrap{height:clamp(420px,120vw,590px);margin:0 -22px;width:calc(100% + 44px)}
+  .rome-city{width:94vw;top:48%;border-radius:15px}
+  .rome-sculptor{height:clamp(570px,158vw,720px)}
+  .contact h2{font-size:clamp(47px,11vw,74px);line-height:.95}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .rome-sculptor,.rome-city{transition:none!important}
+}
+
+
+/* === Art-directed motion pass: layered Roman sculptor + thrown Jack card === */
+html{scroll-behavior:auto!important;scroll-snap-type:none!important}
+body{overflow-x:clip}
+@supports not (overflow:clip){body{overflow-x:hidden}}
+/* Remove any legacy lock that could trap a touch scroll. */
+html.intro-lock,body.intro-lock{overflow-x:hidden!important;overflow-y:auto!important;touch-action:pan-y!important;overscroll-behavior-y:auto!important}
+.jack-band{
+  position:relative;isolation:isolate;overflow:hidden;
+  min-height:clamp(270px,32vw,430px);
+  display:flex;flex-direction:column;justify-content:center;
+  background:
+    radial-gradient(ellipse at 18% 30%,rgba(190,151,92,.14),transparent 38%),
+    linear-gradient(115deg,#e6e1d7 0%,#d8d3c9 48%,#e8e3d9 100%);
+  color:#171612;padding:clamp(28px,4vw,58px) 0;
+}
+.jack-band:before,.jack-band:after{content:"";position:absolute;left:0;right:0;height:1px;background:rgba(23,22,18,.22);z-index:1}
+.jack-band:before{top:0}.jack-band:after{bottom:0}
+.jack-band-label{display:flex;justify-content:space-between;gap:20px;padding:0 var(--gutter,5vw);margin-bottom:clamp(22px,3vw,38px);font:10px var(--mono);letter-spacing:.13em;text-transform:uppercase;color:#5e594f}
+.jack-track{position:relative;display:flex;width:100%;overflow:hidden;white-space:nowrap;align-items:center;min-height:clamp(130px,17vw,230px);background:#171612;color:#f2eee6;transform:translateZ(0)}
+.jack-track-run{flex:0 0 auto;display:flex;align-items:center;gap:clamp(20px,3vw,48px);padding-right:clamp(20px,3vw,48px);font:800 clamp(60px,11.5vw,172px)/.85 var(--sans);letter-spacing:-.095em;text-transform:uppercase;will-change:transform;animation:jack-marquee-right 24s linear infinite}
+.jack-track-run i{font-style:normal;color:#c7a56b;font-size:.38em;letter-spacing:0}
+@keyframes jack-marquee-right{from{transform:translateX(-100%)}to{transform:translateX(0)}}
+.jack-card{
+  position:absolute;z-index:4;left:-18%;top:50%;width:clamp(145px,18vw,260px);height:auto;
+  object-fit:contain;transform:translate3d(0,-50%,0) rotate(-27deg);
+  filter:drop-shadow(0 22px 20px rgba(0,0,0,.26));
+  pointer-events:none;user-select:none;-webkit-user-drag:none;
+  animation:jack-card-throw 3.2s cubic-bezier(.18,.72,.22,1) infinite;
+  will-change:transform;
+}
+@keyframes jack-card-throw{
+  0%{transform:translate3d(-8vw,-50%,0) rotate(-36deg) scale(.82)}
+  10%{transform:translate3d(8vw,-58%,0) rotate(-17deg) scale(1.02)}
+  24%{transform:translate3d(34vw,-42%,0) rotate(18deg) scale(1.05)}
+  42%{transform:translate3d(68vw,-57%,0) rotate(31deg) scale(.98)}
+  58%{transform:translate3d(100vw,-46%,0) rotate(12deg) scale(.9)}
+  63%,100%{transform:translate3d(118vw,-50%,0) rotate(4deg) scale(.84)}
+}
+.rome-build{
+  position:relative;isolation:isolate;overflow:hidden;color:#f2eee6;
+  background:
+    radial-gradient(ellipse at 50% 57%,rgba(127,82,44,.19),transparent 52%),
+    radial-gradient(ellipse at 90% 12%,rgba(168,119,65,.09),transparent 34%),
+    linear-gradient(155deg,#171612 0%,#201c17 54%,#141310 100%);
+  background-image:
+    linear-gradient(90deg,transparent 0 11%,rgba(198,167,119,.035) 11.1%,transparent 11.3% 88%,rgba(198,167,119,.035) 88.1%,transparent 88.3%),
+    radial-gradient(ellipse at 50% 57%,rgba(127,82,44,.19),transparent 52%),
+    linear-gradient(155deg,#171612 0%,#201c17 54%,#141310 100%);
+  padding:clamp(70px,8vw,112px) var(--gutter,5vw) clamp(55px,7vw,95px);
+}
+.rome-build:before{
+  content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.26;
+  background:repeating-linear-gradient(90deg,transparent 0 12.4%,rgba(213,184,138,.055) 12.5%,transparent 12.65% 25%);
+  mask-image:linear-gradient(to bottom,transparent,#000 20%,#000 78%,transparent);
+}
+.rome-heading{
+  position:relative;z-index:2;min-height:clamp(340px,42vw,560px);
+  display:flex;align-items:flex-start;justify-content:center;flex-direction:column;
+  max-width:var(--content-width,1440px);margin:0 auto;padding:clamp(66px,8vw,110px) 0 0;
+}
+.rome-heading .eyebrow{top:clamp(20px,3vw,38px);left:0;color:#bcb09c}
+.rome-title{position:relative;z-index:2;font:800 clamp(52px,9.6vw,140px)/.88 var(--sans);letter-spacing:-.105em;max-width:1250px;margin:0;color:#f0e9dc}
+.rome-title em{font:italic 500 .92em var(--serif);color:#d0b37d;letter-spacing:-.07em}
+.rome-title .word-reveal{color:#fff!important;text-shadow:0 1px 0 rgba(0,0,0,.05);transition:color .16s linear}
+.rome-title .word-reveal.is-ink{color:#171612!important}
+.rome-scene-wrap{
+  position:relative;z-index:4;width:100%;max-width:1600px;height:clamp(660px,72vw,980px);
+  margin:-clamp(140px,18vw,245px) auto 0;overflow:visible;pointer-events:none;
+}
+.rome-scene{position:relative;width:100%;height:100%;overflow:visible;isolation:isolate}
+.rome-city{
+  position:absolute;z-index:0;left:50%;top:56%;display:block;width:min(82vw,1200px);height:auto;
+  aspect-ratio:1536/866;transform:translate3d(-50%,-50%,0) scale(1);
+  border-radius:clamp(16px,2.4vw,30px);object-fit:cover;object-position:center 53%;
+  filter:saturate(.72) brightness(.76) contrast(1.09) sepia(.08);
+  box-shadow:0 32px 80px rgba(0,0,0,.28),0 0 0 1px rgba(221,194,148,.12);
+  will-change:transform,filter;
+}
+.rome-sculptor{
+  position:absolute;z-index:5;left:50%;top:clamp(-90px,-7vw,-35px);display:block;
+  height:clamp(800px,82vw,1160px);width:auto;max-width:none;object-fit:contain;object-position:center top;
+  transform:translate3d(-50%,28%,0);opacity:0;mix-blend-mode:normal;
+  filter:grayscale(1) contrast(1.1) drop-shadow(0 14px 22px rgba(0,0,0,.34));
+  will-change:transform,opacity;pointer-events:none;
+}
+.rome-caption{display:none}
+@media(min-width:1000px){
+  .jack-band{min-height:clamp(330px,36vw,500px)}
+  .jack-track{min-height:clamp(180px,20vw,280px)}
+  .rome-heading{min-height:clamp(420px,45vw,620px)}
+  .rome-scene-wrap{height:clamp(780px,66vw,1050px)}
+  .rome-city{width:min(78vw,1250px)}
+  .rome-sculptor{height:clamp(920px,75vw,1280px)}
+}
+@media(max-width:700px){
+  .jack-band{min-height:260px;padding:28px 0}
+  .jack-band-label{font-size:8px;padding:0 22px}
+  .jack-track{min-height:140px}
+  .jack-track-run{font-size:clamp(58px,14vw,92px);gap:20px}
+  .jack-card{width:clamp(130px,30vw,190px);animation-duration:3.2s}
+  .rome-build{padding:68px 22px 34px}
+  .rome-heading{min-height:clamp(340px,94vw,450px);padding:70px 0 0}
+  .rome-heading .eyebrow{top:22px}
+  .rome-title{font-size:clamp(48px,12.5vw,80px);line-height:.92;max-width:100%}
+  .rome-scene-wrap{height:clamp(620px,158vw,790px);margin:clamp(-130px,-18vw,-80px) -22px 0;width:calc(100% + 44px)}
+  .rome-city{width:92vw;top:45%;border-radius:16px}
+  .rome-sculptor{height:clamp(690px,185vw,870px);top:-22px}
+}
+@media(prefers-reduced-motion:reduce){
+  .jack-track-run{animation:none!important;transform:none!important}
+  .jack-card{animation:none!important;left:50%;top:50%;transform:translate3d(-50%,-50%,0) rotate(-12deg)}
+  .rome-sculptor{opacity:1!important;transform:translate3d(-50%,-10%,0)!important}
+  .rome-city{transform:translate3d(-50%,-50%,0)!important}
+}
+
+
+/* Final art direction: warm limestone, Roman picture-window, sculptor emerging through it. */
+.rome-build{
+  color:#211e19!important;
+  background:
+    radial-gradient(ellipse at 50% 58%,rgba(194,157,102,.13),transparent 44%),
+    linear-gradient(180deg,#f1eee7 0%,#e9e3d8 100%)!important;
+  padding:clamp(52px,7vw,100px) var(--gutter,5vw) clamp(30px,5vw,70px)!important;
+  overflow:hidden!important;
+}
+.rome-build:before{
+  opacity:.14!important;
+  background:
+    linear-gradient(90deg,transparent 0 7%,rgba(112,92,63,.08) 7.1%,transparent 7.25% 92%,rgba(112,92,63,.08) 92.1%,transparent 92.25%),
+    repeating-linear-gradient(0deg,rgba(96,80,59,.018) 0 1px,transparent 1px 5px)!important;
+  mask-image:linear-gradient(to bottom,transparent,#000 12%,#000 86%,transparent)!important;
+}
+.rome-heading{
+  min-height:clamp(250px,31vw,410px)!important;
+  padding:clamp(72px,8vw,105px) 0 clamp(32px,5vw,70px)!important;
+  align-items:center!important;
+}
+.rome-heading .eyebrow{color:#766b5b!important}
+.rome-title{
+  color:#211e19!important;
+  font-size:clamp(50px,8.6vw,122px)!important;
+  line-height:.91!important;
+  max-width:1240px!important;
+  text-wrap:balance;
+}
+.rome-title em{color:#8d6b3f!important}
+.rome-title .word-reveal{color:#c8c0b2!important;text-shadow:none!important;transition:color .12s linear!important}
+.rome-title .word-reveal.is-ink{color:#211e19!important}
+.rome-scene-wrap{
+  height:clamp(680px,78vw,1120px)!important;
+  margin:clamp(8px,1.5vw,22px) auto 0!important;
+  max-width:1600px!important;
+}
+.rome-scene{isolation:isolate!important}
+.rome-city{
+  z-index:0!important;
+  width:min(91%,1320px)!important;
+  top:30%!important;
+  border-radius:clamp(12px,1.8vw,26px)!important;
+  filter:saturate(.68) brightness(.9) contrast(1.08)!important;
+  box-shadow:0 24px 55px rgba(61,47,29,.17),0 0 0 1px rgba(111,88,57,.18)!important;
+}
+.rome-sculptor{
+  z-index:3!important;
+  height:clamp(830px,94vw,1320px)!important;
+  top:clamp(20px,4vw,70px)!important;
+  filter:grayscale(1) contrast(1.12) drop-shadow(0 24px 24px rgba(38,31,23,.2))!important;
+  transform:translate3d(-50%,42%,0)!important;
+  opacity:0!important;
+  -webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 91%,rgba(0,0,0,.98) 95%,transparent 100%);
+  mask-image:linear-gradient(to bottom,#000 0%,#000 91%,rgba(0,0,0,.98) 95%,transparent 100%);
+}
+@media(min-width:1000px){
+  .rome-heading{min-height:clamp(330px,34vw,460px)!important}
+  .rome-scene-wrap{height:clamp(850px,75vw,1200px)!important}
+  .rome-city{width:min(86%,1350px)!important;top:31%!important}
+  .rome-sculptor{height:clamp(1050px,83vw,1450px)!important;top:clamp(15px,3vw,55px)!important}
+}
+@media(max-width:700px){
+  .rome-build{padding:48px 20px 22px!important}
+  .rome-heading{min-height:clamp(270px,75vw,360px)!important;padding:66px 0 34px!important}
+  .rome-heading .eyebrow{top:22px!important}
+  .rome-title{font-size:clamp(47px,12.2vw,76px)!important;line-height:.94!important;margin-top:8px!important}
+  .rome-scene-wrap{height:clamp(650px,168vw,850px)!important;margin:0 -20px 0!important;width:calc(100% + 40px)!important}
+  .rome-city{width:92%!important;top:26%!important;border-radius:15px!important}
+  .rome-sculptor{height:clamp(760px,196vw,960px)!important;top:3px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  .rome-sculptor{opacity:1!important;transform:translate3d(-50%,-3%,0)!important}
+}
+/* Faster, more legible thrown-card loop: a full spin while crossing the band. */
+.jack-card{
+  animation:jack-card-throw 1.65s cubic-bezier(.16,.78,.24,1) infinite!important;
+}
+@keyframes jack-card-throw{
+  0%{transform:translate3d(-18vw,-50%,0) rotate(-50deg) scale(.72)}
+  12%{transform:translate3d(5vw,-59%,0) rotate(35deg) scale(1.02)}
+  28%{transform:translate3d(31vw,-42%,0) rotate(190deg) scale(1.08)}
+  46%{transform:translate3d(62vw,-57%,0) rotate(390deg) scale(1)}
+  64%{transform:translate3d(95vw,-45%,0) rotate(590deg) scale(.92)}
+  78%{transform:translate3d(120vw,-50%,0) rotate(740deg) scale(.78)}
+  100%{transform:translate3d(120vw,-50%,0) rotate(740deg) scale(.78)}
+}
+@media(max-width:700px){.jack-card{animation-duration:1.35s!important}}
+@media(prefers-reduced-motion:reduce){.jack-card{animation:none!important}}
+
+
+/* Critical fix: let scroll progress control the sculpture even though the art-direction
+   rules use !important for responsive sizing. The old !important opacity/transform
+   declarations overrode JavaScript and left the sculpture permanently hidden. */
+.rome-sculptor{
+  opacity:var(--sculptor-opacity,0)!important;
+  transform:translate3d(-50%,var(--sculptor-rise,42%),0)!important;
+  transition:none!important;
+  -webkit-mask-image:none!important;
+  mask-image:none!important;
+}
+@media(prefers-reduced-motion:reduce){
+  .rome-sculptor{
+    opacity:1!important;
+    transform:translate3d(-50%,-4%,0)!important;
+  }
+}
+
+
+
+/* New direction: monochrome cloud field + a single scroll-driven foreground sculpture. */
+.sky-statue-section{
+  --statue-progress:0;
+  --statue-rise:62%;
+  position:relative!important;
+  min-height:165svh!important;
+  padding:0!important;
+  margin:0!important;
+  overflow:clip!important;
+  color:#171717!important;
+  background:#bdbdbd!important;
+  isolation:isolate!important;
+}
+.sky-statue-stage{
+  position:sticky!important;
+  top:0!important;
+  height:100svh!important;
+  min-height:560px!important;
+  overflow:hidden!important;
+  isolation:isolate!important;
+  background-image:linear-gradient(rgba(245,245,245,.12),rgba(225,225,225,.18)),url('sky-monochrome.webp')!important;
+  background-size:cover!important;
+  background-position:center center!important;
+  background-repeat:no-repeat!important;
+}
+.sky-statue-stage:before{
+  content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:linear-gradient(180deg,rgba(245,245,245,.08) 0%,transparent 45%,rgba(20,20,20,.10) 100%);
+}
+.rome-heading{
+  position:absolute!important;z-index:1!important;
+  top:clamp(70px,12vh,150px)!important;
+  left:50%!important;transform:translateX(-50%)!important;
+  width:min(92%,1400px)!important;min-height:0!important;
+  padding:0!important;margin:0!important;
+  display:flex!important;flex-direction:column!important;align-items:center!important;
+  text-align:center!important;pointer-events:none!important;
+}
+.rome-heading .eyebrow{
+  position:static!important;top:auto!important;left:auto!important;
+  margin-bottom:clamp(14px,2.4vh,28px)!important;
+  color:rgba(20,20,20,.7)!important;
+  letter-spacing:.22em!important;font-size:10px!important;
+}
+.rome-title{
+  margin:0!important;max-width:100%!important;
+  color:#171717!important;
+  font-family:var(--sans)!important;
+  font-size:clamp(48px,9.6vw,142px)!important;
+  font-weight:850!important;letter-spacing:-.085em!important;
+  line-height:.86!important;text-wrap:balance!important;
+  text-shadow:0 1px 0 rgba(255,255,255,.13)!important;
+}
+.rome-title em{
+  font-family:var(--serif)!important;font-weight:500!important;
+  font-style:italic!important;letter-spacing:-.075em!important;
+  color:#f3f1eb!important;
+  -webkit-text-stroke:.45px rgba(20,20,20,.65)!important;
+  text-shadow:0 2px 12px rgba(0,0,0,.12)!important;
+}
+.rome-sculptor{
+  position:absolute!important;z-index:3!important;
+  left:50%!important;bottom:-10%!important;top:auto!important;
+  width:auto!important;height:min(112svh,1200px)!important;max-width:none!important;
+  object-fit:contain!important;object-position:center bottom!important;
+  opacity:clamp(0,var(--statue-progress),1)!important;
+  transform:translate3d(-50%,var(--statue-rise),0)!important;
+  transform-origin:center bottom!important;
+  filter:grayscale(1) contrast(1.13) brightness(1.02) drop-shadow(0 22px 24px rgba(0,0,0,.22))!important;
+  transition:none!important;will-change:transform,opacity!important;
+  pointer-events:none!important;
+  -webkit-mask-image:none!important;mask-image:none!important;
+}
+.sky-statue-grain{
+  position:absolute;inset:0;z-index:4;pointer-events:none;opacity:.12;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.24'/%3E%3C/svg%3E");
+  mix-blend-mode:multiply;
+}
+@media(min-width:1000px){
+  .sky-statue-section{min-height:165svh!important}
+  .rome-heading{top:clamp(72px,13vh,155px)!important}
+  .rome-title{font-size:clamp(90px,10vw,158px)!important}
+  .rome-sculptor{height:min(125svh,1450px)!important;bottom:-13%!important}
+}
+@media(max-width:700px){
+  .sky-statue-section{min-height:155svh!important}
+  .sky-statue-stage{min-height:600px!important;background-position:center center!important}
+  .rome-heading{top:clamp(92px,15vh,145px)!important;width:94%!important}
+  .rome-heading .eyebrow{font-size:8px!important;margin-bottom:17px!important}
+  .rome-title{font-size:clamp(43px,11.8vw,78px)!important;line-height:.9!important;letter-spacing:-.08em!important}
+  .rome-title em{color:#f2f0ea!important}
+  .rome-sculptor{height:92svh!important;max-height:850px!important;bottom:-8%!important;left:50%!important}
+}
+@media(prefers-reduced-motion:reduce){
+  .sky-statue-section{--statue-progress:1!important;--statue-rise:0%!important}
+  .rome-sculptor{opacity:1!important;transform:translate3d(-50%,0,0)!important;will-change:auto!important}
+}
+
+
+
+/* ==========================================================================
+   Philosophy section: the single source of truth for the hands, apple and copy.
+   Mobile values first, laptop/desktop refinements at 701px and up.
+   Hands are sized from the stage width and centred vertically; their outer
+   ends overshoot the full-bleed stage so the arms always leave the screen edge.
+   ========================================================================== */
+.apple-philosophy{position:relative;isolation:isolate;overflow:hidden;background:#080808;color:#f3f2ef;padding:64px 22px 42px}
+.apple-philosophy:before{content:"";position:absolute;left:50%;top:50%;z-index:-1;width:min(100%,980px);height:min(78%,680px);transform:translate(-50%,-42%);background:radial-gradient(ellipse at center,rgba(190,137,35,.055) 0%,rgba(190,137,35,.025) 34%,transparent 68%);pointer-events:none}
+.apple-philosophy .eyebrow{color:#a7a49e}
+.apple-philosophy-head{display:grid;grid-template-columns:1fr;gap:8px;align-items:start;position:relative;z-index:2;max-width:var(--content-width,1440px);margin:0 auto}
+.apple-philosophy h2{font:700 clamp(40px,10.5vw,64px)/.92 var(--sans);letter-spacing:-.09em;margin:17px 0 0;max-width:480px}
+.apple-philosophy h2 em{font:italic 500 1em var(--serif);color:#d8b46a;letter-spacing:-.065em;margin-left:.12em}
+.apple-philosophy-copy{padding-top:3px;max-width:410px}
+.apple-philosophy-copy p{font-size:12.5px;line-height:1.65;margin:0 0 9px;color:#bdb9b1}
+.apple-philosophy-copy strong{color:#f4f2ed;font-weight:600}
+
+/* Text reveal uses the same soft rhythm as the rest of the site. */
+.js .apple-philosophy .reveal{opacity:0;transform:translateY(22px);transition:opacity .85s cubic-bezier(.2,.7,.2,1),transform .85s cubic-bezier(.2,.7,.2,1)}
+.js .apple-philosophy .reveal.visible{opacity:1;transform:translateY(0)}
+.apple-philosophy .apple-philosophy-copy.reveal{transition-delay:.16s}
+
+/* Stage */
+.apple-stage{position:relative;height:clamp(270px,78vw,350px);margin:20px -22px 0;overflow:hidden;isolation:isolate;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.apple-stage:before{content:"";position:absolute;z-index:0;left:50%;top:50%;width:68vw;height:45vw;max-height:190px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(ellipse,rgba(204,151,48,.19) 0%,rgba(204,151,48,.075) 36%,rgba(204,151,48,.018) 62%,transparent 76%);filter:blur(9px);pointer-events:none}
+.apple-stage:after{content:"";position:absolute;z-index:1;left:44%;right:44%;top:52%;height:1px;background:linear-gradient(90deg,transparent,#c99b4566,transparent);opacity:.12;pointer-events:none}
+
+/* Draggable artwork */
+.apple-art{position:absolute;display:block;object-fit:contain;pointer-events:auto;cursor:ns-resize;touch-action:pan-y;user-select:none;-webkit-user-select:none;-webkit-user-drag:none;filter:contrast(1.04);will-change:transform,opacity;outline:none}
+.apple-art:active{cursor:grabbing}
+.apple-art:focus-visible{outline:2px solid #d8b46a;outline-offset:5px;filter:drop-shadow(0 0 5px #d5a64c)}
+.apple-philosophy .apple-hand-left,.apple-philosophy .apple-hand-right{width:74%;height:auto;max-width:none;top:50%;transition:filter .25s ease}
+.apple-philosophy .apple-hand-left{left:-42%;transform-origin:76% 53%;transform:translate3d(0,-50%,0) rotate(var(--hand-left-angle,0deg))}
+.apple-philosophy .apple-hand-right{right:-35%;transform-origin:28% 53%;transform:translate3d(0,-50%,0) rotate(var(--hand-right-angle,0deg))}
+.apple-philosophy .apple-fruit{width:clamp(70px,18vw,86px);height:auto;aspect-ratio:1272/1237;left:50%;top:50%;z-index:5;cursor:grab;transform:translate3d(calc(-50% + var(--apple-x,0px)),calc(-50% + var(--apple-y,0px)),0);filter:drop-shadow(0 7px 13px rgba(214,155,39,.17))}
+.apple-philosophy .apple-fruit:active{filter:drop-shadow(0 10px 22px rgba(214,155,39,.24))}
+
+/* Entrance: artwork stays visible without JavaScript and starts hidden only when JS will reveal it. */
+.js .apple-philosophy:not(.is-active) .apple-art{opacity:0}
+.apple-philosophy.is-active .apple-hand-left{animation:ratio-hand-left-in 1.05s cubic-bezier(.16,1,.3,1) .24s both}
+.apple-philosophy.is-active .apple-hand-right{animation:ratio-hand-right-in 1.05s cubic-bezier(.16,1,.3,1) .36s both}
+.apple-philosophy.is-active .apple-fruit{animation:ratio-apple-in .72s cubic-bezier(.2,.8,.2,1) .08s both}
+@keyframes ratio-hand-left-in{from{opacity:0;transform:translate3d(-105%,-50%,0) rotate(0deg)}to{opacity:1;transform:translate3d(0,-50%,0) rotate(var(--hand-left-angle,0deg))}}
+@keyframes ratio-hand-right-in{from{opacity:0;transform:translate3d(105%,-50%,0) rotate(0deg)}to{opacity:1;transform:translate3d(0,-50%,0) rotate(var(--hand-right-angle,0deg))}}
+@keyframes ratio-apple-in{0%{opacity:0;scale:.56}72%{opacity:1;scale:1.04}100%{opacity:1;scale:1}}
+
+/* Foot */
+.apple-philosophy-foot{position:relative;max-width:var(--content-width,1440px);margin:8px auto 0;display:grid;grid-template-columns:1fr;gap:12px;padding-top:18px}
+.apple-philosophy-foot p{margin:0;color:#a7a49e;font-size:11px;line-height:1.75;max-width:430px}
+.apple-philosophy-foot .signature{font:italic 500 24px/1.2 var(--serif);color:#d8b46a;justify-self:start;align-self:end;text-align:left}
+
+@media(min-width:701px){
+  .apple-philosophy{padding:clamp(76px,7vw,112px) var(--gutter,5vw) clamp(54px,6vw,86px)}
+  .apple-philosophy-head{grid-template-columns:.9fr 1.1fr;gap:clamp(30px,6vw,92px)}
+  .apple-philosophy h2{font-size:clamp(38px,6.2vw,82px);margin-top:18px;max-width:560px}
+  .apple-philosophy-copy{padding-top:30px;max-width:520px}
+  .apple-philosophy-copy p{font-size:clamp(13px,1.05vw,15px);line-height:1.7;margin-bottom:12px}
+  /* Full-bleed stage: its clip edge is the screen edge, not the section padding. */
+  .apple-stage{width:100vw;max-width:none;height:clamp(330px,34vw,470px);margin:clamp(24px,3.4vw,48px) calc(50% - 50vw) 0}
+  .apple-stage:before{width:min(34vw,420px);height:min(22vw,245px);max-height:none}
+  .apple-stage:after{left:43%;right:43%;top:50%}
+  .apple-philosophy .apple-hand-left,.apple-philosophy .apple-hand-right{width:70%}
+  .apple-philosophy .apple-hand-left{left:-29%}
+  .apple-philosophy .apple-hand-right{right:-27%}
+  .apple-philosophy .apple-fruit{width:clamp(92px,8.5vw,124px)}
+  .apple-philosophy-foot{grid-template-columns:1fr 1fr;gap:clamp(24px,5vw,72px);padding-top:20px}
+  .apple-philosophy-foot .signature{font-size:clamp(20px,2.4vw,30px);justify-self:end;text-align:right}
+}
+@media(prefers-reduced-motion:reduce){
+  .js .apple-philosophy .reveal{opacity:1;transform:none;transition:none}
+  .apple-philosophy .apple-art{animation:none!important;opacity:1!important}
+}
+
+/* Other sections: let content set the height on laptops. */
+@media(min-width:701px){
+  .intro,.work,.manifesto,#about,.skills,.rome-build,.contact{min-height:0}
+  .intro{padding-top:clamp(100px,10vw,150px);padding-bottom:clamp(100px,10vw,150px)}
+  .work,.skills{display:block}
+  .manifesto,#about,.contact{display:block}
+}
+
+/* Rome is an intentional cinematic transition, not an accidental grey spacer. */
+.sky-statue-section {
+  background: #171612 !important;
+  min-height: 125svh !important;
+}
+.sky-statue-stage {
+  background-color: #171612 !important;
+  background-image:
+    linear-gradient(180deg, rgba(23,22,18,.08), rgba(23,22,18,.2)),
+    url('sky-monochrome.webp') !important;
+  background-size: cover !important;
+  background-position: center center !important;
+}
+@media (min-width: 1000px) {
+  .sky-statue-section { min-height: 125svh !important; }
+  .sky-statue-stage { height: 100svh !important; }
+}
+@media (max-width: 700px) {
+  .sky-statue-section { min-height: 155svh !important; }
+}
+</style>
+<noscript><style>html.intro-lock,body.intro-lock{overflow:auto!important;touch-action:auto!important}.intro-hidden{opacity:1!important;transform:none!important}.reveal{opacity:1!important;transform:none!important}
+</style></noscript>
 </head>
 <body>
-  <div class="app-shell">
-    <aside class="sidebar" aria-label="Main navigation">
-      <a class="brand" href="#home" aria-label="Pocketwise home">
-        <span class="brand-mark"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M7 13a4 4 0 0 1 4-4h21v5H11a4 4 0 0 0-4 4v-5Z" fill="currentColor" opacity=".72"/><path d="M7 18a4 4 0 0 1 4-4h22v16a4 4 0 0 1-4 4H11a4 4 0 0 1-4-4V18Z" fill="currentColor"/><path d="M25 20h7a3 3 0 0 1 3 3v3a3 3 0 0 1-3 3h-7a3 3 0 0 1-3-3v-3a3 3 0 0 1 3-3Z" fill="#000000"/><circle cx="26.5" cy="24.5" r="1.2" fill="currentColor"/></svg></span>
-        <span><strong>Pocketwise</strong><small>money, made clearer</small></span>
-      </a>
-      <div class="side-label">WORKSPACE</div>
-      <nav class="nav-list" id="side-nav">
-        <button class="nav-item active" data-page="home"><span class="icon-wrap"><i class="bi bi-house-door"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z"/></svg></span><span>Home</span></button>
-        <button class="nav-item" data-page="activity"><span class="icon-wrap"><i class="bi bi-arrow-left-right"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M4 7h15m-4-4 4 4-4 4M20 17H5m4 4-4-4 4-4"/></svg></span><span>Activity</span><span class="nav-count" id="activity-count">0</span></button>
-        <button class="nav-item" data-page="insights"><span class="icon-wrap"><i class="bi bi-bar-chart-line"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M4 20V11M10 20V4M16 20v-7M22 20H2"/></svg></span><span>Insights</span></button>
-        <button class="nav-item" data-page="settings"><span class="icon-wrap"><i class="bi bi-sliders"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16M8 3v6m8 0v6m-8 0v6"/></svg></span><span>Settings</span></button>
-      </nav>
-      <div class="sidebar-bottom">
-        <div class="privacy-mini"><span class="privacy-dot"></span><div><strong>Your money stays yours</strong><small>Stored on this device</small></div></div>
-        <button class="profile-chip" id="theme-toggle" aria-label="Switch theme"><span class="avatar" id="profile-avatar">P</span><span class="profile-copy"><strong id="profile-sidebar-name">Personal space</strong><small id="theme-label">Light appearance</small></span><span class="icon-wrap"><i class="bi bi-moon-stars"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M20 15.5A8.5 8.5 0 0 1 8.5 4 8.5 8.5 0 1 0 20 15.5Z"/></svg></span></button>
-      </div>
-    </aside>
-
-    <main class="main-content">
-      <header class="topbar">
-        <div class="mobile-brand"><span class="brand-mark small-mark"><svg viewBox="0 0 40 40"><path d="M20 4 34 12v16L20 36 6 28V12Z" fill="currentColor" opacity=".14"/><path d="M12 21.5 18 27l11-14" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><strong>Pocketwise</strong></div>
-        <div class="page-heading"><span class="eyebrow" id="date-eyebrow">YOUR MONEY, IN CONTEXT</span><h1 id="page-title">Overview</h1></div>
-        <div class="top-actions">
-          <button class="icon-button" id="hide-balances" aria-label="Hide balances" title="Hide balances"><span class="icon-wrap"><i class="bi bi-eye"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></span></button>
-          <button class="icon-button notification-button" id="open-notifications" aria-label="Notifications" title="Notifications"><span class="icon-wrap"><i class="bi bi-bell"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg></span><span class="notification-dot" id="notification-dot" hidden></span></button>
-          <button class="primary-button top-add" id="top-add"><span class="icon-wrap"><i class="bi bi-plus-lg"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span> Add transaction</button>
-        </div>
-      </header>
-
-      <section class="page active" id="page-home" data-page-panel="home">
-        <div class="hero-grid">
-          <article class="card money-card">
-            <div class="card-topline"><span class="section-kicker">TOTAL BALANCE</span><button class="text-button" data-action="accounts">All accounts <span class="icon-wrap"><i class="bi bi-arrow-up-right"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M7 17 17 7M7 7h10v10"/></svg></span></button></div>
-            <div class="balance-number" data-money="balance">₹0</div>
-            <div class="balance-context"><span class="positive-dot"></span><span id="balance-caption">Across your tracked accounts</span></div>
-            <div class="radial-area">
-              <svg id="money-arc" viewBox="0 0 360 190" role="img" aria-label="Income, expenses, elapsed days and remaining days">
-                <path class="arc-track" fill="none" d="M 35 155 A 145 145 0 0 1 325 155" pathLength="100"/>
-                <path class="arc-income" fill="none" d="M 35 155 A 145 145 0 0 1 325 155" pathLength="100"/>
-                <path class="arc-expense" fill="none" d="M 35 155 A 145 145 0 0 1 325 155" pathLength="100"/>
-                <path class="mobile-inner-track" fill="none" d="M 75 155 A 105 105 0 0 1 285 155" pathLength="100"/>
-                <path class="mobile-inner-progress" fill="none" d="M 75 155 A 105 105 0 0 1 285 155" pathLength="100"/>
-              </svg>
-              <div class="mobile-arc-center"><span>BALANCE LEFT</span><strong data-money="balance">₹0</strong><small>Available balance</small></div>
-              <div class="arc-legend"><span><i class="legend-dot income-color"></i>Income <strong data-money="income">₹0</strong></span><span><i class="legend-dot expense-color"></i>Expense <strong data-money="expense">₹0</strong></span><span class="mobile-days-legend"><i class="legend-dot days-color"></i>Days elapsed</span><span class="mobile-days-legend"><i class="legend-dot remaining-color"></i>Remaining</span></div>
-            </div>
-            <div class="days-block">
-              <div class="days-block-label"><span class="section-kicker">DAYS IN THIS PERIOD</span><span class="days-key"><i></i>Elapsed</span></div>
-              <div class="period-arc-wrap">
-                <svg id="days-arc" viewBox="0 0 300 124" role="img" aria-label="Days elapsed and days remaining">
-                  <path class="days-track" d="M 44 108 A 106 106 0 0 1 256 108" pathLength="100"/>
-                  <path class="days-progress" d="M 44 108 A 106 106 0 0 1 256 108" pathLength="100"/>
-                </svg>
-                <div class="days-center"><strong id="days-left">0</strong><span>days left</span></div>
-              </div>
-              <p class="muted centered tiny" id="period-caption">Your month at a glance</p>
-            </div>
-            <div class="card-separator"></div>
-            <div class="money-stats"><div><span>Net this month</span><strong data-money="net">₹0</strong></div><div><span>Available to spend</span><strong data-money="safe">₹0</strong></div></div>
-          </article>
-
-          <article class="card period-card">
-            <div class="card-topline"><span class="section-kicker">YOUR MONTH</span><button class="round-subtle" data-action="budget" aria-label="Edit budget"><span class="icon-wrap"><i class="bi bi-sliders2"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16M8 3v6m8 0v6m-8 0v6"/></svg></span></button></div>
-            <div class="spendable-summary"><span>AVAILABLE TO SPEND</span><strong data-money="safe">₹0</strong><small>After your current budget and planned commitments</small></div>
-            <div class="budget-mini"><div class="row-between"><span>Monthly spending budget</span><button class="inline-link" data-action="budget">Edit</button></div><div class="row-between budget-numbers"><strong data-money="budget">Not set</strong><span id="budget-percent">Set a limit</span></div><div class="progress-track"><span id="budget-progress"></span></div><div class="row-between budget-foot"><span id="budget-spent-text">Set a budget to begin</span><span id="budget-left-text"></span></div></div>
-            <div class="category-budget-preview" id="budget-category-list"></div>
-            <button class="soft-button full-width" data-action="budget"><span class="icon-wrap"><i class="bi bi-plus-lg"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span> Prepare my budget</button>
-          </article>
-        </div>
-
-        <div class="quick-actions-row">
-          <button class="quick-action" data-add-type="expense"><span class="quick-icon expense-bg"><span class="icon-wrap"><i class="bi bi-arrow-down-left"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M7 7 17 17M17 8v9H8"/></svg></span></span><span><strong>Expense</strong><small>Money out</small></span><span class="quick-chevron">›</span></button>
-          <button class="quick-action" data-add-type="income"><span class="quick-icon income-bg"><span class="icon-wrap"><i class="bi bi-arrow-up-right"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M7 17 17 7M7 7h10v10"/></svg></span></span><span><strong>Income</strong><small>Money in</small></span><span class="quick-chevron">›</span></button>
-          <button class="quick-action" data-add-type="transfer"><span class="quick-icon transfer-bg"><span class="icon-wrap"><i class="bi bi-arrow-left-right"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M4 7h15m-4-4 4 4-4 4M20 17H5m4 4-4-4 4-4"/></svg></span></span><span><strong>Transfer</strong><small>Move money</small></span><span class="quick-chevron">›</span></button>
-          <button class="quick-action" data-action="debts"><span class="quick-icon debt-bg"><span class="icon-wrap"><i class="bi bi-people"></i><svg class="icon-fallback" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2M17 5a3 3 0 0 1 0 6m2 3a5 5 0 0 1 3 4v2"/></svg></span></span><span><strong>Debts</strong><small>Owed & lent</small></span><span class="quick-chevron">›</span></button>
-        </div>
-
-        <div class="home-lower-grid">
-          <article class="card chart-card">
-            <div class="section-header"><div><span class="section-kicker">SPENDING PATTERN</span><h2>Your week</h2></div><select id="home-chart-mode" class="compact-select" aria-label="Spending graph period"><option value="week">This week</option><option value="month">This month</option><option value="year">This year</option></select></div>
-            <div class="chart-summary"><strong id="week-total" data-money="week">₹0</strong><span id="week-comparison">Recorded spending</span></div>
-            <canvas id="home-spending-chart" class="chart-canvas" height="210" aria-label="Spending graph"></canvas>
-          </article>
-          <article class="card alerts-card">
-            <div class="section-header"><div><span class="section-kicker">A LITTLE HEADS-UP</span><h2>Worth a look</h2></div><button class="text-button" id="view-alerts">View all <span>→</span></button></div>
-            <div id="home-alerts" class="alert-list"></div>
-          </article>
-        </div>
-
-        <div class="bottom-home-grid">
-          <article class="card recent-card">
-            <div class="section-header"><div><span class="section-kicker">YOUR LATEST</span><h2>Recent activity</h2></div><button class="text-button" data-page="activity">View activity <span>→</span></button></div>
-            <div class="transaction-list compact-list" id="recent-transactions"></div>
-          </article>
-          <article class="card debt-summary-card">
-            <div class="section-header"><div><span class="section-kicker">BETWEEN FRIENDS</span><h2>Debts & lending</h2></div><button class="round-subtle" data-action="debts" aria-label="Open debts"><span class="icon-wrap"><i class="bi bi-arrow-up-right"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M7 17 17 7M7 7h10v10"/></svg></span></button></div>
-            <div class="debt-summaries"><div><span class="debt-mini-icon owes-you"><span class="icon-wrap"><i class="bi bi-arrow-down-left"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M7 7 17 17M17 8v9H8"/></svg></span></span><div><small>Owed to you</small><strong data-money="receivable">₹0</strong></div></div><div><span class="debt-mini-icon you-owe"><span class="icon-wrap"><i class="bi bi-arrow-up-right"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M7 17 17 7M7 7h10v10"/></svg></span></span><div><small>You owe</small><strong data-money="payable">₹0</strong></div></div></div>
-            <button class="soft-button full-width" data-action="new-debt"><span class="icon-wrap"><i class="bi bi-plus-lg"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span> Add a debt record</button>
-          </article>
-        </div>
-
-        <div class="sample-banner" id="sample-banner"><span class="icon-wrap"><i class="bi bi-info-circle"></i><svg class="icon-fallback" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01"/></svg></span><span><strong>Preview data</strong><small>These example records help you explore the app. Clear them before adding your own finances.</small></span><button class="text-button" id="clear-sample">Clear sample</button></div>
-      </section>
-
-      <section class="page" id="page-activity" data-page-panel="activity">
-        <div class="activity-search-row"><div class="search-box"><span class="icon-wrap"><i class="bi bi-search"></i><svg class="icon-fallback" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg></span><input id="activity-search" type="search" placeholder="Try ₹500, yesterday, food, from Safwan…" aria-label="Search transactions"></div></div>
-        <div class="activity-toolbar"><button class="secondary-button" id="export-csv"><span class="icon-wrap"><i class="bi bi-download"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 18v3h16v-3"/></svg></span> Export CSV</button><select id="activity-period" class="compact-select" aria-label="Activity date range"><option value="month">This month</option><option value="all">All time</option><option value="year">This year</option></select></div>
-        <div class="filter-row" id="activity-filters" aria-label="Filter activity"><button class="filter-pill active" data-filter="all">All activity</button><button class="filter-pill" data-filter="expense">Expenses</button><button class="filter-pill" data-filter="income">Income</button><button class="filter-pill" data-filter="transfer">Transfers</button><button class="filter-pill" data-filter="debt">Debt activity</button><button class="filter-pill" data-filter="refund">Refunds</button></div>
-        <article class="card activity-card"><div class="section-header"><div><span class="section-kicker">THE FULL PICTURE</span><h2>Transaction history <span class="subtle-count" id="transaction-total">0</span></h2></div><button class="icon-button" id="activity-add" aria-label="Add transaction"><span class="icon-wrap"><i class="bi bi-plus-lg"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span></button></div><div id="all-transactions" class="transaction-list"></div></article>
-        <article class="card activities-manager"><div class="section-header"><div><span class="section-kicker">YOUR SHORTCUTS</span><h2>Most-used activities</h2><p class="muted small">Your frequent choices rise to the top automatically.</p></div><button class="secondary-button" id="manage-activities"><span class="icon-wrap"><i class="bi bi-tags"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="m3 3 8 0 10 10-8 8L3 11Z"/><circle cx="7" cy="7" r="1"/></svg></span> Add activity</button></div><div id="frequent-activities" class="activity-chip-list"></div></article>
-      </section>
-
-      <section class="page" id="page-insights" data-page-panel="insights">
-        <div class="insights-controls"><div class="insights-actions"><button class="secondary-button" id="goals-jump">Savings goals</button><select id="insights-period" class="compact-select"><option value="month">This month</option><option value="last-month">Last month</option><option value="year">This year</option><option value="all">All records</option></select></div></div>
-        <div class="insight-metrics"><article class="card metric-card"><span class="metric-label">Income</span><strong data-money="insight-income">₹0</strong><span class="metric-foot positive-text">Money received</span></article><article class="card metric-card"><span class="metric-label">Expenses</span><strong data-money="insight-expense">₹0</strong><span class="metric-foot">Money spent</span></article><article class="card metric-card"><span class="metric-label">Net cash flow</span><strong data-money="insight-net">₹0</strong><span class="metric-foot">Income minus spending</span></article><article class="card metric-card"><span class="metric-label">Daily average</span><strong data-money="daily-average">₹0</strong><span class="metric-foot">For selected period</span></article></div>
-        <section class="planning-grid insights-grid" aria-label="Money planning tools">
-          <article class="card insight-wide planner-calendar-card">
-            <div class="section-header planner-section-header"><div><span class="section-kicker">LOOK AHEAD</span><h2>Cash-flow calendar</h2><p class="muted small">Upcoming bills, subscriptions, expected income and debt due dates.</p></div><div class="calendar-controls"><button class="mini-button" id="forecast-prev" type="button" aria-label="Previous month"><span class="icon-wrap" aria-hidden="true"><i class="bi bi-chevron-left"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></span></button><strong id="forecast-month">This month</strong><button class="mini-button" id="forecast-next" type="button" aria-label="Next month"><span class="icon-wrap" aria-hidden="true"><i class="bi bi-chevron-right"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></span></button></div></div>
-            <div class="forecast-summary" id="forecast-summary"></div>
-            <div class="forecast-calendar" id="forecast-calendar" aria-label="Cash-flow calendar dates"></div>
-            <div class="forecast-agenda"><div class="row-between"><strong id="forecast-agenda-title">Upcoming events</strong><small>Projected, not bank-confirmed</small></div><div id="forecast-events" class="forecast-event-list"></div></div>
-          </article>
-          <article class="card planner-tool-card">
-            <div class="section-header"><div><span class="section-kicker">A WEEK AT A TIME</span><h2>Weekly allowance</h2></div><button class="mini-button" id="weekly-allowance-edit" type="button" title="Edit weekly allowance" aria-label="Edit weekly allowance"><span class="icon-wrap" aria-hidden="true"><i class="bi bi-sliders"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16M8 3v6m8 0v6m-8 0v6"/></svg></span></button></div>
-            <div id="weekly-allowance-panel"></div>
-          </article>
-          <article class="card planner-tool-card">
-            <div class="section-header"><div><span class="section-kicker">RECURRING COSTS</span><h2>Subscriptions</h2></div><button class="mini-button" id="subscriptions-manage" type="button" title="Manage subscriptions and bills" aria-label="Manage subscriptions"><span class="icon-wrap" aria-hidden="true"><i class="bi bi-arrow-up-right"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M7 17 17 7M7 7h10v10"/></svg></span></button></div>
-            <div id="subscriptions-panel"></div>
-          </article>
-          <article class="card planner-tool-card">
-            <div class="section-header"><div><span class="section-kicker">LESS REPETITION</span><h2>Smart rules</h2></div><button class="mini-button" id="smart-rules-manage" type="button" title="Manage smart rules" aria-label="Manage smart transaction rules"><span class="icon-wrap" aria-hidden="true"><i class="bi bi-gear"></i><svg class="icon-fallback" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="m19 13.5 2 1.2-2 3.5-2.2-1a7 7 0 0 1-2 1.2L14.5 21h-4l-.3-2.6a7 7 0 0 1-2-1.2l-2.2 1L4 14.7l2-1.2a7 7 0 0 1 0-2.4l-2-1.2L6 6.4l2.2 1a7 7 0 0 1 2-1.2l.3-2.6h4l.3 2.6a7 7 0 0 1 2 1.2l2.2-1 2 3.5-2 1.2a7 7 0 0 1 0 2.4Z"/></svg></span></button></div>
-            <div id="smart-rules-panel"></div>
-          </article>
-          <article class="card planner-tool-card">
-            <div class="section-header"><div><span class="section-kicker">A CLEAR WAY OUT</span><h2>Debt payoff planner</h2></div><button class="mini-button" id="debt-plan-edit" type="button" title="Configure payoff plan" aria-label="Configure debt payoff plan"><span class="icon-wrap" aria-hidden="true"><i class="bi bi-sliders"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16M8 3v6m8 0v6m-8 0v6"/></svg></span></button></div>
-            <div id="debt-planner-panel"></div>
-          </article>
-          <article class="card planner-tool-card monthly-review-card">
-            <div class="section-header"><div><span class="section-kicker">MONTH-END CLARITY</span><h2>Monthly money review</h2></div><button class="mini-button" id="monthly-review-export" type="button" title="Export this review" aria-label="Export monthly review"><span class="icon-wrap" aria-hidden="true"><i class="bi bi-download"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 18v3h16v-3"/></svg></span></button></div>
-            <div id="monthly-review-panel"></div>
-          </article>
-        </section>
-        <div class="insights-grid">
-          <article class="card insight-wide"><div class="section-header"><div><span class="section-kicker">TRENDS</span><h2>Money over time</h2></div><select id="trend-type" class="compact-select" aria-label="Choose trend chart"><option value="line">Line chart</option><option value="area">Area chart</option><option value="bar">Bar chart</option><option value="stacked">Stacked bar</option><option value="waterfall">Waterfall</option><option value="histogram">Amount histogram</option><option value="scatter">Scatter plot</option></select></div><canvas id="trend-chart" class="chart-canvas" height="260" aria-label="Financial trends chart"></canvas></article>
-          <article class="card"><div class="section-header"><div><span class="section-kicker">WHERE IT GOES</span><h2>Spending mix</h2></div><button class="round-subtle" id="mix-view-toggle" aria-label="Switch spending mix chart"><span class="icon-wrap"><i class="bi bi-bar-chart"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M4 20V11M10 20V4M16 20v-7M22 20H2"/></svg></span></button></div><canvas id="category-chart" class="chart-canvas" height="240" aria-label="Spending categories chart"></canvas><div id="category-legend" class="legend-list"></div></article>
-          <article class="card"><div class="section-header"><div><span class="section-kicker">WEEKLY RHYTHM</span><h2>Spending calendar</h2></div><span class="muted tiny">By day</span></div><div id="heatmap" class="heatmap"></div><div class="heatmap-key"><span>Less</span><i class="heat-cell heat-0"></i><i class="heat-cell heat-1"></i><i class="heat-cell heat-2"></i><i class="heat-cell heat-3"></i><i class="heat-cell heat-4"></i><span>More</span></div></article>
-          <article class="card insight-wide"><div class="section-header"><div><span class="section-kicker">COMPARE</span><h2>Income vs. expenses</h2></div><span class="muted tiny">Monthly</span></div><canvas id="comparison-chart" class="chart-canvas" height="235" aria-label="Monthly income compared with expenses"></canvas></article>
-          <article class="card insight-wide"><div class="section-header"><div><span class="section-kicker">THE LONG VIEW</span><h2>Year-by-year archive</h2><p class="muted small">A durable view of your financial history, not just the last month.</p></div><button class="secondary-button" id="archive-export">Export backup</button></div><div id="yearly-archive" class="yearly-archive"></div></article>
-          <article class="card insight-wide"><div class="section-header"><div><span class="section-kicker">ACTIVITY RANKING</span><h2>Where spending adds up</h2></div><select id="ranking-mode" class="compact-select"><option value="amount">By amount</option><option value="count">By frequency</option></select></div><div id="category-ranking" class="ranking-list"></div></article>
-          <article class="card goal-card"><div class="section-header"><div><span class="section-kicker">SMALL STEPS COUNT</span><h2>Savings goals</h2></div><button class="round-subtle" id="add-goal" aria-label="Add savings goal"><span class="icon-wrap"><i class="bi bi-plus-lg"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span></button></div><div id="goals-list"></div></article>
-          <article class="card debt-insight-card"><div class="section-header"><div><span class="section-kicker">BETWEEN PEOPLE</span><h2>Debts snapshot</h2></div><button class="text-button" data-action="debts">Details →</button></div><div class="debt-insight-rows" id="insight-debts"></div></article>
-        </div>
-        <div class="annual-report-banner"><span class="annual-icon"><span class="icon-wrap"><i class="bi bi-file-earmark-bar-graph"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M5 3h9l5 5v13H5Z M14 3v5h5M8 16l3-3 2 2 3-4"/></svg></span></span><div><strong>Keep your story, year after year</strong><p>Export a full backup or create a CSV for spreadsheets. Restore your records on a new device when needed.</p></div><button class="secondary-button" id="insights-backup">Export backup</button></div>
-      </section>
-
-      <section class="page" id="page-settings" data-page-panel="settings">
-        <div class="settings-layout">
-          <article class="card settings-card"><div class="settings-section-title"><span class="settings-icon"><span class="icon-wrap"><i class="bi bi-person-circle"></i><svg class="icon-fallback" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span></span><div><h3>Your profile</h3><p>A name and color to make this space yours. Kept on this device.</p></div></div><div class="profile-settings-preview"><span class="avatar profile-avatar-preview" id="settings-profile-avatar">P</span><div><strong id="settings-profile-name">Personal space</strong><small>Initial avatar · customizable color</small></div><button class="secondary-button" id="edit-profile">Edit profile</button></div></article>
-          <article class="card settings-card"><div class="settings-section-title"><span class="settings-icon"><span class="icon-wrap"><i class="bi bi-palette"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18h1.5a2.5 2.5 0 0 0 1.5-4.5 1.5 1.5 0 0 1 1-2.5H19a2 2 0 0 0 2-2 9 9 0 0 0-9-9Z"/><circle cx="7.5" cy="10" r=".8"/><circle cx="10" cy="6.5" r=".8"/></svg></span></span><div><h3>Appearance</h3><p>Choose Light, Dark or follow your device automatically.</p></div></div><div class="setting-row"><div><strong>Theme</strong><small>Choose how Pocketwise looks</small></div><div class="segmented" id="theme-choice"><button class="selected" data-theme="light">Light</button><button data-theme="dark">Dark</button><button data-theme="system">Auto</button></div></div><div class="setting-row"><div><strong>Hide amounts</strong><small>Keep balances private at a glance</small></div><label class="switch"><input type="checkbox" id="hide-setting"><span></span></label></div></article>
-          <article class="card settings-card"><div class="settings-section-title"><span class="settings-icon"><span class="icon-wrap"><i class="bi bi-bell"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg></span></span><div><h3>Reminders & alerts</h3><p>Useful nudges, never noise.</p></div></div><div class="setting-row"><div><strong>Budget warnings</strong><small>At <span id="threshold-copy">90%</span> of a category limit</small></div><div class="setting-inline"><input type="range" id="alert-threshold" min="50" max="100" step="5" value="90"><output id="alert-output">90%</output></div></div><div class="setting-row"><div><strong>Budget alerts</strong><small>Approaching limits and overspending</small></div><label class="switch"><input type="checkbox" id="notify-budget" checked><span></span></label></div><div class="setting-row"><div><strong>Encouragement</strong><small>Celebrate goals met and staying on track</small></div><label class="switch"><input type="checkbox" id="notify-positive" checked><span></span></label></div><div class="setting-row"><div><strong>Bills & subscriptions</strong><small>Upcoming payments and renewals</small></div><label class="switch"><input type="checkbox" id="notify-bills" checked><span></span></label></div><div class="setting-row"><div><strong>Debt reminders</strong><small>Expected repayments and collections</small></div><label class="switch"><input type="checkbox" id="notify-debts" checked><span></span></label></div><div class="setting-row"><div><strong>Weekly summary</strong><small>A calm recap of the week's spending</small></div><label class="switch"><input type="checkbox" id="notify-weekly" checked><span></span></label></div><div class="setting-row"><div><strong>Quiet hours</strong><small>Pause non-essential reminders overnight</small></div><div class="quiet-hours"><input aria-label="Quiet hours start" id="quiet-start" type="time" value="21:00"><span>to</span><input aria-label="Quiet hours end" id="quiet-end" type="time" value="08:00"></div></div><div class="setting-row"><div><strong>Phone notifications</strong><small id="notification-permission">System alerts; background reminders need an optional push server.</small></div><button class="secondary-button" id="enable-notifications">Enable</button></div></article>
-          <article class="card settings-card"><div class="settings-section-title"><span class="settings-icon"><span class="icon-wrap"><i class="bi bi-tags"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="m3 3 8 0 10 10-8 8L3 11Z"/><circle cx="7" cy="7" r="1"/></svg></span></span><div><h3>Activities & categories</h3><p>Your most-used choices move to the top automatically.</p></div></div><div class="setting-row"><div><strong>Manage activity list</strong><small>Add your own categories and quick-add activities</small></div><button class="secondary-button" id="settings-activities">Manage</button></div><div class="setting-row"><div><strong>Accounts</strong><small>Cash, bank, UPI and custom accounts</small></div><button class="secondary-button" id="settings-accounts">Manage</button></div><div class="setting-row"><div><strong>Budgets</strong><small>Set category limits and a total budget</small></div><button class="secondary-button" data-action="budget">Manage</button></div><div class="setting-row"><div><strong>Reminders</strong><small>Recurring bills and planned payments</small></div><button class="secondary-button" id="manage-reminders">Manage</button></div></article>
-          <article class="card settings-card"><div class="settings-section-title"><span class="settings-icon"><span class="icon-wrap"><i class="bi bi-shield-lock"></i><svg class="icon-fallback" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></svg></span></span><div><h3>Privacy & device shortcuts</h3><p>Keep control of your records and the way you open the app.</p></div></div><div class="setting-row"><div><strong>How to use PocketWise</strong><small>Replay the guided tour and learn the main features.</small></div><button class="secondary-button" id="replay-app-tour" type="button">Start tour</button></div><div class="setting-row"><div><strong>Privacy policy & data controls</strong><small>Read what stays on this device, what browser storage means, and your options.</small></div><button class="secondary-button" id="open-privacy">Privacy page</button></div><div class="setting-row"><div><strong>Local-first storage</strong><small>Core records stay in this browser on this device</small></div><span class="status-pill success-pill"><i></i> On device</span></div><div class="setting-row"><div><strong>Request persistent storage</strong><small>Ask the browser to reduce automatic data eviction where supported</small></div><button class="secondary-button" id="persistent-storage">Request</button></div><div class="setting-row" id="apple-shortcut-setting"><div><strong>Apple Shortcut · website/PWA only</strong><small>Use this shared Shortcut with PocketWise in Safari or as a Home Screen PWA. It does not connect to native finance apps.</small></div><a class="secondary-button shortcut-link-button" href="https://www.icloud.com/shortcuts/aef8264bd14e43079b7e4550dc9e4f66" target="_blank" rel="noopener noreferrer">Get Shortcut ↗</a></div><div class="setting-row" id="shortcut-import-setting"><div><strong>Paste transaction from Shortcut</strong><small>Local-only fallback when iOS opens PocketWise but drops the URL data. Copy the transaction JSON to your clipboard first.</small></div><button class="secondary-button" id="paste-shortcut-settings">Paste now</button></div><div class="setting-row" id="backtap-setting"><div><strong>Back Tap instructions</strong><small>After adding it, choose it in Accessibility settings.</small></div><button class="secondary-button" id="backtap-guide">Setup guide</button></div><div class="setting-row"><div><strong>Install as an app</strong><small>Home Screen and supported Android app shortcuts</small></div><button class="secondary-button" id="install-guide">How to install</button></div></article>
-          <article class="card settings-card data-card"><div class="settings-section-title"><span class="settings-icon"><span class="icon-wrap"><i class="bi bi-database-check"></i><svg class="icon-fallback" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg></span></span><div><h3>Your data, for the long run</h3><p>Keep years of financial records portable and recoverable.</p></div></div><div class="backup-status"><div class="backup-file-icon"><span class="icon-wrap"><i class="bi bi-file-earmark-zip"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M5 3h9l5 5v13H5Z M14 3v5h5M12 11v7m-3-3 3 3 3-3"/></svg></span></div><div><strong>Full financial backup</strong><small id="last-backup">Never exported on this device</small></div><span class="backup-spacer"></span></div><div class="backup-buttons"><button class="primary-button" id="export-backup"><span class="icon-wrap"><i class="bi bi-download"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 18v3h16v-3"/></svg></span> Export full backup</button><button class="secondary-button" id="import-backup"><span class="icon-wrap"><i class="bi bi-upload"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M12 16V4m-5 5 5-5 5 5M4 18v3h16v-3"/></svg></span> Restore backup</button><button class="secondary-button" id="export-settings-csv">Export CSV</button><input id="backup-file-input" type="file" accept=".json,application/json" hidden></div><p class="fine-print">A backup is the safest way to preserve your records. Browser storage and this device are not a substitute for a backup. Files are not uploaded to a server.</p></article>
-          <article class="card danger-card"><div><h3>Reset this workspace</h3><p>This removes stored records from this app on this device. Export a backup first.</p></div><button class="danger-button" id="reset-data">Clear all records</button></article>
-        </div>
-      </section>
-
-      <footer class="app-footer"><span>Made for real life, not perfect spreadsheets.</span><span><span class="privacy-dot"></span> Local-first · <span id="storage-status">Offline-ready shell</span></span></footer>
-    </main>
+<a class="skip-link" href="#main-content">Skip to content</a>
+<header class="topbar intro-hidden"><a class="brand" href="/" aria-label="Nithan Najeeb home">NN<span aria-hidden="true">®</span></a><nav class="nav" aria-label="Main navigation"><a href="#work">Work</a><a href="#about">About</a><a href="#skills">Capabilities</a><a href="#contact">Contact ↗</a></nav><div class="availability"><span class="dot"></span> Building what’s next</div></header>
+<main id="main-content">
+<div id="top" class="top-anchor" aria-hidden="true"></div>
+<section class="hero" aria-label="Nithan Najeeb portfolio introduction"><div class="typewall" aria-hidden="true"><div class="type-row"><span>NITHAN NAJEEB · NITHAN NAJEEB · </span><span>NITHAN NAJEEB · NITHAN NAJEEB · </span></div><div class="type-row"><span>NITHAN NAJEEB · NITHAN NAJEEB · </span><span>NITHAN NAJEEB · NITHAN NAJEEB · </span></div><div class="type-row"><span>NITHAN NAJEEB · NITHAN NAJEEB · </span><span>NITHAN NAJEEB · NITHAN NAJEEB · </span></div><div class="type-row"><span>NITHAN NAJEEB · NITHAN NAJEEB · </span><span>NITHAN NAJEEB · NITHAN NAJEEB · </span></div><div class="type-row"><span>NITHAN NAJEEB · NITHAN NAJEEB · </span><span>NITHAN NAJEEB · NITHAN NAJEEB · </span></div></div><picture class="hero-image intro-hidden" aria-label="Black and white portrait of Nithan Najeeb"><source media="(min-width: 701px)" srcset="nithanl.webp"><img src="nithan.webp" alt="Black-and-white portrait of Nithan Najeeb" width="1216" height="1536" fetchpriority="high" decoding="async"></picture><div class="hero-shade"></div><div class="scroll-cue intro-hidden">Scroll to explore</div><div class="hero-copy intro-hidden"><div><div class="hero-kicker">Independent mind · Digital craft</div><h1 class="hero-title">Nithan <em>Najeeb.</em></h1></div><p class="hero-note">Creative developer exploring the space between thoughtful design, useful technology and visual storytelling.</p></div></section>
+<section class="section intro"><div class="reveal"><div class="eyebrow">01 / The introduction</div><h2>Digital work with <em>clarity, character</em> and a reason to exist.</h2></div><div class="intro-copy reveal delay1"><p>I build considered digital experiences where visual identity and interaction work together, not against each other.</p><p class="small">My interests span UI/UX design, front-end experiences, generative AI workflows and creative direction. I’m interested in making digital products feel as intentional as they are functional.</p><a class="text-link" href="https://nithan.in/work.html">Explore my work <span>↗</span></a></div></section>
+<section class="apple-philosophy" id="philosophy" aria-labelledby="apple-philosophy-title">
+  <div class="apple-philosophy-head">
+    <div class="reveal"><div class="eyebrow">02 / The philosophy</div><h2 id="apple-philosophy-title">Every era has <em>an apple.</em></h2></div>
+    <div class="apple-philosophy-copy reveal delay1">
+      <p>From <strong>choice</strong> to discovery, the apple has stood for the moment knowledge changes everything.</p>
+      <p>Newton made it a story about asking why. Apple made it a symbol of technology reshaping everyday life.</p>
+      <p>I want to build the next kind of apple: a small idea with the power to begin a bigger change.</p>
+    </div>
   </div>
+  <div class="apple-stage" aria-label="Interactive golden apple between two reaching hands. Drag either hand vertically or move the apple in any direction.">
+    <img class="apple-art apple-hand-left" src="hand-left.webp" loading="lazy" decoding="async" alt="A sketched hand reaching in from the left" draggable="false" tabindex="0" role="img" aria-label="Left reaching hand. Drag up or down, or use the arrow keys." data-drag-kind="hand-left">
+    <img class="apple-art apple-hand-right" src="hand-right.webp" loading="lazy" decoding="async" alt="A sketched hand reaching in from the right, slightly higher" draggable="false" tabindex="0" role="img" aria-label="Right reaching hand. Drag up or down, or use the arrow keys." data-drag-kind="hand-right">
+    <img class="apple-art apple-fruit" src="golden-apple.webp" loading="lazy" decoding="async" alt="A polished golden apple, symbolising a transformative idea" draggable="false" tabindex="0" role="img" aria-label="Golden apple. Drag in any direction, or use the arrow keys." data-drag-kind="apple">
+  </div>
+  <div class="apple-philosophy-foot">
+    <p>The hands never need to meet the apple. The space between them is the point: possibility, tension and the moment before an idea becomes something real.</p>
+    <div class="signature">Make the idea matter.</div>
+  </div>
+</section>
 
-  <nav class="mobile-tabbar" aria-label="Main navigation">
-    <button class="mobile-tab active" data-page="home"><span class="icon-wrap"><i class="bi bi-house-door"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z"/></svg></span><small>Home</small></button>
-    <button class="mobile-tab" data-page="activity"><span class="icon-wrap"><i class="bi bi-arrow-left-right"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M4 7h15m-4-4 4 4-4 4M20 17H5m4 4-4-4 4-4"/></svg></span><small>Activity</small></button>
-    <button class="mobile-add" id="mobile-add" aria-label="Quick add"><span class="icon-wrap"><i class="bi bi-plus-lg"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span></button>
-    <button class="mobile-tab" data-page="insights"><span class="icon-wrap"><i class="bi bi-bar-chart-line"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M4 20V11M10 20V4M16 20v-7M22 20H2"/></svg></span><small>Insights</small></button>
-    <button class="mobile-tab" data-page="settings"><span class="icon-wrap"><i class="bi bi-sliders"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16M8 3v6m8 0v6m-8 0v6"/></svg></span><small>Settings</small></button>
-  </nav>
 
-  <div class="toast-region" id="toast-region" aria-live="polite" aria-atomic="true"></div>
+<section class="section work" id="work" aria-labelledby="work-title">
+<div class="section-head reveal"><div><div class="eyebrow">03 / Selected work</div><h2 id="work-title">Things I<br>create.</h2></div><p>Projects and experiments across knowledge systems, web infrastructure and local AI.</p></div>
+<div class="projects">
+<article class="project reveal"><div class="project-no">01</div><div><h3>Mind Atlas</h3><p>A personal knowledge system connecting ideas across science, code and structured notes. Coming soon.</p></div><div class="tags"><span class="tag">Knowledge systems</span><span class="tag">JavaScript</span></div><span class="arrow" aria-hidden="true">·</span></article>
+<article class="project reveal"><div class="project-no">02</div><div><h3>Forenexa</h3><p>Storefront architecture designed around physical hardware and a focused shopping experience. Coming soon.</p></div><div class="tags"><span class="tag">E-commerce</span><span class="tag">Web architecture</span></div><span class="arrow" aria-hidden="true">·</span></article>
+<article class="project reveal"><div class="project-no">03</div><div><h3>Ollama Uplink</h3><p>Exploring how local AI models can connect to clean, responsive frontend interfaces. Coming soon.</p></div><div class="tags"><span class="tag">Local AI</span><span class="tag">Frontend</span></div><span class="arrow" aria-hidden="true">·</span></article>
+<a class="project reveal" href="/MyDairy/" aria-label="Open My Diary"><div class="project-no">04</div><div><h3>My Diary</h3><p>A personal journaling space for notes, memories and reflection, designed around privacy.</p></div><div class="tags"><span class="tag">Personal tool</span><span class="tag">Journal</span></div><span class="arrow" aria-hidden="true">↗</span></a>
+<a class="project reveal" href="/pdf-maker/" aria-label="Open PDF Maker"><div class="project-no">05</div><div><h3>PDF Maker</h3><p>A browser-based tool for arranging images and exporting them as a polished PDF.</p></div><div class="tags"><span class="tag">Web tool</span><span class="tag">Privacy-minded</span></div><span class="arrow" aria-hidden="true">↗</span></a>
+<a class="project reveal" href="https://nithan.in/PocketWise" aria-label="Open PocketWise"><div class="project-no">06</div><div><h3>PocketWise</h3><p>A personal finance app that logs spending straight from an iPhone Shortcut.</p></div><div class="tags"><span class="tag">Web app</span></div><span class="arrow" aria-hidden="true">↗</span></a>
+</div></section>
 
-  <dialog class="app-modal" id="app-modal" aria-labelledby="modal-title"><div class="modal-head"><div><span class="section-kicker" id="modal-kicker">QUICK ADD</span><h2 id="modal-title">Add transaction</h2></div><button class="icon-button" id="modal-close" aria-label="Close dialog"><span class="icon-wrap"><i class="bi bi-x-lg"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></svg></span></button></div><div id="modal-content"></div></dialog>
+<section class="jack-band" id="jack-band" aria-label="Jack of all trades">
+  <div class="jack-band-label"><span>Curiosity, in motion</span><span>Many disciplines</span></div>
+  <div class="jack-track" aria-hidden="true">
+    <div class="jack-track-run">
+      <span>Jack of all trades</span><i>✳</i><span>Jack of all trades</span><i>✳</i><span>Jack of all trades</span><i>✳</i>
+    </div>
+    <div class="jack-track-run">
+      <span>Jack of all trades</span><i>✳</i><span>Jack of all trades</span><i>✳</i><span>Jack of all trades</span><i>✳</i>
+    </div>
+  </div>
+  <img class="jack-card" src="jack-card.webp" alt="" width="1087" height="1447" loading="lazy" decoding="async">
+</section>
 
-  <dialog class="app-modal small-modal" id="notifications-modal" aria-labelledby="notifications-title"><div class="modal-head"><div><span class="section-kicker">STAY IN THE LOOP</span><h2 id="notifications-title">Notifications</h2></div><button class="icon-button" data-close-notifications aria-label="Close notifications"><span class="icon-wrap"><i class="bi bi-x-lg"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></svg></span></button></div><div id="notifications-content" class="notifications-content"></div></dialog>
-  <script src="pwa.js"></script>
-  <script src="app.js"></script>
-  <script src="onboarding.js"></script>
-</body>
-</html>
+<section class="section" id="about"><div class="about-grid"><div class="about-image reveal"><img src="nithan.webp" alt="Black-and-white portrait of Nithan Najeeb" width="1216" height="1536" loading="lazy" decoding="async"><span class="image-label">Nithan Najeeb / Portrait</span></div><div class="about-text reveal delay1"><div class="eyebrow">04 / A little about me</div><h2>Curious by nature.<br><em>Intentional</em> by design.</h2><p>I’m Nithan Najeeb, a B.Com student at MES College in Kerala, India, exploring the space between thoughtful design, practical technology and visual storytelling.</p><p>I enjoy understanding how systems work and turning ideas into useful things, from web interfaces and structured knowledge tools to experiments with locally run AI models. My approach is to stay curious, build deliberately and keep improving the details.</p><div class="facts"><div class="fact"><small>Also known as</small><strong>Rubin Stellar</strong></div><div class="fact"><small>Currently studying</small><strong>B.Com · MES College</strong></div><div class="fact"><small>Focus</small><strong>UI / UX &amp; web development</strong></div><div class="fact"><small>Researching</small><strong>Generative AI &amp; local LLMs</strong></div></div><div class="stack-list" aria-label="Tools and technologies"><span><b>Core</b> HTML5 · CSS3 · JavaScript</span><span><b>Motion</b> GSAP · Lottie · Canvas</span><span><b>R&amp;D</b> Ollama · Local LLMs</span></div></div></div></section>
+<section class="section skills" id="skills"><div class="section-head reveal"><div><div class="eyebrow">05 / Capabilities</div><h2>Where I<br>spend my curiosity.</h2></div><p>A growing toolkit across design, development and visual communication.</p></div><div class="skill-grid"><article class="skill reveal"><span class="num">01 / DESIGN</span><div><h3>UI / UX</h3><p>Information hierarchy, layout systems, responsive interfaces and interaction thinking.</p></div></article><article class="skill reveal delay1"><span class="num">02 / BUILD</span><div><h3>Web experiences</h3><p>Turning visual concepts into clean, responsive pages with purposeful motion.</p></div></article><article class="skill reveal delay2"><span class="num">03 / EXPLORE</span><div><h3>Generative AI</h3><p>Prompt engineering, reference-led image creation and iterative visual direction.</p></div></article><article class="skill reveal delay3"><span class="num">04 / SHAPE</span><div><h3>Visual storytelling</h3><p>Art direction, cinematic concepts, typography and personal brand expression.</p></div></article></div></section>
+<section class="rome-build sky-statue-section" id="rome" aria-labelledby="rome-title">
+  <div class="sky-statue-stage">
+    <div class="rome-heading">
+      <div class="eyebrow">06 / The long game</div>
+      <h2 class="rome-title" id="rome-title">Rome wasn’t<br>built in a <em>day.</em></h2>
+    </div>
+    <img class="rome-sculptor" src="roman-sculptor.webp" alt="A classical marble sculptor raising a hammer" width="802" height="1536" loading="eager" decoding="async">
+    <div class="sky-statue-grain" aria-hidden="true"></div>
+  </div>
+</section>
+<section class="contact" id="contact"><div class="contact-main"><div class="reveal"><div class="eyebrow">07 / Have something in mind?</div><h2>Let’s build<br>something <em>that lasts.</em></h2></div><div class="contact-side reveal delay1"><p>Open to thoughtful collaborations, creative experiments and opportunities to learn by building.</p><a class="contact-button" href="https://www.linkedin.com/in/nithannajeeb" target="_blank" rel="noopener noreferrer">Connect on LinkedIn <span aria-hidden="true">↗</span></a><div class="social-links" aria-label="Social profiles"><a href="https://instagram.com/nithannajeeb_" target="_blank" rel="noopener noreferrer">Instagram ↗</a><a href="https://www.threads.net/@nithannajeeb_" target="_blank" rel="noopener noreferrer">Threads ↗</a><a href="https://www.facebook.com/nithan.najeeb" target="_blank" rel="noopener noreferrer">Facebook ↗</a></div></div></div><footer class="footer"><span>© <span id="year"></span> Nithan Najeeb</span><nav class="footer-links" aria-label="More from Nithan"><a href="/mind-atlas.html">Mind Atlas</a><a href="/pdf-maker/">PDF Maker</a><a href="/MyDairy/">My Diary</a></nav><a href="#top">Back to top ↑</a></footer></section>
+</main>
+<script>
+const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('visible');observer.unobserve(entry.target)}}),{threshold:.12});document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));const yearEl=document.getElementById('year');if(yearEl)yearEl.textContent=new Date().getFullYear();
+
+// A short opening choreography. Lock scrolling without fixing the body, which can cause mobile jump glitches.
+(function runOpeningSequence(){
+  const root = document.documentElement;
+  const body = document.body;
+  const portrait = document.querySelector('.hero-image');
+  const heroCopy = document.querySelector('.hero-copy');
+  const topbar = document.querySelector('.topbar');
+  const scrollCue = document.querySelector('.scroll-cue');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const savedScroll = window.scrollY || window.pageYOffset || 0;
+  const showEverything = () => {
+    root.classList.remove('intro-lock');
+    body.classList.remove('intro-lock');
+    [portrait, heroCopy, topbar, scrollCue].forEach(el => {
+      if (!el) return;
+      el.classList.remove('intro-hidden');
+      el.classList.remove('intro-rise');
+      el.classList.remove('intro-enter');
+    });
+    body.classList.add('intro-name-visible');
+  };
+  // Do not replay the cover animation if the browser restores a previous scroll position.
+  if (reduced || savedScroll > 2) {
+    showEverything();
+    return;
+  }
+  // 1. The repeating name sharpens into view.
+  requestAnimationFrame(() => body.classList.add('intro-name-visible'));
+  // 2. Portrait rises from below the cover.
+  window.setTimeout(() => portrait && portrait.classList.add('intro-rise'), 180);
+  // 3. Name and supporting details settle in.
+  window.setTimeout(() => heroCopy && heroCopy.classList.add('intro-enter'), 720);
+  // 4. Navigation and scroll hint arrive last.
+  window.setTimeout(() => {
+    if (topbar) topbar.classList.add('intro-enter');
+    if (scrollCue) scrollCue.classList.add('intro-enter');
+  }, 1050);
+  // Unlock after the sequence without changing the page's scroll position.
+  window.setTimeout(() => {
+    root.classList.remove('intro-lock');
+    body.classList.remove('intro-lock');
+  }, 1250);
+})();
+// Give the repeating name a tiny pointer-responsive drift on larger screens.
+const wall=document.querySelector('.typewall');
+if(wall&&matchMedia('(pointer:fine)').matches&&!matchMedia('(prefers-reduced-motion:reduce)').matches){let raf=0,pointerY=0;window.addEventListener('pointermove',e=>{pointerY=e.clientY;if(raf||window.scrollY>innerHeight)return;raf=requestAnimationFrame(()=>{raf=0;wall.style.transform=`translateY(${((pointerY/innerHeight)-.5)*5}px)`})},{passive:true})}
+
+// Scroll-linked portrait motion is eased with requestAnimationFrame to avoid step-like jumps.
+const heroSection = document.querySelector('.hero');
+const heroPortrait = document.querySelector('.hero-image');
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// Reveal the intro paragraph and the main headings in the light sections word-by-word.
+const revealTargets = [...document.querySelectorAll(
+  '.intro-copy p:not(.small), .intro h2, .section-head h2, .about-text h2, .contact h2, .rome-title'
+)];
+const revealGroups = [];
+function wrapTextNodes(node, spans) {
+  [...node.childNodes].forEach(child => {
+    if (child.nodeType === Node.TEXT_NODE && child.textContent.trim()) {
+      const pieces = child.textContent.split(/(\s+)/);
+      const fragment = document.createDocumentFragment();
+      pieces.forEach(piece => {
+        if (!piece) return;
+        if (/^\s+$/.test(piece)) fragment.appendChild(document.createTextNode(piece));
+        else {
+          const span = document.createElement('span');
+          span.className = 'word-reveal';
+          span.textContent = piece;
+          spans.push(span);
+          fragment.appendChild(span);
+        }
+      });
+      child.replaceWith(fragment);
+    } else if (child.nodeType === Node.ELEMENT_NODE && child.tagName !== 'BR') {
+      wrapTextNodes(child, spans);
+    }
+  });
+}
+revealTargets.forEach(element => {
+  const spans = [];
+  wrapTextNodes(element, spans);
+  if (spans.length) revealGroups.push({ element, spans });
+});
+
+let portraitTarget = 0;
+let portraitCurrent = 0;
+let motionFrame = 0;
+function measureScrollEffects() {
+  if (heroSection && heroPortrait && !reducedMotion) {
+    const travelled = Math.max(0, Math.min(heroSection.offsetHeight, -heroSection.getBoundingClientRect().top));
+    portraitTarget = Math.min(82, travelled * 0.13);
+    if (!motionFrame) motionFrame = requestAnimationFrame(animatePortrait);
+  }
+  if (reducedMotion) {
+    revealGroups.forEach(group => group.spans.forEach(word => word.classList.add('is-ink')));
+    return;
+  }
+  revealGroups.forEach(({ element, spans }) => {
+    const top = element.getBoundingClientRect().top;
+    // Complete each reveal over a short scroll distance so headings become readable quickly.
+    const start = window.innerHeight * 0.92;
+    const end = window.innerHeight * 0.62;
+    const progress = Math.min(1, Math.max(0, (start - top) / (start - end)));
+    const revealed = Math.ceil(progress * spans.length);
+    spans.forEach((word, index) => word.classList.toggle('is-ink', index < revealed));
+  });
+}
+function animatePortrait() {
+  const delta = portraitTarget - portraitCurrent;
+  portraitCurrent += delta * 0.16;
+  if (Math.abs(delta) < 0.12) portraitCurrent = portraitTarget;
+  heroPortrait.style.setProperty('--portrait-scroll', `${portraitCurrent.toFixed(2)}px`);
+  if (Math.abs(portraitTarget - portraitCurrent) >= 0.12) {
+    motionFrame = requestAnimationFrame(animatePortrait);
+  } else {
+    motionFrame = 0;
+  }
+}
+let scrollUpdateQueued = false;
+window.addEventListener('scroll', () => {
+  if (scrollUpdateQueued) return;
+  scrollUpdateQueued = true;
+  requestAnimationFrame(() => {
+    measureScrollEffects();
+    scrollUpdateQueued = false;
+  });
+}, { passive: true });
+window.addEventListener('resize', measureScrollEffects, { passive: true });
+measureScrollEffects();
+
+
+// Sky statue reveal: progress is tied to the section's center crossing the viewport center.
+// Scrolling back upward reverses the exact same motion instead of playing a one-way entrance.
+(function animateSkyStatue(){
+  const section = document.querySelector('.sky-statue-section');
+  const statue = section?.querySelector('.rome-sculptor');
+  if (!section || !statue) return;
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let frame = 0;
+  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+  const update = () => {
+    frame = 0;
+    if (reduced) {
+      section.style.setProperty('--statue-progress', '1');
+      section.style.setProperty('--statue-rise', '0%');
+      return;
+    }
+    const rect = section.getBoundingClientRect();
+    const vh = window.innerHeight;
+    const progress = clamp((vh * 0.5 - rect.top) / (rect.height * 0.5), 0, 1);
+    const rise = 62 * (1 - progress);
+    section.style.setProperty('--statue-progress', progress.toFixed(3));
+    section.style.setProperty('--statue-rise', `${rise.toFixed(2)}%`);
+  };
+  const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
+  window.addEventListener('scroll', schedule, { passive: true });
+  window.addEventListener('resize', schedule, { passive: true });
+  update();
+})();
+// Start the artwork entrance only when the philosophy section actually enters the viewport.
+(function activateAppleSection(){
+  const section = document.querySelector('.apple-philosophy');
+  if (!section) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    section.classList.add('is-active');
+    return;
+  }
+  if (!('IntersectionObserver' in window)) {
+    section.classList.add('is-active');
+    return;
+  }
+  const entranceObserver = new IntersectionObserver(entries => {
+    if (entries.some(entry => entry.isIntersecting)) {
+      section.classList.add('is-active');
+      entranceObserver.disconnect();
+    }
+  }, { threshold: 0.22 });
+  entranceObserver.observe(section);
+})();
+
+// Hands rotate around a fixed wrist pivot, so the arm stays visually anchored while the hand tilts up/down.
+(function enableAppleStage(){
+  const stage = document.querySelector('.apple-stage');
+  if (!stage) return;
+  const items = [...stage.querySelectorAll('[data-drag-kind]')];
+  const positions = new Map(items.map(el => [el, {x:0, y:0}]));
+  let active = null;
+  let start = null;
+  const isApple = el => el.dataset.dragKind === 'apple';
+  const apply = el => {
+    const p = positions.get(el);
+    if (el.dataset.dragKind === 'hand-left') el.style.setProperty('--hand-left-angle', `${p.y}deg`);
+    else if (el.dataset.dragKind === 'hand-right') el.style.setProperty('--hand-right-angle', `${p.y}deg`);
+    else { el.style.setProperty('--apple-x', `${p.x}px`); el.style.setProperty('--apple-y', `${p.y}px`); }
+  };
+  window.addEventListener('blur', () => { active = null; start = null; });
+  items.forEach(el => {
+    el.addEventListener('pointerdown', event => {
+      if (event.pointerType === 'mouse' && event.button !== 0) return;
+      // Touch input stays available to native page scrolling; mouse/pen and keyboard retain the artwork controls.
+      if (event.pointerType === 'touch') return;
+      active = el;
+      start = {pointerX:event.clientX, pointerY:event.clientY, ...positions.get(el)};
+      el.setPointerCapture?.(event.pointerId);
+      event.preventDefault();
+    });
+    el.addEventListener('pointermove', event => {
+      if (active !== el || !start) return;
+      const p = positions.get(el);
+      const dx = event.clientX - start.pointerX;
+      const dy = event.clientY - start.pointerY;
+      if (isApple(el)) {
+        const bounds = stage.getBoundingClientRect();
+        p.x = Math.max(-bounds.width*.10, Math.min(bounds.width*.10, start.x + dx));
+        p.y = Math.max(-bounds.height*.20, Math.min(bounds.height*.20, start.y + dy));
+      } else {
+        // A vertical drag pivots the hand at the wrist; the forearm attachment stays in place.
+        p.y = Math.max(-14, Math.min(14, start.y + dy * .18));
+      }
+      apply(el);
+    });
+    const end = () => { if (active === el) { active = null; start = null; } };
+    el.addEventListener('pointerup', end);
+    el.addEventListener('pointercancel', end);
+    el.addEventListener('lostpointercapture', end);
+    el.addEventListener('keydown', event => {
+      const p = positions.get(el);
+      const step = event.shiftKey ? 3 : 1;
+      if (!['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Home'].includes(event.key)) return;
+      event.preventDefault();
+      if (event.key === 'Home') { p.x = 0; p.y = 0; }
+      else if (event.key === 'ArrowUp') p.y += isApple(el) ? -8 : -step;
+      else if (event.key === 'ArrowDown') p.y += isApple(el) ? 8 : step;
+      else if (isApple(el) && event.key === 'ArrowLeft') p.x -= 8;
+      else if (isApple(el) && event.key === 'ArrowRight') p.x += 8;
+      const bounds = stage.getBoundingClientRect();
+      p.y = isApple(el) ? Math.max(-bounds.height*.28, Math.min(bounds.height*.28, p.y)) : Math.max(-14, Math.min(14, p.y));
+      p.x = Math.max(-bounds.width*.22, Math.min(bounds.width*.22, p.x));
+      apply(el);
+    });
+  });
+})();
+
+</script>
+</body></html>
