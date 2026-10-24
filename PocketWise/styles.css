@@ -808,3 +808,12 @@ html[data-theme="dark"] ::selection { background: #14532D; color: #FFFFFF; }
   .activity-toolbar #activity-period { min-width: 112px; font-size: 12px; }
   .activity-toolbar #export-csv { padding-left: 9px; padding-right: 9px; font-size: 11px; }
 }
+
+/* 2.3.3: keep each page header to its title; section content starts directly below. */
+.page-heading h1{margin-bottom:0}
+.insights-controls{display:flex;align-items:center;justify-content:flex-end;gap:12px;margin:0 0 18px}
+.insights-controls .insights-actions{width:min(100%,520px);margin-left:auto}
+@media(max-width:720px){
+  .insights-controls{align-items:stretch;flex-direction:row;gap:0;margin:0 0 16px}
+  .insights-controls .insights-actions{width:100%;max-width:none;margin-left:0}
+}
