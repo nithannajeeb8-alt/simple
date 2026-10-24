@@ -1610,3 +1610,113 @@ html[data-theme="light"][data-liquid-glass="on"] .transaction-delete-action{back
 @media (prefers-reduced-motion: reduce) {
   .pw-tour-spotlight { transition: none !important; }
 }
+
+/* PocketWise 2.3.14: align the desktop cash-flow rings and keep the tour actions reachable. */
+@media (min-width: 721px) {
+  .money-card > .balance-number,
+  .money-card > .balance-context { display: none; }
+  .radial-area { width: min(100%, 520px); margin: 6px auto 0; }
+  #money-arc .arc-track,
+  #money-arc .arc-income,
+  #money-arc .arc-expense {
+    fill: none;
+    stroke-width: 17;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+  }
+  #money-arc .arc-track { stroke: var(--surface-3); }
+  #money-arc .arc-income { stroke: var(--green); }
+  #money-arc .arc-expense { stroke: var(--red); }
+  #money-arc .mobile-inner-track,
+  #money-arc .mobile-inner-progress {
+    display: inline;
+    fill: none;
+    stroke-width: 10;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+  }
+  #money-arc .mobile-inner-track { stroke: var(--surface-3); }
+  #money-arc .mobile-inner-progress { stroke: var(--day-progress, var(--blue)); }
+  .mobile-arc-center {
+    display: flex;
+    position: absolute;
+    z-index: 2;
+    left: 18%;
+    right: 18%;
+    top: 56%;
+    transform: translateY(-50%);
+    align-items: center;
+    flex-direction: column;
+    pointer-events: none;
+    text-align: center;
+    line-height: 1.15;
+  }
+  .mobile-arc-center > span { font-size: 10px; letter-spacing: .13em; color: var(--muted); font-weight: 700; }
+  .mobile-arc-center > strong { font-size: clamp(25px, 2.4vw, 34px); letter-spacing: -1px; line-height: 1.2; font-weight: 800; font-family: var(--display); color: var(--ink); white-space: nowrap; }
+  .mobile-arc-center > small { font-size: 11px; color: var(--muted); margin-top: 3px; }
+  .arc-legend { gap: clamp(10px, 1.3vw, 22px); margin: 0 auto 4px; }
+  .arc-legend > span { font-size: 11px; white-space: nowrap; }
+  .arc-legend strong { font-size: 11px; }
+  .mobile-days-legend { display: flex; }
+  .desktop-period-caption { display: block; margin: 5px 0 0; text-align: center; color: var(--muted); font-size: 10px; line-height: 1.4; }
+  .days-block { display: none; }
+}
+@media (max-width: 720px) {
+  /* The desktop-only caption is in the shared markup but has no mobile footprint. */
+  .desktop-period-caption { display: none; }
+}
+
+/* Keep Settings readable on narrower laptops; use aligned cards only when two columns fit. */
+@media (min-width: 721px) and (max-width: 1199px) {
+  .settings-layout { display: block; max-width: none; }
+  .settings-layout > .data-card,
+  .settings-layout > .danger-card,
+  .settings-layout > .settings-card:has(#apple-shortcut-setting) { grid-column: auto; }
+  .settings-layout > .settings-card { margin-bottom: 14px; }
+  .settings-layout > .data-card { margin-bottom: 14px; }
+  .settings-layout > .danger-card { margin-bottom: 0; }
+  .setting-row { gap: 14px; align-items: center; }
+  .setting-row > div:first-child { flex: 1 1 190px; min-width: 0; }
+  .setting-row small { max-width: none; overflow-wrap: anywhere; }
+  .setting-row > .segmented,
+  .setting-row > .switch,
+  .setting-row > .setting-inline,
+  .setting-row > .quiet-hours { flex: 0 0 auto; }
+}
+@media (min-width: 1200px) {
+  .settings-layout { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: stretch; gap: 16px; max-width: none; margin: 0; }
+  .settings-layout > * { min-width: 0; }
+  .settings-layout > .settings-card { margin-bottom: 0; }
+  .settings-profile-card { display: flex; flex-direction: column; }
+  .settings-profile-card .profile-settings-preview { flex: 1 1 auto; padding-top: 12px; padding-bottom: 12px; }
+  .settings-activities-card { display: flex; flex-direction: column; }
+  .settings-activities-card .setting-row { flex: 1 1 auto; }
+  .settings-layout > .settings-card:has(#apple-shortcut-setting),
+  .settings-layout > .data-card,
+  .settings-layout > .danger-card { grid-column: 1 / -1; }
+  .settings-layout > .data-card,
+  .settings-layout > .danger-card { margin-bottom: 0; }
+  .setting-row { gap: 16px; }
+  .setting-row > div:first-child { flex: 1 1 auto; min-width: 0; }
+  .setting-row small { max-width: none; overflow-wrap: anywhere; }
+  .setting-row > .segmented,
+  .setting-row > .switch,
+  .setting-row > .setting-inline,
+  .setting-row > .quiet-hours { flex: 0 0 auto; }
+}
+
+/* The tour body may scroll, but Skip/Next stay in a dedicated, always-visible action row. */
+.pw-tour-card { display: flex; flex-direction: column; overflow: hidden !important; }
+.pw-tour-content { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scroll-padding-bottom: 16px; -webkit-overflow-scrolling: touch; }
+.pw-tour-content .pw-tour-progress { margin-bottom: 8px; }
+.pw-tour-actions { position: relative !important; inset: auto !important; flex: 0 0 auto; display: flex; align-items: center; gap: 8px; margin: 0; padding: 10px 0 0; background: var(--surface); }
+.pw-tour-actions .pw-tour-next { min-height: 48px; flex: 1 1 auto; touch-action: manipulation; }
+.pw-tour-skip { min-height: 48px; min-width: 76px; touch-action: manipulation; }
+.pw-tour-card :is(button, a) { pointer-events: auto; }
+@media (max-height: 500px) {
+  .pw-tour-card { padding: 14px 16px 12px; }
+  .pw-tour-visual { width: 42px; height: 42px; margin-bottom: 8px; border-radius: 16px; }
+  .pw-tour-card h2 { font-size: 22px; margin-bottom: 7px; }
+  .pw-tour-card p { font-size: 12px; line-height: 1.45; margin-bottom: 10px; }
+  .pw-tour-progress { margin-bottom: 8px; }
+}
