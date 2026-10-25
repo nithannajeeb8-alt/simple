@@ -25,7 +25,7 @@
         <small id="pw-statement-file-help">PDF, CSV or TSV · Maximum 50 MB · Up to 150 PDF pages. Scanned/image-only PDFs need a searchable bank export or CSV.</small>
       </div>
       <div class="form-field"><label for="pw-statement-account">IMPORT TO ACCOUNT</label><select id="pw-statement-account">${accounts||'<option value="bank">Bank / UPI</option>'}</select></div>
-      <div class="pw-statement-privacy"><strong>Private by design</strong><span>Your statement is processed on this device. The optional local AI receives column labels only when mapping is needed; transaction rows are parsed separately and are not sent to an AI service.</span></div>
+      <div class="pw-statement-privacy"><strong>Private by design</strong><span>Your statement stays on this device. If you choose local AI, Qwen receives the column labels and a small sample of extracted rows to help identify columns. This runs locally in your browser; data is not sent to an AI service.</span></div>
       <div id="pw-statement-status" class="pw-ocr-status" role="status" aria-live="polite">Tap the upload card to choose a statement, then analyze it.</div>
       <div id="pw-statement-password-area" class="pw-statement-password-area" hidden></div>
       <div id="pw-statement-mapping" class="pw-statement-mapping" hidden></div>
@@ -50,7 +50,7 @@
         result=parser().parseMatrix(matrix,mapping);
       }else result=await analyzePDF(file,token);
       if(token!==parseToken)return;parsed=result;mapping=result.mapping||mapping;
-      if(result.error&&result.headers&&matrix){renderMappingControls(result.headers,result.mapping,result.error);setStatus(result.error,'warn');return;}
+      if(result.error&&result.headers&&matrix){renderMappingControls(result.headers,result.mapping,result.error,matrix?.slice(1,9)||result.sampleRows||[]);setStatus(result.error,'warn');return;}
       if(result.error)throw new Error(result.error);
       decorateRiskyRows(result.transactions||[]);renderPreview();setStatus(`Analysis complete. ${result.transactions?.length||0} transaction rows detected. Review them before importing.`,'success');
     }catch(error){if(token!==parseToken)return;setStatus(error?.message||'The statement could not be read. Try a CSV export from your bank.','error');}
@@ -117,12 +117,19 @@
       if(token!==parseToken)throw new Error('Statement analysis was cancelled.');
       setStatus('PDF unlocked. Verifying the document and reading its pages locally…');
       if(doc.numPages>150)throw new Error('This PDF has more than 150 pages. Export the statement in smaller date ranges to protect device memory.');
-      let anyText=false,matrices=[],textOnlyLines=[],previousLayout=null;
-      for(let pageNo=1;pageNo<=doc.numPages;pageNo++){if(token!==parseToken)return {error:'Analysis cancelled.'};setStatus(`Reading PDF page ${pageNo} of ${doc.numPages}…`);const pageObj=await doc.getPage(pageNo);try{const content=await pageObj.getTextContent({includeMarkedContent:false});const lines=parser().pdfItemsToLines(content.items);if(lines.some(l=>l.items.length))anyText=true;textOnlyLines.push(...lines.map(l=>l.text));const table=parser().pdfPageToMatrix(lines,previousLayout);if(table.layout?.length)previousLayout=table.layout;if(table.rows&&table.rows.length>1)matrices.push(table);}finally{if(typeof pageObj.cleanup==='function')pageObj.cleanup();}}
+      let anyText=false,matrices=[],textOnlyLines=[],allPdfLines=[],previousLayout=null;
+      for(let pageNo=1;pageNo<=doc.numPages;pageNo++){if(token!==parseToken)return {error:'Analysis cancelled.'};setStatus(`Reading PDF page ${pageNo} of ${doc.numPages}…`);const pageObj=await doc.getPage(pageNo);try{const content=await pageObj.getTextContent({includeMarkedContent:false});const lines=parser().pdfItemsToLines(content.items);if(lines.some(l=>l.items.length))anyText=true;textOnlyLines.push(...lines.map(l=>l.text));allPdfLines.push(...lines);const table=parser().pdfPageToMatrix(lines,previousLayout);if(table.layout?.length)previousLayout=table.layout;if(table.rows&&table.rows.length>1)matrices.push(table);}finally{if(typeof pageObj.cleanup==='function')pageObj.cleanup();}}
       if(!anyText)throw new Error('This looks like a scanned/image-only PDF. For reliable amounts, export a CSV statement or download a searchable/text PDF from your bank. PocketWise will not guess digits from a scan.');
-      if(!matrices.length)throw new Error('Text was found, but the PDF table headings could not be mapped safely. Download a CSV statement from your bank or use a clearly structured text PDF.');
+      if(!matrices.length){
+        const fallback=fallbackPdfMatrix(allPdfLines);
+        if(!fallback)throw new Error('PDF.js found text, but could not separate enough transaction columns safely. Try your bank CSV export or another text-based statement format.');
+        matrix=fallback;mapping=parser().mapHeaders(matrix[0]);const result=parser().parseMatrix(matrix,mapping);
+        result.sourcePages=doc.numPages;result.sourceName=file.name;
+        if(result.error&&result.headers)result.sampleRows=matrix.slice(1,9);
+        return result;
+      }
       const headers=matrices[0].rows[0];const rows=[headers];for(const table of matrices){const th=table.rows[0];const idx=headers.map(h=>th.findIndex(x=>parser().norm(x)===parser().norm(h)));for(const row of table.rows.slice(1)){rows.push(headers.map((_,i)=>idx[i]>=0?(row[idx[i]]||''):''));}}
-      matrix=rows;mapping=parser().mapHeaders(headers);let result=parser().parseMatrix(rows,mapping);result.sourcePages=doc.numPages;result.sourceName=file.name;return result;
+      matrix=rows;mapping=parser().mapHeaders(headers);let result=parser().parseMatrix(rows,mapping);result.sourcePages=doc.numPages;result.sourceName=file.name;if(result.error&&result.headers)result.sampleRows=rows.slice(1,9);return result;
     }catch(error){
       if(passwordCancelled)throw new Error('PDF password entry was cancelled. Select Analyze statement to try again.');
       if(/password|encrypted|encrypt/i.test(String(error?.message||'')))throw new Error('PDF.js could not unlock this statement. Check the PDF password and try again.');
@@ -133,11 +140,33 @@
       try{if(typeof loadingTask.destroy==='function')await loadingTask.destroy();else if(typeof doc?.cleanup==='function')await doc.cleanup();}catch(cleanupError){console.warn('PDF reader cleanup failed:',cleanupError);}
     }
   }
+  function fallbackPdfMatrix(lines){
+    // Fallback for searchable PDFs with unfamiliar headings: use text coordinates to
+    // recover a best-effort grid, then require AI/manual mapping and normal review.
+    const source=[];
+    for(const line of (lines||[])){
+      const items=(line.items||[]).slice().sort((a,b)=>a.x-b.x);if(!items.length)continue;
+      const cells=[];
+      for(const item of items){const last=cells[cells.length-1],gap=last?item.x-last.right:Infinity;
+        if(last&&gap<=18){last.text=(last.text+' '+item.text).replace(/\s+/g,' ').trim();last.right=Math.max(last.right,item.right);}
+        else cells.push({x:item.x,right:item.right,text:String(item.text||'').trim()});}
+      if(cells.some(c=>c.text))source.push({y:line.y,cells});
+    }
+    if(source.length<2)return null;
+    const anchors=[];for(const row of source)for(const cell of row.cells)if(!anchors.some(x=>Math.abs(x-cell.x)<=13))anchors.push(cell.x);
+    anchors.sort((a,b)=>a-b);const cols=[];for(const x of anchors)if(!cols.length||x-cols[cols.length-1]>13)cols.push(x);
+    if(cols.length<3)return null;
+    const rows=source.map(row=>{const out=Array(cols.length).fill('');for(const cell of row.cells){let best=0,dist=Infinity;cols.forEach((x,i)=>{const d=Math.abs(x-cell.x);if(d<dist){dist=d;best=i;}});out[best]=(out[best]+' '+cell.text).trim();}return out;});
+    const headerAt=parser().findHeaderRow(rows);if(headerAt>=0)return rows.slice(headerAt);
+    const data=rows.filter(row=>row.some(cell=>parser().parseDate(cell))||row.some(cell=>/opening balance|closing balance|brought forward/i.test(cell)));
+    if(!data.some(row=>row.some(cell=>parser().parseDate(cell))&&row.filter(cell=>parser().parseMoney(cell).value!==null).length>=1))return null;
+    return [Array.from({length:cols.length},(_,i)=>`Column ${i+1}`),...data];
+  }
   function decorateRiskyRows(rows){for(const row of rows){const d=String(row.description||'');if(/\b(?:own account|self transfer|transfer to own|transfer from own|between own|internal transfer|credit card payment|credit card bill|cc payment|card bill payment|atm cash withdrawal)\b/i.test(d)){row.transferReview=true;row.originalType=row.type;row.type='review';row.selected=false;row.issue=row.issue||'Possible transfer, card settlement or cash movement. Choose how to classify it.';}}}
-  function renderMappingControls(headers,suggested,message){
+  function renderMappingControls(headers,suggested,message,sampleRows=[]){
     const fields=[['date','Date (required)'],['description','Description / narration (required)'],['debit','Debit / withdrawal'],['credit','Credit / deposit'],['amount','Single amount column'],['balance','Running balance'],['reference','Reference / UTR']];
     const selectOptions=selected=>`<option value="">Not mapped</option>`+headers.map((h,i)=>`<option value="${i}" ${selected===i?'selected':''}>${i+1}. ${escapeHTML(String(h||`Column ${i+1}`).slice(0,80))}</option>`).join('');
-    const html=`<section class="pw-statement-map-card"><strong>Map statement columns</strong><p>${escapeHTML(message)}</p><div class="pw-statement-map-grid">${fields.map(([field,label])=>`<label for="pw-map-${field}">${label}<select id="pw-map-${field}" data-map-field="${field}">${selectOptions(suggested?.[field]??null)}</select></label>`).join('')}</div><div class="form-actions"><button type="button" class="secondary-button" id="pw-statement-map-ai">Use local AI</button><button type="button" class="primary-button" id="pw-statement-map-apply">Use these columns</button></div><small class="fine-print">If you use Qwen, it receives column headings only and suggests field indexes. It does not read transaction rows or infer amounts. Every row is still parsed and checked separately, and you can correct the suggestion.</small></section>`;
+    const html=`<section class="pw-statement-map-card"><strong>Map statement columns</strong><p>${escapeHTML(message)}</p><div class="pw-statement-map-grid">${fields.map(([field,label])=>`<label for="pw-map-${field}">${label}<select id="pw-map-${field}" data-map-field="${field}">${selectOptions(suggested?.[field]??null)}</select></label>`).join('')}</div><div class="form-actions"><button type="button" class="secondary-button" id="pw-statement-map-ai">Use local AI</button><button type="button" class="primary-button" id="pw-statement-map-apply">Use these columns</button></div><small class="fine-print">Qwen uses column headings and a small sample of extracted rows to suggest column roles on this device. It does not create or change transaction amounts. All rows are parsed and checked separately; verify the suggested columns before continuing.</small></section>`;
     const host=$('#pw-statement-mapping');host.innerHTML=html;host.hidden=false;
     $('#pw-statement-map-apply')?.addEventListener('click',()=>{
       const map={date:null,description:null,debit:null,credit:null,amount:null,balance:null,reference:null};
@@ -149,9 +178,9 @@
     const aiButton=$('#pw-statement-map-ai');
     const runAI=async()=>{
       if(!window.PocketwiseLocalAI){setStatus('Local AI module is not available. Use the manual column selectors.','error');return;}
-      aiButton.disabled=true;aiButton.textContent='Mapping…';setStatus('Using local Qwen2.5 to interpret the column labels…');
+      aiButton.disabled=true;aiButton.textContent='Mapping…';setStatus('Using local Qwen2.5 to interpret column labels and sample row values on this device…');
       try{
-        const proposed=await window.PocketwiseLocalAI.mapColumns(headers);const valid=parser().validateMapping(proposed,headers.length);
+        const proposed=await window.PocketwiseLocalAI.mapColumns(headers,sampleRows);const valid=parser().validateMapping(proposed,headers.length);
         if(!valid){setStatus('The model suggestion was incomplete or unsafe. Choose the columns manually.','warn');return;}
         host.querySelectorAll('[data-map-field]').forEach(select=>{const value=valid[select.dataset.mapField];select.value=value===null?'':String(value);});
         setStatus('Qwen suggestion ready. Check the selected columns, then tap “Use these columns”.','success');

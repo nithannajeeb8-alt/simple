@@ -86,13 +86,13 @@
       try{await clearModelCache();}catch(error){settingStatus(`Could not fully remove model cache: ${error.message||error}. PocketWise transaction data was not changed.`);setActionButtons();}
     });
   }
-  async function mapColumns(headers){
-    currentIntent='map';await ensureLoaded('map');
-    const w=ensureWorker(),id=++seq;
+  async function mapColumns(headers,sampleRows=[]){
+    currentIntent='map';await ensureLoaded('map');const w=ensureWorker(),id=++seq;
+    const safeHeaders=(headers||[]).slice(0,80).map(v=>String(v).slice(0,100));
+    const safeRows=(Array.isArray(sampleRows)?sampleRows:[]).slice(0,8).map(row=>(Array.isArray(row)?row:[]).slice(0,12).map(v=>String(v??'').slice(0,100)));
     return new Promise((resolve,reject)=>{
       const timer=setTimeout(()=>{const request=requests.get(id);if(request){requests.delete(id);request.reject(new Error('The local AI took too long to respond. Use manual column mapping instead.'));releaseWorker();}},90000);
-      requests.set(id,{resolve,reject,timer});
-      w.postMessage({type:'mapColumns',id,headers:(headers||[]).slice(0,80).map(String)});
+      requests.set(id,{resolve,reject,timer});w.postMessage({type:'mapColumns',id,headers:safeHeaders,sampleRows:safeRows});
     });
   }
   window.PocketwiseLocalAI={ensureLoaded,mapColumns,isLoaded:()=>loadState==='ready',isDownloaded,modelName:'Qwen2.5-1.5B-Instruct-q4f16_1-MLC',initializeSettings};
