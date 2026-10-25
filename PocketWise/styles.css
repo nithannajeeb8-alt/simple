@@ -1793,3 +1793,54 @@ html[data-theme="light"][data-liquid-glass="on"] .transaction-delete-action{back
 .pw-statement-entry{display:flex;align-items:center;justify-content:flex-start;gap:12px;width:100%;min-height:54px;margin:4px 0 14px;padding:12px 14px;text-align:left;white-space:normal}
 .pw-statement-entry>span:last-child{display:flex;flex-direction:column;align-items:flex-start;gap:3px;font-weight:750}
 .pw-statement-entry small{font-size:11px;font-weight:500;line-height:1.4;color:var(--muted)}
+
+
+/* PocketWise statement importer: clearer upload affordance and inline password handling. */
+.pw-statement-filebox{display:flex;flex-direction:column;gap:10px;padding:15px;border:1px solid var(--line);border-radius:17px;background:var(--surface)}
+.pw-statement-filebox .pw-statement-filebox-title{display:block;font-size:10px;line-height:1.4;letter-spacing:.12em;font-weight:800;color:var(--muted);margin:0}
+.pw-statement-file-input{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;clip-path:inset(50%)!important;white-space:nowrap!important;border:0!important}
+.pw-statement-upload-card{display:flex;align-items:center;gap:11px;width:100%;min-width:0;padding:13px;border:1px solid var(--line);border-radius:14px;background:var(--surface-2);cursor:pointer;transition:border-color .15s,background .15s;color:var(--ink)!important;font-size:inherit!important;letter-spacing:normal!important}
+.pw-statement-upload-card:hover{border-color:color-mix(in srgb,var(--green) 45%,var(--line));background:var(--green-soft)}
+.pw-statement-file-input:focus-visible+.pw-statement-upload-card{outline:3px solid color-mix(in srgb,var(--green) 38%,transparent);outline-offset:3px;border-color:var(--green)}
+.pw-statement-pdf-icon{width:42px!important;height:42px!important;border-radius:12px;background:var(--red-soft);color:var(--red);flex:0 0 42px}
+.pw-statement-pdf-icon i{font-size:25px!important;line-height:1}
+.pw-statement-pdf-icon .icon-fallback{width:27px;height:27px}
+.bi-loaded .pw-statement-pdf-icon i{display:inline-block}
+.bi-loaded .pw-statement-pdf-icon .icon-fallback{display:none}
+.pw-statement-upload-copy{display:flex;flex-direction:column;gap:3px;align-items:flex-start;min-width:0;flex:1}
+.pw-statement-upload-copy strong{font-size:12px;line-height:1.35;font-weight:800;color:var(--ink)}
+.pw-statement-upload-copy small{font-size:10px;line-height:1.4;color:var(--muted);font-weight:500;letter-spacing:0}
+.pw-statement-browse{display:inline-flex;align-items:center;justify-content:center;gap:6px;flex:none;min-height:36px;padding:0 11px;border-radius:10px;background:var(--green);color:#fff;font-size:10px;font-weight:800;white-space:nowrap}
+.pw-statement-browse span{font-size:19px;line-height:1;font-weight:500}
+.pw-statement-file-name{padding:9px 10px;border-radius:10px;background:var(--surface-2);font-size:11px;font-weight:700;color:var(--ink);overflow-wrap:anywhere}
+.pw-statement-filebox>small#pw-statement-file-help{font-size:10px;line-height:1.55;color:var(--muted)}
+.pw-statement-password-area[hidden]{display:none!important}
+.pw-statement-password-card{display:flex;flex-direction:column;gap:11px;padding:14px;border:1px solid color-mix(in srgb,var(--green) 30%,var(--line));border-radius:15px;background:var(--surface)}
+.pw-statement-password-heading{display:flex;align-items:center;gap:10px}
+.pw-statement-lock-icon{width:38px!important;height:38px!important;border-radius:11px;background:var(--green-soft);color:var(--green);flex:0 0 38px}
+.pw-statement-lock-icon i{font-size:18px!important}
+.pw-statement-lock-icon .icon-fallback{width:20px;height:20px}
+.bi-loaded .pw-statement-lock-icon i{display:inline-block}
+.bi-loaded .pw-statement-lock-icon .icon-fallback{display:none}
+.pw-statement-password-heading strong,.pw-statement-password-heading small{display:block}
+.pw-statement-password-heading strong{font-size:12px;font-weight:800;color:var(--ink)}
+.pw-statement-password-heading small{font-size:10px;line-height:1.45;color:var(--muted);margin-top:3px}
+.pw-statement-password-card form{display:flex;flex-direction:column;gap:7px}
+.pw-statement-password-card form>label{font-size:10px;letter-spacing:0;color:var(--muted);font-weight:700}
+.pw-statement-password-card input[type=password]{width:100%;min-height:44px;padding:11px 12px;border:1px solid var(--line);border-radius:11px;background:var(--surface-2);color:var(--ink);font-size:16px;letter-spacing:.02em}
+.pw-statement-password-card input[type=password]:focus{outline:2px solid color-mix(in srgb,var(--green) 30%,transparent);border-color:var(--green)}
+.pw-statement-password-actions{display:flex;gap:8px;margin-top:4px}
+.pw-statement-password-actions button{flex:1;white-space:normal;min-height:42px}
+.pw-statement-password-privacy{font-size:9px;line-height:1.5;color:var(--muted)}
+.pw-statement-password-error{margin:0;padding:9px 10px;border-radius:9px;background:var(--red-soft);color:var(--red);font-size:10px;line-height:1.45}
+@media(max-width:520px){
+  .pw-statement-filebox{padding:12px}
+  .pw-statement-upload-card{gap:8px;padding:10px}
+  .pw-statement-pdf-icon{width:38px!important;height:38px!important;flex-basis:38px}
+  .pw-statement-pdf-icon i{font-size:22px!important}
+  .pw-statement-upload-copy strong{font-size:11px}
+  .pw-statement-upload-copy small{font-size:9px}
+  .pw-statement-browse{min-height:34px;padding:0 8px;font-size:9px;gap:4px}
+  .pw-statement-password-actions{flex-direction:column-reverse}
+  .pw-statement-password-actions button{width:100%}
+}

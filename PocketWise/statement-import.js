@@ -4,32 +4,44 @@
   const $=s=>document.querySelector(s);
   const escapeHTML=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const parser=()=>window.PWStatementParser;
-  let selectedFile=null,parsed=null,matrix=null,mapping=null,page=0,parseToken=0,sourceName='',lastFileType='';
+  let selectedFile=null,parsed=null,matrix=null,mapping=null,page=0,parseToken=0,sourceName='',lastFileType='',activePasswordCancel=null;
   const PAGE_SIZE=25;
   function setStatus(message,kind='info'){const el=$('#pw-statement-status');if(el){el.textContent=message;el.dataset.kind=kind;}}
   function getBridge(){return window.PocketwiseStatementBridge||null;}
   function setModal(title,kicker,html){const dialog=$('#app-modal');if(!dialog)return;$('#modal-title').textContent=title;$('#modal-kicker').textContent=kicker;$('#modal-content').innerHTML=html;if(!dialog.open)dialog.showModal();}
-  function open(){selectedFile=null;parsed=null;matrix=null;mapping=null;page=0;sourceName='';lastFileType='';const context=getBridge()?.getContext?.()||{accounts:[]};const accounts=(context.accounts||[]).map(a=>`<option value="${escapeHTML(a.id)}">${escapeHTML(a.name||a.id)}</option>`).join('');setModal('Import bank statement','LOCAL STATEMENT READER',`
+  function open(){cancelActivePdfImport();selectedFile=null;parsed=null;matrix=null;mapping=null;page=0;sourceName='';lastFileType='';const context=getBridge()?.getContext?.()||{accounts:[]};const accounts=(context.accounts||[]).map(a=>`<option value="${escapeHTML(a.id)}">${escapeHTML(a.name||a.id)}</option>`).join('');setModal('Import bank statement','LOCAL STATEMENT READER',`
     <div class="modal-body pw-statement-import">
       <button type="button" class="secondary-button pw-statement-back" id="pw-statement-back">← Back to payment import</button>
       <p>Import an Indian bank statement from a <strong>CSV or text-based PDF</strong>. PocketWise parses transactions locally, checks debit/credit direction and balances where available, then lets you review everything before saving.</p>
-      <div class="pw-statement-filebox"><label for="pw-statement-file">BANK STATEMENT FILE</label><input id="pw-statement-file" type="file" accept=".pdf,.csv,.tsv,application/pdf,text/csv,text/tab-separated-values"><small>Maximum 50 MB and 150 PDF pages. A scanned/image-only PDF needs a bank-exported searchable PDF or CSV for reliable extraction.</small><div id="pw-statement-file-name" class="pw-statement-file-name">No file selected.</div></div>
+      <div class="pw-statement-filebox">
+        <label class="pw-statement-filebox-title" for="pw-statement-file">BANK STATEMENT FILE</label>
+        <input class="pw-statement-file-input" id="pw-statement-file" type="file" accept=".pdf,.csv,.tsv,application/pdf,text/csv,text/tab-separated-values" aria-describedby="pw-statement-file-help">
+        <label class="pw-statement-upload-card" for="pw-statement-file">
+          <span class="icon-wrap pw-statement-pdf-icon" aria-hidden="true"><i class="bi bi-file-earmark-pdf-fill"></i><svg class="icon-fallback" viewBox="0 0 32 32"><path d="M7 2.5h12l7 7V29H7Z"/><path d="M19 2.5v7h7"/><path d="M10 21h12M10 24h9"/><path d="M10 15v4m0-4h2a2 2 0 0 1 0 4h-2m7 0v-4h1a2 2 0 0 1 0 4h-1m5-4h-3v4m0-2h2"/></svg></span>
+          <span class="pw-statement-upload-copy"><strong>Choose a bank statement</strong><small>Tap here to browse your files</small></span>
+          <span class="pw-statement-browse">Browse files <span aria-hidden="true">›</span></span>
+        </label>
+        <div id="pw-statement-file-name" class="pw-statement-file-name">No file selected yet</div>
+        <small id="pw-statement-file-help">PDF, CSV or TSV · Maximum 50 MB · Up to 150 PDF pages. Scanned/image-only PDFs need a searchable bank export or CSV.</small>
+      </div>
       <div class="form-field"><label for="pw-statement-account">IMPORT TO ACCOUNT</label><select id="pw-statement-account">${accounts||'<option value="bank">Bank / UPI</option>'}</select></div>
       <div class="pw-statement-privacy"><strong>Private by design</strong><span>Your statement is processed on this device. The optional local AI receives column labels only when mapping is needed; transaction rows are parsed separately and are not sent to an AI service.</span></div>
-      <div id="pw-statement-status" class="pw-ocr-status" role="status" aria-live="polite">Choose a statement file, then analyze it.</div>
+      <div id="pw-statement-status" class="pw-ocr-status" role="status" aria-live="polite">Tap the upload card to choose a statement, then analyze it.</div>
+      <div id="pw-statement-password-area" class="pw-statement-password-area" hidden></div>
       <div id="pw-statement-mapping" class="pw-statement-mapping" hidden></div>
       <div class="form-actions pw-statement-first-actions"><button type="button" class="secondary-button" data-cancel-modal>Cancel</button><button type="button" class="primary-button" id="pw-statement-analyze" disabled>Analyze statement</button></div>
       <div id="pw-statement-preview" hidden></div>
       <p class="fine-print">Nothing is saved until you tap Import selected transactions. Review unusual transfers, card bill payments and uncertain directions manually. Existing payment screenshot/SMS import remains unchanged.</p>
     </div>`);
     $('#pw-statement-back')?.addEventListener('click',()=>window.dispatchEvent(new Event('pw-return-to-payment-import')));
-    const input=$('#pw-statement-file');input?.addEventListener('change',()=>{selectedFile=input.files?.[0]||null;parsed=null;matrix=null;mapping=null;page=0;$('#pw-statement-preview').hidden=true;$('#pw-statement-mapping').hidden=true;const name=$('#pw-statement-file-name');if(name)name.textContent=selectedFile?`${selectedFile.name} · ${(selectedFile.size/1024/1024).toFixed(2)} MB`:'No file selected.';const analyze=$('#pw-statement-analyze');if(analyze)analyze.disabled=!selectedFile;setStatus(selectedFile?'Ready to analyze. The file will be read locally.':'Choose a statement file.');});
+    const dialog=$('#app-modal');dialog?.addEventListener('close',cancelActivePdfImport,{once:true});
+    const input=$('#pw-statement-file');input?.addEventListener('change',()=>{if(input.disabled)return;selectedFile=input.files?.[0]||null;parsed=null;matrix=null;mapping=null;page=0;$('#pw-statement-preview').hidden=true;$('#pw-statement-mapping').hidden=true;const passwordArea=$('#pw-statement-password-area');if(passwordArea){passwordArea.hidden=true;passwordArea.replaceChildren();}const name=$('#pw-statement-file-name');if(name)name.textContent=selectedFile?`${selectedFile.name} · ${(selectedFile.size/1024/1024).toFixed(2)} MB`:'No file selected.';const analyze=$('#pw-statement-analyze');if(analyze)analyze.disabled=!selectedFile;setStatus(selectedFile?'Ready to analyze. The file will be read locally.':'Choose a statement file.');});
     $('#pw-statement-analyze')?.addEventListener('click',analyzeSelected);
   }
   function identifyFormat(file){const name=(file?.name||'').toLowerCase();if(name.endsWith('.pdf')||file?.type==='application/pdf')return 'pdf';if(/\.(csv|tsv)$/.test(name)||/text\/(?:csv|tab-separated-values)/.test(file?.type||''))return 'csv';return ''}
   async function analyzeSelected(){
-    const file=selectedFile;if(!file)return;const token=++parseToken;const type=identifyFormat(file);if(!type){setStatus('Choose a PDF, CSV or TSV statement.','error');return;}if(file.size>50*1024*1024){setStatus('This file is over 50 MB. Export a smaller date range or CSV statement.','error');return;}
-    const analyze=$('#pw-statement-analyze');if(analyze){analyze.disabled=true;analyze.textContent='Analyzing…';}$('#pw-statement-preview').hidden=true;$('#pw-statement-mapping').hidden=true;setStatus('Reading statement locally…');sourceName=file.name;lastFileType=type;
+    const file=selectedFile;if(!file)return;const type=identifyFormat(file);if(!type){setStatus('Choose a PDF, CSV or TSV statement.','error');return;}if(file.size>50*1024*1024){setStatus('This file is over 50 MB. Export a smaller date range or CSV statement.','error');return;}const token=++parseToken;
+    const analyze=$('#pw-statement-analyze'),fileInput=$('#pw-statement-file');if(analyze){analyze.disabled=true;analyze.textContent='Analyzing…';}if(fileInput)fileInput.disabled=true;$('#pw-statement-preview').hidden=true;$('#pw-statement-mapping').hidden=true;setStatus('Reading statement locally…');sourceName=file.name;lastFileType=type;
     try{
       let result;
       if(type==='csv'){
@@ -42,13 +54,68 @@
       if(result.error)throw new Error(result.error);
       decorateRiskyRows(result.transactions||[]);renderPreview();setStatus(`Analysis complete. ${result.transactions?.length||0} transaction rows detected. Review them before importing.`,'success');
     }catch(error){if(token!==parseToken)return;setStatus(error?.message||'The statement could not be read. Try a CSV export from your bank.','error');}
-    finally{if(token===parseToken&&analyze){analyze.disabled=!selectedFile;analyze.textContent='Analyze statement';}}
+    finally{if(token===parseToken){if(analyze){analyze.disabled=!selectedFile;analyze.textContent='Analyze statement';}if(fileInput)fileInput.disabled=false;}}
+  }
+  function cancelActivePdfImport(){
+    // Invalidate page-loop work and reject a pending password request. The active analyzePDF
+    // call owns the finally block that disposes the PDF.js task, preventing double-destroy races.
+    parseToken++;
+    const cancelPassword=activePasswordCancel;
+    if(cancelPassword)try{cancelPassword();}catch(error){}
+  }
+  function showPdfPasswordPrompt(pdfjs,updatePassword,reason,onCancel){
+    const host=$('#pw-statement-password-area');
+    if(!host){onCancel();return;}
+    const incorrect=reason===pdfjs.PasswordResponses?.INCORRECT_PASSWORD;
+    host.innerHTML=`<section class="pw-statement-password-card" aria-labelledby="pw-pdf-password-title">
+      <div class="pw-statement-password-heading"><span class="icon-wrap pw-statement-lock-icon" aria-hidden="true"><i class="bi bi-shield-lock-fill"></i><svg class="icon-fallback" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></svg></span><div><strong id="pw-pdf-password-title">Unlock this bank statement</strong><small>Enter the PDF password once to read and analyze the document.</small></div></div>
+      ${incorrect?'<p class="pw-statement-password-error" role="alert">That password did not unlock the PDF. Check it and try again.</p>':''}
+      <form id="pw-statement-password-form" autocomplete="off">
+        <label for="pw-statement-pdf-password">PDF password</label>
+        <input id="pw-statement-pdf-password" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="go" required>
+        <div class="pw-statement-password-actions"><button type="button" class="secondary-button" id="pw-statement-password-cancel">Cancel</button><button type="submit" class="primary-button">Unlock &amp; analyze</button></div>
+      </form>
+      <small class="pw-statement-password-privacy">Password is used locally by PDF.js and is not saved or uploaded. No unlocked PDF copy is created.</small>
+    </section>`;
+    host.hidden=false;
+    const form=$('#pw-statement-password-form'),input=$('#pw-statement-pdf-password');
+    let responded=false;
+    const cancel=()=>{
+      if(responded)return;responded=true;
+      host.hidden=true;host.replaceChildren();
+      if(activePasswordCancel===cancel)activePasswordCancel=null;
+      onCancel();
+    };
+    activePasswordCancel=cancel;
+    form?.addEventListener('submit',event=>{
+      event.preventDefault();
+      if(!input?.value){input?.focus();return;}
+      const password=input.value;input.value='';responded=true;
+      host.hidden=true;host.replaceChildren();
+      if(activePasswordCancel===cancel)activePasswordCancel=null;
+      setStatus('Checking the PDF password locally…');
+      try{updatePassword(password);}catch(error){setStatus('PDF.js could not accept that password. Try again.','error');}
+    });
+    $('#pw-statement-password-cancel')?.addEventListener('click',cancel);
+    input?.focus();
+    return cancel;
   }
   async function analyzePDF(file,token){
     setStatus('Loading the local PDF reader…');const pdfjs=await import('https://cdn.jsdelivr.net/npm/pdfjs-dist@6.4.299/build/pdf.mjs');pdfjs.GlobalWorkerOptions.workerSrc='https://cdn.jsdelivr.net/npm/pdfjs-dist@6.4.299/build/pdf.worker.min.mjs';
-    const loadingTask=pdfjs.getDocument({data:new Uint8Array(await file.arrayBuffer()),isEvalSupported:false});let doc=null;
+    const loadingTask=pdfjs.getDocument({data:new Uint8Array(await file.arrayBuffer()),isEvalSupported:false});let doc=null,passwordCancelled=false,passwordCancelForThisTask=null;
+    loadingTask.onPassword=(updatePassword,reason)=>{
+      if(token!==parseToken){passwordCancelled=true;try{updatePassword(new Error('Statement analysis cancelled'));}catch(error){}return;}
+      passwordCancelForThisTask=showPdfPasswordPrompt(pdfjs,updatePassword,reason,()=>{
+        passwordCancelled=true;
+        // PDF.js supports rejecting its pending password request with an Error. Its promise
+        // then settles and the finally block destroys the reader worker; no hidden prompt remains.
+        try{updatePassword(new Error('PDF password entry cancelled'));}catch(error){}
+      });
+    };
     try{
       doc=await loadingTask.promise;
+      if(token!==parseToken)throw new Error('Statement analysis was cancelled.');
+      setStatus('PDF unlocked. Verifying the document and reading its pages locally…');
       if(doc.numPages>150)throw new Error('This PDF has more than 150 pages. Export the statement in smaller date ranges to protect device memory.');
       let anyText=false,matrices=[],textOnlyLines=[],previousLayout=null;
       for(let pageNo=1;pageNo<=doc.numPages;pageNo++){if(token!==parseToken)return {error:'Analysis cancelled.'};setStatus(`Reading PDF page ${pageNo} of ${doc.numPages}…`);const pageObj=await doc.getPage(pageNo);try{const content=await pageObj.getTextContent({includeMarkedContent:false});const lines=parser().pdfItemsToLines(content.items);if(lines.some(l=>l.items.length))anyText=true;textOnlyLines.push(...lines.map(l=>l.text));const table=parser().pdfPageToMatrix(lines,previousLayout);if(table.layout?.length)previousLayout=table.layout;if(table.rows&&table.rows.length>1)matrices.push(table);}finally{if(typeof pageObj.cleanup==='function')pageObj.cleanup();}}
@@ -56,9 +123,13 @@
       if(!matrices.length)throw new Error('Text was found, but the PDF table headings could not be mapped safely. Download a CSV statement from your bank or use a clearly structured text PDF.');
       const headers=matrices[0].rows[0];const rows=[headers];for(const table of matrices){const th=table.rows[0];const idx=headers.map(h=>th.findIndex(x=>parser().norm(x)===parser().norm(h)));for(const row of table.rows.slice(1)){rows.push(headers.map((_,i)=>idx[i]>=0?(row[idx[i]]||''):''));}}
       matrix=rows;mapping=parser().mapHeaders(headers);let result=parser().parseMatrix(rows,mapping);result.sourcePages=doc.numPages;result.sourceName=file.name;return result;
+    }catch(error){
+      if(passwordCancelled)throw new Error('PDF password entry was cancelled. Select Analyze statement to try again.');
+      if(/password|encrypted|encrypt/i.test(String(error?.message||'')))throw new Error('PDF.js could not unlock this statement. Check the PDF password and try again.');
+      throw error;
     }finally{
-      // PDF.js exposes destruction on PDFDocumentLoadingTask, not consistently on PDFDocumentProxy.
-      // Guard the call for runtime/version compatibility and avoid masking the actual parse error.
+      if(activePasswordCancel&&activePasswordCancel===passwordCancelForThisTask)activePasswordCancel=null;
+      // Destroy PDF.js worker/document resources after reading, including failures and cancellation.
       try{if(typeof loadingTask.destroy==='function')await loadingTask.destroy();else if(typeof doc?.cleanup==='function')await doc.cleanup();}catch(cleanupError){console.warn('PDF reader cleanup failed:',cleanupError);}
     }
   }
