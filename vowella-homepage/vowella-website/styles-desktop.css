@@ -1,0 +1,46 @@
+/* Desktop art direction: 1024px and wider. Broad, editorial layouts with a balanced 5-card fan. */
+@media (min-width: 1024px) {
+  :root {
+    --page-gutter: clamp(52px, 6.2vw, 116px);
+    --hero-height: clamp(760px, 78vw, 960px);
+    --hero-copy-top: clamp(54px, 5.8vw, 88px);
+    --hero-wordmark-size: clamp(190px, 17.4vw, 270px);
+    --couple-width: min(63vw, 900px);
+    --couple-bottom: -1px;
+    --curve-height: clamp(205px, 18vw, 265px);
+    --rings-width: clamp(118px, 9.4vw, 152px);
+    --rings-bottom: 0px;
+  }
+
+  .hero-hedge { background-position: center 48%; }
+  .hero-copy { padding-inline: 32px; }
+  .hero-eyebrow { font-size: clamp(16px, 1.2vw, 20px); }
+  .hero-wordmark { margin-top: clamp(18px, 2vw, 30px); }
+  .hero-couple { filter: drop-shadow(0 7px 16px rgb(5 14 6 / 11%)); }
+
+  .story { padding-top: clamp(132px, 11.5vw, 170px); padding-bottom: clamp(100px, 8vw, 132px); }
+  .story-quote { max-width: 820px; font-size: clamp(27px, 2.05vw, 34px); }
+  .story-copy { max-width: 650px; font-size: clamp(16px, 1.05vw, 18px); }
+
+  .coverflow-section { min-height: 600px; padding-top: clamp(78px, 7.2vw, 112px); padding-bottom: 98px; }
+  .coverflow { height: clamp(380px, 32vw, 470px); perspective: 1450px; perspective-origin: 50% 44%; transform-style: preserve-3d; }
+  .flow-card { top: 51%; left: 50%; width: clamp(180px, 15vw, 224px); height: clamp(292px, 24vw, 350px); transform-origin: 50% 78%; }
+  .flow-card--far-left, .flow-card.is-far-left { left: 17%; top: 56%; z-index: 1; transform: translate(-50%, -50%) perspective(1300px) rotateY(24deg) rotateZ(-13deg) scale(.78); opacity: .72; }
+  .flow-card--left, .flow-card.is-left { left: 33%; top: 52%; z-index: 2; transform: translate(-50%, -50%) perspective(1300px) rotateY(17deg) rotateZ(-7deg) scale(.9); opacity: .93; }
+  .flow-card--hero, .flow-card.is-featured { left: 50%; top: 47%; z-index: 5; width: clamp(218px, 17.5vw, 260px); height: clamp(344px, 28vw, 402px); transform: translate(-50%, -50%) perspective(1300px) rotateY(0) rotateZ(0) scale(1); opacity: 1; box-shadow: 0 24px 48px rgb(45 24 18 / 23%); }
+  .flow-card--right, .flow-card.is-right { left: 67%; top: 52%; z-index: 2; transform: translate(-50%, -50%) perspective(1300px) rotateY(-17deg) rotateZ(7deg) scale(.9); opacity: .93; }
+  .flow-card--far-right, .flow-card.is-far-right { left: 83%; top: 56%; z-index: 1; transform: translate(-50%, -50%) perspective(1300px) rotateY(-24deg) rotateZ(13deg) scale(.78); opacity: .72; }
+  .flow-card img { object-fit: cover; }
+  .coverflow-hint { margin-top: 20px; font-size: 13px; }
+  .coverflow-butterfly { left: clamp(28px, 4.5vw, 66px); bottom: -30px; }
+
+  .template-row { grid-template-columns: minmax(280px, .84fr) minmax(0, 1.16fr); column-gap: clamp(62px, 7.2vw, 110px); margin-bottom: clamp(86px, 8vw, 124px); padding-bottom: clamp(70px, 6.8vw, 100px); }
+  .template-row--minimalist { grid-template-columns: minmax(0, 1.16fr) minmax(280px, .84fr); }
+  .template-details h2 { font-size: clamp(44px, 4.1vw, 58px); }
+
+  .footer-panel { height: clamp(600px, 52vw, 820px); }
+  .footer-photo { object-position: center 49%; }
+  .footer-hands { object-position: center 46%; }
+  .footer-wordmark { top: 31%; font-size: clamp(96px, 8.4vw, 132px); }
+  .footer-tagline { top: 62%; }
+}

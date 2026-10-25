@@ -1,0 +1,170 @@
+/* Mobile art direction: 680px and below. Taller hero, restrained curve and swipe-first gallery. */
+@media (max-width: 680px) {
+  :root {
+    --page-gutter: 24px;
+    --hero-height: clamp(552px, 146vw, 626px);
+    --hero-copy-top: clamp(36px, 8vw, 48px);
+    --hero-wordmark-size: clamp(82px, 25vw, 102px);
+    --couple-width: clamp(500px, 142vw, 570px);
+    --couple-bottom: clamp(-28px, -6vw, -18px);
+    --curve-height: clamp(172px, 46vw, 194px);
+    --rings-width: clamp(82px, 23vw, 94px);
+    --rings-bottom: clamp(12px, 4vw, 16px);
+  }
+
+  .hero { overflow: visible; }
+  .hero-hedge { background-position: center 46%; }
+  .hero::before { background: linear-gradient(180deg, rgb(4 12 4 / 17%), transparent 45%, rgb(4 12 4 / 7%)); }
+  .hero-copy { padding-inline: 6px; }
+  .hero-eyebrow { font-size: clamp(12px, 3.25vw, 14px); letter-spacing: -.02em; }
+  .hero-wordmark {
+    margin-top: clamp(11px, 3vw, 16px);
+    font-size: var(--hero-wordmark-size);
+    line-height: .82;
+    letter-spacing: -.09em;
+    transform: none;
+  }
+  .hero-couple {
+    bottom: var(--couple-bottom);
+    width: var(--couple-width);
+    filter: drop-shadow(0 5px 9px rgb(5 14 6 / 8%));
+  }
+  .hero-curve { height: var(--curve-height); }
+  .hero-curve-path--desktop { display: none; }
+  .hero-curve-path--mobile { display: block; }
+  .hero-rings { width: var(--rings-width); bottom: var(--rings-bottom); }
+
+  .story {
+    padding: 106px 25px 78px;
+    background: var(--story-paper);
+  }
+  .story-quote {
+    max-width: 34rem;
+    margin-bottom: 24px;
+    font-size: clamp(22px, 5.9vw, 26px);
+    line-height: 1.42;
+  }
+  .story-copy {
+    max-width: 36rem;
+    font-size: clamp(14px, 3.8vw, 15.5px);
+    line-height: 1.78;
+    letter-spacing: -.015em;
+    text-align: left;
+  }
+  .story-signature {
+    margin-top: 30px;
+    padding-right: 1%;
+    font-size: clamp(43px, 12.3vw, 51px);
+  }
+  .story-flower { right: -1px; bottom: -28px; width: clamp(82px, 24vw, 96px); }
+
+  .coverflow-section { padding: 56px 0 78px; overflow: hidden; }
+  .coverflow {
+    --mobile-card-width: clamp(154px, 46vw, 188px);
+    display: flex;
+    align-items: center;
+    gap: clamp(12px, 4.2vw, 18px);
+    width: 100%;
+    height: clamp(328px, 91vw, 376px);
+    margin: 0 auto;
+    padding: 26px max(20px, calc((100vw - var(--mobile-card-width)) / 2)) 30px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    perspective: 1000px;
+    perspective-origin: 50% 48%;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: max(20px, calc((100vw - var(--mobile-card-width)) / 2));
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+    touch-action: pan-x pan-y;
+    outline-offset: -5px;
+  }
+  .coverflow::-webkit-scrollbar { display: none; }
+  .coverflow .flow-card {
+    position: relative;
+    top: auto;
+    left: auto;
+    flex: 0 0 var(--mobile-card-width);
+    width: var(--mobile-card-width);
+    height: auto;
+    aspect-ratio: .635;
+    border-radius: 15px;
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
+    transform-origin: center center;
+    opacity: .84;
+    z-index: 1;
+    box-shadow: 0 14px 28px rgb(45 35 31 / 16%);
+    transition: transform .28s ease-out, opacity .28s ease-out, box-shadow .28s ease-out;
+  }
+  .coverflow .flow-card img { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+  .coverflow .flow-card.is-active { z-index: 6; opacity: 1; transform: perspective(1000px) rotateY(0deg) scale(1); box-shadow: 0 19px 34px rgb(45 24 18 / 21%); }
+  .coverflow .flow-card.is-prev { z-index: 5; opacity: .94; transform: perspective(1000px) rotateY(-17deg) scale(.87); transform-origin: right center; }
+  .coverflow .flow-card.is-next { z-index: 5; opacity: .94; transform: perspective(1000px) rotateY(17deg) scale(.87); transform-origin: left center; }
+  .coverflow .flow-card.is-prev-2 { z-index: 3; opacity: .68; transform: perspective(1000px) rotateY(-24deg) scale(.75); transform-origin: right center; }
+  .coverflow .flow-card.is-next-2 { z-index: 3; opacity: .68; transform: perspective(1000px) rotateY(24deg) scale(.75); transform-origin: left center; }
+  .coverflow-hint { margin: 24px 0 0; font-size: 12px; }
+  .coverflow-butterfly { left: 10px; bottom: -22px; width: 72px; }
+
+  .templates { padding: 78px 23px 78px; }
+  .templates-inner { width: 100%; }
+  .template-row,
+  .template-row--minimalist {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 22px;
+    min-height: 0;
+    margin: 0 0 52px;
+    padding: 0 0 47px;
+  }
+  .template-row:last-of-type { margin-bottom: 0; padding-bottom: 0; }
+  .template-row--minimalist .template-visual,
+  .template-row--minimalist .template-details { order: initial; }
+  .template-visual { width: 100%; }
+  .template-visual img,
+  .template-visual--portrait img,
+  .template-visual--site img,
+  .template-visual--collage img {
+    width: min(100%, 390px);
+    max-height: min(66svh, 420px);
+    object-fit: contain;
+    border-radius: 15px;
+    box-shadow: 0 13px 30px rgb(50 38 25 / 12%);
+  }
+  .template-visual--site img { width: min(100%, 460px); max-height: min(58svh, 350px); }
+  .template-details { padding: 0 1px; }
+  .template-kicker { margin-bottom: 8px; font-size: 9px; letter-spacing: .14em; }
+  .template-details h2 { margin: 0 0 14px; font-size: clamp(32px, 8.4vw, 39px); line-height: 1.05; }
+  .template-details p:not(.template-kicker):not(.template-price) { max-width: 48ch; font-size: 14px; line-height: 1.78; }
+  .template-price { gap: 14px; margin-top: 17px; font-size: 15px; }
+  .view-more { margin-top: 10px; font-size: 17px; }
+
+  .footer-panel { height: clamp(390px, 112vw, 472px); }
+  .footer-photo { object-position: center 48%; }
+  .footer-wordmark { top: 33%; font-size: clamp(57px, 15.5vw, 68px); letter-spacing: -.045em; }
+  .footer-hands {
+    top: auto;
+    right: auto;
+    bottom: -2%;
+    left: -38%;
+    width: 176%;
+    height: auto;
+    object-fit: contain;
+    object-position: center bottom;
+  }
+  .footer-tagline { top: 64%; max-width: calc(100% - 46px); font-size: 12px; }
+  .footer-connect { right: 18px; bottom: 17px; font-size: 8px; }
+}
+
+@media (max-width: 360px) {
+  :root {
+    --hero-wordmark-size: clamp(78px, 24.5vw, 88px);
+    --couple-width: 500px;
+    --curve-height: 174px;
+  }
+  .hero-copy { top: 34px; }
+  .story { padding-inline: 21px; }
+  .coverflow { --mobile-card-width: 152px; gap: 12px; }
+  .template-details p:not(.template-kicker):not(.template-price) { font-size: 13.5px; }
+}

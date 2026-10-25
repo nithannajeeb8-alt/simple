@@ -1,0 +1,41 @@
+/* Tablet art direction: 681px through 1023px. Preserve the wide hero but reduce editorial spread. */
+@media (min-width: 681px) and (max-width: 1023px) {
+  :root {
+    --page-gutter: 34px;
+    --hero-height: clamp(650px, 78svh, 790px);
+    --hero-copy-top: clamp(48px, 6.5vh, 68px);
+    --hero-wordmark-size: clamp(156px, 19vw, 205px);
+    --couple-width: min(80vw, 680px);
+    --couple-bottom: -1px;
+    --curve-height: clamp(185px, 23vw, 220px);
+    --rings-width: clamp(104px, 13vw, 128px);
+    --rings-bottom: 0px;
+  }
+
+  .hero-hedge { background-position: center 47%; }
+  .hero-eyebrow { font-size: 16px; }
+  .hero-wordmark { margin-top: 18px; }
+  .story { padding-top: 126px; padding-bottom: 98px; }
+  .story-copy { max-width: 600px; font-size: 16px; }
+
+  .coverflow-section { min-height: 510px; padding: 76px 0 86px; }
+  .coverflow { height: 350px; perspective: 1100px; perspective-origin: 50% 44%; }
+  .flow-card { width: clamp(150px, 18vw, 184px); height: clamp(240px, 29vw, 294px); }
+  .flow-card--far-left, .flow-card.is-far-left { left: 14%; top: 56%; z-index: 1; transform: translate(-50%, -50%) perspective(1000px) rotateY(22deg) rotateZ(-12deg) scale(.77); opacity: .7; }
+  .flow-card--left, .flow-card.is-left { left: 31%; top: 52%; z-index: 2; transform: translate(-50%, -50%) perspective(1000px) rotateY(14deg) rotateZ(-6deg) scale(.9); opacity: .92; }
+  .flow-card--hero, .flow-card.is-featured { left: 50%; top: 47%; z-index: 5; width: clamp(178px, 22vw, 220px); height: clamp(276px, 34vw, 340px); transform: translate(-50%, -50%) perspective(1000px) rotateY(0) scale(1); opacity: 1; }
+  .flow-card--right, .flow-card.is-right { left: 69%; top: 52%; z-index: 2; transform: translate(-50%, -50%) perspective(1000px) rotateY(-14deg) rotateZ(6deg) scale(.9); opacity: .92; }
+  .flow-card--far-right, .flow-card.is-far-right { left: 86%; top: 56%; z-index: 1; transform: translate(-50%, -50%) perspective(1000px) rotateY(-22deg) rotateZ(12deg) scale(.77); opacity: .7; }
+
+  .templates { padding: 86px 34px 96px; }
+  .template-row, .template-row--minimalist { grid-template-columns: minmax(220px, .9fr) minmax(0, 1.1fr); column-gap: 34px; min-height: 0; margin-bottom: 74px; padding-bottom: 62px; }
+  .template-row--minimalist .template-visual { order: 2; }
+  .template-row--minimalist .template-details { order: 1; }
+  .template-details h2 { margin-bottom: 16px; font-size: clamp(34px, 4vw, 42px); }
+  .template-details p:not(.template-kicker):not(.template-price) { font-size: 15px; line-height: 1.78; }
+  .template-price { margin-top: 18px; font-size: 15px; }
+
+  .footer-panel { height: clamp(500px, 60vw, 680px); }
+  .footer-wordmark { top: 31%; font-size: clamp(84px, 11vw, 116px); }
+  .footer-tagline { top: 63%; }
+}
