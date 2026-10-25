@@ -1,125 +1,178 @@
-// Cover flow: one slow loop, drag/swipe, click a side card, or use the arrow keys.
+// Vowella Cover Flow: desktop fan, native mobile swipe, keyboard support, and reduced-motion respect.
 (() => {
-  const flow = document.querySelector('.flow');
-  if (!flow) return;
+  const gallery = document.querySelector('.coverflow');
+  if (!gallery) return;
 
-  const cards = Array.from(flow.querySelectorAll('.flow-card'));
-  const count = cards.length;
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const AUTOPLAY_MS = 4200;
-  const RESUME_MS = 7000;
+  const cards = Array.from(gallery.querySelectorAll('.flow-card'));
+  if (!cards.length) return;
 
-  let active = Math.floor(count / 2);   // the middle card opens centred
-  let timer = null;
-  let resumeTimer = null;
-  let onScreen = true;
-  let hovering = false;
-  let held = false;
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const mobile = window.matchMedia('(max-width: 680px)');
+  const roles = ['far-left', 'left', 'mid-left', 'featured', 'mid-right', 'far-right'];
+  const depthClasses = ['is-active', 'is-prev', 'is-next', 'is-prev-2', 'is-next-2', 'is-prev-3', 'is-next-3'];
 
-  // Shortest signed distance from the active card, e.g. -2..2 for five cards.
-  const offsetOf = (index) => {
-    let o = (((index - active) % count) + count) % count;
-    if (o > count / 2) o -= count;
-    return o;
-  };
+  let currentRoles = cards.map((card) => {
+    if (card.classList.contains('flow-card--hero')) return 'featured';
+    if (card.classList.contains('flow-card--right')) return 'mid-right';
+    if (card.classList.contains('flow-card--far-right')) return 'far-right';
+    if (card.classList.contains('flow-card--mid-left')) return 'mid-left';
+    if (card.classList.contains('flow-card--left')) return 'left';
+    return 'far-left';
+  });
 
-  function render() {
+  let mobileIndex = Math.max(0, currentRoles.indexOf('featured'));
+  let visible = true;
+  let interacting = false;
+  let resumeTimer = 0;
+  let depthFrame = 0;
+
+  function announceMobileIndex() {
+    const activeCard = cards[mobileIndex];
+    if (!activeCard) return;
+    gallery.setAttribute(
+      'aria-label',
+      `Vowella invitation previews. Preview ${mobileIndex + 1} of ${cards.length}. Use the left and right arrow keys or swipe to explore.`
+    );
     cards.forEach((card, index) => {
-      const o = offsetOf(index);
-      const previous = card.dataset.o === undefined ? o : Number(card.dataset.o);
-      const wrapped = Math.abs(o - previous) > 2;   // card travelling from one end to the other
-
-      if (wrapped) {
-        card.style.transition = 'none';
-        card.style.opacity = '0';
-      }
-      card.dataset.o = String(o);
-      card.style.setProperty('--o', o);
-      card.style.setProperty('--abs', Math.abs(o));
-      card.style.zIndex = String(10 - Math.abs(o));
-      card.setAttribute('aria-hidden', o === 0 ? 'false' : 'true');
-
-      if (wrapped) {
-        void card.offsetWidth;          // commit the jump, then fade the card back in
-        card.style.transition = '';
-        card.style.opacity = '';
-      }
+      if (index === mobileIndex) card.setAttribute('aria-current', 'true');
+      else card.removeAttribute('aria-current');
     });
   }
 
-  function goTo(index) {
-    active = ((index % count) + count) % count;
-    render();
+  function applyDesktopRoles() {
+    cards.forEach((card, index) => {
+      roles.forEach((role) => card.classList.remove(`is-${role}`));
+      card.classList.add(`is-${currentRoles[index]}`);
+    });
   }
 
-  function play() {
-    stop();
-    if (reduceMotion.matches) return;
-    timer = window.setInterval(() => {
-      if (document.hidden || !onScreen || hovering || held) return;
-      goTo(active + 1);
-    }, AUTOPLAY_MS);
+  function centerCard(index, behavior = 'smooth') {
+    const card = cards[index];
+    if (!mobile.matches || !card) return;
+    const galleryRect = gallery.getBoundingClientRect();
+    const cardRect = card.getBoundingClientRect();
+    const cardCenter = cardRect.left + cardRect.width / 2;
+    const galleryCenter = galleryRect.left + gallery.clientWidth / 2;
+    const target = gallery.scrollLeft + cardCenter - galleryCenter;
+    const maxScroll = Math.max(0, gallery.scrollWidth - gallery.clientWidth);
+    gallery.scrollTo({
+      left: Math.min(maxScroll, Math.max(0, target)),
+      behavior: reducedMotion.matches ? 'auto' : behavior
+    });
   }
-  function stop() { window.clearInterval(timer); timer = null; }
 
-  function pauseThenResume() {
-    held = true;
+  function updateMobileDepth() {
+    depthFrame = 0;
+    if (!mobile.matches) return;
+
+    const galleryRect = gallery.getBoundingClientRect();
+    const center = galleryRect.left + gallery.clientWidth / 2;
+    const positions = cards.map((card, index) => {
+      const rect = card.getBoundingClientRect();
+      return { index, center: rect.left + rect.width / 2 };
+    });
+    const active = positions.reduce((best, item) =>
+      Math.abs(item.center - center) < Math.abs(best.center - center) ? item : best
+    );
+    mobileIndex = active.index;
+
+    const leftOfActive = positions
+      .filter((item) => item.center < active.center)
+      .sort((a, b) => b.center - a.center);
+    const rightOfActive = positions
+      .filter((item) => item.center > active.center)
+      .sort((a, b) => a.center - b.center);
+
+    cards.forEach((card) => depthClasses.forEach((name) => card.classList.remove(name)));
+    cards[mobileIndex].classList.add('is-active');
+    leftOfActive.forEach((item, order) => {
+      cards[item.index].classList.add(order === 0 ? 'is-prev' : `is-prev-${order + 1}`);
+    });
+    rightOfActive.forEach((item, order) => {
+      cards[item.index].classList.add(order === 0 ? 'is-next' : `is-next-${order + 1}`);
+    });
+    announceMobileIndex();
+  }
+
+  function scheduleMobileDepth() {
+    if (!depthFrame) depthFrame = window.requestAnimationFrame(updateMobileDepth);
+  }
+
+  function pauseAfterInteraction() {
+    interacting = true;
     window.clearTimeout(resumeTimer);
-    resumeTimer = window.setTimeout(() => { held = false; }, RESUME_MS);
+    resumeTimer = window.setTimeout(() => { interacting = false; }, 6500);
   }
 
-  // Pointer: drag to move, tap a side card to bring it forward.
-  let startX = 0;
-  let startY = 0;
-  let dragging = false;
+  function advance() {
+    // Keep autoplay desktop-only. Native mobile scrolling should never be pulled away by a timer.
+    if (reducedMotion.matches || !visible || interacting || document.hidden || mobile.matches) return;
+    currentRoles = currentRoles.map((_, index) => currentRoles[(index + currentRoles.length - 1) % currentRoles.length]);
+    applyDesktopRoles();
+  }
 
-  flow.addEventListener('pointerdown', (event) => {
-    if (event.pointerType === 'mouse' && event.button !== 0) return;
-    startX = event.clientX;
-    startY = event.clientY;
-    dragging = true;
-    pauseThenResume();
-  });
-
-  flow.addEventListener('pointerup', (event) => {
-    if (!dragging) return;
-    dragging = false;
-    flow.classList.remove('is-dragging');
-    const dx = event.clientX - startX;
-    const dy = event.clientY - startY;
-
-    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
-      goTo(active + (dx < 0 ? 1 : -1));
-      return;
+  function initializeLayout() {
+    if (mobile.matches) {
+      const featuredIndex = Math.max(0, currentRoles.indexOf('featured'));
+      mobileIndex = featuredIndex;
+      window.requestAnimationFrame(() => {
+        centerCard(featuredIndex, 'auto');
+        scheduleMobileDepth();
+      });
+    } else {
+      applyDesktopRoles();
+      cards.forEach((card) => card.removeAttribute('aria-current'));
+      gallery.setAttribute(
+        'aria-label',
+        'Vowella invitation previews. Use the left and right arrow keys to explore the rotating display.'
+      );
     }
-    if (Math.abs(dx) < 8 && Math.abs(dy) < 8) {
-      const card = event.target.closest('.flow-card');
-      if (card) goTo(cards.indexOf(card));
-    }
-  });
+  }
 
-  flow.addEventListener('pointermove', (event) => {
-    if (dragging && Math.abs(event.clientX - startX) > 8) flow.classList.add('is-dragging');
-  });
-  flow.addEventListener('pointercancel', () => { dragging = false; flow.classList.remove('is-dragging'); });
+  gallery.addEventListener('pointerdown', pauseAfterInteraction, { passive: true });
+  gallery.addEventListener('touchstart', pauseAfterInteraction, { passive: true });
+  gallery.addEventListener('focusin', pauseAfterInteraction);
+  gallery.addEventListener('focusout', pauseAfterInteraction);
+  gallery.addEventListener('pointerenter', () => { if (!mobile.matches) interacting = true; });
+  gallery.addEventListener('pointerleave', () => { interacting = false; });
+  gallery.addEventListener('scroll', scheduleMobileDepth, { passive: true });
 
-  flow.addEventListener('pointerenter', (event) => { if (event.pointerType === 'mouse') hovering = true; });
-  flow.addEventListener('pointerleave', () => { hovering = false; });
-
-  flow.addEventListener('keydown', (event) => {
-    if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return;
+  gallery.addEventListener('keydown', (event) => {
+    if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
     event.preventDefault();
-    pauseThenResume();
-    goTo(active + (event.key === 'ArrowRight' ? 1 : -1));
+    pauseAfterInteraction();
+
+    const direction = event.key === 'ArrowRight' ? 1 : -1;
+    if (mobile.matches) {
+      mobileIndex = (mobileIndex + direction + cards.length) % cards.length;
+      centerCard(mobileIndex);
+    } else {
+      currentRoles = direction > 0
+        ? currentRoles.map((_, index) => currentRoles[(index + currentRoles.length - 1) % currentRoles.length])
+        : currentRoles.map((_, index) => currentRoles[(index + 1) % currentRoles.length]);
+      applyDesktopRoles();
+    }
   });
 
-  // Only run while the section is in view.
   if ('IntersectionObserver' in window) {
-    new IntersectionObserver(([entry]) => { onScreen = entry.isIntersecting; }, { threshold: 0.25 }).observe(flow);
+    const observer = new IntersectionObserver((entries) => {
+      visible = entries.some((entry) => entry.isIntersecting);
+    }, { threshold: 0.12 });
+    observer.observe(gallery);
   }
 
-  reduceMotion.addEventListener?.('change', play);
+  if ('ResizeObserver' in window) {
+    const observer = new ResizeObserver(scheduleMobileDepth);
+    observer.observe(gallery);
+  }
 
-  render();
-  play();
+  window.addEventListener('resize', initializeLayout, { passive: true });
+  window.addEventListener('load', initializeLayout, { once: true });
+  if (typeof mobile.addEventListener === 'function') mobile.addEventListener('change', initializeLayout);
+  else if (typeof mobile.addListener === 'function') mobile.addListener(initializeLayout);
+  if (typeof reducedMotion.addEventListener === 'function') reducedMotion.addEventListener('change', initializeLayout);
+  else if (typeof reducedMotion.addListener === 'function') reducedMotion.addListener(initializeLayout);
+
+  initializeLayout();
+  window.setInterval(advance, 6200);
 })();
