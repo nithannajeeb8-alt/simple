@@ -1316,6 +1316,8 @@ body { background:var(--paper); color:var(--ink); }
 }
 
 @media (max-width: 640px) {
+  /* Hide the carousel navigation strip on phones; swipe and keyboard navigation remain available. */
+  #designs.dark .ctrl { display: none !important; }
   #designs.dark .ctrl { gap: 6px; margin-top: 10px; padding: 4px 5px; }
   #designs.dark .arr { width: 46px; height: 46px; min-width: 46px; min-height: 46px; border-radius: 12px; }
   #designs.dark .dots { gap: 0; }
