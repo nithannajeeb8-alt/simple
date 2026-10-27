@@ -65,7 +65,7 @@
     const raw=clean(value);if(/^(?:ignored|other column|unmapped)\b/i.test(raw))return null;
     const h=norm(raw);if(!h)return null;
     if(/^(?:direction|transaction type|txn type|tran type|dr cr|cr dr|type|credit debit|debit credit)$/.test(h)||/^(?:paid to received from)$/.test(h))return 'direction';
-    if(/^(?:transaction )?(?:date|txn date|tran date|value date|posting date|transaction date|date of transaction|txn dt|tran dt|trans date|value dt|transaction dt|entry date|dt)$/.test(h)||/\b(value date|transaction date|txn date|tran date|posting date|transaction dt)\b/.test(h))return 'date';
+    if(/^(?:transaction )?(?:date|txn date|tran date|value date|post date|posting date|transaction date|date of transaction|txn dt|tran dt|trans date|value dt|post dt|posting dt|transaction dt|entry date|dt)$/.test(h)||/\b(value date|post date|transaction date|txn date|tran date|posting date|transaction dt)\b/.test(h))return 'date';
     if(/\b(opening balance|closing balance|running balance|available balance|balance amount|balance|closing bal|balance rs|ledger balance|available bal|running bal|closing bal)\b/.test(h)||/^bal(?:ance)?$/.test(h))return 'balance';
     if(/\b(withdrawal|withdrawals|withdrawn|withdrawl|debit|debits|debit amount|withdrawal amount|paid out|money out|dr amount|withdrawal amt|withdrawal dr|debit dr|outflow|money withdrawn|withdra)\b/.test(h)||/^(?:dr|amount dr|amt dr|dr amount|dr amt|withdrawal amt|withdra|withdra wal|withdraw|withdrawl|debit amt)$/.test(h))return 'debit';
     if(/\b(deposit|deposits|deposited|deposite|credit|credits|credit amount|deposit amount|paid in|money in|cr amount|deposit amt|deposit cr|credit cr|inflow|money received|depos)\b/.test(h)||/^(?:cr|amount cr|amt cr|cr amount|cr amt|deposit amt|depos|credit amt)$/.test(h))return 'credit';
@@ -79,7 +79,7 @@
     const text=(Array.isArray(value)?value.map(clean).join(' '):String(value??'')).toLowerCase();
     const compact=norm(text);
     if(/\bicici bank\b/.test(text)||(/\btran id\b/.test(compact)&&/withdra|deposit/.test(compact)))return {id:'icici',name:'ICICI Bank',narrationFlow:'post'};
-    if(/\bstate bank of india\b/.test(text)||(/\btxn date\b/.test(compact)&&/ref no cheque|withdrawal amt/.test(compact)))return {id:'sbi',name:'State Bank of India',narrationFlow:'post'};
+    if(/\bstate bank of india\b/.test(text)||(/\btxn date\b/.test(compact)&&/ref no cheque|withdrawal amt/.test(compact))||(/\bpost date\b/.test(compact)&&/ref no cheque no/.test(compact)&&/\bdebit\b/.test(compact)))return {id:'sbi',name:'State Bank of India',narrationFlow:'post'};
     if(/\bcanara bank\b/.test(text)||(/opening balance/.test(compact)&&/particulars/.test(compact)&&/chq/.test(compact)))return {id:'canara',name:'Canara Bank',narrationFlow:'post'};
     if(/\bkotak mahindra\b/.test(text)||(/transaction details/.test(compact)&&/cheque reference/.test(compact)))return {id:'kotak',name:'Kotak Mahindra Bank',narrationFlow:'post'};
     if(/\bgoogle pay\b|\bgpay\b/.test(text)||/upi transaction id/.test(compact)&&/paid to|received from/.test(compact))return {id:'gpay',name:'Google Pay',narrationFlow:'post'};
@@ -118,7 +118,7 @@
       if(map[kind]===null)map[kind]=index;
       // A value/posting date is secondary when the statement also exposes a transaction date.
       if(kind==='date'&&map.date!==index){const existing=norm(headers[map.date]||''),candidate=norm(header);
-        const primary=/\b(?:txn|tran|transaction|posting|entry) date\b|\b(?:txn|tran) dt\b/.test(candidate);
+        const primary=/\b(?:txn|tran|transaction|post|posting|entry) date\b|\b(?:txn|tran|post|posting) dt\b/.test(candidate);
         const existingSecondary=/\b(?:value|effective) date\b|\bvalue dt\b/.test(existing);
         if(primary&&existingSecondary)map.date=index;
       }
@@ -240,7 +240,7 @@
       const rawSegments=pdfHeaderSegments(nearbyItems);
       const labelled=rawSegments.map(segment=>({...segment,kind:headerType(segment.text,bankProfile.id)}));
       const dateSegments=labelled.filter(s=>s.kind==='date');
-      const dateCaption=dateSegments.find(s=>/txn|trans|transaction|posting|entry/.test(norm(s.text))&&!/value date|effective date/.test(norm(s.text)))||dateSegments.find(s=>!/value date|effective date/.test(norm(s.text)))||dateSegments[0];
+      const dateCaption=dateSegments.find(s=>/txn|trans|transaction|post|posting|entry/.test(norm(s.text))&&!/value date|effective date/.test(norm(s.text)))||dateSegments.find(s=>!/value date|effective date/.test(norm(s.text)))||dateSegments[0];
       if(!dateCaption)continue;
       const description=labelled.find(s=>s.kind==='description');
       const money=labelled.some(s=>['amount','debit','credit'].includes(s.kind));

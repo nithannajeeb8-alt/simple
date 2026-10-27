@@ -55,7 +55,8 @@
         if (due >= new Date(start.getFullYear(), start.getMonth(), start.getDate())) {
           // If today's 9 AM passed before sync, deliver once shortly after sync.
           const scheduledAt = due <= start ? new Date(start.getTime() + 60000) : due;
-          events.push({ id: `${reminder.id}:${date}`, title: String(reminder.name || 'Payment reminder').slice(0, 100), scheduledAt: scheduledAt.toISOString() });
+          // Do not send reminder names or other user-entered details to the push server.
+          events.push({ id: `${reminder.id}:${date}`, scheduledAt: scheduledAt.toISOString() });
         }
         if (repeat === 'once') break;
         date = addOccurrence(date, repeat, anchorDay);

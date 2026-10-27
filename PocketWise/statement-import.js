@@ -158,8 +158,17 @@
     if(cols.length<3)return null;
     const rows=source.map(row=>{const out=Array(cols.length).fill('');for(const cell of row.cells){let best=0,dist=Infinity;cols.forEach((x,i)=>{const d=Math.abs(x-cell.x);if(d<dist){dist=d;best=i;}});out[best]=(out[best]+' '+cell.text).trim();}return out;});
     const headerAt=parser().findHeaderRow(rows);if(headerAt>=0)return rows.slice(headerAt);
-    const data=rows.filter(row=>row.some(cell=>parser().parseDate(cell))||row.some(cell=>/opening balance|closing balance|brought forward/i.test(cell)));
-    if(!data.some(row=>row.some(cell=>parser().parseDate(cell))&&row.filter(cell=>parser().parseMoney(cell).value!==null).length>=1))return null;
+    // SBI and other banks often begin with an account-information page. Its generated
+    // statement date and available balance are metadata, not transactions. In the fallback
+    // path, require a date, a monetary value and meaningful narration before accepting a row.
+    const data=rows.filter(row=>{
+      const texts=row.map(cell=>String(cell||'').trim()).filter(Boolean);
+      const hasDate=texts.some(cell=>parser().parseDate(cell));
+      const moneyCount=texts.filter(cell=>parser().parseMoney(cell).value!==null).length;
+      const meaningfulNarration=texts.some(cell=>cell.length>=3&&!parser().parseDate(cell)&&parser().parseMoney(cell).value===null&&!/^(?:date|statement date|account number|account no|cif no|ifsc|micr|available balance|uncleared balance|opening balance|closing balance|page no|customer name|branch|address|email|account description|currency)$/i.test(cell));
+      return hasDate&&moneyCount>=1&&meaningfulNarration;
+    });
+    if(!data.length)return null;
     return [Array.from({length:cols.length},(_,i)=>`Column ${i+1}`),...data];
   }
   function decorateRiskyRows(rows){for(const row of rows){const d=String(row.description||'');if(/\b(?:own account|self transfer|transfer to own|transfer from own|between own|internal transfer|credit card payment|credit card bill|cc payment|card bill payment|atm cash withdrawal)\b/i.test(d)){row.transferReview=true;row.originalType=row.type;row.type='review';row.selected=false;row.issue=row.issue||'Possible transfer, card settlement or cash movement. Choose how to classify it.';}}}

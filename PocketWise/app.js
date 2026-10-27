@@ -259,6 +259,29 @@
     if(record.settings?.smartRules!==undefined&&(!Array.isArray(record.settings.smartRules)||record.settings.smartRules.some(rule=>!rule||typeof rule!=='object'||Array.isArray(rule)||!validRecordId(rule.id))))return false;
     return record.transactions.every(tx=>validStoredAmount(tx.amount)&&validStoredDate(tx.date));
   }
+  const BACKUP_COLLECTION_LIMITS={transactions:100000,accounts:500,activities:2000,debts:20000,goals:20000,reminders:20000,smartRules:2000,seenAlerts:10000,notifications:10000,sentAlerts:10000};
+  function hasSafeBackupShape(value,depth=0,key=''){
+    if(depth>12)return false;
+    if(value===null||typeof value==='boolean')return true;
+    if(typeof value==='number')return Number.isFinite(value);
+    if(typeof value==='string')return value.length<=5000;
+    if(Array.isArray(value)){
+      const limit=BACKUP_COLLECTION_LIMITS[key]??100000;
+      if(value.length>limit)return false;
+      return value.every(item=>hasSafeBackupShape(item,depth+1,''));
+    }
+    if(typeof value!=='object')return false;
+    const keys=Object.keys(value);
+    if(keys.length>2000||keys.some(k=>k.length>200||['__proto__','prototype','constructor'].includes(k)))return false;
+    return keys.every(k=>hasSafeBackupShape(value[k],depth+1,k));
+  }
+  function isSafeBackupState(record){
+    if(!isLoadableState(record)||!hasSafeBackupShape(record))return false;
+    if(record.transactions.length>BACKUP_COLLECTION_LIMITS.transactions||record.accounts.length>BACKUP_COLLECTION_LIMITS.accounts||record.activities.length>BACKUP_COLLECTION_LIMITS.activities)return false;
+    for(const key of ['debts','goals','reminders'])if(record[key]!==undefined&&(!Array.isArray(record[key])||record[key].length>BACKUP_COLLECTION_LIMITS[key]))return false;
+    if(record.settings){for(const key of ['smartRules','seenAlerts','notifications','sentAlerts'])if(record.settings[key]!==undefined&&(!Array.isArray(record.settings[key])||record.settings[key].length>BACKUP_COLLECTION_LIMITS[key]))return false;}
+    return true;
+  }
   function normalizeStateShape(record){
     const defaults=initialState(),source=record&&typeof record==='object'?record:{};
     const next={...defaults,...source};
@@ -833,16 +856,18 @@
   function openNotifications(){const active=makeAlerts().filter(a=>a.id!=='all-clear'),history=state.settings.notifications||[],previousSeen=[...(state.settings.seenAlerts||[])];active.forEach(a=>{if(!state.settings.seenAlerts.includes(a.id))state.settings.seenAlerts.push(a.id)});$('#notifications-content').innerHTML=(history.length?[...history.slice(0,20)]:active).map(a=>`<div class="notification-record"><span class="alert-symbol ${a.type||'blue'}">${icon(a.icon||'bell')}</span><div><strong>${escapeHTML(a.title||'Financial reminder')}</strong><p>${escapeHTML(a.body||'')}</p><small>${escapeHTML(a.createdAt?new Date(a.createdAt).toLocaleString():a.time||'Current')}</small></div></div>`).join('')||'<div class="empty-state"><span class="empty-icon">'+icon('bell')+'</span><h3>All caught up</h3><p>Important reminders will show up here.</p></div>';$('#notifications-modal').showModal();persist().then(()=>renderAlerts()).catch(error=>{state.settings.seenAlerts=previousSeen;console.error('Could not persist notification read state.',error);toast('Could not save notification read status. Your other records are unchanged.','error');renderAlerts();});}
   function downloadBlob(filename,blob){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=filename;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1800);}
   async function exportBackup(){const snapshot=JSON.stringify(state);state.settings.lastBackup=new Date().toISOString();if(!(await persistMutation(snapshot,'Could not update backup metadata. Your previous records were restored.')))return;const pack={app:'Pocketwise',format:'pocketwise-backup',version:2,exportedAt:state.settings.lastBackup,description:'Complete local financial records. Keep this file private.',data:state};downloadBlob(`pocketwise-backup-${today()}.json`,new Blob([JSON.stringify(pack,null,2)],{type:'application/json'}));renderSettingsSummary();toast('Full backup exported. Keep it somewhere safe.');}
-  function csvCell(v){let s=String(v??'');if(/^[=+\-@\t\r]/.test(s)&&!/^-?\d+(\.\d+)?$/.test(s))s="'"+s;return `"${s.replace(/"/g,'""')}"`;}
+  function csvCell(v){let s=String(v??'');const formulaPrefix=/^[\u0000-\u0020]*[=+\-@]/.test(s);const plainNumber=/^-?\d+(?:\.\d+)?$/.test(s);if(formulaPrefix&&!plainNumber)s="'"+s;return `"${s.replace(/"/g,'""')}"`;}
   function exportCSV(){const headers=['id','date','type','amount_inr','activity','account','to_account','debt_person','note'];const rows=state.transactions.slice().sort((a,b)=>a.date.localeCompare(b.date)).map(t=>[t.id,t.date,typeLabel(t.type),t.amount,txActivity(t).name,accountById(t.accountId).name,t.toAccountId?accountById(t.toAccountId).name:'',t.debtId?debtById(t.debtId)?.person||'':'',t.note]);const csv=[headers,...rows].map(r=>r.map(csvCell).join(',')).join('\r\n');downloadBlob(`pocketwise-transactions-${today()}.csv`,new Blob(['\ufeff',csv],{type:'text/csv;charset=utf-8'}));toast('CSV ready for your spreadsheet.');}
   async function importBackup(file){
     if(!file)return;
     const snapshot=JSON.stringify(state);let mutated=false;
     try{
+      // Check the Blob size before file.text() allocates a second full copy in memory.
+      if(!Number.isFinite(file.size)||file.size<=0||file.size>50*1024*1024)throw new Error('Choose a non-empty backup smaller than 50 MB. No records were changed.');
       const text=await file.text(),raw=JSON.parse(text),imported=raw?.data||raw;
       if(!imported||typeof imported!=='object'||!Array.isArray(imported.transactions)||!Array.isArray(imported.accounts)||!Array.isArray(imported.activities))throw new Error('That file does not look like a Pocketwise backup.');
       if(imported.transactions.length>100000||imported.accounts.length>500||imported.activities.length>2000)throw new Error('This backup is larger than PocketWise can safely restore in one step.');
-      if(!isLoadableState(imported)||imported.transactions.some(t=>!t||typeof t!=='object'||!t.id||!Number.isFinite(Number(t.amount))||Number(t.amount)<0||typeof t.date!=='string'||!t.date))throw new Error('The backup contains malformed transaction or state records. No records were changed.');
+      if(!isSafeBackupState(imported)||imported.transactions.some(t=>!t||typeof t!=='object'||!t.id||!Number.isFinite(Number(t.amount))||Number(t.amount)<0||typeof t.date!=='string'||!t.date))throw new Error('The backup contains malformed or oversized state records. No records were changed.');
       if(!confirm(`Backup contains ${imported.transactions.length} transactions, ${imported.accounts.length} accounts, and ${imported.debts?.length||0} debt records.\n\nOK = Replace this workspace\nCancel = Keep current records`)){
         const merge=confirm('Merge records instead? Existing record identifiers will not be duplicated.');if(!merge)return;
         mutated=true;ensurePersonalWorkspace();
@@ -1309,7 +1334,7 @@
     };
     const onImageSelected=(input)=>{const file=input?.files?.[0];if(!file)return;if(!file.type.startsWith('image/')){toast('Choose an image file.','error');input.value='';return;}if(file.size>15*1024*1024){toast('Choose an image smaller than 15 MB.','error');input.value='';return;}selectedFile=file;preview.src=URL.createObjectURL(file);preview.hidden=false;run.disabled=false;status.textContent=`Selected ${file.name}. Tap “Read screenshot with OCR” to extract the text.`;};
     gallery?.addEventListener('change',()=>onImageSelected(gallery));camera?.addEventListener('change',()=>onImageSelected(camera));
-    run?.addEventListener('click',async()=>{const file=selectedFile;if(!file)return;run.disabled=true;status.textContent='Loading OCR engine…';try{if(!window.Tesseract){await new Promise((resolve,reject)=>{const script=document.createElement('script');script.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';script.onload=resolve;script.onerror=()=>reject(new Error('Could not load OCR. Connect to the internet, or paste text manually.'));document.head.appendChild(script);});}status.textContent='Reading screenshot…';const prepared=await prepareOcrImage(file);status.textContent='Enhancing screenshot locally…';const result=await window.Tesseract.recognize(prepared,'eng',{logger:m=>{if(m.status==='recognizing text')status.textContent=`Reading screenshot… ${Math.round((m.progress||0)*100)}%`;}});const recognized=String(result?.data?.text||'').trim();if(!recognized)throw new Error('No readable text found. Try a clearer screenshot or paste the payment text.');$('#pw-import-raw').value=recognized;status.textContent='Text extracted. Review it below, then tap Extract details.';$('#pw-import-raw').focus({preventScroll:true});}catch(error){status.textContent=error.message||'OCR failed. Paste the text manually instead.';}finally{run.disabled=false;}});
+    run?.addEventListener('click',async()=>{const file=selectedFile;if(!file)return;run.disabled=true;status.textContent='Loading OCR engine…';try{if(!window.Tesseract){await new Promise((resolve,reject)=>{const script=document.createElement('script');script.src='https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';script.crossOrigin='anonymous';script.referrerPolicy='no-referrer';script.onload=resolve;script.onerror=()=>reject(new Error('Could not load OCR. Connect to the internet, or paste text manually.'));document.head.appendChild(script);});}status.textContent='Reading screenshot…';const prepared=await prepareOcrImage(file);status.textContent='Enhancing screenshot locally…';const result=await window.Tesseract.recognize(prepared,'eng',{logger:m=>{if(m.status==='recognizing text')status.textContent=`Reading screenshot… ${Math.round((m.progress||0)*100)}%`;}});const recognized=String(result?.data?.text||'').trim();if(!recognized)throw new Error('No readable text found. Try a clearer screenshot or paste the payment text.');$('#pw-import-raw').value=recognized;status.textContent='Text extracted. Review it below, then tap Extract details.';$('#pw-import-raw').focus({preventScroll:true});}catch(error){status.textContent=error.message||'OCR failed. Paste the text manually instead.';}finally{run.disabled=false;}});
   }
   function pwReviewImport(d){if(d.ignored){toast(d.reason,'amber');return;}if(d.error){toast(d.error,'error');return;}if(pwHasDuplicate(d)){toast('This looks like a duplicate transaction. Nothing was added.','amber');return;}
     const details=[d.party,d.upi?`UPI: ${d.upi}`:'',d.accountSuffix?`Account ending ${d.accountSuffix}`:'',d.reference?`RRN: ${d.reference}`:'',`Imported text: ${d.raw.slice(0,240)}`].filter(Boolean).join(' · ');

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pocketwise-shell-v2.3.22';
+const CACHE_NAME = 'pocketwise-shell-v2.3.23';
 const BASE_URL = self.registration.scope;
 const asset = path => new URL(path, BASE_URL).href;
 const APP_SHELL = [
@@ -58,24 +58,35 @@ self.addEventListener('push', event => {
   let payload = {};
   try { payload = event.data ? event.data.json() : {}; }
   catch (_) { payload = { body: event.data ? event.data.text() : '' }; }
-  const title = String(payload.title || 'PocketWise');
+  const title = String(payload.title || 'PocketWise').slice(0, 100);
+  const requestedUrl = new URL(String(payload.url || BASE_URL), BASE_URL);
+  const scopeUrl = new URL(BASE_URL);
+  const safeUrl = requestedUrl.origin === scopeUrl.origin && requestedUrl.pathname.startsWith(scopeUrl.pathname)
+    ? requestedUrl.href : BASE_URL;
   const options = {
-    body: String(payload.body || 'You have an update in PocketWise.'),
+    body: String(payload.body || 'You have an update in PocketWise.').slice(0, 240),
     icon: asset('assets/icons/icon-192.PNG'),
     badge: asset('assets/icons/icon-192.PNG'),
-    tag: String(payload.tag || 'pocketwise-push'),
+    tag: String(payload.tag || 'pocketwise-push').slice(0, 100),
     renotify: Boolean(payload.renotify),
-    data: { url: payload.url || BASE_URL }
+    data: { url: safeUrl }
   };
   event.waitUntil(self.registration.showNotification(title, options));
 });
 
 self.addEventListener('notificationclick', event => {
   event.notification.close();
-  const target = new URL(event.notification.data && event.notification.data.url || BASE_URL, BASE_URL).href;
+  let target = BASE_URL;
+  try {
+    const candidate = new URL(event.notification.data && event.notification.data.url || BASE_URL, BASE_URL);
+    const scopeUrl = new URL(BASE_URL);
+    if (candidate.origin === scopeUrl.origin && candidate.pathname.startsWith(scopeUrl.pathname)) target = candidate.href;
+  } catch (_) { target = BASE_URL; }
   event.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clients => {
     for (const client of clients) {
-      if (client.url.startsWith(BASE_URL) && 'focus' in client) return client.focus();
+      const current = new URL(client.url);
+      const scopeUrl = new URL(BASE_URL);
+      if (current.origin === scopeUrl.origin && current.pathname.startsWith(scopeUrl.pathname) && 'focus' in client) return client.focus();
     }
     return self.clients.openWindow ? self.clients.openWindow(target) : undefined;
   }));
