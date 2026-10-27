@@ -1,4 +1,4 @@
-/* Optional local WebLLM column mapper. The statement rows never enter this worker. */
+/* Optional on-device WebLLM mapper. Only bounded sample rows explicitly supplied for column mapping enter this worker; no statement data is posted to a remote inference API. */
 import './local-ai-cache-recovery.js';
 const MODEL_ID='Qwen2.5-1.5B-Instruct-q4f16_1-MLC';
 const WEBLLM_URL='https://esm.run/@mlc-ai/web-llm@0.2.86';
