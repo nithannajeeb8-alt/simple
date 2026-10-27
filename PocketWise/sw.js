@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pocketwise-shell-v2.3.24';
+const CACHE_NAME = 'pocketwise-shell-v2.3.25';
 const BASE_URL = self.registration.scope;
 const asset = path => new URL(path, BASE_URL).href;
 const APP_SHELL = [

@@ -512,13 +512,33 @@
   function renderPage(page){if(page==='home'){renderRecent();renderDailyStory();renderAlerts();updateMoneyText();scheduleCharts()}if(page==='activity'){renderActivity();renderFrequent()}if(page==='insights'){renderInsights();scheduleCharts()}if(page==='settings'){renderSettingsSummary()}syncSmartNavIndicator();}
   function createTxIcon(tx){const a=txActivity(tx);let name=a.icon||'receipt',color='';if(tx.type==='income'||tx.type==='repay_in'||tx.type==='refund'){color='positive';if(tx.type==='income')name='income';else if(tx.type==='refund')name='receipt';}else if(tx.type==='expense'||tx.type==='repay_out'){color='negative';if(tx.type==='expense')name=a.icon||'receipt';}else if(tx.type==='transfer'){color='blue';name='transfer';}else if(tx.type==='borrowed'||tx.type==='lent'){color='amber';name='people';}return `<span class="transaction-icon ${color}">${icon(name)}</span>`;}
   function previousLocalDate(){const d=new Date();d.setDate(d.getDate()-1);return localDate(d);}
-  function dailyStoryData(){
-    const date=previousLocalDate();
+  function dailyStoryDates(){
+    const dates=[];
+    const base=new Date();base.setHours(12,0,0,0);
+    for(let offset=1;offset<=7;offset++){const d=new Date(base);d.setDate(d.getDate()-offset);dates.push(localDate(d));}
+    return dates;
+  }
+  function storyBalanceDeltaMinor(tx,accountIds){
+    if(!tx||!accountIds)return 0;
+    const amount=toMinorUnits(tx.amount);
+    if(tx.type==='transfer')return (accountIds.has(tx.toAccountId)?amount:0)-(accountIds.has(tx.accountId)?amount:0);
+    return accountIds.has(tx.accountId)?toMinorUnits(txCashDelta(tx)):0;
+  }
+  function storyBalanceBefore(date){
+    const accounts=state.accounts||[],accountIds=new Set(accounts.map(account=>account.id));
+    let totalMinor=accounts.reduce((sum,account)=>sum+toMinorUnits(account.openingBalance),0);
+    (state.transactions||[]).forEach(tx=>{if(tx&&String(tx.date||'')<date)totalMinor+=storyBalanceDeltaMinor(tx,accountIds);});
+    return totalMinor;
+  }
+  function dailyStoryData(date=previousLocalDate()){
     const transactions=state.transactions.filter(tx=>tx&&tx.date===date).sort((a,b)=>String(b.createdAt||b.id||'').localeCompare(String(a.createdAt||a.id||'')));
-    let incomeMinor=0,expenseMinor=0,refundMinor=0;
+    let incomeMinor=0,expenseMinor=0,refundMinor=0,dayBalanceDeltaMinor=0;
     const categoryMinor=new Map();
+    const accountIds=new Set((state.accounts||[]).map(account=>account.id));
+    const openingBalanceMinor=storyBalanceBefore(date);
     transactions.forEach(tx=>{
       const amount=toMinorUnits(tx.amount);
+      dayBalanceDeltaMinor+=storyBalanceDeltaMinor(tx,accountIds);
       if(tx.type==='income')incomeMinor+=amount;
       else if(tx.type==='expense'){
         expenseMinor+=amount;
@@ -528,9 +548,10 @@
     });
     const categories=[...categoryMinor.entries()].map(([name,minor])=>({name,value:fromMinorUnits(minor)})).filter(item=>item.value>0).sort((a,b)=>b.value-a.value);
     const visibleCategories=categories.length>6?[...categories.slice(0,5),{name:'Other categories',value:fromMinorUnits(categories.slice(5).reduce((sum,item)=>sum+toMinorUnits(item.value),0))}]:categories;
-    return {date,transactions,income:fromMinorUnits(incomeMinor),expenses:fromMinorUnits(expenseMinor),refunds:fromMinorUnits(refundMinor),net:fromMinorUnits(incomeMinor-expenseMinor+refundMinor),categories:visibleCategories};
+    return {date,transactions,income:fromMinorUnits(incomeMinor),expenses:fromMinorUnits(expenseMinor),refunds:fromMinorUnits(refundMinor),net:fromMinorUnits(incomeMinor-expenseMinor+refundMinor),categories:visibleCategories,openingBalance:fromMinorUnits(openingBalanceMinor),closingBalance:fromMinorUnits(openingBalanceMinor+dayBalanceDeltaMinor)};
   }
   function storyDateLabel(date){return dateFrom(date).toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'long'});}
+  function storyBubbleDateLabel(date){return dateFrom(date).toLocaleDateString(undefined,{month:'short',day:'numeric'});}
   function storyPieSVG(categories){
     const total=categories.reduce((sum,item)=>sum+Math.max(0,Number(item.value)||0),0);
     if(total<=0)return '<svg class="daily-story-pie" viewBox="0 0 180 180" role="img" aria-label="No expense categories recorded"><circle cx="90" cy="90" r="76" fill="var(--surface-3)"/><circle cx="90" cy="90" r="54" fill="var(--surface)"/></svg>';
@@ -557,25 +578,24 @@
     const region=$('#daily-story-region');if(!region)return;
     const enabled=!!state.settings.dailyStory;region.hidden=!enabled;
     if(!enabled)return;
-    const data=dailyStoryData();
-    const count=data.transactions.length;
-    const label=count===1?'1 transaction':`${count} transactions`;
-    const dateLabel=storyDateLabel(data.date);
-    $('#daily-story-date').textContent=dateLabel;
-    $('#daily-story-count').textContent=label;
-    $('#daily-story-income-preview').textContent=fmtHidden(data.income);
-    $('#daily-story-expense-preview').textContent=fmtHidden(data.expenses);
-    $('#daily-story-teaser-copy').textContent=count?`${label} · Your day in money`:'No transactions recorded';
-    $('#daily-story-open-label').textContent=count?'Open story':'View daily recap';
+    const list=$('#daily-story-list');if(!list)return;
+    list.innerHTML=dailyStoryDates().map(date=>{
+      const data=dailyStoryData(date),count=data.transactions.length;
+      const dateLabel=storyBubbleDateLabel(date),spokenDate=storyDateLabel(date);
+      const transactionLabel=count===1?'1 transaction':`${count} transactions`;
+      const aria=`Open money story for ${spokenDate}. ${transactionLabel}. Income ${fmtHidden(data.income)}. Spent ${fmtHidden(data.expenses)}. Balance brought down ${fmtHidden(data.openingBalance)}. Balance carried down ${fmtHidden(data.closingBalance)}.`;
+      const pie=storyPieSVG(data.categories).replace('class="daily-story-pie"','class="daily-story-pie daily-story-thumbnail-pie"');
+      return `<div class="daily-story-list-item" role="listitem"><button class="daily-story-bubble ${count?'has-transactions':'is-quiet'}" type="button" data-story-date="${date}" aria-label="${escapeHTML(aria)}" aria-haspopup="dialog" title="${escapeHTML(spokenDate)}"><span class="daily-story-ring" aria-hidden="true"><span class="daily-story-ring-inner">${pie}</span></span><span class="daily-story-bubble-label">${escapeHTML(dateLabel)}</span></button></div>`;
+    }).join('');
   }
-  function openDailyStory(){
-    const data=dailyStoryData(),count=data.transactions.length;
+  function openDailyStory(date=previousLocalDate()){
+    const data=dailyStoryData(date),count=data.transactions.length;
     const dateLabel=storyDateLabel(data.date),topCategories=data.categories;
     const categoryLegend=topCategories.length?topCategories.map((item,index)=>`<div class="daily-story-legend-row"><span class="daily-story-legend-swatch" style="--story-swatch:${['#22C55E','#EF4444','#60A5FA','#FBBF24','#A78BFA','#2DD4BF'][index%6]}"></span><span>${escapeHTML(item.name)}</span><strong>${fmtHidden(item.value)}</strong></div>`).join(''):'<p class="daily-story-empty-note">No expenses to break down for this day.</p>';
     const txMarkup=count?data.transactions.slice(0,12).map(dailyStoryTransactionHTML).join(''):'<div class="daily-story-empty"><span class="daily-story-empty-icon">'+icon('wallet')+'</span><strong>A quiet day</strong><span>No transactions were recorded for this date.</span></div>';
     const extra=count>12?`<p class="daily-story-more">Showing 12 of ${count} transactions. Open Activity to see the full history.</p>`:'';
-    const content=`<div class="modal-body daily-story-modal-body"><div class="daily-story-cover"><span class="daily-story-kicker">YESTERDAY · MONEY RECAP</span><h3>${escapeHTML(dateLabel)}</h3><p>${count?`${count} transaction${count===1?'':'s'} captured on this device`:'No transactions saved for this day'}</p><div class="daily-story-cover-metrics"><div><small>INCOME</small><strong>${fmtHidden(data.income)}</strong></div><div><small>SPENT</small><strong>${fmtHidden(data.expenses)}</strong></div></div></div><div class="daily-story-cashflow"><div><small>Refunds</small><strong>${fmtHidden(data.refunds)}</strong></div><div><small>Net from income & spending</small><strong class="${data.net<0?'daily-story-negative':'daily-story-positive'}">${fmtHidden(data.net)}</strong></div></div><section class="daily-story-chart-section" aria-labelledby="daily-story-chart-title"><div class="section-header"><div><span class="section-kicker">WHERE IT WENT</span><h3 id="daily-story-chart-title">Spending breakdown</h3></div><span class="muted tiny">Expense total: ${fmtHidden(data.expenses)}</span></div><div class="daily-story-chart-layout">${storyPieSVG(topCategories)}<div class="daily-story-legend">${categoryLegend}</div></div></section><section class="daily-story-transactions"><div class="section-header"><div><span class="section-kicker">YOUR DAY</span><h3>Transactions</h3></div><span class="muted tiny">${count}</span></div><div class="daily-story-transaction-list">${txMarkup}</div>${extra}<div class="form-actions"><button class="secondary-button" type="button" data-cancel-modal>Close story</button><button class="primary-button" type="button" data-story-view-activity>View activity</button></div></section></div>`;
-    openModal('Yesterday’s money story',content,'DAILY RECAP');
+    const content=`<div class="modal-body daily-story-modal-body"><div class="daily-story-cover"><span class="daily-story-kicker">DAILY MONEY RECAP</span><h3>${escapeHTML(dateLabel)}</h3><p>${count?`${count} transaction${count===1?'':'s'} recorded on this day`:'A quiet day. No transactions were recorded.'}</p><section class="daily-story-chart-section" aria-labelledby="daily-story-chart-title"><div class="section-header"><div><span class="section-kicker">WHERE IT WENT</span><h3 id="daily-story-chart-title">Spending breakdown</h3></div><span class="muted tiny">Spent: ${fmtHidden(data.expenses)}</span></div><div class="daily-story-chart-layout">${storyPieSVG(topCategories)}<div class="daily-story-legend">${categoryLegend}</div></div></section><div class="daily-story-cover-metrics"><div><small>MONEY IN</small><strong>${fmtHidden(data.income)}</strong><span>Income recorded that day</span></div><div><small>MONEY OUT</small><strong>${fmtHidden(data.expenses)}</strong><span>Recorded spending</span></div></div></div><section class="daily-story-balances" aria-label="Start and end balances"><div><small>STARTED WITH · B/D</small><strong>${fmtHidden(data.openingBalance)}</strong><span>Balance brought down · Start of day</span></div><div><small>ENDED WITH · C/D</small><strong>${fmtHidden(data.closingBalance)}</strong><span>Balance carried down · End of day</span></div></section><div class="daily-story-cashflow"><div><small>Refunds received</small><strong>${fmtHidden(data.refunds)}</strong></div><div><small>Income minus spending</small><strong class="${data.net<0?'daily-story-negative':'daily-story-positive'}">${fmtHidden(data.net)}</strong></div></div><section class="daily-story-transactions"><div class="section-header"><div><span class="section-kicker">YOUR DAY</span><h3>Transactions</h3></div><span class="muted tiny">${count}</span></div><div class="daily-story-transaction-list">${txMarkup}</div>${extra}<div class="form-actions"><button class="secondary-button" type="button" data-cancel-modal>Close story</button><button class="primary-button" type="button" data-story-view-activity>View activity</button></div></section></div>`;
+    openModal(`Money story · ${dateLabel}`,content,'DAILY RECAP');
     $('#app-modal').classList.add('daily-story-dialog');
   }
   function scheduleDailyStoryRefresh(){
@@ -1006,7 +1026,7 @@
       const quickActivity=event.target.closest('[data-quick-activity]');if(quickActivity&&quickAddDraft){quickAddDraft.activityId=quickActivity.dataset.quickActivity;renderQuickAddStep('note');return;}
       const quickBack=event.target.closest('[data-quick-back]');if(quickBack&&quickAddDraft){renderQuickAddStep(quickBack.dataset.quickBack);return;}
       if(event.target.closest('#quick-flow-skip')){const note=$('#quick-flow-note-value');quickAddDraft.note=String(note?.value||'').trim();const account=$('#quick-flow-account'),payment=$('#quick-flow-payment');if(account)quickAddDraft.accountId=account.value;if(payment)quickAddDraft.paymentMethod=payment.value;await saveQuickAdd();return;}
-      if(event.target.closest('#open-daily-story')){openDailyStory();return;}
+      const storyButton=event.target.closest('[data-story-date]');if(storyButton){openDailyStory(storyButton.dataset.storyDate);return;}
       if(event.target.closest('[data-story-view-activity]')){closeModal();setPage('activity');return;}
       const pageBtn=event.target.closest('[data-page]');if(pageBtn){setPage(pageBtn.dataset.page);return;}
       const typeBtn=event.target.closest('.type-switch button[data-type]');if(typeBtn&&typeBtn.closest('#transaction-form')){event.preventDefault();currentTxType=typeBtn.dataset.type;const form=$('#transaction-form');form.dataset.type=currentTxType;$$('.type-switch [data-type]',form).forEach(b=>{b.classList.toggle('selected',b===typeBtn);b.setAttribute('aria-pressed',b===typeBtn?'true':'false');});syncGlassSegmentIndicators(typeBtn.closest('.type-switch'));const act=$('#tx-activity');const wanted=currentTxType==='income'?'salary':currentTxType==='refund'?'refunds':'food';act.innerHTML=activityOptions(currentTxType,wanted);const note=$('#tx-form-note');if(note)note.textContent=currentTxType==='transfer'?'Transfers change account balances but do not count as income or spending.':currentTxType==='refund'?'Refunds reduce recorded spending, rather than inflate income.':'Tap an activity to keep your records organized. You can add a note after choosing it.';if(currentTxType==='transfer'&&!$('#tx-to-account')){$('#tx-account').parentElement.insertAdjacentHTML('afterend',`<div class="form-field full" id="tx-to-account-wrap"><label for="tx-to-account">TO ACCOUNT</label><select id="tx-to-account" name="toAccountId">${accountOptions(state.accounts.find(a=>a.id!==$('#tx-account').value)?.id)}</select></div>`);}else if(currentTxType!=='transfer')$('#tx-to-account-wrap')?.remove();return;}

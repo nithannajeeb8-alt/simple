@@ -2026,3 +2026,59 @@ html[data-theme="dark"] .smart-ui-setting-icon { color: var(--green); background
 .story-open-icon i { font-size: 12px !important; line-height: 1; }
 .story-open-icon .icon-fallback { width: 12px; height: 12px; }
 html[data-theme="dark"] .story-open-icon { color: var(--green); }
+
+
+/* 2.3.25: seven-day money stories sit beneath Overview, above the balance card. */
+.daily-story-region { margin: -8px 0 14px; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+.daily-story-region[hidden] { display: none !important; }
+.daily-story-strip-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 0 2px 7px; }
+.daily-story-strip-heading h2 { margin: 0; color: var(--muted); font: 750 10px/1.2 var(--font); letter-spacing: .14em; text-transform: uppercase; }
+.daily-story-date-pill { flex: 0 0 auto; color: var(--muted); font-size: 10px; font-weight: 650; }
+.daily-story-scroller { display: flex; align-items: flex-start; gap: 12px; width: 100%; min-width: 0; overflow-x: auto; overflow-y: hidden; padding: 3px 2px 9px; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; scroll-snap-type: x proximity; scrollbar-width: none; }
+.daily-story-scroller::-webkit-scrollbar { display: none; }
+.daily-story-list-item { flex: 0 0 68px; min-width: 0; scroll-snap-align: start; }
+.daily-story-bubble { display: flex; width: 100%; flex-direction: column; align-items: center; gap: 6px; min-width: 0; padding: 0; border: 0; border-radius: 14px; background: transparent; color: var(--ink); text-align: center; }
+.daily-story-ring { display: grid; place-items: center; width: 64px; height: 64px; padding: 3px; border-radius: 50%; background: conic-gradient(from 220deg, var(--green), color-mix(in srgb, var(--green) 42%, var(--blue)) 54%, var(--green)); box-shadow: 0 3px 15px color-mix(in srgb, var(--green) 10%, transparent); transition: transform .22s cubic-bezier(.2,.8,.2,1), box-shadow .22s ease; }
+.daily-story-ring-inner { display: grid; place-items: center; width: 100%; height: 100%; padding: 4px; overflow: hidden; border: 2px solid var(--surface); border-radius: 50%; background: var(--surface-2); color: var(--green); }
+.daily-story-thumbnail-pie { display: block; width: 100%; height: 100%; border-radius: 50%; }
+.daily-story-bubble-label { display: block; max-width: 100%; color: var(--muted); font-size: 10px; font-weight: 700; line-height: 1.25; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.daily-story-bubble:hover .daily-story-ring,.daily-story-bubble:focus-visible .daily-story-ring { transform: translateY(-1px) scale(1.035); box-shadow: 0 5px 18px color-mix(in srgb, var(--green) 18%, transparent); }
+.daily-story-bubble.is-quiet .daily-story-ring { background: conic-gradient(from 220deg, var(--line), var(--subtle), var(--line)); box-shadow: none; }
+.daily-story-bubble.is-quiet .daily-story-ring-inner { color: var(--muted); }
+.daily-story-bubble:focus-visible { outline-offset: 4px; }
+.daily-story-cover .daily-story-chart-section { margin-top: 18px; }
+.daily-story-cover .daily-story-chart-section .section-header { margin-bottom: 9px; }
+.daily-story-cover .daily-story-cover-metrics { margin-top: 17px; }
+.daily-story-cover-metrics > div > span { color: var(--muted); font-size: 10px; line-height: 1.4; }
+.daily-story-balances { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 10px; margin: 12px 0 0; }
+.daily-story-balances > div { display: flex; min-width: 0; flex-direction: column; gap: 5px; padding: 14px 15px; border: 1px solid var(--line); border-radius: 15px; background: var(--surface); }
+.daily-story-balances > div + div { background: var(--surface-2); }
+.daily-story-balances small { color: var(--muted); font-size: 9px; font-weight: 850; letter-spacing: .09em; }
+.daily-story-balances strong { font: 800 clamp(17px,4vw,22px)/1.15 var(--display); letter-spacing: -.5px; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.daily-story-balances span { color: var(--muted); font-size: 10px; line-height: 1.4; }
+html[data-theme="dark"] .daily-story-balances > div { border-color: var(--line); }
+html[data-liquid-glass="on"] .daily-story-ring-inner { border-color: var(--glass-border); background: var(--glass-control); box-shadow: inset 0 1px 0 var(--glass-highlight); backdrop-filter: blur(16px) saturate(1.35); -webkit-backdrop-filter: blur(16px) saturate(1.35); }
+@media (max-width: 720px) {
+  .daily-story-region { margin: -12px 0 11px; }
+  .daily-story-strip-heading { margin-bottom: 5px; }
+  .daily-story-scroller { gap: 10px; padding-bottom: 7px; }
+  .daily-story-list-item { flex-basis: 66px; }
+  .daily-story-ring { width: 62px; height: 62px; }
+  .money-card { position: relative; }
+  .money-card > .balance-card-topline { position: absolute; top: 12px; right: 12px; z-index: 3; width: auto; height: 42px; margin: 0; }
+  .money-card > .balance-card-topline .balance-card-context { display: none; }
+  .money-card > .radial-area { margin: -2px auto -12px; }
+}
+@media (max-width: 390px) {
+  .daily-story-scroller { gap: 8px; }
+  .daily-story-list-item { flex-basis: 62px; }
+  .daily-story-ring { width: 58px; height: 58px; }
+  .daily-story-bubble-label { font-size: 9px; }
+  .daily-story-balances > div { padding: 12px 11px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .daily-story-bubble .daily-story-ring { transition: none !important; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  html[data-liquid-glass="on"] .daily-story-ring-inner { background: var(--surface); backdrop-filter: none; -webkit-backdrop-filter: none; }
+}
