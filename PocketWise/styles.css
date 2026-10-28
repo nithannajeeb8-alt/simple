@@ -2311,16 +2311,19 @@ html[data-liquid-glass="on"] .daily-story-ring-inner { border-color: var(--glass
 }
 
 
-/* PocketWise 2.3.33 — remove browser tap flashes and mobile scroll-position rails.
-   Touch scrolling remains enabled; keyboard focus indicators are intentionally preserved. */
+/* PocketWise 2.3.34 — remove tap flashes and pointer-triggered focus boxes while
+   retaining visible focus feedback for keyboard users. Scroll position indicators
+   are hidden on touch devices without disabling scrolling. */
 *, *::before, *::after {
   -webkit-tap-highlight-color: transparent !important;
 }
+/* Some Safari/WebView versions classify a tapped custom [tabindex] control as
+   :focus-visible. Explicit input-modality tracking avoids a persistent blue box. */
+html[data-input-modality="pointer"] :where(button, a, [role="button"], [tabindex]):focus,
+html[data-input-modality="pointer"] :where(button, a, [role="button"], [tabindex]):focus-visible {
+  outline: none !important;
+}
 @media (hover: none) and (pointer: coarse) {
-  /* Suppress residual touch-focus paint only when the browser says it is not keyboard focus. */
-  :where(button, a, [role="button"], [tabindex]):focus:not(:focus-visible) {
-    outline: none !important;
-  }
   html, body, body * {
     scrollbar-width: none;
     -ms-overflow-style: none;
