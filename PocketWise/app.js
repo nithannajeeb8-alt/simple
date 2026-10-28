@@ -902,23 +902,77 @@
       <footer class="receipt-footer"><span>Private by design</span><span>Receipt · ${escapeHTML(ref.slice(-8).toUpperCase()||'LOCAL')}</span></footer>
     </article>`;
   }
+  function receiptFilename(tx){
+    const ref=String(tx?.id||'LOCAL').replace(/[^a-zA-Z0-9_-]/g,'').slice(-28)||'LOCAL';
+    const date=/^\d{4}-\d{2}-\d{2}$/.test(String(tx?.date||''))?tx.date:today();
+    return `PocketWise-Receipt-${date}-${ref}.html`;
+  }
+  function receiptShareText(tx){
+    const account=accountById(tx.accountId),activity=txActivity(tx);
+    const title=String(tx.note||'').trim()||activity.name;
+    const amountPrefix=['expense','lent','repay_out'].includes(tx.type)?'−':['income','refund','borrowed','repay_in'].includes(tx.type)?'+':'';
+    return [
+      'PocketWise · Personal finance receipt',
+      title,
+      `${amountPrefix}${money(tx.amount)} · ${typeLabel(tx.type)}`,
+      `Date: ${tx.date?niceDate(tx.date):'Date not set'}`,
+      `Reference ID: ${String(tx.id||'').replace(/[^a-zA-Z0-9_-]/g,'')||'Not available'}`,
+      `Activity: ${activity.name}`,
+      `Account: ${account.name}`,
+      `Payment method: ${tx.paymentMethod||'Not specified'}`,
+      tx.note?`Note: ${tx.note}`:'',
+      'Personal record generated from information entered in PocketWise. It is not a bank-issued receipt or proof of settlement.'
+    ].filter(Boolean).join('\n');
+  }
+  function standaloneReceiptHTML(tx){
+    const markup=receiptMarkup(tx);
+    return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>PocketWise receipt</title><style>
+      *{box-sizing:border-box}html{background:#f3f5f2}body{margin:0;padding:clamp(12px,4vw,32px);background:#f3f5f2;color:#202820;font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.receipt-paper{max-width:450px;margin:8px auto 18px;padding:24px;background:#fff;color:#202820;border:1px solid #e3e9e2;border-radius:18px;box-shadow:0 8px 28px rgba(18,35,22,.06)}.receipt-brand{display:flex;align-items:center;gap:10px;min-width:0}.receipt-mark{display:grid;place-items:center;width:38px;height:38px;flex:none;border-radius:12px;background:#e2f2e8;color:#258456;font-size:22px;font-weight:800}.receipt-brand>div{min-width:0}.receipt-brand strong,.receipt-brand small{display:block}.receipt-brand strong{font-size:18px}.receipt-brand small{font-size:9px;letter-spacing:1.05px;color:#78837b;margin-top:2px}.receipt-status{margin-left:auto;border-radius:30px;padding:5px 9px;background:#e7f5eb;color:#258456;font-size:9px;font-weight:800;letter-spacing:.9px}.receipt-rule{height:1px;background:#e5eae4;margin:18px 0}.receipt-rule-dashed{height:1px;background:repeating-linear-gradient(to right,#cbd4cc 0 5px,transparent 5px 10px)}.receipt-kicker{margin:0;color:#77837a;font-size:10px;font-weight:800;letter-spacing:1.5px}.receipt-title{margin:6px 0 0;font-size:22px;line-height:1.25;overflow-wrap:anywhere}.receipt-amount{font-size:36px;line-height:1.2;font-weight:800;letter-spacing:-1px;font-variant-numeric:tabular-nums;margin:18px 0 5px}.receipt-in{color:#258456}.receipt-out{color:#c84e48}.receipt-subtitle{color:#77837b;font-size:12px;margin:0}.receipt-fields{display:grid;gap:0;margin:0}.receipt-fields>div{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;padding:9px 0;border-bottom:1px solid #edf0ec}.receipt-fields dt{color:#78827a;font-size:12px;flex:0 0 38%}.receipt-fields dd{margin:0;max-width:62%;text-align:right;font-size:12px;font-weight:650;overflow-wrap:anywhere;word-break:break-word}.receipt-note{margin-top:15px;padding:12px;background:#f6f8f5;border-radius:10px}.receipt-note small{font-size:9px;font-weight:800;letter-spacing:1px;color:#77837a}.receipt-note p{margin:4px 0 0;overflow-wrap:anywhere}.receipt-footnote{font-size:10px;color:#768078;line-height:1.55}.receipt-footer{display:flex;justify-content:space-between;gap:10px;color:#8b948d;font-size:9px;letter-spacing:.25px;flex-wrap:wrap}.receipt-export-actions{max-width:450px;margin:0 auto 14px;padding:8px 0 14px;display:flex;gap:9px;flex-wrap:wrap;position:sticky;top:0;z-index:10;background:#f3f5f2}.receipt-export-actions button{min-height:44px;border:1px solid #d9e2da;border-radius:12px;background:#fff;color:#202820;padding:10px 14px;font:600 13px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.receipt-export-actions button[data-export-print]{background:#258456;color:#fff;border-color:#258456}@media print{html,body{background:#fff;padding:0}.receipt-paper{border:0;box-shadow:none;border-radius:0;margin:0 auto;padding:0}.receipt-export-actions{display:none}}
+      </style></head><body><div class="receipt-export-actions"><button type="button" onclick="history.back()">Back</button><button type="button" onclick="if(navigator.share){navigator.share({title:'PocketWise receipt',text:document.getElementById('receipt-paper')?.innerText||document.body.innerText}).catch(()=>{})}else{alert('Use your browser or Files share action to share this receipt.')} ">Share receipt</button><button type="button" data-export-print onclick="window.print()">Print / Save PDF</button></div>${markup}</body></html>`;
+  }
   function showTransactionReceipt(tx){
-    openModal('Receipt preview',`${receiptMarkup(tx)}<div class="receipt-actions"><button class="secondary-button" data-cancel-modal>Close</button><button class="primary-button" id="print-receipt" data-print-receipt="${escapeHTML(tx.id)}">${icon('download')} Print / Save PDF</button></div>`,'SAVE OR PRINT');
+    openModal('Receipt preview',`<div class="receipt-actions receipt-actions-top"><button class="secondary-button" type="button" data-cancel-modal>← Back</button><button class="secondary-button" type="button" data-share-receipt="${escapeHTML(tx.id)}">${icon('upload')} Share receipt</button><button class="secondary-button" type="button" data-download-receipt="${escapeHTML(tx.id)}">${icon('download')} Download copy</button><button class="primary-button" type="button" data-print-receipt="${escapeHTML(tx.id)}">${icon('file')} Print / Save PDF</button></div>${receiptMarkup(tx)}`,'RECEIPT · PRIVATE ON THIS DEVICE');
+  }
+  async function shareTransactionReceipt(id){
+    const tx=state.transactions.find(item=>item.id===id);if(!tx){toast('This transaction could not be found.','error');return;}
+    const title='PocketWise transaction receipt',text=receiptShareText(tx),filename=receiptFilename(tx),html=standaloneReceiptHTML(tx);
+    try{
+      if(typeof File==='function'&&navigator.share&&typeof navigator.canShare==='function'){
+        const file=new File([html],filename,{type:'text/html'});
+        if(navigator.canShare({files:[file]})){await navigator.share({title,files:[file]});return;}
+      }
+    }catch(error){if(error?.name==='AbortError')return;console.warn('PocketWise receipt file sharing unavailable; trying a supported fallback.',error);}
+    try{
+      if(window.PocketWiseNative&&typeof window.PocketWiseNative.shareReceipt==='function'){
+        window.PocketWiseNative.shareReceipt(title,text);return;
+      }
+      if(navigator.share){await navigator.share({title,text});return;}
+    }catch(error){if(error?.name==='AbortError')return;console.warn('PocketWise receipt share failed; offering a download instead.',error);}
+    downloadTransactionReceipt(id);
+  }
+  function downloadTransactionReceipt(id){
+    const tx=state.transactions.find(item=>item.id===id);if(!tx){toast('This transaction could not be found.','error');return;}
+    const filename=receiptFilename(tx),html=standaloneReceiptHTML(tx);
+    try{
+      if(window.PocketWiseNative&&typeof window.PocketWiseNative.saveReceiptHtml==='function'&&window.PocketWiseNative.saveReceiptHtml(filename,html)){
+        toast('Receipt saved to your device.');return;
+      }
+    }catch(error){console.warn('Native receipt save unavailable; falling back to a browser download.',error);}
+    try{
+      const blob=new Blob([html],{type:'text/html;charset=utf-8'}),url=URL.createObjectURL(blob),anchor=document.createElement('a');
+      anchor.href=url;anchor.download=filename;anchor.rel='noopener';anchor.hidden=true;document.body.appendChild(anchor);anchor.click();anchor.remove();
+      window.setTimeout(()=>URL.revokeObjectURL(url),60000);
+      toast('Receipt download started. Check Downloads or Files.');
+    }catch(error){console.error('Receipt download failed.',error);toast('Could not download this receipt. Use Share receipt or Print / Save PDF instead.','error');}
   }
   function printTransactionReceipt(id){
-    const tx=state.transactions.find(item=>item.id===id); if(!tx){toast('This transaction could not be found.','error');return;}
-    // Build a self-contained print document. Financial records never leave this device.
-    const popup=window.open('','_blank','width=520,height=760');
-    if(!popup){toast('Allow pop-ups for this site to print or save the receipt as PDF.','amber');return;}
-    try { popup.opener = null; } catch {}
-    const markup=receiptMarkup(tx);
-    popup.document.open();
-    popup.document.write(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pocketwise receipt</title><style>
-      *{box-sizing:border-box}body{margin:0;padding:28px;background:#f3f5f2;color:#202820;font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.receipt-paper{max-width:440px;margin:0 auto;background:#fff;padding:28px;border:1px solid #e4e9e3;border-radius:18px;box-shadow:0 8px 28px #1e30200d}.receipt-brand{display:flex;gap:10px;align-items:center}.receipt-mark{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:#e2f2e8;color:#258456;font-size:22px;font-weight:800}.receipt-brand strong,.receipt-brand small{display:block}.receipt-brand strong{font-size:18px}.receipt-brand small{font-size:9px;letter-spacing:1.25px;color:#7a857d}.receipt-status{margin-left:auto;font-size:9px;letter-spacing:1px;font-weight:800;color:#258456;background:#e8f5ec;border-radius:30px;padding:5px 9px}.receipt-rule{height:1px;background:#e5e9e4;margin:20px 0}.receipt-rule-dashed{background:repeating-linear-gradient(to right,#c8d2c9 0 5px,transparent 5px 10px)}.receipt-kicker{margin:0;color:#77837a;font-size:10px;font-weight:800;letter-spacing:1.6px}.receipt-title{margin:6px 0 0;font-size:22px;line-height:1.25;overflow-wrap:anywhere}.receipt-amount{font-weight:800;font-size:36px;line-height:1.2;letter-spacing:-1px;margin:18px 0 5px;font-variant-numeric:tabular-nums}.receipt-in{color:#258456}.receipt-out{color:#c84e48}.receipt-subtitle{margin:0;color:#7a857d;font-size:12px}.receipt-fields{margin:0;display:grid;gap:0}.receipt-fields>div{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px solid #edf0ec}.receipt-fields dt{color:#78827a;font-size:12px}.receipt-fields dd{margin:0;text-align:right;max-width:62%;font-size:12px;font-weight:650;overflow-wrap:anywhere}.receipt-note{margin-top:17px;padding:12px;background:#f6f8f5;border-radius:10px}.receipt-note small{font-size:9px;font-weight:800;letter-spacing:1px;color:#77837a}.receipt-note p{margin:4px 0 0;overflow-wrap:anywhere}.receipt-footnote{font-size:10px;color:#768078;line-height:1.55}.receipt-footer{display:flex;justify-content:space-between;gap:10px;color:#8b948d;font-size:9px;letter-spacing:.3px}.receipt-actions{display:none}@page{size:auto;margin:12mm}@media print{body{background:#fff;padding:0}.receipt-paper{border:0;box-shadow:none;border-radius:0;padding:0;max-width:none}.receipt-actions{display:none}}
-      </style></head><body>${markup}</body></html>`);
-    popup.document.close();
-    // The print call is made from this page: the Content-Security-Policy forbids inline scripts in the receipt window.
-    setTimeout(()=>{try{popup.focus();popup.print();}catch{}},400);
+    const tx=state.transactions.find(item=>item.id===id);if(!tx){toast('This transaction could not be found.','error');return;}
+    // Keep the user in PocketWise: native WebView uses Android PrintManager; Safari/Chrome use the current page print UI.
+    try{
+      if(window.PocketWiseNative&&typeof window.PocketWiseNative.printReceipt==='function'){window.PocketWiseNative.printReceipt();return;}
+      if(typeof window.print==='function'){window.print();return;}
+      toast('Printing is unavailable here. Use Share receipt or Download copy instead.','amber');
+    }catch(error){console.error('PocketWise receipt print failed.',error);toast('Could not open printing. Use Share receipt or Download copy instead.','error');}
   }
   const deletingTransactionIds = new Set();
   async function confirmDeleteTransaction(id){
@@ -1062,6 +1116,8 @@
       const swipeDelete=event.target.closest('[data-tx-swipe-delete]');if(swipeDelete){const txId=swipeDelete.dataset.txSwipeDelete;closeTransactionSwipeActions();await confirmDeleteTransaction(txId);return;}
       const txOpen=event.target.closest('[data-tx-open]');if(txOpen){const shell=txOpen.closest('.transaction-swipe-shell');if(shell?.classList.contains('is-open')){closeTransactionSwipeActions();return;}const tx=state.transactions.find(t=>t.id===txOpen.dataset.txOpen);if(tx)showTransactionDetail(tx);return;}
       const txReceipt=event.target.closest('[data-tx-receipt]');if(txReceipt){const tx=state.transactions.find(t=>t.id===txReceipt.dataset.txReceipt);if(tx)showTransactionReceipt(tx);return;}
+      const shareReceipt=event.target.closest('[data-share-receipt]');if(shareReceipt){await shareTransactionReceipt(shareReceipt.dataset.shareReceipt);return;}
+      const downloadReceipt=event.target.closest('[data-download-receipt]');if(downloadReceipt){downloadTransactionReceipt(downloadReceipt.dataset.downloadReceipt);return;}
       const printReceipt=event.target.closest('[data-print-receipt]');if(printReceipt){printTransactionReceipt(printReceipt.dataset.printReceipt);return;}
       const txEdit=event.target.closest('[data-tx-edit]');if(txEdit){const tx=state.transactions.find(t=>t.id===txEdit.dataset.txEdit);if(tx)transactionForm(tx,tx.type);return;}
       const undo=event.target.closest('[data-undo-tx]');if(undo){
