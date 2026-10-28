@@ -449,7 +449,7 @@
     if(firstPosition)indicator.style.transition='none';
     indicator.style.width=`${activeRect.width}px`;
     indicator.style.height=`${activeRect.height}px`;
-    indicator.style.transform=`translate3d(${(activeRect.left-navRect.left).toFixed(2)}px,${(activeRect.top-navRect.top).toFixed(2)}px,0)`;
+    indicator.style.transform=`translate3d(${(activeRect.left-navRect.left-nav.clientLeft).toFixed(2)}px,${(activeRect.top-navRect.top-nav.clientTop).toFixed(2)}px,0)`;
     indicator.setAttribute('data-positioned','true');
     if(firstPosition)requestAnimationFrame(()=>{if(indicator.isConnected)indicator.style.removeProperty('transition');});
   }

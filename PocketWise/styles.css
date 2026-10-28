@@ -2082,3 +2082,182 @@ html[data-liquid-glass="on"] .daily-story-ring-inner { border-color: var(--glass
 @media (prefers-reduced-transparency: reduce) {
   html[data-liquid-glass="on"] .daily-story-ring-inner { background: var(--surface); backdrop-filter: none; -webkit-backdrop-filter: none; }
 }
+
+
+/* PocketWise 2.3.29 — restrained spacing and navigation alignment refinement.
+   Only the mobile balance-gauge offset is restored from the 2.3.25 reference build;
+   the rest of the earlier project is intentionally left untouched. */
+.daily-story-region { margin: 16px 0 16px; }
+.daily-story-strip-heading { margin: 0 2px 13px; gap: 14px; }
+.daily-story-date-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-2);
+  line-height: 1;
+}
+.daily-story-ring {
+  box-sizing: border-box;
+  border: 1px solid color-mix(in srgb, var(--green) 24%, var(--line));
+  background: conic-gradient(from 220deg, var(--green), color-mix(in srgb, var(--green) 54%, var(--blue)) 58%, color-mix(in srgb, var(--green) 82%, var(--surface)) 100%);
+  box-shadow: 0 2px 12px color-mix(in srgb, var(--green) 11%, transparent), inset 0 0 0 1px color-mix(in srgb, var(--surface) 28%, transparent);
+}
+.daily-story-ring-inner { border-width: 2px; }
+.daily-story-bubble:active .daily-story-ring { transform: scale(.97); }
+.daily-story-bubble.is-quiet .daily-story-ring { border-color: var(--line); }
+
+@media (max-width: 720px) {
+  /* Match the pre-height-adjustment balance-card geometry from 2.3.25. */
+  .money-card > .radial-area { margin: -2px auto -12px; }
+
+  /* Separate the Overview header, date pill and circular previews without changing order. */
+  .daily-story-region { margin: 18px 0 16px; }
+  .daily-story-strip-heading { margin: 0 2px 13px; }
+  .daily-story-scroller { gap: 11px; padding: 4px 2px 10px; scroll-padding-inline: 2px; }
+  .daily-story-ring { box-shadow: 0 2px 11px color-mix(in srgb, var(--green) 10%, transparent), inset 0 0 0 1px color-mix(in srgb, var(--surface) 28%, transparent); }
+
+  /* The Smart UI capsule uses a compact native-like control height and 44pt targets. */
+  html[data-smart-ui="on"] .mobile-tabbar,
+  html[data-liquid-glass="on"] .mobile-tabbar {
+    min-height: 60px;
+    height: 60px;
+    box-sizing: border-box;
+    align-items: center;
+    padding: 4px 8px;
+    gap: 2px;
+    overflow: hidden;
+    border-radius: 999px;
+  }
+  html[data-smart-ui="on"][data-liquid-glass="on"] .mobile-tabbar {
+    min-height: 60px;
+    height: 60px;
+    padding: 4px 7px;
+    gap: 2px;
+    border-radius: 999px;
+  }
+  html[data-smart-ui="on"] .mobile-tab,
+  html[data-smart-ui="on"][data-liquid-glass="on"] .mobile-tab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+    width: 100%;
+    min-width: 0;
+    min-height: 46px;
+    height: 46px;
+    margin: 0;
+    padding: 0 2px;
+    box-sizing: border-box;
+    line-height: 1;
+  }
+  html[data-smart-ui="on"] .mobile-tab .icon-wrap,
+  html[data-smart-ui="on"] .mobile-tab .icon-fallback,
+  html[data-smart-ui="on"][data-liquid-glass="on"] .mobile-tab .icon-wrap,
+  html[data-smart-ui="on"][data-liquid-glass="on"] .mobile-tab .icon-fallback {
+    flex: 0 0 24px;
+    width: 24px;
+    height: 24px;
+  }
+  html[data-smart-ui="on"] .mobile-tab .icon-wrap i,
+  html[data-smart-ui="on"][data-liquid-glass="on"] .mobile-tab .icon-wrap i { font-size: 22px; line-height: 1; }
+  html[data-smart-ui="on"] .mobile-add,
+  html[data-smart-ui="on"][data-liquid-glass="on"] .mobile-add,
+  html[data-smart-ui="off"][data-liquid-glass="on"] .mobile-add {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    justify-self: center;
+    align-self: center;
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    margin: 0;
+    padding: 0;
+    transform: none;
+    border-radius: 50%;
+    box-sizing: border-box;
+  }
+  html[data-smart-ui="on"] .mobile-tabbar,
+  html[data-liquid-glass="on"] .mobile-tabbar { bottom: calc(8px + env(safe-area-inset-bottom)); }
+  html[data-smart-ui="on"] .main-content,
+  html[data-liquid-glass="on"] .main-content { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
+
+  /* Glass stays a floating pill in classic mode too, not a full-width square slab. */
+  html[data-smart-ui="off"][data-liquid-glass="on"] .mobile-tabbar {
+    position: fixed;
+    z-index: 45;
+    left: 12px;
+    right: 12px;
+    bottom: calc(8px + env(safe-area-inset-bottom));
+    width: auto;
+    min-height: 60px;
+    height: 60px;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    align-items: center;
+    justify-items: stretch;
+    gap: 2px;
+    padding: 4px 8px;
+    border: 1px solid var(--glass-border);
+    border-top-color: var(--glass-highlight);
+    border-radius: 999px;
+    background: linear-gradient(155deg, var(--glass-nav), var(--glass-card-low));
+    box-shadow: var(--glass-float-shadow), inset 0 1px 0 var(--glass-highlight), inset 0 -1px 0 var(--glass-edge);
+    -webkit-backdrop-filter: blur(24px) saturate(165%);
+    backdrop-filter: blur(24px) saturate(165%);
+    isolation: isolate;
+    overflow: hidden;
+  }
+  html[data-smart-ui="off"][data-liquid-glass="on"] .mobile-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    justify-self: stretch;
+    width: 100%;
+    min-width: 0;
+    min-height: 48px;
+    height: 48px;
+    margin: 0;
+    padding: 0 2px;
+    gap: 3px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    background: transparent;
+    box-shadow: none;
+    box-sizing: border-box;
+    line-height: 1;
+  }
+  html[data-smart-ui="off"][data-liquid-glass="on"] .mobile-tab.active {
+    color: var(--green-deep);
+    background: color-mix(in srgb, var(--glass-accent) 72%, transparent);
+    border-color: color-mix(in srgb, var(--glass-border) 72%, transparent);
+    box-shadow: inset 0 1px 0 var(--glass-highlight);
+  }
+  html[data-theme="dark"][data-smart-ui="off"][data-liquid-glass="on"] .mobile-tab.active { color: #39E982; }
+  html[data-smart-ui="off"][data-liquid-glass="on"] .mobile-tab .icon-wrap,
+  html[data-smart-ui="off"][data-liquid-glass="on"] .mobile-tab .icon-fallback { flex: 0 0 22px; width: 22px; height: 22px; }
+  html[data-smart-ui="off"][data-liquid-glass="on"] .mobile-tab .icon-wrap i { font-size: 19px; line-height: 1; }
+  html[data-smart-ui="off"][data-liquid-glass="on"] .mobile-tab small { display: block; margin: 0; line-height: 1.05; font-size: 9px; }
+}
+@media (max-width: 390px) {
+  .daily-story-scroller { gap: 8px; }
+  html[data-smart-ui="on"] .mobile-tabbar,
+  html[data-smart-ui="on"][data-liquid-glass="on"] .mobile-tabbar,
+  html[data-smart-ui="off"][data-liquid-glass="on"] .mobile-tabbar { left: 8px; right: 8px; padding-left: 6px; padding-right: 6px; }
+  html[data-smart-ui="on"] .mobile-add,
+  html[data-smart-ui="on"][data-liquid-glass="on"] .mobile-add,
+  html[data-smart-ui="off"][data-liquid-glass="on"] .mobile-add { width: 44px; height: 44px; min-width: 44px; min-height: 44px; flex-basis: 44px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-smart-ui="on"] .smart-nav-indicator,
+  .daily-story-ring,
+  .daily-story-bubble:active .daily-story-ring { transition: none !important; transform: none !important; }
+}
