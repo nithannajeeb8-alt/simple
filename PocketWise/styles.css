@@ -2028,7 +2028,7 @@ html[data-theme="dark"] .smart-ui-setting-icon { color: var(--green); background
 html[data-theme="dark"] .story-open-icon { color: var(--green); }
 
 
-/* 2.3.27: fine-tuned balance gauge placement, slightly higher while retaining card padding. */
+/* 2.3.28: restored the previous normal balance gauge height (3px top margin). */
 .daily-story-region { margin: -8px 0 14px; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
 .daily-story-region[hidden] { display: none !important; }
 .daily-story-strip-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 0 2px 7px; }
@@ -2067,7 +2067,7 @@ html[data-liquid-glass="on"] .daily-story-ring-inner { border-color: var(--glass
   .money-card { position: relative; }
   .money-card > .balance-card-topline { position: absolute; top: 12px; right: 12px; z-index: 3; width: auto; height: 42px; margin: 0; }
   .money-card > .balance-card-topline .balance-card-context { display: none; }
-  .money-card > .radial-area { margin: 0px auto -12px; }
+  .money-card > .radial-area { margin: 3px auto -12px; }
 }
 @media (max-width: 390px) {
   .daily-story-scroller { gap: 8px; }
