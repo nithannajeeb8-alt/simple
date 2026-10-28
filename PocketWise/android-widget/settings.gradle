@@ -2,3 +2,6 @@ pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal()
 dependencyResolutionManagement { repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS); repositories { google(); mavenCentral() } }
 rootProject.name = "PocketWiseWidget"
 include(":app")
+
+// Prepared by tools/prepare_native_ocr.py. The app remains buildable without optional native OCR until setup runs.
+if (file("ppocr-sdk/build.gradle").exists()) include(":ppocr-sdk")
