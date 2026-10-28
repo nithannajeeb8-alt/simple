@@ -225,7 +225,8 @@ img,svg,canvas{max-width:100%}
 .receipt-fields{display:grid;gap:0;margin:0}.receipt-fields>div{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;padding:9px 0;border-bottom:1px solid #edf0ec}.receipt-fields dt{color:#78827a;font-size:12px;flex:0 0 38%}.receipt-fields dd{margin:0;max-width:62%;text-align:right;font-size:12px;font-weight:650;overflow-wrap:anywhere;word-break:break-word}
 .receipt-note{margin-top:15px;padding:12px;background:#f6f8f5;border-radius:10px}.receipt-note small{font-size:9px;font-weight:800;letter-spacing:1px;color:#77837a}.receipt-note p{margin:4px 0 0;overflow-wrap:anywhere}.receipt-footnote{font-size:10px;color:#768078;line-height:1.55}.receipt-footer{display:flex;justify-content:space-between;gap:10px;color:#8b948d;font-size:9px;letter-spacing:.25px;flex-wrap:wrap}.receipt-actions{display:flex;justify-content:flex-end;gap:8px;padding:0 22px 22px;max-width:500px;margin:auto}.receipt-actions .primary-button{min-width:160px}.receipt-actions .icon-wrap{width:16px;height:16px}
 @media(max-width:720px){.transaction-amount{min-width:80px}.receipt-paper{padding:20px;margin:4px 14px 16px}.receipt-actions{padding:0 18px 18px;flex-wrap:wrap}.receipt-actions>*{flex:1 1 140px}.receipt-fields dt,.receipt-fields dd{font-size:11px}.receipt-amount{font-size:33px}}
-@media print{body *{visibility:hidden!important}#receipt-paper,#receipt-paper *{visibility:visible!important}#receipt-paper{position:absolute!important;left:0!important;top:0!important;width:100%!important;max-width:100%!important;margin:0!important;padding:0!important;border:0!important;box-shadow:none!important;border-radius:0!important}.receipt-actions,.modal-head,.form-actions{display:none!important}@page{margin:12mm}}
+@media print{body *{visibility:hidden!important}#receipt-paper,#receipt-paper *{visibility:visible!important}#receipt-paper{position:absolute!important;left:0!important;top:0!important;width:100%!important;max-width:100%!important;margin:0!important;padding:0!important;border:0!important;box-shadow:none!important;border-radius:0!important}.receipt-actions,.modal-head,.form-actions{display:none!important}}
+@page{margin:12mm}
 
 /* Pocketwise 1.3.2: debt direction and one-screen-at-a-time quick entry */
 .debt-direction-switch{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:0 0 22px}
@@ -2260,4 +2261,36 @@ html[data-liquid-glass="on"] .daily-story-ring-inner { border-color: var(--glass
   html[data-smart-ui="on"] .smart-nav-indicator,
   .daily-story-ring,
   .daily-story-bubble:active .daily-story-ring { transition: none !important; transform: none !important; }
+}
+
+
+/* PocketWise 2.3.30 — restore original balance-card geometry and native-like bottom placement.
+   The 2.3.23 balance card used an in-flow heading row above the radial chart. Keep an equivalent
+   small row of breathing room after replacing its heading/link with the bank shortcut icon. */
+@media (max-width: 720px) {
+  .money-card > .balance-card-topline {
+    position: relative;
+    top: auto;
+    right: auto;
+    z-index: 3;
+    width: 100%;
+    height: 26px;
+    min-height: 26px;
+    margin: 0 0 4px;
+  }
+  .money-card > .balance-card-topline .balance-card-context { display: block; }
+  .money-card > .balance-card-topline .account-shortcut {
+    position: absolute;
+    top: -8px;
+    right: -6px;
+  }
+  .money-card > .radial-area { margin: 8px auto 0; }
+
+  /* Float at the bottom safe-area edge, without the extra 8px lift that made the pills sit high. */
+  html[data-smart-ui="on"] .mobile-tabbar,
+  html[data-liquid-glass="on"] .mobile-tabbar,
+  html[data-smart-ui="on"][data-liquid-glass="on"] .mobile-tabbar,
+  html[data-smart-ui="off"][data-liquid-glass="on"] .mobile-tabbar {
+    bottom: max(8px, env(safe-area-inset-bottom));
+  }
 }
