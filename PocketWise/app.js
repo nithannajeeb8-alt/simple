@@ -1483,6 +1483,62 @@
   initialise().then(()=>{appReady=true;handleShortcutQuickAdd();}).catch(error=>{console.error('Pocketwise could not initialise.',error);toast('PocketWise could not start correctly. Please reload the app.','error');});
 
   // PocketWise 2.0 import helpers: conservative parsing, preview-before-save and duplicate checks.
+  // Native OCR is an optional enhancement: PaddleOCR in the Android wrapper and VisionKit in
+  // the native iOS wrapper. Ordinary Safari/PWA builds keep the local Tesseract fallback.
+  const pwNativeOcrPending = new Map();
+  window.PocketWiseOCRNativeResult = function(payload) {
+    if (typeof payload === 'string') { try { payload = JSON.parse(payload); } catch (_) { return; } }
+    if (!payload || typeof payload.requestId !== 'string') return;
+    const pending = pwNativeOcrPending.get(payload.requestId);
+    if (!pending) return;
+    pwNativeOcrPending.delete(payload.requestId);
+    clearTimeout(pending.timer);
+    if (payload.error) pending.reject(new Error(String(payload.error).slice(0, 240)));
+    else pending.resolve({ text: String(payload.text || '').trim(), engine: String(payload.engine || 'native OCR') });
+  };
+  async function pwReadWithNativeOcr(prepared) {
+    const androidBridge = window.PocketWisePaddleOCR;
+    const iosHandler = window.webkit?.messageHandlers?.pocketWiseVisionOCR;
+    const androidOcrToken = typeof window.__PocketWiseNativeOcrToken === 'string' ? window.__PocketWiseNativeOcrToken : '';
+    let androidAvailable = false;
+    try { androidAvailable = Boolean(androidBridge && androidOcrToken && typeof androidBridge.isAvailable === 'function' && androidBridge.isAvailable(androidOcrToken)); }
+    catch (_) { androidAvailable = false; }
+    if (!androidAvailable && !iosHandler) return null;
+    let blob;
+    if (typeof HTMLCanvasElement !== 'undefined' && prepared instanceof HTMLCanvasElement) {
+      blob = await new Promise((resolve, reject) => prepared.toBlob(value => value ? resolve(value) : reject(new Error('Could not prepare the image for native OCR.')), 'image/jpeg', 0.88));
+    } else if (typeof Blob !== 'undefined' && prepared instanceof Blob) blob = prepared;
+    else return null;
+    // Keep the bridge payload bounded to avoid huge JavaScript-interface messages on older phones.
+    if (blob.size > 8 * 1024 * 1024) throw new Error('Image is too large for native OCR.');
+    const dataUrl = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || ''));
+      reader.onerror = () => reject(new Error('Could not read the prepared image.'));
+      reader.readAsDataURL(blob);
+    });
+    const base64 = dataUrl.slice(dataUrl.indexOf(',') + 1);
+    if (!base64 || base64.length > 11_200_000) throw new Error('Image is too large for native OCR.');
+    const requestId = `pwo_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`;
+    const response = new Promise((resolve, reject) => {
+      const timer = setTimeout(() => { pwNativeOcrPending.delete(requestId); reject(new Error('Native OCR timed out.')); }, 75_000);
+      pwNativeOcrPending.set(requestId, { resolve, reject, timer });
+    });
+    try {
+      if (androidAvailable) {
+        const accepted = androidBridge.recognizeImageBase64(base64, requestId, androidOcrToken);
+        if (accepted === false) throw new Error('PaddleOCR could not start.');
+      } else {
+        iosHandler.postMessage({ requestId, base64 });
+      }
+      return await response;
+    } catch (error) {
+      const pending = pwNativeOcrPending.get(requestId);
+      if (pending) { clearTimeout(pending.timer); pwNativeOcrPending.delete(requestId); }
+      throw error;
+    }
+  }
+
   function pwParsePaymentText(raw){
     const text=String(raw||'').replace(/\u00a0/g,' ').trim(); if(!text)return null;
     if(/\b(OTP|one time password|verification code|offer|cashback|won a prize)\b/i.test(text) && !/\b(debited|credited|sent|received|paid|payment)\b/i.test(text))return {ignored:true,reason:'This looks like an OTP or promotional message, not a transaction.'};
@@ -1519,7 +1575,7 @@
     return {amount,type,date,reference:ref,upi,accountSuffix:acct,party,status,confidence:Math.min(0.99,confidence),needsReview:status==='unknown'||!party||!ref,raw:text};
   }
   function pwHasDuplicate(parsed){return state.transactions.some(t=>{const note=String(t.note||'');if(parsed.reference&&new RegExp(`(?:RRN|UTR|Ref(?:erence)?):?\\s*${parsed.reference.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}`,'i').test(note))return true;return Number(t.amount)===parsed.amount&&String(t.date||'')===parsed.date&&(/UPI/i.test(String(t.paymentMethod||''))||parsed.upi&&note.includes(parsed.upi))&&(!parsed.party||note.toLowerCase().includes(parsed.party.toLowerCase()));});}
-  function pwShowImport(){openModal('Import a payment',`<div class="modal-body pw-import"><p>Choose a payment screenshot from your photo gallery, or take a new photo. OCR reads the image in your browser and extracts likely payment details for review.</p><button type="button" class="secondary-button pw-statement-entry" id="pw-open-statement-import">${icon('file')}<span>Import a bank statement <small>PDF or CSV · review every transaction before saving</small></span></button><div class="pw-upload-zone"><input id="pw-payment-gallery" type="file" accept="image/*" hidden><input id="pw-payment-camera" type="file" accept="image/*" capture="environment" hidden><div class="pw-upload-actions"><button type="button" class="pw-upload-button" id="pw-choose-gallery"><span class="pw-upload-symbol">▧</span><strong>Choose from gallery</strong><small>Select an existing screenshot</small></button><button type="button" class="pw-upload-button" id="pw-choose-camera"><span class="pw-upload-symbol">＋</span><strong>Take a photo</strong><small>Open your camera</small></button></div><img id="pw-image-preview" alt="Selected payment screenshot preview" hidden><div id="pw-ocr-status" class="pw-ocr-status" role="status" aria-live="polite">Your image stays in this browser. Choose a screenshot to begin.</div><button class="secondary-button" id="pw-run-ocr" type="button" disabled>Read screenshot with OCR</button></div><label class="form-field"><span>OR PASTE BANK SMS / OCR TEXT</span><textarea id="pw-import-raw" rows="5" placeholder="Paste payment text here…"></textarea></label><div class="form-actions"><button class="secondary-button" type="button" data-cancel-modal>Cancel</button><button class="primary-button" type="button" id="pw-parse-payment">Extract details</button></div><p class="fine-print">OCR uses Tesseract.js loaded from jsDelivr when first needed. The image is processed in your browser, not uploaded to PocketWise. Internet is needed to load OCR on first use. Verify every field before saving.</p></div>`,'IMPORT · REVIEW BEFORE SAVING');
+  function pwShowImport(){openModal('Import a payment',`<div class="modal-body pw-import"><p>Choose a payment screenshot from your photo gallery, or take a new photo. OCR extracts likely payment details for review.</p><button type="button" class="secondary-button pw-statement-entry" id="pw-open-statement-import">${icon('file')}<span>Import a bank statement <small>PDF or CSV · review every transaction before saving</small></span></button><div class="pw-upload-zone"><input id="pw-payment-gallery" type="file" accept="image/*" hidden><input id="pw-payment-camera" type="file" accept="image/*" capture="environment" hidden><div class="pw-upload-actions"><button type="button" class="pw-upload-button" id="pw-choose-gallery"><span class="pw-upload-symbol">▧</span><strong>Choose from gallery</strong><small>Select an existing screenshot</small></button><button type="button" class="pw-upload-button" id="pw-choose-camera"><span class="pw-upload-symbol">＋</span><strong>Take a photo</strong><small>Open your camera</small></button></div><img id="pw-image-preview" alt="Selected payment screenshot preview" hidden><div id="pw-ocr-status" class="pw-ocr-status" role="status" aria-live="polite">Your image stays on this device. Choose a screenshot to begin.</div><button class="secondary-button" id="pw-run-ocr" type="button" disabled>Read screenshot with OCR</button></div><label class="form-field"><span>OR PASTE BANK SMS / OCR TEXT</span><textarea id="pw-import-raw" rows="5" placeholder="Paste payment text here…"></textarea></label><div class="form-actions"><button class="secondary-button" type="button" data-cancel-modal>Cancel</button><button class="primary-button" type="button" id="pw-parse-payment">Extract details</button></div><p class="fine-print">Uses on-device PaddleOCR on the Android app and Apple VisionKit in the native iOS app when available. Browser-only PWA mode falls back to Tesseract.js and may need internet the first time. Images are not uploaded to PocketWise. Verify every field before saving.</p></div>`,'IMPORT · REVIEW BEFORE SAVING');
     const gallery=$('#pw-payment-gallery'),camera=$('#pw-payment-camera'),run=$('#pw-run-ocr'),preview=$('#pw-image-preview'),status=$('#pw-ocr-status');let selectedFile=null;
     $('#pw-choose-gallery')?.addEventListener('click',()=>gallery?.click());
     $('#pw-choose-camera')?.addEventListener('click',()=>camera?.click());
@@ -1541,7 +1597,7 @@
     };
     const onImageSelected=(input)=>{const file=input?.files?.[0];if(!file)return;if(!file.type.startsWith('image/')){toast('Choose an image file.','error');input.value='';return;}if(file.size>15*1024*1024){toast('Choose an image smaller than 15 MB.','error');input.value='';return;}selectedFile=file;preview.src=URL.createObjectURL(file);preview.hidden=false;run.disabled=false;status.textContent=`Selected ${file.name}. Tap “Read screenshot with OCR” to extract the text.`;};
     gallery?.addEventListener('change',()=>onImageSelected(gallery));camera?.addEventListener('change',()=>onImageSelected(camera));
-    run?.addEventListener('click',async()=>{const file=selectedFile;if(!file)return;run.disabled=true;status.textContent='Loading OCR engine…';try{if(!window.Tesseract){await new Promise((resolve,reject)=>{const script=document.createElement('script');script.src='https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';script.crossOrigin='anonymous';script.referrerPolicy='no-referrer';script.onload=resolve;script.onerror=()=>reject(new Error('Could not load OCR. Connect to the internet, or paste text manually.'));document.head.appendChild(script);});}status.textContent='Reading screenshot…';const prepared=await prepareOcrImage(file);status.textContent='Enhancing screenshot locally…';const result=await window.Tesseract.recognize(prepared,'eng',{logger:m=>{if(m.status==='recognizing text')status.textContent=`Reading screenshot… ${Math.round((m.progress||0)*100)}%`;}});const recognized=String(result?.data?.text||'').trim();if(!recognized)throw new Error('No readable text found. Try a clearer screenshot or paste the payment text.');$('#pw-import-raw').value=recognized;status.textContent='Text extracted. Review it below, then tap Extract details.';$('#pw-import-raw').focus({preventScroll:true});}catch(error){status.textContent=error.message||'OCR failed. Paste the text manually instead.';}finally{run.disabled=false;}});
+    run?.addEventListener('click',async()=>{const file=selectedFile;if(!file)return;run.disabled=true;status.textContent='Preparing on-device OCR…';try{const prepared=await prepareOcrImage(file);let recognized='';let engine='browser OCR';try{const nativeResult=await pwReadWithNativeOcr(prepared);if(nativeResult?.text){recognized=nativeResult.text;engine=nativeResult.engine||'native OCR';}else if(nativeResult===null){status.textContent='Loading browser OCR…';}}catch(nativeError){status.textContent='Native OCR unavailable; trying browser OCR…';}if(!recognized){if(!window.Tesseract){await new Promise((resolve,reject)=>{const script=document.createElement('script');script.src='https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';script.crossOrigin='anonymous';script.referrerPolicy='no-referrer';script.onload=resolve;script.onerror=()=>reject(new Error('Could not load browser OCR. Connect to the internet, or paste text manually.'));document.head.appendChild(script);});}status.textContent='Reading screenshot…';const result=await window.Tesseract.recognize(prepared,'eng',{logger:m=>{if(m.status==='recognizing text')status.textContent=`Reading screenshot… ${Math.round((m.progress||0)*100)}%`;}});recognized=String(result?.data?.text||'').trim();engine='Tesseract.js';}if(!recognized)throw new Error('No readable text found. Try a clearer screenshot or paste the payment text.');$('#pw-import-raw').value=recognized;status.textContent=`Text extracted with ${engine}. Review it below, then tap Extract details.`;$('#pw-import-raw').focus({preventScroll:true});}catch(error){status.textContent=error.message||'OCR failed. Paste the text manually instead.';}finally{run.disabled=false;}});
   }
   function pwReviewImport(d){if(d.ignored){toast(d.reason,'amber');return;}if(d.error){toast(d.error,'error');return;}if(pwHasDuplicate(d)){toast('This looks like a duplicate transaction. Nothing was added.','amber');return;}
     const details=[d.party,d.upi?`UPI: ${d.upi}`:'',d.accountSuffix?`Account ending ${d.accountSuffix}`:'',d.reference?`RRN: ${d.reference}`:'',`Imported text: ${d.raw.slice(0,240)}`].filter(Boolean).join(' · ');
@@ -1552,6 +1608,8 @@
   // without implicitly submitting/saving the form; the visible Save/Continue buttons remain the
   // only commit actions. Delegation also covers dynamically-rendered budget/goal forms.
   const numericKeyboardSelector='input[type="number"],input[inputmode="decimal"],input[inputmode="numeric"]';
+  // Do not change desktop Enter-to-submit behavior. Include iPadOS, which may advertise itself as a Mac.
+  const isMobileKeyboardPlatform=isAndroid||/iPhone|iPad|iPod/i.test(navigator.userAgent||'')||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
   document.addEventListener('focusin',event=>{
     const field=event.target;
     if(field instanceof HTMLInputElement&&field.matches(numericKeyboardSelector))field.setAttribute('enterkeyhint','done');
@@ -1559,6 +1617,7 @@
   document.addEventListener('keydown',event=>{
     const field=event.target;
     if(event.key!=='Enter'&&event.key!=='NumpadEnter')return;
+    if(!isMobileKeyboardPlatform)return;
     if(!(field instanceof HTMLInputElement)||!field.matches(numericKeyboardSelector)||event.isComposing)return;
     event.preventDefault();
     event.stopPropagation();
