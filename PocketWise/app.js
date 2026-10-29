@@ -246,15 +246,6 @@
       error.cause = indexedError || localError;
       throw error;
     }
-    // Native Android wrapper bridge: keep the home-screen widget derived from the same local ledger.
-    try {
-      if (window.PocketWiseNative && typeof window.PocketWiseNative.updateWidget === 'function') {
-        const available = sumMoney((state.accounts || []).map(account => balanceForAccount(account.id)));
-        const cutoff = new Date(); cutoff.setHours(0,0,0,0); cutoff.setDate(cutoff.getDate()-6);
-        const weekSpend = sumMoney((state.transactions || []).filter(t => ['expense','refund'].includes(t.type) && dateFrom(t.date) >= cutoff && t.date <= today()).map(t => (t.type === 'refund' ? -1 : 1) * (Number(t.amount)||0)));
-        window.PocketWiseNative.updateWidget(money(available), `7-day spending · ${money(Math.max(0,weekSpend))}`);
-      }
-    } catch (error) { console.warn('PocketWise widget update skipped.', error); }
     return { indexedDB: indexedSaved, localStorage: localSaved };
   }
   function validRecordId(id){return typeof id==='string'&&/^[a-zA-Z0-9_-]{1,128}$/.test(id);}
@@ -414,10 +405,7 @@
   }
   function applyTheme(){
     const pref=state.settings.theme||'light';let actual=pref;if(pref==='system')actual=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
-    document.documentElement.dataset.theme=actual;document.documentElement.dataset.liquidGlass=state.settings.liquidGlass?'on':'off';document.documentElement.dataset.smartUi=state.settings.smartUI?'on':'off';const meta=$('meta[name="theme-color"]');if(meta)meta.content=actual==='dark'?'#000000':'#f6f8f5';$('#theme-label').textContent=pref==='system'?'System appearance':`${pref[0].toUpperCase()+pref.slice(1)} appearance`;
-    // Keep the Android WebView's system bars matched to the resolved app theme.
-    // Installed PWAs and browsers simply omit this optional native bridge.
-    try { if(window.PocketWiseNative && typeof window.PocketWiseNative.setSystemBarsTheme==='function') window.PocketWiseNative.setSystemBarsTheme(actual); } catch (_) {}
+    document.documentElement.dataset.theme=actual;document.documentElement.dataset.liquidGlass=state.settings.liquidGlass?'on':'off';document.documentElement.dataset.smartUi=state.settings.smartUI?'on':'off';try{localStorage.setItem('pocketwise-appearance-v1',JSON.stringify({theme:pref,liquidGlass:!!state.settings.liquidGlass,smartUI:!!state.settings.smartUI}));}catch(_){}const meta=$('meta[name="theme-color"]');if(meta)meta.content=actual==='dark'?'#000000':'#f6f8f5';$('#theme-label').textContent=pref==='system'?'System appearance':`${pref[0].toUpperCase()+pref.slice(1)} appearance`;
     $$('#theme-choice button').forEach(b=>b.classList.toggle('selected',b.dataset.theme===pref));
     if($('#hide-setting'))$('#hide-setting').checked=!!state.settings.hideBalances;
     if($('#liquid-glass-setting'))$('#liquid-glass-setting').checked=!!state.settings.liquidGlass;
@@ -958,9 +946,6 @@
       }
     }catch(error){if(error?.name==='AbortError')return;console.warn('PocketWise receipt file sharing unavailable; trying a supported fallback.',error);}
     try{
-      if(window.PocketWiseNative&&typeof window.PocketWiseNative.shareReceipt==='function'){
-        window.PocketWiseNative.shareReceipt(title,text);return;
-      }
       if(navigator.share){await navigator.share({title,text});return;}
     }catch(error){if(error?.name==='AbortError')return;console.warn('PocketWise receipt share failed; offering a download instead.',error);}
     downloadTransactionReceipt(id);
@@ -968,11 +953,6 @@
   function downloadTransactionReceipt(id){
     const tx=state.transactions.find(item=>item.id===id);if(!tx){toast('This transaction could not be found.','error');return;}
     const filename=receiptFilename(tx),html=standaloneReceiptHTML(tx);
-    try{
-      if(window.PocketWiseNative&&typeof window.PocketWiseNative.saveReceiptHtml==='function'&&window.PocketWiseNative.saveReceiptHtml(filename,html)){
-        toast('Receipt saved to your device.');return;
-      }
-    }catch(error){console.warn('Native receipt save unavailable; falling back to a browser download.',error);}
     try{
       const blob=new Blob([html],{type:'text/html;charset=utf-8'}),url=URL.createObjectURL(blob),anchor=document.createElement('a');
       anchor.href=url;anchor.download=filename;anchor.rel='noopener';anchor.hidden=true;document.body.appendChild(anchor);anchor.click();anchor.remove();
@@ -982,9 +962,8 @@
   }
   function printTransactionReceipt(id){
     const tx=state.transactions.find(item=>item.id===id);if(!tx){toast('This transaction could not be found.','error');return;}
-    // Keep the user in PocketWise: native WebView uses Android PrintManager; Safari/Chrome use the current page print UI.
+    // Use the browser's print dialog in the PWA.
     try{
-      if(window.PocketWiseNative&&typeof window.PocketWiseNative.printReceipt==='function'){window.PocketWiseNative.printReceipt();return;}
       if(typeof window.print==='function'){window.print();return;}
       toast('Printing is unavailable here. Use Share receipt or Download copy instead.','amber');
     }catch(error){console.error('PocketWise receipt print failed.',error);toast('Could not open printing. Use Share receipt or Download copy instead.','error');}
@@ -1483,62 +1462,7 @@
   initialise().then(()=>{appReady=true;handleShortcutQuickAdd();}).catch(error=>{console.error('Pocketwise could not initialise.',error);toast('PocketWise could not start correctly. Please reload the app.','error');});
 
   // PocketWise 2.0 import helpers: conservative parsing, preview-before-save and duplicate checks.
-  // Native OCR is an optional enhancement: PaddleOCR in the Android wrapper and VisionKit in
-  // the native iOS wrapper. Ordinary Safari/PWA builds keep the local Tesseract fallback.
-  const pwNativeOcrPending = new Map();
-  window.PocketWiseOCRNativeResult = function(payload) {
-    if (typeof payload === 'string') { try { payload = JSON.parse(payload); } catch (_) { return; } }
-    if (!payload || typeof payload.requestId !== 'string') return;
-    const pending = pwNativeOcrPending.get(payload.requestId);
-    if (!pending) return;
-    pwNativeOcrPending.delete(payload.requestId);
-    clearTimeout(pending.timer);
-    if (payload.error) pending.reject(new Error(String(payload.error).slice(0, 240)));
-    else pending.resolve({ text: String(payload.text || '').trim(), engine: String(payload.engine || 'native OCR') });
-  };
-  async function pwReadWithNativeOcr(prepared) {
-    const androidBridge = window.PocketWisePaddleOCR;
-    const iosHandler = window.webkit?.messageHandlers?.pocketWiseVisionOCR;
-    const androidOcrToken = typeof window.__PocketWiseNativeOcrToken === 'string' ? window.__PocketWiseNativeOcrToken : '';
-    let androidAvailable = false;
-    try { androidAvailable = Boolean(androidBridge && androidOcrToken && typeof androidBridge.isAvailable === 'function' && androidBridge.isAvailable(androidOcrToken)); }
-    catch (_) { androidAvailable = false; }
-    if (!androidAvailable && !iosHandler) return null;
-    let blob;
-    if (typeof HTMLCanvasElement !== 'undefined' && prepared instanceof HTMLCanvasElement) {
-      blob = await new Promise((resolve, reject) => prepared.toBlob(value => value ? resolve(value) : reject(new Error('Could not prepare the image for native OCR.')), 'image/jpeg', 0.88));
-    } else if (typeof Blob !== 'undefined' && prepared instanceof Blob) blob = prepared;
-    else return null;
-    // Keep the bridge payload bounded to avoid huge JavaScript-interface messages on older phones.
-    if (blob.size > 8 * 1024 * 1024) throw new Error('Image is too large for native OCR.');
-    const dataUrl = await new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(String(reader.result || ''));
-      reader.onerror = () => reject(new Error('Could not read the prepared image.'));
-      reader.readAsDataURL(blob);
-    });
-    const base64 = dataUrl.slice(dataUrl.indexOf(',') + 1);
-    if (!base64 || base64.length > 11_200_000) throw new Error('Image is too large for native OCR.');
-    const requestId = `pwo_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`;
-    const response = new Promise((resolve, reject) => {
-      const timer = setTimeout(() => { pwNativeOcrPending.delete(requestId); reject(new Error('Native OCR timed out.')); }, 75_000);
-      pwNativeOcrPending.set(requestId, { resolve, reject, timer });
-    });
-    try {
-      if (androidAvailable) {
-        const accepted = androidBridge.recognizeImageBase64(base64, requestId, androidOcrToken);
-        if (accepted === false) throw new Error('PaddleOCR could not start.');
-      } else {
-        iosHandler.postMessage({ requestId, base64 });
-      }
-      return await response;
-    } catch (error) {
-      const pending = pwNativeOcrPending.get(requestId);
-      if (pending) { clearTimeout(pending.timer); pwNativeOcrPending.delete(requestId); }
-      throw error;
-    }
-  }
-
+  // Screenshot OCR runs through the browser engines in the PWA; all extracted details remain review-before-save.
   function pwParsePaymentText(raw){
     const text=String(raw||'').replace(/\u00a0/g,' ').trim(); if(!text)return null;
     if(/\b(OTP|one time password|verification code|offer|cashback|won a prize)\b/i.test(text) && !/\b(debited|credited|sent|received|paid|payment)\b/i.test(text))return {ignored:true,reason:'This looks like an OTP or promotional message, not a transaction.'};
@@ -1575,7 +1499,7 @@
     return {amount,type,date,reference:ref,upi,accountSuffix:acct,party,status,confidence:Math.min(0.99,confidence),needsReview:status==='unknown'||!party||!ref,raw:text};
   }
   function pwHasDuplicate(parsed){return state.transactions.some(t=>{const note=String(t.note||'');if(parsed.reference&&new RegExp(`(?:RRN|UTR|Ref(?:erence)?):?\\s*${parsed.reference.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}`,'i').test(note))return true;return Number(t.amount)===parsed.amount&&String(t.date||'')===parsed.date&&(/UPI/i.test(String(t.paymentMethod||''))||parsed.upi&&note.includes(parsed.upi))&&(!parsed.party||note.toLowerCase().includes(parsed.party.toLowerCase()));});}
-  function pwShowImport(){openModal('Import a payment',`<div class="modal-body pw-import"><p>Choose a payment screenshot from your photo gallery, or take a new photo. OCR extracts likely payment details for review.</p><button type="button" class="secondary-button pw-statement-entry" id="pw-open-statement-import">${icon('file')}<span>Import a bank statement <small>PDF or CSV · review every transaction before saving</small></span></button><div class="pw-upload-zone"><input id="pw-payment-gallery" type="file" accept="image/*" hidden><input id="pw-payment-camera" type="file" accept="image/*" capture="environment" hidden><div class="pw-upload-actions"><button type="button" class="pw-upload-button" id="pw-choose-gallery"><span class="pw-upload-symbol">▧</span><strong>Choose from gallery</strong><small>Select an existing screenshot</small></button><button type="button" class="pw-upload-button" id="pw-choose-camera"><span class="pw-upload-symbol">＋</span><strong>Take a photo</strong><small>Open your camera</small></button></div><img id="pw-image-preview" alt="Selected payment screenshot preview" hidden><div id="pw-ocr-status" class="pw-ocr-status" role="status" aria-live="polite">Your image stays on this device. Choose a screenshot to begin.</div><button class="secondary-button" id="pw-run-ocr" type="button" disabled>Read screenshot with OCR</button></div><label class="form-field"><span>OR PASTE BANK SMS / OCR TEXT</span><textarea id="pw-import-raw" rows="5" placeholder="Paste payment text here…"></textarea></label><div class="form-actions"><button class="secondary-button" type="button" data-cancel-modal>Cancel</button><button class="primary-button" type="button" id="pw-parse-payment">Extract details</button></div><p class="fine-print">Uses on-device PaddleOCR on the Android app and Apple VisionKit in the native iOS app when available. Browser-only PWA mode falls back to Tesseract.js and may need internet the first time. Images are not uploaded to PocketWise. Verify every field before saving.</p></div>`,'IMPORT · REVIEW BEFORE SAVING');
+  function pwShowImport(){openModal('Import a payment',`<div class="modal-body pw-import"><p>Choose a payment screenshot from your photo gallery, or take a new photo. OCR extracts likely payment details for review.</p><button type="button" class="secondary-button pw-statement-entry" id="pw-open-statement-import">${icon('file')}<span>Import a bank statement <small>PDF or CSV · review every transaction before saving</small></span></button><div class="pw-upload-zone"><input id="pw-payment-gallery" type="file" accept="image/*" hidden><input id="pw-payment-camera" type="file" accept="image/*" capture="environment" hidden><div class="pw-upload-actions"><button type="button" class="pw-upload-button" id="pw-choose-gallery"><span class="pw-upload-symbol">▧</span><strong>Choose from gallery</strong><small>Select an existing screenshot</small></button><button type="button" class="pw-upload-button" id="pw-choose-camera"><span class="pw-upload-symbol">＋</span><strong>Take a photo</strong><small>Open your camera</small></button></div><img id="pw-image-preview" alt="Selected payment screenshot preview" hidden><div id="pw-ocr-status" class="pw-ocr-status" role="status" aria-live="polite">Your image stays on this device. Choose a screenshot to begin.</div><button class="secondary-button" id="pw-run-ocr" type="button" disabled>Read screenshot with OCR</button></div><label class="form-field"><span>OR PASTE BANK SMS / OCR TEXT</span><textarea id="pw-import-raw" rows="5" placeholder="Paste payment text here…"></textarea></label><div class="form-actions"><button class="secondary-button" type="button" data-cancel-modal>Cancel</button><button class="primary-button" type="button" id="pw-parse-payment">Extract details</button></div><p class="fine-print">Uses browser-based PaddleOCR when available, with Tesseract.js as a fallback. The OCR engine and model may need an internet connection the first time. Images are processed on this device and are not uploaded to PocketWise. Verify every field before saving.</p></div>`,'IMPORT · REVIEW BEFORE SAVING');
     const gallery=$('#pw-payment-gallery'),camera=$('#pw-payment-camera'),run=$('#pw-run-ocr'),preview=$('#pw-image-preview'),status=$('#pw-ocr-status');let selectedFile=null;
     $('#pw-choose-gallery')?.addEventListener('click',()=>gallery?.click());
     $('#pw-choose-camera')?.addEventListener('click',()=>camera?.click());
@@ -1597,7 +1521,72 @@
     };
     const onImageSelected=(input)=>{const file=input?.files?.[0];if(!file)return;if(!file.type.startsWith('image/')){toast('Choose an image file.','error');input.value='';return;}if(file.size>15*1024*1024){toast('Choose an image smaller than 15 MB.','error');input.value='';return;}selectedFile=file;preview.src=URL.createObjectURL(file);preview.hidden=false;run.disabled=false;status.textContent=`Selected ${file.name}. Tap “Read screenshot with OCR” to extract the text.`;};
     gallery?.addEventListener('change',()=>onImageSelected(gallery));camera?.addEventListener('change',()=>onImageSelected(camera));
-    run?.addEventListener('click',async()=>{const file=selectedFile;if(!file)return;run.disabled=true;status.textContent='Preparing on-device OCR…';try{const prepared=await prepareOcrImage(file);let recognized='';let engine='browser OCR';try{const nativeResult=await pwReadWithNativeOcr(prepared);if(nativeResult?.text){recognized=nativeResult.text;engine=nativeResult.engine||'native OCR';}else if(nativeResult===null){status.textContent='Loading browser OCR…';}}catch(nativeError){status.textContent='Native OCR unavailable; trying browser OCR…';}if(!recognized&&window.PocketWisePaddleWebOCR&&typeof window.PocketWisePaddleWebOCR.recognize==='function'){try{status.textContent='Loading PaddleOCR in browser…';const paddleResult=await window.PocketWisePaddleWebOCR.recognize(prepared,message=>{if(typeof message==='string')status.textContent=message;});recognized=String(paddleResult?.text||'').trim();if(recognized)engine=paddleResult.engine||'PaddleOCR.js';}catch(paddleError){console.warn('PocketWise PaddleOCR.js unavailable; using Tesseract.js fallback.',paddleError);status.textContent='PaddleOCR unavailable; trying browser OCR…';}}if(!recognized){if(!window.Tesseract){await new Promise((resolve,reject)=>{const script=document.createElement('script');script.src='https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';script.crossOrigin='anonymous';script.referrerPolicy='no-referrer';script.onload=resolve;script.onerror=()=>reject(new Error('Could not load browser OCR. Connect to the internet, or paste text manually.'));document.head.appendChild(script);});}status.textContent='Reading screenshot…';const result=await window.Tesseract.recognize(prepared,'eng',{logger:m=>{if(m.status==='recognizing text')status.textContent=`Reading screenshot… ${Math.round((m.progress||0)*100)}%`;}});recognized=String(result?.data?.text||'').trim();engine='Tesseract.js';}if(!recognized)throw new Error('No readable text found. Try a clearer screenshot or paste the payment text.');$('#pw-import-raw').value=recognized;status.textContent=`Text extracted with ${engine}. Review it below, then tap Extract details.`;$('#pw-import-raw').focus({preventScroll:true});}catch(error){status.textContent=error.message||'OCR failed. Paste the text manually instead.';}finally{run.disabled=false;}});
+    run?.addEventListener('click',async()=>{
+      const file=selectedFile;
+      if(!file)return;
+      run.disabled=true;
+      status.textContent='Preparing on-device OCR…';
+      try{
+        const prepared=await prepareOcrImage(file);
+        let recognized='';
+        let engine='browser OCR';
+        let ocrItems=[];
+
+        // Use the browser engine available to an installed PWA, then the established fallback.
+        if(window.PocketWisePaddleWebOCR&&typeof window.PocketWisePaddleWebOCR.recognize==='function'){
+          try{
+            status.textContent='Loading PaddleOCR in browser…';
+            const paddleResult=await window.PocketWisePaddleWebOCR.recognize(prepared,message=>{
+              if(typeof message==='string')status.textContent=message;
+            });
+            recognized=String(paddleResult?.text||'').trim();
+            ocrItems=Array.isArray(paddleResult?.items)?paddleResult.items:[];
+            if(recognized)engine=paddleResult.engine||'PaddleOCR.js';
+          }catch(paddleError){
+            console.warn('PocketWise PaddleOCR.js unavailable; using Tesseract.js fallback.',paddleError);
+            status.textContent='PaddleOCR unavailable; trying browser OCR…';
+          }
+        }
+
+        if(!recognized){
+          if(!window.Tesseract){
+            await new Promise((resolve,reject)=>{
+              const script=document.createElement('script');
+              script.src='https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';
+              script.crossOrigin='anonymous';
+              script.referrerPolicy='no-referrer';
+              script.onload=resolve;
+              script.onerror=()=>reject(new Error('Could not load browser OCR. Connect to the internet, or paste the payment text manually.'));
+              document.head.appendChild(script);
+            });
+          }
+          status.textContent='Reading screenshot…';
+          const result=await window.Tesseract.recognize(prepared,'eng',{
+            logger:m=>{if(m.status==='recognizing text')status.textContent=`Reading screenshot… ${Math.round((m.progress||0)*100)}%`;}
+          });
+          recognized=String(result?.data?.text||'').trim();
+          ocrItems=Array.isArray(result?.data?.lines)?result.data.lines.map(line=>({
+            text:String(line.text||'').trim(),
+            score:Number(line.confidence||0)/100,
+            poly:line.bbox?[[line.bbox.x0,line.bbox.y0],[line.bbox.x1,line.bbox.y0],[line.bbox.x1,line.bbox.y1],[line.bbox.x0,line.bbox.y1]]:null
+          })).filter(item=>item.poly&&item.poly.every(point=>point.every(Number.isFinite))):[];
+          engine='Tesseract.js';
+        }
+
+        if(!recognized)throw new Error('No readable text found. Try a clearer screenshot or paste the payment text.');
+        if(window.PocketWiseRupeeOCR&&ocrItems.length){
+          const repaired=window.PocketWiseRupeeOCR.recover({image:prepared,text:recognized,items:ocrItems});
+          if(repaired&&repaired.detected){recognized=repaired.text;engine+=' + rupee-symbol recovery';}
+        }
+        $('#pw-import-raw').value=recognized;
+        status.textContent=`Text extracted with ${engine}. Review it below, then tap Extract details.`;
+        $('#pw-import-raw').focus({preventScroll:true});
+      }catch(error){
+        status.textContent=error.message||'OCR failed. Paste the text manually instead.';
+      }finally{
+        run.disabled=false;
+      }
+    });
   }
   function pwReviewImport(d){if(d.ignored){toast(d.reason,'amber');return;}if(d.error){toast(d.error,'error');return;}if(pwHasDuplicate(d)){toast('This looks like a duplicate transaction. Nothing was added.','amber');return;}
     const details=[d.party,d.upi?`UPI: ${d.upi}`:'',d.accountSuffix?`Account ending ${d.accountSuffix}`:'',d.reference?`RRN: ${d.reference}`:'',`Imported text: ${d.raw.slice(0,240)}`].filter(Boolean).join(' · ');
@@ -1622,7 +1611,6 @@
     event.preventDefault();
     event.stopPropagation();
     field.blur();
-    try{window.PocketWiseNative?.hideKeyboard?.();}catch(error){console.debug('Native keyboard dismissal unavailable.',error);}
   },true);
 
   function pwPlatformSetup(){const android=isAndroid;document.documentElement.classList.toggle('pw-is-iphone',/iPhone|iPad|iPod/i.test(navigator.userAgent));document.documentElement.classList.toggle('pw-is-android',android);}

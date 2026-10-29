@@ -62,13 +62,20 @@
     const results = await engine.predict(input);
     const result = Array.isArray(results) ? results[0] : null;
     const items = result && Array.isArray(result.items) ? result.items : [];
-    const text = items
+    const cleanItems = items.filter(function (item) { return String(item && item.text || '').trim(); });
+    const text = cleanItems
       .map(function (item) { return String(item && item.text || '').trim(); })
-      .filter(Boolean)
       .join('\n')
       .trim();
-
-    return { text: text, engine: 'PaddleOCR.js' };
+    // Keep the line polygon and recognition score for local rupee-glyph verification.
+    const boxes = cleanItems.map(function (item) {
+      return {
+        text: String(item && item.text || '').trim(),
+        score: Number(item && item.score || 0),
+        poly: item && (item.poly || item.box) || null
+      };
+    });
+    return { text: text, engine: 'PaddleOCR.js', items: boxes };
   }
 
   // Small API consumed by the existing screenshot-import flow. No UI is created here.
