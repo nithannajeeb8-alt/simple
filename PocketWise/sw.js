@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pocketwise-shell-v2.3.46';
+const CACHE_NAME = 'pocketwise-shell-v2.3.47';
 const PADDLE_RUNTIME_CACHE = 'pocketwise-paddle-runtime-v243';
 const BASE_URL = self.registration.scope;
 const asset = path => new URL(path, BASE_URL).href;
@@ -19,6 +19,7 @@ const APP_SHELL = [
   asset('onboarding.js'),
   asset('pwa.js'),
   asset('manifest.webmanifest'),
+  asset('share-target.html'),
   asset('assets/icons/icon.svg'),
   asset('assets/icons/icon-192.PNG'),
   asset('assets/icons/icon-512.PNG')
@@ -33,10 +34,117 @@ self.addEventListener('activate', event => {
     .then(keys => Promise.all(keys.filter(key => key.startsWith('pocketwise-shell-') && key !== CACHE_NAME).map(key => caches.delete(key))))
     .then(() => self.clients.claim()));
 });
+const SHARE_INBOX_DB = 'PocketWiseShareInbox';
+const SHARE_INBOX_STORE = 'shares';
+const SHARE_TARGET_PATH = new URL('share-target.html', BASE_URL).pathname;
+const SHARE_MAX_BYTES = 15 * 1024 * 1024;
+
+function openShareInboxDb() {
+  return new Promise((resolve, reject) => {
+    let request;
+    try { request = indexedDB.open(SHARE_INBOX_DB, 1); }
+    catch (error) { reject(error); return; }
+    request.onupgradeneeded = () => {
+      const db = request.result;
+      if (!db.objectStoreNames.contains(SHARE_INBOX_STORE)) {
+        db.createObjectStore(SHARE_INBOX_STORE, { keyPath: 'id' });
+      }
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error || new Error('Could not open the local share inbox.'));
+    request.onblocked = () => reject(new Error('The local share inbox is blocked by another tab.'));
+  });
+}
+
+function makeShareId() {
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, value => value.toString(16).padStart(2, '0')).join('');
+}
+
+function inferSharedImageType(name) {
+  const ext = String(name || '').toLowerCase().split('.').pop();
+  return ({ jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp', heic: 'image/heic', heif: 'image/heif' })[ext] || '';
+}
+
+async function storeSharedPayment(record) {
+  const db = await openShareInboxDb();
+  try {
+    await new Promise((resolve, reject) => {
+      let tx;
+      try {
+        tx = db.transaction(SHARE_INBOX_STORE, 'readwrite');
+        tx.objectStore(SHARE_INBOX_STORE).put(record);
+      } catch (error) { reject(error); return; }
+      tx.oncomplete = resolve;
+      tx.onerror = () => reject(tx.error || new Error('Could not save the shared image locally.'));
+      tx.onabort = () => reject(tx.error || new Error('Saving the shared image was cancelled.'));
+    });
+  } finally { try { db.close(); } catch (_) {} }
+}
+
+async function receiveSharedPayment(request) {
+  const id = makeShareId();
+  let formData = null;
+  let receiveError = '';
+  try { formData = await request.formData(); }
+  catch (_) { receiveError = 'invalid-share'; }
+
+  const text = formData ? String(formData.get('text') || '').slice(0, 5000) : '';
+  const title = formData ? String(formData.get('title') || '').slice(0, 240) : '';
+  const sharedUrl = formData ? String(formData.get('url') || '').slice(0, 2000) : '';
+  const candidates = formData ? [...formData.getAll('images'), ...formData.getAll('file')] : [];
+  const file = candidates.find(value => value && typeof value.size === 'number' && typeof value.slice === 'function' && value.size > 0) || null;
+  const record = {
+    id,
+    createdAt: Date.now(),
+    title,
+    text,
+    url: sharedUrl,
+    fileBlob: null,
+    fileName: '',
+    fileType: '',
+    fileLastModified: 0,
+    error: receiveError
+  };
+
+  if (!record.error && file) {
+    const name = String(file.name || 'shared-payment-image').slice(0, 180);
+    let type = String(file.type || '').toLowerCase();
+    if (!type || type === 'application/octet-stream') type = inferSharedImageType(name);
+    if (!type.startsWith('image/')) record.error = 'unsupported-file';
+    else if (file.size > SHARE_MAX_BYTES) record.error = 'too-large';
+    else {
+      record.fileBlob = file.slice(0, file.size, type || 'application/octet-stream');
+      record.fileName = name;
+      record.fileType = type || 'application/octet-stream';
+      record.fileLastModified = Number(file.lastModified) || Date.now();
+    }
+  } else if (!record.error) {
+    record.error = 'missing-file';
+  }
+
+  try {
+    await storeSharedPayment(record);
+    const destination = new URL('./', BASE_URL);
+    destination.searchParams.set('pwShare', id);
+    return Response.redirect(destination.href, 303);
+  } catch (error) {
+    console.error('PocketWise could not store the incoming share locally.', error);
+    const destination = new URL('./', BASE_URL);
+    destination.searchParams.set('pwShareError', 'storage');
+    return Response.redirect(destination.href, 303);
+  }
+}
+
 self.addEventListener('fetch', event => {
   const req = event.request;
-  if (req.method !== 'GET') return;
   const url = new URL(req.url);
+  if (req.method === 'POST' && url.origin === self.location.origin && url.pathname === SHARE_TARGET_PATH) {
+    event.respondWith(receiveSharedPayment(req));
+    return;
+  }
+  if (req.method !== 'GET') return;
   // Cache the official PaddleOCR.js ESM runtime and its jsDelivr dependencies after
   // first use. This lets the already-installed PWA load the runtime offline later.
   // Receipt images are never sent to this cache or to a remote OCR endpoint.

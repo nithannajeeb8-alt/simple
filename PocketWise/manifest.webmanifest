@@ -1,6 +1,6 @@
 {
   "id": "./",
-  "name": "Pocketwise \u00b7 Money, made clearer",
+  "name": "Pocketwise · Money, made clearer",
   "short_name": "Pocketwise",
   "description": "Offline-first personal finance tracker with reviewed payment imports.",
   "lang": "en-IN",
@@ -86,13 +86,27 @@
     }
   ],
   "share_target": {
-    "action": "./",
-    "method": "GET",
-    "enctype": "application/x-www-form-urlencoded",
+    "action": "./share-target.html",
+    "method": "POST",
+    "enctype": "multipart/form-data",
     "params": {
       "title": "title",
       "text": "text",
-      "url": "url"
+      "url": "url",
+      "files": [
+        {
+          "name": "images",
+          "accept": [
+            "image/*",
+            ".jpg",
+            ".jpeg",
+            ".png",
+            ".webp",
+            ".heic",
+            ".heif"
+          ]
+        }
+      ]
     }
   }
 }

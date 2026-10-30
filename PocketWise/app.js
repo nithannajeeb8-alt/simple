@@ -801,7 +801,13 @@
     }
     if (errorEl) { errorEl.hidden = true; errorEl.textContent = ''; }
     let data = {type,amount,activityId:fd.get('activityId'),accountId:fd.get('accountId'),toAccountId:fd.get('toAccountId'),date:fd.get('date'),note:fd.get('note'),repeat:fd.get('repeat'),paymentMethod:fd.get('paymentMethod')||'Cash'};
-    const matchedRule = editing ? null : applySmartRule(data);
+    if(form.dataset.importReview==='true'){
+      let meta={};try{meta=JSON.parse(form.dataset.importMeta||'{}')||{};}catch(_){}
+      const merchant=String(fd.get('merchantName')||'').trim().slice(0,100);
+      const reference=String(fd.get('referenceId')||'').trim().slice(0,100);
+      data.note=[merchant?`Merchant: ${merchant}`:'',reference?`${String(meta.referenceType||'Reference ID')}: ${reference}`:'',meta.upi?`UPI: ${String(meta.upi).slice(0,100)}`:'',meta.sourceApp?`Payment app: ${String(meta.sourceApp).slice(0,60)}`:'',meta.accountSuffix?`Account ending ${String(meta.accountSuffix).slice(-6)}`:''].filter(Boolean).join(' · ');
+    }
+    const matchedRule = editing || form.dataset.importReview==='true' ? null : applySmartRule(data);
     if (matchedRule) data = {...data,activityId:matchedRule.activityId};
     if (!data.date) { toast('Choose a transaction date.', 'error'); return; }
     if (type === 'transfer' && (!data.toAccountId || data.accountId === data.toAccountId)) { toast('Choose two different accounts.', 'error'); return; }
@@ -1452,14 +1458,18 @@
       }
     },220);
   }
-  function checkIncomingShortcutRoute(){if(appReady)handleShortcutQuickAdd();}
-  window.addEventListener('pageshow',()=>checkIncomingShortcutRoute());
-  window.addEventListener('focus',checkIncomingShortcutRoute);
-  window.addEventListener('popstate',checkIncomingShortcutRoute);
-  window.addEventListener('hashchange',checkIncomingShortcutRoute);
+  async function checkIncomingShortcutRoute(){
+    if(!appReady)return;
+    const shared=await handleIncomingPaymentShare();
+    if(!shared)handleShortcutQuickAdd();
+  }
+  window.addEventListener('pageshow',()=>{void checkIncomingShortcutRoute();});
+  window.addEventListener('focus',()=>{void checkIncomingShortcutRoute();});
+  window.addEventListener('popstate',()=>{void checkIncomingShortcutRoute();});
+  window.addEventListener('hashchange',()=>{void checkIncomingShortcutRoute();});
   window.addEventListener('error', event => { console.error('Pocketwise runtime error:',event.error||event.message); });
   window.addEventListener('unhandledrejection', event => { console.error('Pocketwise async error:',event.reason); toast(event.reason?.message||'A background action failed. Your existing records are unchanged.','error'); });
-  initialise().then(()=>{appReady=true;handleShortcutQuickAdd();}).catch(error=>{console.error('Pocketwise could not initialise.',error);toast('PocketWise could not start correctly. Please reload the app.','error');});
+  initialise().then(async()=>{appReady=true;const shared=await handleIncomingPaymentShare();if(!shared)handleShortcutQuickAdd();}).catch(error=>{console.error('Pocketwise could not initialise.',error);toast('PocketWise could not start correctly. Please reload the app.','error');});
 
   // PocketWise 2.0 import helpers: conservative parsing, preview-before-save and duplicate checks.
   // Screenshot OCR runs through the browser engines in the PWA; all extracted details remain review-before-save.
@@ -1529,91 +1539,192 @@
   function pwFriendlyOcrError(error){
     const raw=String(error&&error.message||error||'').trim();
     if(/unsafe-eval|trusted-types-eval|content security policy|blocked by csp/i.test(raw))
-      return 'The OCR engine could not start because this browser blocked part of its runtime. Close and reopen PocketWise, then try again. You can also paste the payment text manually.';
+      return 'The on-device OCR engine could not start. Close and reopen PocketWise, then try again.';
     if(/failed to fetch|networkerror|load failed|importing a module script failed|offline|download failed|could not download/i.test(raw))
-      return 'Connect to the internet once to load the OCR engine and its models, then try again. Your screenshot stays on this device. You can also paste the payment text manually.';
+      return 'Connect to the internet once to load the OCR engine and its models, then try again. The screenshot stays on this device.';
     if(/out of memory|memory access out of bounds|allocation failed|wasm memory/i.test(raw))
-      return 'This screenshot is too large for the available memory. Try a smaller or cropped screenshot, or paste the payment text manually.';
-    if(!raw)return 'OCR could not read this screenshot. Try a clearer image or paste the payment text manually.';
-    return raw.length>220?'OCR could not read this screenshot. Try a clearer image or paste the payment text manually.':raw;
+      return 'This screenshot is too large for the available memory. Try a smaller or cropped screenshot.';
+    if(!raw)return 'PocketWise could not read this screenshot. Try a clearer image.';
+    return raw.length>220?'PocketWise could not read this screenshot. Try a clearer image.':raw;
   }
-  function pwShowImport(){window.PocketWiseLastReceiptOCR=null;openModal('Import a payment',`<div class="modal-body pw-import"><p>Choose a payment screenshot from your photo gallery, or take a new photo. OCR extracts likely payment details for review.</p><button type="button" class="secondary-button pw-statement-entry" id="pw-open-statement-import">${icon('file')}<span>Import a bank statement <small>PDF or CSV · review every transaction before saving</small></span></button><div class="pw-upload-zone"><input id="pw-payment-gallery" type="file" accept="image/*" hidden><input id="pw-payment-camera" type="file" accept="image/*" capture="environment" hidden><div class="pw-upload-actions"><button type="button" class="pw-upload-button" id="pw-choose-gallery"><span class="pw-upload-symbol">▧</span><strong>Choose from gallery</strong><small>Select an existing screenshot</small></button><button type="button" class="pw-upload-button" id="pw-choose-camera"><span class="pw-upload-symbol">＋</span><strong>Take a photo</strong><small>Open your camera</small></button></div><img id="pw-image-preview" alt="Selected payment screenshot preview" hidden><div id="pw-ocr-status" class="pw-ocr-status" role="status" aria-live="polite">Your image stays on this device. Choose a screenshot to begin.</div><button class="secondary-button" id="pw-run-ocr" type="button" disabled>Read screenshot with OCR</button></div><label class="form-field"><span>OR PASTE BANK SMS / OCR TEXT</span><textarea id="pw-import-raw" rows="5" placeholder="Paste payment text here…"></textarea></label><div class="form-actions"><button class="secondary-button" type="button" data-cancel-modal>Cancel</button><button class="primary-button" type="button" id="pw-parse-payment">Extract details</button></div><p class="fine-print">Uses PaddleOCR locally on this device. Its model is downloaded once and cached for later offline scans where browser storage allows. Receipt images are not uploaded. Verify every field before saving.</p></div>`,'IMPORT · REVIEW BEFORE SAVING');
-    const gallery=$('#pw-payment-gallery'),camera=$('#pw-payment-camera'),run=$('#pw-run-ocr'),preview=$('#pw-image-preview'),status=$('#pw-ocr-status');let selectedFile=null;
-    $('#pw-choose-gallery')?.addEventListener('click',()=>gallery?.click());
-    $('#pw-choose-camera')?.addEventListener('click',()=>camera?.click());
-    // Local-only preprocessing: upscale small screenshots and normalize contrast before OCR.
-    // Keep within conservative canvas limits for iOS Safari memory stability.
-    const prepareOcrImage=async(file)=>{
-      if(typeof createImageBitmap!=='function')return file;
-      const bitmap=await createImageBitmap(file);
-      try{
-        const shortest=Math.min(bitmap.width,bitmap.height),longest=Math.max(bitmap.width,bitmap.height);
-        const scale=Math.min(1.6,shortest<1050?1400/Math.max(1,shortest):1,4200/Math.max(1,longest));
-        const width=Math.max(1,Math.round(bitmap.width*scale)),height=Math.max(1,Math.round(bitmap.height*scale));
-        const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;
-        const ctx=canvas.getContext('2d',{willReadFrequently:true});if(!ctx)throw new Error('Image preprocessing is unavailable in this browser.');
-        ctx.fillStyle='#fff';ctx.fillRect(0,0,width,height);ctx.drawImage(bitmap,0,0,width,height);
-        const image=ctx.getImageData(0,0,width,height),data=image.data;
-        for(let i=0;i<data.length;i+=4){const gray=data[i]*0.299+data[i+1]*0.587+data[i+2]*0.114;const adjusted=Math.max(0,Math.min(255,(gray-128)*1.16+128));data[i]=data[i+1]=data[i+2]=adjusted;}
-        ctx.putImageData(image,0,0);return canvas;
-      }finally{bitmap.close?.();}
-    };
-    const onImageSelected=(input)=>{const file=input?.files?.[0];if(!file)return;if(!file.type.startsWith('image/')){toast('Choose an image file.','error');input.value='';return;}if(file.size>15*1024*1024){toast('Choose an image smaller than 15 MB.','error');input.value='';return;}selectedFile=file;window.PocketWiseLastReceiptOCR=null;preview.src=URL.createObjectURL(file);preview.hidden=false;run.disabled=false;status.textContent=`Selected ${file.name}. Tap “Read screenshot with OCR” to extract the text.`;};
-    gallery?.addEventListener('change',()=>onImageSelected(gallery));camera?.addEventListener('change',()=>onImageSelected(camera));
-    run?.addEventListener('click',async()=>{
-      const file=selectedFile;
-      if(!file)return;
-      run.disabled=true;
-      status.textContent='Preparing on-device OCR…';
-      try{
-        const prepared=await prepareOcrImage(file);
-        let recognized='';
-        let engine='PaddleOCR.js PP-OCRv6 small';
-        let ocrItems=[];
-        window.PocketWiseLastReceiptOCR=null;
 
-        // PaddleOCR is the only screenshot recognition engine in the PWA path.
-        if(window.PocketWisePaddleWebOCR&&typeof window.PocketWisePaddleWebOCR.recognize==='function'){
-          try{
-            status.textContent='Loading PaddleOCR in browser…';
-            const paddleResult=await window.PocketWisePaddleWebOCR.recognize(prepared,message=>{
-              if(typeof message==='string')status.textContent=message;
-            });
-            recognized=String(paddleResult?.text||'').trim();
-            ocrItems=Array.isArray(paddleResult?.items)?paddleResult.items:[];
-            if(recognized)engine=paddleResult.engine||'PaddleOCR.js';
-          }catch(paddleError){
-            console.warn('PocketWise PaddleOCR.js could not read this receipt.',paddleError);
-            throw new Error(paddleError?.message||'PaddleOCR could not initialise. Connect once to download its model, or paste payment text manually.');
-          }
-        }
-
-
-        if(!recognized)throw new Error('No readable text found. Try a clearer screenshot or paste the payment text.');
-        if(window.PocketWiseRupeeOCR&&ocrItems.length){
-          const repaired=window.PocketWiseRupeeOCR.recover({image:prepared,text:recognized,items:ocrItems});
-          if(repaired&&repaired.detected){recognized=repaired.text;engine+=' + rupee-symbol recovery';}
-        }
-        const correctedLines=recognized.split(/\r?\n/);
-        const parserItems=ocrItems.map((item,index)=>Object.assign({},item,{text:correctedLines[index]||item.text}));
-        const spatialFields=window.PocketWiseReceiptParser&&typeof window.PocketWiseReceiptParser.extract==='function'
-          ?window.PocketWiseReceiptParser.extract({text:recognized,items:parserItems}):null;
-        window.PocketWiseLastReceiptOCR={sourceText:recognized,fields:spatialFields,engine:engine};
-        $('#pw-import-raw').value=recognized;
-        status.textContent=`Text extracted with ${engine}. Review it below, then tap Extract details.`;
-        $('#pw-import-raw').focus({preventScroll:true});
-      }catch(error){
-        status.textContent=pwFriendlyOcrError(error);
-      }finally{
-        run.disabled=false;
-      }
+  function pwOpenShareInbox(){
+    return new Promise((resolve,reject)=>{
+      let request;
+      try{request=indexedDB.open('PocketWiseShareInbox',1);}catch(error){reject(error);return;}
+      request.onupgradeneeded=()=>{const database=request.result;if(!database.objectStoreNames.contains('shares'))database.createObjectStore('shares',{keyPath:'id'});};
+      request.onsuccess=()=>resolve(request.result);
+      request.onerror=()=>reject(request.error||new Error('Could not open the shared-image inbox.'));
+      request.onblocked=()=>reject(new Error('The shared-image inbox is busy. Close other PocketWise tabs and retry.'));
     });
   }
-  function pwReviewImport(d){if(d.ignored){toast(d.reason,'amber');return;}if(d.error){toast(d.error,'error');return;}if(pwHasDuplicate(d)){toast('This looks like a duplicate transaction. Nothing was added.','amber');return;}
-    const details=[d.party,d.sourceApp?`Source app: ${d.sourceApp}`:'',d.upi?`UPI: ${d.upi}`:'',d.accountSuffix?`Account ending ${d.accountSuffix}`:'',d.utr?`UTR: ${d.utr}`:'',d.transactionId?`Transaction ID: ${d.transactionId}`:'',!d.utr&&!d.transactionId&&d.reference?`${d.referenceType||'Reference'}: ${d.reference}`:'',`Imported text: ${d.raw.slice(0,240)}`].filter(Boolean).join(' · ');
-    openModal('Review imported transaction',`<div class="modal-body"><div class="pw-import-summary"><span>${d.type==='income'?'Money received':'Money sent'}</span><strong>${escapeHTML(money(d.amount))}</strong><small>${escapeHTML(d.date)} · Status: ${escapeHTML(d.status||"unknown")} · Confidence: ${Math.round((d.confidence||0)*100)}%</small></div><dl class="pw-import-details"><dt>Direction</dt><dd>${d.type==='income'?'Incoming':'Outgoing'}</dd><dt>Merchant / UPI</dt><dd>${escapeHTML(d.party||d.upi||'Not identified')}</dd><dt>Reference</dt><dd>${escapeHTML(d.reference||'Not found')}</dd><dt>Account suffix</dt><dd>${escapeHTML(d.accountSuffix||'Not found')}</dd></dl><p class="fine-print">Confirm the category and account on the next screen. Missing information is not guessed.</p><div class="form-actions"><button class="secondary-button" type="button" data-cancel-modal>Cancel</button><button class="primary-button" type="button" id="pw-confirm-import">Review category & save</button></div></div>`,'CHECK THE DETAILS');
-    $('#pw-confirm-import').addEventListener('click',()=>{transactionForm(null,d.type);const form=$('#transaction-form');$('#tx-amount').value=String(d.amount);$('#tx-date').value=d.date;$('#tx-payment-method').value='UPI';$('#tx-note').value=details;form.dataset.importReference=d.reference||'';form.dataset.importUpi=d.upi||'';});
+  async function pwConsumeSharedPayment(id){
+    const database=await pwOpenShareInbox();
+    try{
+      return await new Promise((resolve,reject)=>{
+        let tx,record=null;
+        try{
+          tx=database.transaction('shares','readwrite');
+          const store=tx.objectStore('shares');
+          const get=store.get(id);
+          get.onsuccess=()=>{record=get.result||null;if(record)store.delete(id);};
+        }catch(error){reject(error);return;}
+        tx.oncomplete=()=>resolve(record);
+        tx.onerror=()=>reject(tx.error||new Error('Could not retrieve the shared screenshot.'));
+        tx.onabort=()=>reject(tx.error||new Error('Retrieving the shared screenshot was cancelled.'));
+      });
+    }finally{try{database.close();}catch(_){}}
   }
+  async function handleIncomingPaymentShare(){
+    const current=new URL(location.href);
+    const id=current.searchParams.get('pwShare');
+    const routeError=current.searchParams.get('pwShareError');
+    if(!id&&!routeError)return false;
+    if(id&&!/^[a-f0-9]{32}$/i.test(id)){try{history.replaceState(null,'',current.pathname+current.hash);}catch(_){}toast('This shared payment link is invalid. Share the screenshot again.','error');return true;}
+    try{history.replaceState(null,'',current.pathname+current.hash);}catch(_){ }
+    if(routeError){toast(routeError==='storage'?'PocketWise could not keep the shared image on this device. Open Import Payment and choose it from your gallery.':'PocketWise could not receive that share.','error');pwShowImport();return true;}
+    let record=null;
+    try{record=await pwConsumeSharedPayment(id);}catch(error){console.warn('PocketWise share inbox read failed.',error);}
+    if(!record){toast('The shared image is no longer available. Choose it from your gallery instead.','error');pwShowImport();return true;}
+    if(record.fileBlob&&record.fileBlob.size>0){
+      let file;
+      try{file=new File([record.fileBlob],record.fileName||'shared-payment-image',{type:record.fileType||record.fileBlob.type||'image/jpeg',lastModified:record.fileLastModified||Date.now()});}
+      catch(_){file=record.fileBlob;try{Object.defineProperty(file,'name',{value:record.fileName||'shared-payment-image'});}catch(__){}}
+      await pwProcessPaymentImage(file,{shared:true});
+      return true;
+    }
+    const sharedText=[record.title,record.text,record.url].filter(Boolean).join('\n').trim();
+    if(sharedText){
+      window.PocketWiseLastReceiptOCR=null;
+      const parsed=pwParsePaymentText(sharedText);
+      if(parsed&&!parsed.error&&!parsed.ignored){pwReviewImport(parsed);return true;}
+    }
+    const message=record.error==='too-large'?'The shared image is larger than 15 MB. Choose a smaller screenshot.':record.error==='unsupported-file'?'PocketWise received a file that is not a supported image.':'Android opened PocketWise but did not attach the screenshot. Choose the image from your gallery instead.';
+    toast(message,'amber');
+    pwShowImport();
+    return true;
+  }
+
+  async function pwPrepareOcrImage(file){
+    if(typeof createImageBitmap!=='function')return file;
+    const bitmap=await createImageBitmap(file);
+    try{
+      const shortest=Math.min(bitmap.width,bitmap.height),longest=Math.max(bitmap.width,bitmap.height);
+      const scale=Math.min(1.6,shortest<1050?1400/Math.max(1,shortest):1,4200/Math.max(1,longest));
+      const width=Math.max(1,Math.round(bitmap.width*scale)),height=Math.max(1,Math.round(bitmap.height*scale));
+      const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;
+      const ctx=canvas.getContext('2d',{willReadFrequently:true});if(!ctx)throw new Error('Image preprocessing is unavailable in this browser.');
+      ctx.fillStyle='#fff';ctx.fillRect(0,0,width,height);ctx.drawImage(bitmap,0,0,width,height);
+      const image=ctx.getImageData(0,0,width,height),data=image.data;
+      for(let i=0;i<data.length;i+=4){const gray=data[i]*0.299+data[i+1]*0.587+data[i+2]*0.114;const adjusted=Math.max(0,Math.min(255,(gray-128)*1.16+128));data[i]=data[i+1]=data[i+2]=adjusted;}
+      ctx.putImageData(image,0,0);return canvas;
+    }finally{bitmap.close?.();}
+  }
+
+  async function pwProcessPaymentImage(file,{shared=false,statusElement=null}={}){
+    const imageName=String(file?.name||'').toLowerCase();
+    const looksLikeImage=String(file?.type||'').toLowerCase().startsWith('image/')||/\.(?:jpe?g|png|webp|heic|heif)$/.test(imageName);
+    if(!file||!looksLikeImage){toast('Choose a payment screenshot image.','error');return false;}
+    if(file.size>15*1024*1024){toast('Choose an image smaller than 15 MB.','error');return false;}
+    let progressElement=statusElement;
+    if(shared){
+      openModal('Reading shared payment',`<div class="modal-body pw-share-progress"><div class="pw-share-progress-mark">${icon('receipt')}</div><p id="pw-share-ocr-progress" role="status" aria-live="polite">Preparing your screenshot for on-device OCR…</p><p class="fine-print">The image stays on this device. Only the extracted transaction fields will be shown.</p></div>`,'ON-DEVICE OCR');
+      progressElement=$('#pw-share-ocr-progress');
+    }
+    const setStatus=message=>{if(progressElement?.isConnected)progressElement.textContent=message;};
+    try{
+      setStatus('Preparing the screenshot locally…');
+      const prepared=await pwPrepareOcrImage(file);
+      let recognized='',engine='PaddleOCR.js PP-OCRv6',ocrItems=[];
+      window.PocketWiseLastReceiptOCR=null;
+      if(window.PocketWisePaddleWebOCR&&typeof window.PocketWisePaddleWebOCR.recognize==='function'){
+        setStatus('Reading the payment screenshot…');
+        const paddleResult=await window.PocketWisePaddleWebOCR.recognize(prepared,message=>{if(typeof message==='string')setStatus(message);});
+        recognized=String(paddleResult?.text||'').trim();
+        ocrItems=Array.isArray(paddleResult?.items)?paddleResult.items:[];
+        if(recognized)engine=paddleResult.engine||engine;
+      }else throw new Error('The local OCR engine is unavailable.');
+      if(!recognized)throw new Error('No readable text found. Try a clearer screenshot.');
+      if(window.PocketWiseRupeeOCR&&ocrItems.length){
+        const repaired=window.PocketWiseRupeeOCR.recover({image:prepared,text:recognized,items:ocrItems});
+        if(repaired&&repaired.detected){recognized=repaired.text;engine+=' + rupee-symbol recovery';}
+      }
+      const correctedLines=recognized.split(/\r?\n/);
+      const parserItems=ocrItems.map((item,index)=>Object.assign({},item,{text:correctedLines[index]||item.text}));
+      const spatialFields=window.PocketWiseReceiptParser&&typeof window.PocketWiseReceiptParser.extract==='function'
+        ?window.PocketWiseReceiptParser.extract({text:recognized,items:parserItems}):null;
+      // OCR output remains internal. It is never copied into a visible text area or review panel.
+      window.PocketWiseLastReceiptOCR={sourceText:recognized,fields:spatialFields,engine};
+      let parsed=pwParsePaymentText(recognized);
+      if(parsed?.ignored){toast(parsed.reason,'amber');if(shared)pwShowImport(file,'This screenshot looks like an OTP or promotional message, not a payment receipt.');return false;}
+      if(parsed?.error){
+        if(/No clear INR amount|amount could not be read safely/i.test(parsed.error)){
+          const refs=spatialFields?.references||{};
+          const utr=String(refs.utr||'').trim(),transactionId=String(refs.transactionId||'').trim();
+          parsed={amount:'',type:spatialFields?.direction==='incoming'?'income':'expense',date:today(),party:String(spatialFields?.party?.name||''),reference:utr||transactionId,referenceType:utr?'UTR':transactionId?'Transaction ID':'',utr,transactionId,upi:String(spatialFields?.upi?.id||''),upiProvider:String(spatialFields?.upi?.provider||''),sourceApp:String(spatialFields?.sourceApp?.name||''),accountSuffix:'',status:'unknown',confidence:0,needsReview:true,reviewReasons:['Amount was not confidently identified. Enter it manually.']};
+        }else throw new Error(parsed.error);
+      }
+      setStatus('Payment details extracted.');
+      pwReviewImport(parsed);
+      return true;
+    }catch(error){
+      console.warn('PocketWise payment screenshot OCR failed.',error);
+      const message=pwFriendlyOcrError(error);
+      if(shared){closeModal();pwShowImport(file,message);}else setStatus(message);
+      return false;
+    }
+  }
+
+  function pwShowImport(initialFile=null,initialStatus='Your image stays on this device. Choose a screenshot to begin.'){
+    window.PocketWiseLastReceiptOCR=null;
+    openModal('Import a payment',`<div class="modal-body pw-import"><p>Choose a payment screenshot from your photo gallery, or take a new photo. PocketWise reads it locally and shows only the transaction fields for review.</p><button type="button" class="secondary-button pw-statement-entry" id="pw-open-statement-import">${icon('file')}<span>Import a bank statement <small>PDF or CSV · review every transaction before saving</small></span></button><div class="pw-upload-zone"><input id="pw-payment-gallery" type="file" accept="image/*" hidden><input id="pw-payment-camera" type="file" accept="image/*" capture="environment" hidden><div class="pw-upload-actions"><button type="button" class="pw-upload-button" id="pw-choose-gallery"><span class="pw-upload-symbol">▧</span><strong>Choose from gallery</strong><small>Select an existing screenshot</small></button><button type="button" class="pw-upload-button" id="pw-choose-camera"><span class="pw-upload-symbol">＋</span><strong>Take a photo</strong><small>Open your camera</small></button></div><img id="pw-image-preview" alt="Selected payment screenshot preview" hidden><div id="pw-ocr-status" class="pw-ocr-status" role="status" aria-live="polite">${escapeHTML(initialStatus)}</div><button class="secondary-button" id="pw-run-ocr" type="button" disabled>Read screenshot with OCR</button></div><div class="pw-import-sms"><button type="button" class="text-button" id="pw-toggle-sms">Paste bank SMS instead</button><div id="pw-sms-panel" hidden><label class="form-field"><span>BANK SMS</span><textarea id="pw-import-sms" rows="4" placeholder="Paste the payment SMS here…"></textarea></label><button class="primary-button" type="button" id="pw-parse-payment">Extract payment details</button></div></div><p class="fine-print">Uses on-device OCR. The screenshot and extracted text are not uploaded or displayed as raw text. Verify the amount, merchant and reference before saving.</p><div class="form-actions"><button class="secondary-button" type="button" data-cancel-modal>Cancel</button></div></div>`,'IMPORT · REVIEW BEFORE SAVING');
+    const gallery=$('#pw-payment-gallery'),camera=$('#pw-payment-camera'),run=$('#pw-run-ocr'),preview=$('#pw-image-preview'),status=$('#pw-ocr-status');
+    let selectedFile=null;
+    $('#pw-choose-gallery')?.addEventListener('click',()=>gallery?.click());
+    $('#pw-choose-camera')?.addEventListener('click',()=>camera?.click());
+    const selectFile=file=>{
+      if(!file)return;
+      const type=String(file.type||'').toLowerCase();
+      const name=String(file.name||'').toLowerCase();
+      if(!type.startsWith('image/')&&!/\.(?:jpe?g|png|webp|heic|heif)$/.test(name)){toast('Choose an image file.','error');return;}
+      if(file.size>15*1024*1024){toast('Choose an image smaller than 15 MB.','error');return;}
+      selectedFile=file;window.PocketWiseLastReceiptOCR=null;
+      try{if(preview.dataset.objectUrl)URL.revokeObjectURL(preview.dataset.objectUrl);const objectUrl=URL.createObjectURL(file);preview.dataset.objectUrl=objectUrl;preview.src=objectUrl;}catch(_){preview.removeAttribute('src');}
+      preview.hidden=false;run.disabled=false;
+      if(!initialFile)status.textContent=`Selected ${file.name||'payment screenshot'}. Tap “Read screenshot with OCR” to continue.`;
+    };
+    gallery?.addEventListener('change',()=>selectFile(gallery.files?.[0]));
+    camera?.addEventListener('change',()=>selectFile(camera.files?.[0]));
+    $('#pw-toggle-sms')?.addEventListener('click',()=>{const panel=$('#pw-sms-panel');panel.hidden=!panel.hidden;if(!panel.hidden)$('#pw-import-sms')?.focus({preventScroll:true});});
+    $('#pw-run-ocr')?.addEventListener('click',async()=>{
+      if(!selectedFile)return;
+      run.disabled=true;
+      try{await pwProcessPaymentImage(selectedFile,{statusElement:status});}
+      finally{if(run.isConnected)run.disabled=false;}
+    });
+    if(initialFile)selectFile(initialFile);
+  }
+
+  function pwReviewImport(d){
+    if(d.ignored){toast(d.reason,'amber');return;}
+    if(pwHasDuplicate(d)){toast('This looks like a duplicate transaction. Nothing was added.','amber');return;}
+    const type=d.type==='income'?'income':'expense';
+    let activities=state.activities.filter(a=>!a.archived&&(a.kind==='both'||a.kind===type||(type==='expense'&&a.kind==='refund')));
+    activities.sort((a,b)=>{const ca=state.transactions.filter(t=>t.activityId===a.id).length,cb=state.transactions.filter(t=>t.activityId===b.id).length;return cb-ca||a.name.localeCompare(b.name);});
+    if(!activities.length)activities=state.activities.filter(a=>!a.archived);
+    const preferred=type==='income'?activities.find(a=>a.id==='salary'):activities.find(a=>a.id==='food');
+    const selectedActivity=preferred?.id||activities[0]?.id||'other';
+    const categoryMarkup=activities.map(activity=>`<label class="pw-review-category"><input type="radio" name="activityId" value="${escapeHTML(activity.id)}" ${activity.id===selectedActivity?'checked':''}><span>${escapeHTML(activity.name)}</span></label>`).join('');
+    const merchant=String(d.party||d.upiProvider||'').trim().slice(0,100);
+    const reference=String(d.reference||'').trim().slice(0,100);
+    const meta={referenceType:d.referenceType||'Reference ID',upi:d.upi||'',sourceApp:d.sourceApp||'',accountSuffix:d.accountSuffix||''};
+    const rememberedAccount=state.settings.lastQuickAddAccountId;
+    const importAccountId=state.accounts.some(account=>account.id===rememberedAccount)?rememberedAccount:(state.accounts[0]?.id||'cash');
+    currentEditId=null;currentTxType=type;
+    openModal('Review payment',`<form id="transaction-form" class="modal-body pw-payment-review" data-type="${type}" data-import-review="true" data-import-meta="${escapeHTML(JSON.stringify(meta))}"><div class="pw-payment-review-fields"><div class="form-field full"><label for="tx-amount">AMOUNT · INR</label><input id="tx-amount" class="amount-input" name="amount" inputmode="decimal" enterkeyhint="done" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="₹ 0" value="${escapeHTML(d.amount==null?'':String(d.amount))}" aria-describedby="tx-amount-error" required autofocus><p class="field-error" id="tx-amount-error" role="alert" hidden></p></div><div class="form-field full"><label for="pw-review-merchant">MERCHANT NAME</label><input id="pw-review-merchant" name="merchantName" type="text" autocomplete="off" maxlength="100" placeholder="Merchant or recipient" value="${escapeHTML(merchant)}"></div><div class="form-field full"><label for="pw-review-reference">REFERENCE ID</label><input id="pw-review-reference" name="referenceId" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="100" placeholder="UTR / transaction reference" value="${escapeHTML(reference)}"></div></div><section class="pw-review-category-column" aria-labelledby="pw-review-category-title"><div class="pw-review-category-heading" id="pw-review-category-title">CHOOSE CATEGORY</div><div class="pw-review-category-list" role="radiogroup" aria-labelledby="pw-review-category-title">${categoryMarkup||'<p class="muted">No categories are available. Add a category in Settings before saving.</p>'}</div></section><input type="hidden" name="accountId" value="${escapeHTML(importAccountId)}"><input type="hidden" name="paymentMethod" value="UPI"><input type="hidden" name="date" value="${escapeHTML(d.date||today())}"><input type="hidden" name="repeat" value="none"><div class="form-actions"><button class="secondary-button" type="button" data-cancel-modal>Cancel</button><button class="primary-button" type="submit" ${activities.length?'':'disabled'}>Save transaction</button></div><p class="form-note">Check the details. PocketWise will not save until you confirm.</p></form>`,'PAYMENT · REVIEW BEFORE SAVING');
+    $('#tx-amount')?.focus({preventScroll:true});
+  }
+
   // Mobile numeric keyboards should expose a Done action. Pressing it dismisses the keyboard
   // without implicitly submitting/saving the form; the visible Save/Continue buttons remain the
   // only commit actions. Delegation also covers dynamically-rendered budget/goal forms.
@@ -1644,7 +1755,7 @@
   document.addEventListener('pointercancel',()=>{txSwipeStart=null;},{passive:true});
   document.addEventListener('click',event=>{if(Date.now()<txSwipeSuppressClickUntil&&event.target.closest('.transaction-swipe-shell')){txSwipeSuppressClickUntil=0;event.preventDefault();event.stopPropagation();}},true);
   // Payment import is intentionally accessed from the central + menu, not a persistent home overlay.
-  document.addEventListener('click',e=>{if(e.target.closest('#pw-parse-payment')){const parsed=pwParsePaymentText($('#pw-import-raw')?.value||'');if(!parsed||parsed.error){toast(parsed?.error||'Add payment text or scan a screenshot first.','error');return;}pwReviewImport(parsed);} });
+  document.addEventListener('click',e=>{if(e.target.closest('#pw-parse-payment')){const parsed=pwParsePaymentText($('#pw-import-sms')?.value||'');if(!parsed||parsed.error){toast(parsed?.error||'Paste a bank SMS first.','error');return;}pwReviewImport(parsed);} });
   // Dedicated bank-statement flow is isolated from the established payment screenshot/SMS parser.
   document.addEventListener('click',event=>{if(event.target.closest('#pw-open-statement-import'))window.PocketwiseStatementImporter?.open();});
   window.addEventListener('pw-open-statement-import',()=>window.PocketwiseStatementImporter?.open());
@@ -1674,6 +1785,6 @@
     }
   };
   // iOS may strip query parameters when launching an installed PWA. Clipboard paste remains the reliable fallback.
-  (function(){try{const q=new URLSearchParams(location.search);const payload=q.get('transaction')||q.get('payload')||q.get('text');if(payload){history.replaceState({},'',location.pathname);setTimeout(()=>{pwShowImport();const el=$('#pw-import-raw');if(el)el.value=payload;},350);}}catch{}})();
+  (function(){try{const q=new URLSearchParams(location.search);const payload=q.get('transaction')||q.get('payload')||q.get('text');if(payload){history.replaceState({},'',location.pathname);setTimeout(()=>{pwShowImport();const panel=$('#pw-sms-panel'),el=$('#pw-import-sms');if(panel)panel.hidden=false;if(el){el.value=payload;el.focus({preventScroll:true});}},350);}}catch{}})();
 
 })();
