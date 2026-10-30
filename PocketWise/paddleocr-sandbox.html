@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-2SJxj9lcBvy2oxjjVmLq3KwBwdXW/tOexnWV9TvmJY8=' https://cdn.jsdelivr.net https://esm.run 'unsafe-eval' 'wasm-unsafe-eval'; connect-src https://cdn.jsdelivr.net https://esm.run blob:; img-src blob: data:; worker-src blob: https://cdn.jsdelivr.net https://esm.run; style-src 'none'; font-src 'none'; base-uri 'none'; object-src 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-uPk5VTbixklQCT5RCcZuX/2dNwCpS4tb5NFGeI4iJ9A=' https://cdn.jsdelivr.net https://esm.run 'unsafe-eval' 'wasm-unsafe-eval'; connect-src https://cdn.jsdelivr.net https://esm.run blob:; img-src blob: data:; worker-src blob: https://cdn.jsdelivr.net https://esm.run; style-src 'none'; font-src 'none'; base-uri 'none'; object-src 'none'; form-action 'none'">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>PocketWise local OCR runtime</title>
 </head>
@@ -48,8 +48,10 @@ async function initialise(message) {
   if (!(message.detectionModel instanceof Blob) || !(message.recognitionModel instanceof Blob)) {
     throw new Error('The local OCR model files were not transferred correctly.');
   }
-  if (engine && typeof engine.dispose === 'function') {
-    try { await engine.dispose(); } catch (_) { /* replacing a failed runtime */ }
+  const previousEngine = engine;
+  engine = null;
+  if (previousEngine && typeof previousEngine.dispose === 'function') {
+    try { await previousEngine.dispose(); } catch (_) { /* replacing a failed runtime */ }
   }
   modelUrls.forEach(function (url) { try { URL.revokeObjectURL(url); } catch (_) {} });
   modelUrls = [];
@@ -57,18 +59,25 @@ async function initialise(message) {
   const detUrl = URL.createObjectURL(message.detectionModel);
   const recUrl = URL.createObjectURL(message.recognitionModel);
   modelUrls.push(detUrl, recUrl);
-  engine = await PaddleOCR.create({
-    textDetectionModelName: String(message.detectionModelName || 'PP-OCRv6_small_det'),
-    textDetectionModelAsset: { url: detUrl },
-    textRecognitionModelName: String(message.recognitionModelName || 'PP-OCRv6_small_rec'),
-    textRecognitionModelAsset: { url: recUrl },
-    ortOptions: { backend: 'auto', numThreads: 1, simd: true }
-  });
-  if (!engine || typeof engine.predict !== 'function') {
+  try {
+    const created = await PaddleOCR.create({
+      textDetectionModelName: String(message.detectionModelName || 'PP-OCRv6_small_det'),
+      textDetectionModelAsset: { url: detUrl },
+      textRecognitionModelName: String(message.recognitionModelName || 'PP-OCRv6_small_rec'),
+      textRecognitionModelAsset: { url: recUrl },
+      ortOptions: { backend: 'auto', numThreads: 1, simd: true }
+    });
+    if (!created || typeof created.predict !== 'function') {
+      throw new Error('PaddleOCR did not initialise correctly.');
+    }
+    engine = created;
+    return { ready: true, detectionModelName: message.detectionModelName, recognitionModelName: message.recognitionModelName };
+  } catch (error) {
     engine = null;
-    throw new Error('PaddleOCR did not initialise correctly.');
+    modelUrls.forEach(function (url) { try { URL.revokeObjectURL(url); } catch (_) {} });
+    modelUrls = [];
+    throw error;
   }
-  return { ready: true };
 }
 
 window.addEventListener('message', async function (event) {

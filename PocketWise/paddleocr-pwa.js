@@ -9,7 +9,12 @@
   'use strict';
 
   const SDK_URL = 'https://cdn.jsdelivr.net/npm/@paddleocr/paddleocr-js@0.4.2/+esm';
-  const MODEL_NAMES = Object.freeze({ det: 'PP-OCRv6_small_det', rec: 'PP-OCRv6_small_rec' });
+  // Tiny is the fast local AI recognizer. Small is the existing, larger PaddleOCR fallback.
+  // Keep the v243 CacheStorage namespace so previously downloaded Small archives remain usable.
+  const MODEL_PROFILES = Object.freeze({
+    tiny: Object.freeze({ det: 'PP-OCRv6_tiny_det', rec: 'PP-OCRv6_tiny_rec', label: 'PP-OCRv6 Tiny' }),
+    small: Object.freeze({ det: 'PP-OCRv6_small_det', rec: 'PP-OCRv6_small_rec', label: 'PP-OCRv6 Small' })
+  });
   const MODEL_CACHE = 'pocketwise-paddle-models-v243';
   const SANDBOX_FILE = 'paddleocr-sandbox.html';
   const SCRIPT_BASE = (typeof document !== 'undefined' && document.currentScript && document.currentScript.src) || '';
@@ -18,6 +23,7 @@
   const MAX_TILE_SIDE = 2200;
   const TILE_OVERLAP = 260;
   let enginePromise = null;
+  let engineProfile = null;
   let sandboxFrame = null;
   let sandboxReadyPromise = null;
   let sandboxReadyResolve = null;
@@ -212,20 +218,27 @@
     });
   }
 
-  async function createEngine(onStatus) {
-    if (enginePromise) return enginePromise;
-    enginePromise = (async function () {
+  async function createEngine(profileName, onStatus) {
+    const profile = MODEL_PROFILES[profileName];
+    if (!profile) throw new Error('Unknown local OCR model profile.');
+    if (enginePromise && engineProfile === profileName) return enginePromise;
+    engineProfile = profileName;
+    const requestedPromise = (async function () {
+      report(onStatus, profileName === 'tiny'
+        ? 'Preparing lightweight AI OCR model (PP-OCRv6 Tiny)…'
+        : 'Preparing PaddleOCR fallback model (PP-OCRv6 Small)…');
       const [detBlob, recBlob] = await Promise.all([
-        downloadModel(MODEL_NAMES.det, onStatus), downloadModel(MODEL_NAMES.rec, onStatus)
+        downloadModel(profile.det, onStatus), downloadModel(profile.rec, onStatus)
       ]);
-      report(onStatus, 'Starting isolated PaddleOCR runtime…');
+      report(onStatus, 'Starting isolated ' + profile.label + ' runtime…');
       await sandboxRequest('init', {
         detectionModel: detBlob,
         recognitionModel: recBlob,
-        detectionModelName: MODEL_NAMES.det,
-        recognitionModelName: MODEL_NAMES.rec
+        detectionModelName: profile.det,
+        recognitionModelName: profile.rec
       }, 180000);
-      const engine = {
+      return {
+        profile: profileName,
         predict: async function (canvas, options) {
           const image = await canvasToBlob(canvas);
           const result = await sandboxRequest('predict', { image: image, options: options || {} }, 120000);
@@ -235,9 +248,17 @@
           try { await sandboxRequest('dispose', {}, 15000); } catch (_) { /* iframe may already be gone */ }
         }
       };
-      return engine;
-    })().catch(function (error) { enginePromise = null; throw error; });
-    return enginePromise;
+    })();
+    enginePromise = requestedPromise;
+    try {
+      return await requestedPromise;
+    } catch (error) {
+      if (enginePromise === requestedPromise) {
+        enginePromise = null;
+        engineProfile = null;
+      }
+      throw error;
+    }
   }
 
   async function toCanvas(input) {
@@ -345,13 +366,37 @@
     const results = await engine.predict(canvas, options);
     return Array.isArray(results) && results[0] ? results[0] : null;
   }
-  async function recognize(input, onStatus) {
-    if (!input) throw new TypeError('PaddleOCR requires a receipt image.');
-    const engine = await createEngine(onStatus);
-    const source = await toCanvas(input), width = source.width, height = source.height;
+  function assessTinyResult(result) {
+    const text = String(result && result.text || '').trim();
+    const items = Array.isArray(result && result.items) ? result.items : [];
+    const lines = text.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+    const scores = items.map(item => Number(item && item.score)).filter(score => Number.isFinite(score) && score > 0);
+    const averageScore = scores.length ? scores.reduce((sum, score) => sum + score, 0) / scores.length : 0;
+    const numericLines = lines.filter(line => /\d/.test(line)).length;
+    const hasCurrencyCue = /₹|\bINR\b|\bRs\.?\s*\d/i.test(text);
+    const hasPaymentCue = /\b(paid|payment|received|sent|upi|transaction|successful|completed|ref(?:erence)?|utr|rrn|amount)\b/i.test(text);
+    const reasons = [];
+    if (!text || !items.length) reasons.push('no readable text');
+    if (lines.length < 4) reasons.push('too few text lines');
+    if (numericLines < 1) reasons.push('no amount or reference digits');
+    if (!hasCurrencyCue) reasons.push('no reliable currency marker');
+    if (!scores.length || averageScore < 0.48) reasons.push('low or missing recognition confidence');
+    if (!hasPaymentCue && lines.length < 7) reasons.push('weak payment context');
+    return {
+      useFallback: reasons.length > 0,
+      reasons: reasons,
+      averageScore: averageScore,
+      lineCount: lines.length,
+      hasCurrencyCue: hasCurrencyCue
+    };
+  }
+
+  async function recognizeWithEngine(engine, source, onStatus, profileName) {
+    const width = source.width, height = source.height;
     if (!width || !height) throw new Error('The selected image has no readable pixels.');
     const tiles = tileRects(width, height), collected = [], timings = [];
-    report(onStatus, 'Detecting and reading receipt text with PaddleOCR…');
+    const label = MODEL_PROFILES[profileName].label;
+    report(onStatus, 'Reading receipt with ' + label + '…');
     for (let i = 0; i < tiles.length; i++) {
       const rect = tiles[i];
       const normal = canvasTile(source, rect, null);
@@ -369,14 +414,13 @@
         });
         if (result.metrics) timings.push(result.metrics);
       }
-      report(onStatus, 'Reading receipt regions… ' + Math.round((i + 1) / tiles.length * 100) + '%');
+      report(onStatus, label + ' reading receipt regions… ' + Math.round((i + 1) / tiles.length * 100) + '%');
     }
     let items = dedupeItems(collected);
-    // Retry when there are very few lines OR Paddle did not retain any currency cue.
-    // In particular, a leading ₹ misread as the digit 2 must not suppress the relaxed pass.
+    // Retry weak detection once at a lower threshold. Missing ₹ must not suppress this pass.
     const hasCurrencyCue = items.some(item => /₹|\bINR\b|\bRs\.?/i.test(item.text));
     if (items.length < 3 || !hasCurrencyCue) {
-      report(onStatus, 'Retrying faint text with a more sensitive PaddleOCR detector…');
+      report(onStatus, 'Retrying faint text with a more sensitive ' + label + ' detector…');
       for (const rect of tiles) {
         const tile = canvasTile(source, rect, null);
         const result = await predictOne(engine, tile.canvas, true);
@@ -389,22 +433,62 @@
       items = dedupeItems(collected);
     }
     const text = items.map(item => item.text).filter(Boolean).join('\n').trim();
-    if (!text) throw new Error('PaddleOCR could not find readable text. Try a clearer image or paste the payment text manually.');
     return {
       text: text,
-      engine: 'PaddleOCR.js PP-OCRv6 small',
+      engine: label,
       items: items,
       image: { width: width, height: height, tiles: tiles.length },
       metrics: timings
     };
   }
 
+  async function recognize(input, onStatus) {
+    if (!input) throw new TypeError('PaddleOCR requires a receipt image.');
+    const source = await toCanvas(input);
+    let tinyFailure = null;
+    try {
+      const tinyEngine = await createEngine('tiny', onStatus);
+      const tinyResult = await recognizeWithEngine(tinyEngine, source, onStatus, 'tiny');
+      const assessment = assessTinyResult(tinyResult);
+      if (!assessment.useFallback) {
+        tinyResult.engine = 'PP-OCRv6 Tiny (local AI)';
+        tinyResult.model = 'PP-OCRv6_tiny';
+        tinyResult.fallbackUsed = false;
+        return tinyResult;
+      }
+      tinyFailure = new Error(assessment.reasons.join(', '));
+      report(onStatus, 'Tiny OCR result looks incomplete (' + assessment.reasons.join(', ') + '). Switching to PaddleOCR Small…');
+    } catch (error) {
+      tinyFailure = error;
+      report(onStatus, 'The lightweight AI model could not start. Switching to PaddleOCR Small fallback…');
+    }
+
+    try {
+      const fallbackEngine = await createEngine('small', onStatus);
+      const fallbackResult = await recognizeWithEngine(fallbackEngine, source, onStatus, 'small');
+      if (!fallbackResult.text) throw new Error('The fallback model found no readable text.');
+      fallbackResult.engine = 'PaddleOCR.js PP-OCRv6 Small fallback';
+      fallbackResult.model = 'PP-OCRv6_small';
+      fallbackResult.fallbackUsed = true;
+      fallbackResult.fallbackReason = tinyFailure && String(tinyFailure.message || tinyFailure).slice(0, 180);
+      return fallbackResult;
+    } catch (fallbackError) {
+      console.warn('PocketWise OCR primary and fallback models both failed.', tinyFailure, fallbackError);
+      const message = 'The lightweight OCR model could not read this screenshot, and the PaddleOCR fallback could not start. Connect once to install/cache the models, then retry. You can also paste the payment text manually.';
+      throw new Error(message);
+    }
+  }
+
   window.PocketWisePaddleWebOCR = Object.freeze({
     recognize: recognize,
     // Exposed for deterministic geometry regression tests; the app UI does not call this.
     getTilePlan: function (width, height) { return tileRects(width, height).map(rect => Object.assign({}, rect)); },
+    getModelConfig: function (name) { const profile = MODEL_PROFILES[name]; return profile ? Object.assign({}, profile) : null; },
+    assessTinyResult: assessTinyResult,
     clearEngine: async function () {
-    if (enginePromise) { try { const engine = await enginePromise; if (engine && typeof engine.dispose === 'function') await engine.dispose(); } catch (_) {} }
-    enginePromise = null;
-  } });
+      if (enginePromise) { try { const engine = await enginePromise; if (engine && typeof engine.dispose === 'function') await engine.dispose(); } catch (_) {} }
+      enginePromise = null;
+      engineProfile = null;
+    }
+  });
 }());
