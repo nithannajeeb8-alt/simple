@@ -2698,8 +2698,8 @@ textarea,
 }
 @media(prefers-reduced-motion:reduce){.quick-progress span,.quick-choice{transition:none!important}}
 
-/* PocketWise 2.4.4 · keep dense financial detail in the downloadable sheets. */
-.finance-overview-card #finance-overview-metrics{display:none!important}
+/* PocketWise 2.4.5 · concise overview metrics; detailed tables remain downloadable. */
+.finance-overview-card #finance-overview-metrics{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))}
 .finance-overview-card .finance-coverage-note{margin:9px 0 0;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);font-size:10px;line-height:1.45}
 .finance-report-download-heading h2{margin:5px 0 4px;font-size:17px;letter-spacing:-.35px}
 .finance-report-download-heading p{max-width:54ch;margin:0;font-size:11px;line-height:1.45}
@@ -2759,3 +2759,13 @@ textarea,
   .finance-report-download-card .secondary-button{min-width:76px;padding:8px 10px;font-size:11px}
   .finance-report-download-copy small{font-size:9px}
 }
+
+
+/* 2.4.5 · chart accessibility text stays available to assistive tech without appearing below the chart. */
+.sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+.insights-top-charts{margin:0 0 17px}
+.insights-top-charts>.insight-wide{grid-column:auto}
+.finance-overview-card #finance-overview-metrics{margin-top:12px}
+.finance-overview-card .finance-metric em{max-width:100%;overflow-wrap:anywhere}
+@media(max-width:760px){.finance-overview-card #finance-overview-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:360px){.finance-overview-card #finance-overview-metrics{gap:7px}.finance-overview-card .finance-metric{padding:9px}.finance-overview-card .finance-metric strong{font-size:14px}}
