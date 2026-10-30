@@ -64,6 +64,11 @@
           if (String(text || '').trim()) return { kind: 'text', text: String(text) };
         }
       } catch (error) {
+        // Safari/WebKit does not use the Permissions API for clipboard reads. A
+        // NotAllowedError must be returned to the UI so it can offer a real,
+        // user-driven paste-event target. Immediately calling readText() here can
+        // consume the same transient activation and still will not show a prompt.
+        if (error?.name === 'NotAllowedError' || error?.name === 'SecurityError') throw error;
         readError = error;
       }
     }
@@ -74,13 +79,57 @@
         const text = await clipboard.readText();
         if (String(text || '').trim()) return { kind: 'text', text: String(text) };
       } catch (error) {
+        if (error?.name === 'NotAllowedError' || error?.name === 'SecurityError') throw error;
         if (!readError) readError = error;
       }
     }
 
     if (readError) throw readError;
-    throw new Error('No image or PocketWise transaction was found on the clipboard. For screenshots, use the updated Shortcut to copy the image first.');
+    throw new Error('No image or PocketWise transaction was found on the clipboard.');
   }
 
-  root.PocketWiseClipboardImport = Object.freeze({ read: readClipboardImport });
+  // Synchronous DataTransfer access from a user-initiated paste event is the
+  // WebKit fallback when the asynchronous Clipboard API cannot expose content.
+  async function readPasteEvent(dataTransfer) {
+    if (!dataTransfer) return null;
+    const items = Array.from(dataTransfer.items || []);
+    for (const item of items) {
+      const type = String(item?.type || '').toLowerCase();
+      if (!type.startsWith('image/') || typeof item.getAsFile !== 'function') continue;
+      const file = item.getAsFile();
+      if (file) return { kind: 'image', file: makeImageFile(file, type) };
+    }
+
+    for (const file of Array.from(dataTransfer.files || [])) {
+      if (String(file?.type || '').toLowerCase().startsWith('image/')) {
+        return { kind: 'image', file: makeImageFile(file, file.type) };
+      }
+    }
+
+    // Some WebKit paste sources expose an image as an HTML <img> subresource
+    // rather than a DataTransfer file. Only resolve local data/blob URLs; never
+    // fetch an arbitrary URL copied from untrusted clipboard HTML.
+    const html = typeof dataTransfer.getData === 'function' ? String(dataTransfer.getData('text/html') || '') : '';
+    if (html && html.length <= 22 * 1024 * 1024) {
+      const match = html.match(/<img\b[^>]*?\bsrc\s*=\s*(["'])(.*?)\1/i);
+      const src = match?.[2] || '';
+      if (/^(?:data:image\/(?:png|jpeg|webp|gif|bmp);|blob:)/i.test(src) && typeof root.fetch === 'function') {
+        try {
+          const response = await root.fetch(src);
+          if (response?.ok) {
+            const blob = await response.blob();
+            if (String(blob?.type || '').toLowerCase().startsWith('image/')) {
+              return { kind: 'image', file: makeImageFile(blob, blob.type) };
+            }
+          }
+        } catch (_) { /* Continue to the text fallback. */ }
+      }
+    }
+
+    const text = typeof dataTransfer.getData === 'function' ? String(dataTransfer.getData('text/plain') || '') : '';
+    if (text.trim()) return { kind: 'text', text };
+    return null;
+  }
+
+  root.PocketWiseClipboardImport = Object.freeze({ read: readClipboardImport, readPasteEvent });
 })(typeof window !== 'undefined' ? window : globalThis);

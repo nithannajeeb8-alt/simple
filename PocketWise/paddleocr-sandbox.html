@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-uPk5VTbixklQCT5RCcZuX/2dNwCpS4tb5NFGeI4iJ9A=' https://cdn.jsdelivr.net https://esm.run 'unsafe-eval' 'wasm-unsafe-eval'; connect-src https://cdn.jsdelivr.net https://esm.run blob:; img-src blob: data:; worker-src blob: https://cdn.jsdelivr.net https://esm.run; style-src 'none'; font-src 'none'; base-uri 'none'; object-src 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-/Wdo+AyhTqUEgTnnOeRlMyvbGZsfMZF4E9NgBTKFW+M=' https://cdn.jsdelivr.net https://esm.run 'unsafe-eval' 'wasm-unsafe-eval'; connect-src https://cdn.jsdelivr.net https://esm.run blob:; img-src blob: data:; worker-src blob: https://cdn.jsdelivr.net https://esm.run; style-src 'none'; font-src 'none'; base-uri 'none'; object-src 'none'; form-action 'none'">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>PocketWise local OCR runtime</title>
 </head>
@@ -65,7 +65,13 @@ async function initialise(message) {
       textDetectionModelAsset: { url: detUrl },
       textRecognitionModelName: String(message.recognitionModelName || 'PP-OCRv6_small_rec'),
       textRecognitionModelAsset: { url: recUrl },
-      ortOptions: { backend: 'auto', numThreads: 1, simd: true }
+      // Use the exact ONNX Runtime Web version bundled with PaddleOCR.js 0.4.2.
+      // One WASM thread works without COOP/COEP and avoids flaky mobile WebGPU paths.
+      ortOptions: {
+        backend: message.backend === 'wasm' ? 'wasm' : 'auto',
+        wasmPaths: 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.24.3/dist/',
+        numThreads: 1
+      }
     });
     if (!created || typeof created.predict !== 'function') {
       throw new Error('PaddleOCR did not initialise correctly.');

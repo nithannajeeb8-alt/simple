@@ -1072,7 +1072,7 @@
   function voiceDraft(){const Speech=window.SpeechRecognition||window.webkitSpeechRecognition;if(!Speech){toast('Voice recognition is not available in this browser. You can use the keyboard microphone instead.','amber');$('#tx-note').focus();return;}const rec=new Speech();rec.lang='en-IN';rec.interimResults=false;rec.maxAlternatives=1;toast('Listening for a short transaction description…');rec.onresult=e=>{const phrase=e.results[0][0].transcript;$('#tx-note').value=phrase;const match=phrase.match(/(?:₹|rs\.?\s*)?(\d+(?:\.\d{1,2})?)/i);if(match)$('#tx-amount').value=match[1];const txt=phrase.toLowerCase();const choices=[['food',['lunch','dinner','breakfast','food','tea','coffee','snack','canteen']],['transport',['bus','auto','taxi','petrol','fuel','travel']],['shopping',['bought','shop','shopping','clothes','headphones']],['education',['book','college','exam','notes','photocopy','course']],['subscriptions',['subscription','recharge','data pack','streaming']]];for(const [id,words] of choices){if(words.some(w=>txt.includes(w))){const act=state.activities.find(a=>a.id===id);if(act)$('#tx-activity').value=act.id;break;}}toast('Draft created. Check the amount and category before saving.');};rec.onerror=()=>toast('Could not hear that clearly. Please enter the details manually.','amber');rec.start();}
 
   function bindEvents(){
-    if(isAndroid){$('#shortcut-import-setting')?.remove();$('#apple-shortcut-setting')?.remove();$('#backtap-setting')?.remove();}
+    if(isAndroid){$('#shortcut-import-setting')?.remove();$('#apple-shortcut-setting')?.remove();$('#apple-image-shortcut-setting')?.remove();$('#backtap-setting')?.remove();}
     const appModal=$('#app-modal');
     appModal.addEventListener('cancel',()=>{ currentEditId=null; });
     appModal.addEventListener('click',event=>{ if(event.target===appModal)closeModal(); });
@@ -1173,6 +1173,7 @@
       if(event.target.closest('#backtap-guide')){showBackTapGuide();return;}
       if(event.target.closest('#install-guide')){showInstallGuide();return;}
       if(event.target.closest('#copy-quickadd')){const url='webapp://nithan.in/PocketWise/';try{await navigator.clipboard.writeText(url);toast('App launch URL copied.');}catch{toast(url,'amber');}return;}
+      if(event.target.closest('#copy-image-shortcut-pwa-url')){const url='webapp://nithan.in/PocketWise/';try{await navigator.clipboard.writeText(url);toast('PocketWise PWA launch link copied.');}catch{toast(url,'amber');}return;}
       if(event.target.closest('#enable-notifications')){if(!('Notification'in window)){toast('System notifications are not supported in this browser.','amber');return;}const permission=Notification.permission==='granted'?'granted':await Notification.requestPermission();let message=permission==='granted'?'System notification permission enabled. Background delivery needs a configured push service.':'Permission was not granted.';if(permission==='granted'&&window.PocketWisePush?.isConfigured()){if(!confirm('Enable background bill reminders? PocketWise will send reminder titles and due dates to your configured push server so it can notify this device while the app is closed. Amounts, notes and transaction history are not sent.')){renderSettingsSummary();return;}try{const pushResult=await window.PocketWisePush.subscribe();if(pushResult.ok){await window.PocketWisePush.syncReminders(state.reminders||[]);message='Background bill reminders are enabled on this device.';}else message=pushResult.reason==='permission-denied'?'Notification permission was not granted.':'Push is unavailable on this device.';}catch(error){console.error('Push subscription failed.',error);message='Could not connect this device to the push service. Check the server settings.';}}if(permission==='granted'&&'serviceWorker'in navigator){try{await navigator.serviceWorker.ready;}catch(_){}}renderSettingsSummary();toast(message,permission==='granted'?'success':'amber');return;}
       if(event.target.closest('#reset-data')){if(!confirm('Clear all transactions, debts, goals, accounts, budgets, activities and reminders stored in this app? This cannot be undone.'))return;if(!confirm('Last check: export a backup first if you want to keep any records. Continue clearing?'))return;const snapshot=JSON.stringify(state);state=initialState();state.sample=false;state.transactions=[];state.debts=[];state.goals=[];state.reminders=[];state.accounts=state.accounts.map(a=>({...a,openingBalance:0}));state.budgets={total:0,categories:{}};if(!(await persistMutation(snapshot,'Could not clear this workspace. Your previous records were restored.')))return;applyTheme();renderAll();toast('Workspace cleared.');return;}
       if(event.target.closest('[data-reset-filters]')){$('#activity-search').value='';$('#activity-period').value='all';currentFilter='all';renderActivity();return;}
@@ -1396,28 +1397,51 @@
     quickAddDraft=draft;
     await saveQuickAdd();
   }
+  async function processShortcutClipboardPayload(clipboardPayload){
+    if(!clipboardPayload)throw new Error('The clipboard content is not a supported image or PocketWise Shortcut payload.');
+    if(clipboardPayload.kind==='image'){
+      transactionHaptic();
+      toast('Screenshot received. Starting on-device OCR…');
+      await pwProcessPaymentImage(clipboardPayload.file,{shared:true});
+      return;
+    }
+    if(clipboardPayload.kind==='text'){
+      await importShortcutText(clipboardPayload.text);
+      return;
+    }
+    throw new Error('The clipboard content is not a supported image or PocketWise Shortcut payload.');
+  }
+  function showNativePasteFallback(){
+    openModal('Paste from iPhone',`<div class="modal-body pw-native-paste-fallback"><p>iOS did not expose the clipboard through automatic reading. This is not a Settings permission switch. Use the iPhone's own Paste action instead.</p><div id="pw-native-paste-target" class="pw-native-paste-target" contenteditable="true" role="textbox" aria-label="Paste payment screenshot or Shortcut text here" aria-multiline="true" spellcheck="false" autocapitalize="off" data-placeholder="Touch and hold here, then choose Paste"></div><p class="fine-print">After pasting, PocketWise detects an image or an older Shortcut's transaction text and continues locally. Your transaction is not saved automatically from an image.</p><div class="form-actions"><button class="secondary-button" type="button" data-cancel-modal>Cancel</button><button class="primary-button" id="pw-native-paste-gallery" type="button">Choose from Photos</button></div></div>`,'IOS NATIVE PASTE');
+    const target=$('#pw-native-paste-target');
+    $('#pw-native-paste-gallery')?.addEventListener('click',()=>{pwShowImport();$('#pw-choose-gallery')?.click();});
+    target?.addEventListener('paste',event=>{
+      // Read DataTransfer synchronously inside the trusted paste event. This is
+      // WebKit's native paste-event route and avoids a second permission probe.
+      const transfer=event.clipboardData;
+      event.preventDefault();
+      target.textContent='';
+      void (async()=>{
+        try{
+          const payload=await window.PocketWiseClipboardImport?.readPasteEvent(transfer);
+          if(!payload){toast('No usable image or Shortcut text was pasted. Try Copy to Clipboard again.','error');return;}
+          await processShortcutClipboardPayload(payload);
+        }catch(error){toast(error?.message||'PocketWise could not read that pasted item.','error');}
+      })();
+    });
+  }
   async function pasteShortcutTransaction(){
     try{
-      // Must be called directly from a Paste button gesture. On iOS, read() may
-      // present Apple's native Paste confirmation before exposing image/png.
+      // Must be called directly from a Paste button gesture. Safari does not
+      // support clipboard-read permission queries; it may expose a native Paste
+      // callout. If it rejects, offer an editable target for a real paste event.
       const clipboardPayload=await window.PocketWiseClipboardImport?.read();
-      if(!clipboardPayload)throw new Error('Clipboard import is unavailable. Reload PocketWise and try again.');
-      if(clipboardPayload.kind==='image'){
-        transactionHaptic();
-        toast('Screenshot received. Starting on-device OCR…');
-        await pwProcessPaymentImage(clipboardPayload.file,{shared:true});
-        return;
-      }
-      if(clipboardPayload.kind==='text'){
-        await importShortcutText(clipboardPayload.text);
-        return;
-      }
-      throw new Error('The clipboard content is not a supported image or PocketWise Shortcut payload.');
+      if(!clipboardPayload)throw new Error('Clipboard import is unavailable.');
+      await processShortcutClipboardPayload(clipboardPayload);
     }catch(error){
-      const message=error?.name==='NotAllowedError'
-        ?'iOS needs permission to paste. Tap Paste again and choose Paste in the iOS prompt.'
-        :(error?.message||'Could not read the copied image or Shortcut transaction.');
-      toast(message,'error');
+      const manualPasteRequired=error?.name==='NotAllowedError'||error?.name==='SecurityError'||/Clipboard access is unavailable|No image or PocketWise transaction was found|Clipboard import is unavailable/i.test(String(error?.message||''));
+      if(manualPasteRequired){showNativePasteFallback();return;}
+      toast(error?.message||'Could not read the copied image or Shortcut transaction.','error');
     }
   }
   function showShortcutReturnNudge(){

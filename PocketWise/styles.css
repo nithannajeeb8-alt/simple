@@ -280,6 +280,10 @@ img,svg,canvas{max-width:100%}
 .profile-settings-preview{display:flex;align-items:center;gap:12px;padding:14px 0 2px}.profile-settings-preview>div{min-width:0;flex:1}.profile-settings-preview strong,.profile-settings-preview small{display:block}.profile-settings-preview strong{font-size:12px}.profile-settings-preview small{font-size:10px;color:var(--muted);margin-top:4px}.avatar{display:grid;place-items:center;width:42px;height:42px;flex:none;border-radius:15px;background:#2f8f67;color:#fff;font-size:18px;font-weight:800;box-shadow:inset 0 1px 0 #ffffff40}.profile-avatar-preview{width:48px;height:48px;border-radius:16px}.profile-preview-large{display:flex;align-items:center;gap:12px;padding:10px 0 20px;font-weight:750;font-size:17px}.profile-preview-large .avatar{width:58px;height:58px;border-radius:19px;font-size:25px}.profile-color-options{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-top:9px}.profile-color-option{--profile-color:#2f8f67;display:flex;flex-direction:column;align-items:center;gap:7px;padding:10px 5px;border:1px solid var(--line);border-radius:13px;cursor:pointer}.profile-color-option input{position:absolute;opacity:0;pointer-events:none}.profile-color-option span{display:block;width:29px;height:29px;border-radius:50%;background:var(--profile-color);box-shadow:inset 0 1px 0 #ffffff55}.profile-color-option small{font-size:10px;color:var(--muted)}.profile-color-option:has(input:checked){border-color:var(--profile-color);box-shadow:0 0 0 2px color-mix(in srgb,var(--profile-color) 18%,transparent)}.privacy-page-content h3{font-size:13px;margin:19px 0 6px}.privacy-page-content p,.privacy-page-content li{font-size:12px;line-height:1.65;color:var(--muted)}.privacy-page-content ul{padding-left:20px}.privacy-callout{background:var(--green-soft);border-radius:14px;padding:14px}.privacy-callout strong{font-size:13px;color:var(--ink)}.privacy-callout p{margin:6px 0 0}.profile-form .form-actions{display:flex;gap:8px}
 
 .shortcut-link-button{display:inline-flex;align-items:center;text-decoration:none;white-space:nowrap}
+.shortcut-setting-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex:0 0 auto;flex-wrap:wrap}
+.shortcut-setting-actions>*{white-space:nowrap}
+@media(max-width:720px){.shortcut-setting-actions{margin-left:auto}}
+@media(max-width:390px){.shortcut-setting-actions{width:100%;justify-content:flex-start;margin-left:0}.shortcut-setting-actions>*{flex:1 1 auto;justify-content:center}}
 
 
 /* v1.5.0: compact, scroll-safe onboarding and deliberate feedback */
@@ -2347,3 +2351,12 @@ html[data-input-modality="pointer"] :where(button, a, [role="button"], [tabindex
 .pw-clipboard-paste{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;min-height:48px;margin:4px 0 0;padding:12px 14px}
 .pw-clipboard-paste .icon-wrap{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px}
 .pw-clipboard-help{margin:6px 2px 12px!important;color:var(--muted);font-size:10px;line-height:1.45;text-align:center}
+
+
+/* 2.3.49: iOS native paste-event fallback when async clipboard access is denied/unavailable */
+.pw-native-paste-fallback{gap:12px}
+.pw-native-paste-target{display:flex;align-items:center;justify-content:center;min-height:132px;padding:18px;border:1.5px dashed var(--line);border-radius:16px;background:var(--surface-2,var(--surface));color:var(--muted);text-align:center;font-size:14px;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere;-webkit-user-select:text;user-select:text;touch-action:manipulation;outline:none}
+.pw-native-paste-target:empty::before{content:attr(data-placeholder);pointer-events:none}
+.pw-native-paste-target:focus{border-color:var(--green);box-shadow:0 0 0 3px color-mix(in srgb,var(--green) 14%,transparent)}
+
+/* 2.3.50: aligned separate text and image Shortcut actions in Settings */

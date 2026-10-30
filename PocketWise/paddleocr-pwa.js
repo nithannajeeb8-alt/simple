@@ -24,6 +24,17 @@
   const TILE_OVERLAP = 260;
   let enginePromise = null;
   let engineProfile = null;
+
+  // Android Chromium can expose WebGPU before every operator/runtime path used by
+  // PaddleOCR is reliable on that device. Prefer the supported CPU/WASM provider
+  // there; desktop browsers may still use auto (WebGPU when it is genuinely usable).
+  function isAndroidBrowser() {
+    try {
+      const nav = window.navigator || {};
+      return /Android/i.test(String(nav.userAgent || '')) || String(nav.userAgentData && nav.userAgentData.platform || '') === 'Android';
+    } catch (_) { return false; }
+  }
+  function backendOrder() { return isAndroidBrowser() ? ['wasm'] : ['auto', 'wasm']; }
   let sandboxFrame = null;
   let sandboxReadyPromise = null;
   let sandboxReadyResolve = null;
@@ -218,11 +229,13 @@
     });
   }
 
-  async function createEngine(profileName, onStatus) {
+  async function createEngine(profileName, onStatus, backend) {
     const profile = MODEL_PROFILES[profileName];
     if (!profile) throw new Error('Unknown local OCR model profile.');
-    if (enginePromise && engineProfile === profileName) return enginePromise;
-    engineProfile = profileName;
+    const runtimeBackend = backend === 'wasm' ? 'wasm' : 'auto';
+    const engineKey = profileName + ':' + runtimeBackend;
+    if (enginePromise && engineProfile === engineKey) return enginePromise;
+    engineProfile = engineKey;
     const requestedPromise = (async function () {
       report(onStatus, profileName === 'tiny'
         ? 'Preparing lightweight AI OCR model (PP-OCRv6 Tiny)…'
@@ -235,7 +248,8 @@
         detectionModel: detBlob,
         recognitionModel: recBlob,
         detectionModelName: profile.det,
-        recognitionModelName: profile.rec
+        recognitionModelName: profile.rec,
+        backend: runtimeBackend
       }, 180000);
       return {
         profile: profileName,
@@ -382,12 +396,43 @@
     if (!hasCurrencyCue) reasons.push('no reliable currency marker');
     if (!scores.length || averageScore < 0.48) reasons.push('low or missing recognition confidence');
     if (!hasPaymentCue && lines.length < 7) reasons.push('weak payment context');
+
+    // Presence of a rupee glyph alone is not proof that Tiny captured the full
+    // amount. A common mobile failure is to return only the leading digit (₹2)
+    // while dropping the remaining digits. Reuse the same conservative spatial
+    // receipt parser used by the review flow before deciding that Tiny succeeded.
+    let structuredAmount = null;
+    const receiptParser = window.PocketWiseReceiptParser;
+    if (receiptParser && typeof receiptParser.extract === 'function' && items.length) {
+      try {
+        const fields = receiptParser.extract({ text: text, items: items });
+        structuredAmount = fields && fields.amount || null;
+        // Text-only test doubles and some simplified export paths do not retain
+        // geometry. In that case the parser may keep a clear currency candidate
+        // just below its stricter review threshold. Accept it for fallback gating
+        // only when it is a multi-digit amount with a currency marker; never use
+        // this heuristic to save a transaction.
+        const candidateAmount = !structuredAmount && fields && Array.isArray(fields.candidates)
+          ? fields.candidates.find(function (candidate) {
+            return candidate && candidate.hasCurrency && Number(candidate.value) >= 10 && Number(candidate.confidence) >= .55;
+          }) : null;
+        if (candidateAmount) structuredAmount = candidateAmount;
+        if (!structuredAmount) reasons.push('no confidently identified payment amount');
+        else if (Number(structuredAmount.value) > 0 && Number(structuredAmount.value) < 10) {
+          reasons.push('suspiciously short amount; possible dropped digits');
+        }
+      } catch (error) {
+        reasons.push('receipt amount validation failed');
+      }
+    }
     return {
       useFallback: reasons.length > 0,
       reasons: reasons,
       averageScore: averageScore,
       lineCount: lines.length,
-      hasCurrencyCue: hasCurrencyCue
+      hasCurrencyCue: hasCurrencyCue,
+      amountValue: structuredAmount ? Number(structuredAmount.value) : null,
+      amountConfidence: structuredAmount ? Number(structuredAmount.confidence) || 0 : 0
     };
   }
 
@@ -445,38 +490,56 @@
   async function recognize(input, onStatus) {
     if (!input) throw new TypeError('PaddleOCR requires a receipt image.');
     const source = await toCanvas(input);
-    let tinyFailure = null;
-    try {
-      const tinyEngine = await createEngine('tiny', onStatus);
-      const tinyResult = await recognizeWithEngine(tinyEngine, source, onStatus, 'tiny');
-      const assessment = assessTinyResult(tinyResult);
-      if (!assessment.useFallback) {
-        tinyResult.engine = 'PP-OCRv6 Tiny (local AI)';
-        tinyResult.model = 'PP-OCRv6_tiny';
-        tinyResult.fallbackUsed = false;
-        return tinyResult;
+    const backends = backendOrder();
+    let tinyFailure = null, fallbackFailure = null, usableFallback = null;
+
+    for (let backendIndex = 0; backendIndex < backends.length; backendIndex++) {
+      const backend = backends[backendIndex];
+      const backendLabel = backend === 'wasm' ? 'CPU/WASM' : 'automatic WebGPU/WASM';
+      if (backendIndex > 0) report(onStatus, 'Retrying local OCR with the compatibility ' + backendLabel + ' runtime…');
+
+      try {
+        const tinyEngine = await createEngine('tiny', onStatus, backend);
+        const tinyResult = await recognizeWithEngine(tinyEngine, source, onStatus, 'tiny');
+        const assessment = assessTinyResult(tinyResult);
+        if (!assessment.useFallback) {
+          tinyResult.engine = 'PP-OCRv6 Tiny (local AI)';
+          tinyResult.model = 'PP-OCRv6_tiny';
+          tinyResult.backend = backend;
+          tinyResult.fallbackUsed = false;
+          return tinyResult;
+        }
+        tinyFailure = new Error(assessment.reasons.join(', '));
+        report(onStatus, 'Lightweight OCR result is incomplete (' + assessment.reasons.join(', ') + '). Switching to PaddleOCR Small…');
+      } catch (error) {
+        tinyFailure = error;
+        report(onStatus, 'Lightweight OCR could not run on ' + backendLabel + '. Switching to PaddleOCR Small…');
       }
-      tinyFailure = new Error(assessment.reasons.join(', '));
-      report(onStatus, 'Tiny OCR result looks incomplete (' + assessment.reasons.join(', ') + '). Switching to PaddleOCR Small…');
-    } catch (error) {
-      tinyFailure = error;
-      report(onStatus, 'The lightweight AI model could not start. Switching to PaddleOCR Small fallback…');
+
+      try {
+        const fallbackEngine = await createEngine('small', onStatus, backend);
+        const fallbackResult = await recognizeWithEngine(fallbackEngine, source, onStatus, 'small');
+        if (!fallbackResult.text) throw new Error('The fallback model found no readable text.');
+        fallbackResult.engine = 'PaddleOCR.js PP-OCRv6 Small fallback';
+        fallbackResult.model = 'PP-OCRv6_small';
+        fallbackResult.backend = backend;
+        fallbackResult.fallbackUsed = true;
+        fallbackResult.fallbackReason = tinyFailure && String(tinyFailure.message || tinyFailure).slice(0, 180);
+        usableFallback = fallbackResult;
+        const fallbackAssessment = assessTinyResult(fallbackResult);
+        if (!fallbackAssessment.useFallback || backendIndex === backends.length - 1) return fallbackResult;
+        fallbackFailure = new Error('Small result was incomplete: ' + fallbackAssessment.reasons.join(', '));
+        report(onStatus, 'PaddleOCR Small returned incomplete fields. Retrying with the compatibility ' + backends[backendIndex + 1] + ' runtime…');
+      } catch (error) {
+        fallbackFailure = error;
+        report(onStatus, 'PaddleOCR Small could not run on ' + backendLabel + '.');
+      }
     }
 
-    try {
-      const fallbackEngine = await createEngine('small', onStatus);
-      const fallbackResult = await recognizeWithEngine(fallbackEngine, source, onStatus, 'small');
-      if (!fallbackResult.text) throw new Error('The fallback model found no readable text.');
-      fallbackResult.engine = 'PaddleOCR.js PP-OCRv6 Small fallback';
-      fallbackResult.model = 'PP-OCRv6_small';
-      fallbackResult.fallbackUsed = true;
-      fallbackResult.fallbackReason = tinyFailure && String(tinyFailure.message || tinyFailure).slice(0, 180);
-      return fallbackResult;
-    } catch (fallbackError) {
-      console.warn('PocketWise OCR primary and fallback models both failed.', tinyFailure, fallbackError);
-      const message = 'The lightweight OCR model could not read this screenshot, and the PaddleOCR fallback could not start. Connect once to install/cache the models, then retry. You can also paste the payment text manually.';
-      throw new Error(message);
-    }
+    if (usableFallback) return usableFallback;
+    console.warn('PocketWise OCR primary and fallback models both failed.', tinyFailure, fallbackFailure);
+    const detail = fallbackFailure && String(fallbackFailure.message || fallbackFailure).slice(0, 120);
+    throw new Error('The lightweight OCR and PaddleOCR Small fallback could not complete. ' + (detail || 'Connect once to install/cache the models, then retry.') + ' You can also choose the screenshot again or enter the payment details manually.');
   }
 
   window.PocketWisePaddleWebOCR = Object.freeze({
@@ -485,6 +548,7 @@
     getTilePlan: function (width, height) { return tileRects(width, height).map(rect => Object.assign({}, rect)); },
     getModelConfig: function (name) { const profile = MODEL_PROFILES[name]; return profile ? Object.assign({}, profile) : null; },
     assessTinyResult: assessTinyResult,
+    getBackendOrder: backendOrder,
     clearEngine: async function () {
       if (enginePromise) { try { const engine = await enginePromise; if (engine && typeof engine.dispose === 'function') await engine.dispose(); } catch (_) {} }
       enginePromise = null;
