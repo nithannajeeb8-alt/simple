@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pocketwise-shell-v2.4.6-structure-and-report-regression-fix';
+const CACHE_NAME = 'pocketwise-shell-v2.4.7-excel-statements-stories-default';
 const PADDLE_RUNTIME_CACHE = 'pocketwise-paddle-runtime-v243';
 const BASE_URL = self.registration.scope;
 const asset = path => new URL(path, BASE_URL).href;
@@ -13,6 +13,7 @@ const APP_SHELL = [
   asset('rupee-ocr.js'),
   asset('receipt-ocr-parser.js'),
   asset('statement-parser.js'),
+  asset('xlsx-reader.js'),
   asset('local-ai.js'),
   asset('local-ai-worker.js'),
   asset('local-ai-cache-recovery.js'),

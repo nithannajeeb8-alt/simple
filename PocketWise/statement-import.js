@@ -12,17 +12,17 @@
   function open(){cancelActivePdfImport();selectedFile=null;parsed=null;matrix=null;mapping=null;page=0;sourceName='';lastFileType='';const context=getBridge()?.getContext?.()||{accounts:[]};const accounts=(context.accounts||[]).map(a=>`<option value="${escapeHTML(a.id)}">${escapeHTML(a.name||a.id)}</option>`).join('');setModal('Import bank statement','LOCAL STATEMENT READER',`
     <div class="modal-body pw-statement-import">
       <button type="button" class="secondary-button pw-statement-back" id="pw-statement-back">← Back to payment import</button>
-      <p>Import an Indian bank statement from a <strong>CSV or text-based PDF</strong>. PocketWise parses transactions locally, checks debit/credit direction and balances where available, then lets you review everything before saving.</p>
+      <p>Import an Indian bank statement from a <strong>CSV, text-based PDF or Excel (.xlsx) workbook</strong>. PocketWise parses transactions locally, checks debit/credit direction and balances where available, then lets you review everything before saving.</p>
       <div class="pw-statement-filebox">
         <label class="pw-statement-filebox-title" for="pw-statement-file">BANK STATEMENT FILE</label>
-        <input class="pw-statement-file-input" id="pw-statement-file" type="file" accept=".pdf,.csv,.tsv,application/pdf,text/csv,text/tab-separated-values" aria-describedby="pw-statement-file-help">
+        <input class="pw-statement-file-input" id="pw-statement-file" type="file" accept=".pdf,.csv,.tsv,.xlsx,.xls,application/pdf,text/csv,text/tab-separated-values,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" aria-describedby="pw-statement-file-help">
         <label class="pw-statement-upload-card" for="pw-statement-file">
           <span class="icon-wrap pw-statement-pdf-icon" aria-hidden="true"><i class="bi bi-file-earmark-pdf-fill"></i><svg class="icon-fallback" viewBox="0 0 32 32"><path d="M7 2.5h12l7 7V29H7Z"/><path d="M19 2.5v7h7"/><path d="M10 21h12M10 24h9"/><path d="M10 15v4m0-4h2a2 2 0 0 1 0 4h-2m7 0v-4h1a2 2 0 0 1 0 4h-1m5-4h-3v4m0-2h2"/></svg></span>
           <span class="pw-statement-upload-copy"><strong>Choose a bank statement</strong><small>Tap here to browse your files</small></span>
           <span class="pw-statement-browse">Browse files <span aria-hidden="true">›</span></span>
         </label>
         <div id="pw-statement-file-name" class="pw-statement-file-name">No file selected yet</div>
-        <small id="pw-statement-file-help">PDF, CSV or TSV · Maximum 50 MB · Up to 150 PDF pages. Scanned/image-only PDFs need a searchable bank export or CSV.</small>
+        <small id="pw-statement-file-help">PDF, CSV, TSV or Excel XLSX · Legacy XLS must be resaved as XLSX · Maximum 50 MB. Scanned/image-only PDFs need a searchable bank export or CSV.</small>
       </div>
       <div class="form-field"><label for="pw-statement-account">IMPORT TO ACCOUNT</label><select id="pw-statement-account">${accounts||'<option value="bank">Bank / UPI</option>'}</select></div>
       <div class="pw-statement-privacy"><strong>Private by design</strong><span>Your statement stays on this device. If you choose local AI, Qwen receives the column labels and a small sample of extracted rows to help identify columns. This runs locally in your browser; data is not sent to an AI service.</span></div>
@@ -38,22 +38,28 @@
     const input=$('#pw-statement-file');input?.addEventListener('change',()=>{if(input.disabled)return;selectedFile=input.files?.[0]||null;parsed=null;matrix=null;mapping=null;page=0;$('#pw-statement-preview').hidden=true;$('#pw-statement-mapping').hidden=true;const passwordArea=$('#pw-statement-password-area');if(passwordArea){passwordArea.hidden=true;passwordArea.replaceChildren();}const name=$('#pw-statement-file-name');if(name)name.textContent=selectedFile?`${selectedFile.name} · ${(selectedFile.size/1024/1024).toFixed(2)} MB`:'No file selected.';const analyze=$('#pw-statement-analyze');if(analyze)analyze.disabled=!selectedFile;setStatus(selectedFile?'Ready to analyze. The file will be read locally.':'Choose a statement file.');});
     $('#pw-statement-analyze')?.addEventListener('click',analyzeSelected);
   }
-  function identifyFormat(file){const name=(file?.name||'').toLowerCase();if(name.endsWith('.pdf')||file?.type==='application/pdf')return 'pdf';if(/\.(csv|tsv)$/.test(name)||/text\/(?:csv|tab-separated-values)/.test(file?.type||''))return 'csv';return ''}
+  function identifyFormat(file){const name=(file?.name||'').toLowerCase(),mime=(file?.type||'').toLowerCase();if(name.endsWith('.pdf')||mime==='application/pdf')return 'pdf';if(name.endsWith('.xlsx')||mime==='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')return 'xlsx';if(name.endsWith('.xls')||mime==='application/vnd.ms-excel')return 'xls-legacy';if(/\.(csv|tsv)$/.test(name)||/text\/(?:csv|tab-separated-values)/.test(mime))return 'csv';return '';}
   async function analyzeSelected(){
-    const file=selectedFile;if(!file)return;const type=identifyFormat(file);if(!type){setStatus('Choose a PDF, CSV or TSV statement.','error');return;}if(file.size>50*1024*1024){setStatus('This file is over 50 MB. Export a smaller date range or CSV statement.','error');return;}const token=++parseToken;
+    const file=selectedFile;if(!file)return;const type=identifyFormat(file);if(type==='xls-legacy'){setStatus('This is a legacy .xls workbook. Open it in Excel or Numbers and save/export it as .xlsx, then import the new file.','error');return;}if(!type){setStatus('Choose a PDF, CSV, TSV or Excel (.xlsx) statement.','error');return;}if(file.size>50*1024*1024){setStatus('This file is over 50 MB. Export a smaller date range or CSV statement.','error');return;}const token=++parseToken;
     const analyze=$('#pw-statement-analyze'),fileInput=$('#pw-statement-file');if(analyze){analyze.disabled=true;analyze.textContent='Analyzing…';}if(fileInput)fileInput.disabled=true;$('#pw-statement-preview').hidden=true;$('#pw-statement-mapping').hidden=true;setStatus('Reading statement locally…');sourceName=file.name;lastFileType=type;
     try{
       let result;
       if(type==='csv'){
-        const text=await file.text();if(token!==parseToken)return;const parsedCSV=parser().parseCSV(text);if(!parsedCSV.rows.length)throw new Error('No rows were found in the file.');const detectedHeader=parser().findHeaderRow(parsedCSV.rows);if(detectedHeader>0)matrix=parsedCSV.rows.slice(detectedHeader);else matrix=parsedCSV.rows;mapping=parser().mapHeaders(matrix[0]);
+        const csvText=await file.text();if(token!==parseToken)return;const parsedCSV=parser().parseCSV(csvText);if(!parsedCSV.rows.length)throw new Error('No rows were found in the file.');const detectedHeader=parser().findHeaderRow(parsedCSV.rows);if(detectedHeader>0)matrix=parsedCSV.rows.slice(detectedHeader);else matrix=parsedCSV.rows;mapping=parser().mapHeaders(matrix[0]);
         if(!parser().mappingUsable(mapping)){renderMappingControls(matrix[0],mapping,'Some column headings were unfamiliar. Let the local AI suggest a map, or choose the columns yourself.');setStatus('The file was read, but its columns need mapping.','warn');return;}
         result=parser().parseMatrix(matrix,mapping);
+      }else if(type==='xlsx'){
+        if(!window.PWXLSXReader?.read||!window.PWXLSXReader?.selectStatementSheet)throw new Error('The offline Excel reader is unavailable. Reload PocketWise and try again.');
+        setStatus('Opening Excel workbook locally…');const workbook=await window.PWXLSXReader.read(await file.arrayBuffer());if(token!==parseToken)return;
+        const chosen=window.PWXLSXReader.selectStatementSheet(workbook,parser());if(!chosen)throw new Error('No readable worksheets or transaction rows were found in this workbook.');
+        matrix=chosen.matrix;mapping=chosen.mapping;result=chosen.result;result.sourceSheet=chosen.sheetName;result.sourceName=file.name;result.otherWorksheets=Math.max(0,workbook.sheets.length-1);
+        if(!result.transactions?.length&&!result.error)result.error=`No transaction rows could be read from the “${chosen.sheetName}” worksheet. Check that it contains a transaction date, description and debit/credit or amount columns.`;
       }else result=await analyzePDF(file,token);
       if(token!==parseToken)return;parsed=result;mapping=result.mapping||mapping;
       if(result.error&&result.headers&&matrix){renderMappingControls(result.headers,result.mapping,result.error,matrix?.slice(1,9)||result.sampleRows||[]);setStatus(result.error,'warn');return;}
       if(result.error)throw new Error(result.error);
-      decorateRiskyRows(result.transactions||[]);renderPreview();setStatus(`Analysis complete. ${result.transactions?.length||0} transaction rows detected. Review them before importing.`,'success');
-    }catch(error){if(token!==parseToken)return;setStatus(error?.message||'The statement could not be read. Try a CSV export from your bank.','error');}
+      decorateRiskyRows(result.transactions||[]);renderPreview();const sheetLabel=result.sourceSheet?` from “${result.sourceSheet}”${result.otherWorksheets?` (other ${result.otherWorksheets} worksheet(s) not included)`:''}`:'';setStatus(`Analysis complete. ${result.transactions?.length||0} transaction rows detected${sheetLabel}. Review them before importing.`,'success');
+    }catch(error){if(token!==parseToken)return;setStatus(error?.message||'The statement could not be read. Try a CSV export from your bank or an Excel (.xlsx) workbook.','error');}
     finally{if(token===parseToken){if(analyze){analyze.disabled=!selectedFile;analyze.textContent='Analyze statement';}if(fileInput)fileInput.disabled=false;}}
   }
   function cancelActivePdfImport(){

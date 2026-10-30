@@ -168,7 +168,7 @@
   const daysAgo = n => { const d = new Date(); d.setDate(d.getDate()-n); return localDate(d); };
   const initialState = () => ({
     version:2, sample:false,
-    settings:{theme:'light',liquidGlass:false,smartUI:false,dailyStory:false,profileName:'',profileColor:'mint',profileComplete:false,hideBalances:false,alertThreshold:90,notifyBudget:true,notifyPositive:true,notifyBills:true,notifyDebts:true,notifyWeekly:true,quietStart:'21:00',quietEnd:'08:00',lastBackup:null,lastPositiveMonth:null,seenAlerts:[],notifications:[],categoryChart:'doughnut',weeklyAllowance:0,debtPayoffMonthly:0,debtStrategy:'snowball',smartRules:[],salaryPlan:{expectedSalary:0,frequency:'monthly',paydayDay:1,paydayDate:null,allocations:[]}},
+    settings:{theme:'light',liquidGlass:false,smartUI:false,dailyStory:true,dailyStoryPreferenceSet:false,profileName:'',profileColor:'mint',profileComplete:false,hideBalances:false,alertThreshold:90,notifyBudget:true,notifyPositive:true,notifyBills:true,notifyDebts:true,notifyWeekly:true,quietStart:'21:00',quietEnd:'08:00',lastBackup:null,lastPositiveMonth:null,seenAlerts:[],notifications:[],categoryChart:'doughnut',weeklyAllowance:0,debtPayoffMonthly:0,debtStrategy:'snowball',smartRules:[],salaryPlan:{expectedSalary:0,frequency:'monthly',paydayDay:1,paydayDate:null,allocations:[]}},
     accounts:[{id:'cash',name:'Cash',type:'cash',openingBalance:0,openingBalanceDate:null},{id:'bank',name:'Bank / UPI',type:'bank',openingBalance:0,openingBalanceDate:null},{id:'card',name:'Card',type:'card',openingBalance:0,openingBalanceDate:null}],
     activities: activityDefaults.map(a=>({...a})),
     budgets:{total:0,categories:{},note:''}, goals:[], reminders:[], debts:[], transactions:[]
@@ -292,13 +292,21 @@
     if(record.settings){for(const key of ['smartRules','seenAlerts','notifications','sentAlerts'])if(record.settings[key]!==undefined&&(!Array.isArray(record.settings[key])||record.settings[key].length>BACKUP_COLLECTION_LIMITS[key]))return false;}
     return true;
   }
+  function normalizeDailyStoryPreference(settings){
+    const next={...(settings&&typeof settings==='object'&&!Array.isArray(settings)?settings:{})};
+    // Before 2.4.7 the feature defaulted to off, so an unmarked false value may only be
+    // the old default. Turn it on once; a toggle made in this release records an explicit choice.
+    if(next.dailyStoryPreferenceSet!==true){next.dailyStory=true;next.dailyStoryPreferenceSet=false;}
+    else next.dailyStory=next.dailyStory===true;
+    return next;
+  }
   function normalizeStateShape(record){
     const defaults=initialState(),source=record&&typeof record==='object'?record:{};
     const next={...defaults,...source};
     for(const key of ['transactions','accounts','activities','debts','goals','reminders'])if(!Array.isArray(source[key]))next[key]=defaults[key];
     if(!next.accounts.length)next.accounts=defaults.accounts.map(a=>({...a}));
     if(!next.activities.length)next.activities=defaults.activities.map(a=>({...a}));
-    next.settings={...defaults.settings,...(source.settings&&typeof source.settings==='object'&&!Array.isArray(source.settings)?source.settings:{})};
+    next.settings=normalizeDailyStoryPreference({...defaults.settings,...(source.settings&&typeof source.settings==='object'&&!Array.isArray(source.settings)?source.settings:{})});
     for(const key of ['seenAlerts','notifications','sentAlerts','smartRules'])if(!Array.isArray(next.settings[key]))next.settings[key]=[];
     const salarySource=source.settings&&source.settings.salaryPlan&&typeof source.settings.salaryPlan==='object'&&!Array.isArray(source.settings.salaryPlan)?source.settings.salaryPlan:{};
     next.settings.salaryPlan={expectedSalary:Math.max(0,Number(salarySource.expectedSalary)||0),frequency:['monthly','fortnightly','weekly'].includes(salarySource.frequency)?salarySource.frequency:'monthly',paydayDay:Number.isFinite(Number(salarySource.paydayDay))?Number(salarySource.paydayDay):1,paydayDate:typeof salarySource.paydayDate==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(salarySource.paydayDate)?salarySource.paydayDate:null,allocations:Array.isArray(salarySource.allocations)?salarySource.allocations.filter(rule=>rule&&typeof rule==='object'&&!Array.isArray(rule)).slice(0,100):[]};
@@ -1602,7 +1610,7 @@
     $('#hide-setting').addEventListener('change',async e=>{const snapshot=JSON.stringify(state);state.settings.hideBalances=e.target.checked;if(!(await persistMutation(snapshot,'Could not save the balance visibility setting.'))){e.target.checked=!!state.settings.hideBalances;applyHiddenAmounts();return;}applyHiddenAmounts();renderAll();});
     $('#liquid-glass-setting').addEventListener('change',async e=>{const snapshot=JSON.stringify(state);state.settings.liquidGlass=!!e.target.checked;if(!(await persistMutation(snapshot,'Could not save the appearance setting.'))){e.target.checked=!!state.settings.liquidGlass;applyTheme();return;}applyTheme();scheduleCharts();toast(state.settings.liquidGlass?'Liquid Glass enabled.':'Liquid Glass disabled.');});
     $('#smart-ui-setting').addEventListener('change',async e=>{const snapshot=JSON.stringify(state);state.settings.smartUI=!!e.target.checked;if(!(await persistMutation(snapshot,'Could not save Smart UI. Your previous settings were restored.'))){e.target.checked=!!state.settings.smartUI;applyTheme();return;}applyTheme();syncSmartNavIndicator();toast(state.settings.smartUI?'Smart UI enabled. Your navigation capsule follows the selected section.':'Smart UI disabled. Your classic navigation is restored.');});
-    $('#daily-story-setting').addEventListener('change',async e=>{const snapshot=JSON.stringify(state);state.settings.dailyStory=!!e.target.checked;if(!(await persistMutation(snapshot,'Could not save the daily story setting. Your previous settings were restored.'))){e.target.checked=!!state.settings.dailyStory;renderDailyStory();return;}renderDailyStory();toast(state.settings.dailyStory?'Daily money story enabled.':'Daily money story hidden.');});
+    $('#daily-story-setting').addEventListener('change',async e=>{const snapshot=JSON.stringify(state);state.settings.dailyStory=!!e.target.checked;state.settings.dailyStoryPreferenceSet=true;if(!(await persistMutation(snapshot,'Could not save the daily story setting. Your previous settings were restored.'))){e.target.checked=!!state.settings.dailyStory;renderDailyStory();return;}renderDailyStory();toast(state.settings.dailyStory?'Daily money story enabled.':'Daily money story hidden.');});
     ['alert-threshold','notify-budget','notify-positive','notify-bills','notify-debts','notify-weekly','quiet-start','quiet-end'].forEach(id=>{const el=$(`#${id}`);el.addEventListener('change',async()=>{const map={'alert-threshold':'alertThreshold','notify-budget':'notifyBudget','notify-positive':'notifyPositive','notify-bills':'notifyBills','notify-debts':'notifyDebts','notify-weekly':'notifyWeekly','quiet-start':'quietStart','quiet-end':'quietEnd'},snapshot=JSON.stringify(state);state.settings[map[id]]=id==='alert-threshold'?Number(el.value):el.type==='checkbox'?el.checked:el.value;if(!(await persistMutation(snapshot,'Could not save this notification setting. Your previous settings were restored.'))){renderSettingsSummary();return;}renderSettingsSummary();});});
     $('#backup-file-input').addEventListener('change',e=>importBackup(e.target.files?.[0]));
     $('#modal-content').addEventListener('click',e=>{if(e.target.closest('#voice-entry'))voiceDraft();});
