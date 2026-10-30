@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>UPI Screenshot Reader</title>
+<style>
+:root{--bg:#f7f6f2;--card:#fff;--ink:#1c1b18;--mute:#6b675e;--line:#e4e1d8;--acc:#0b6b4f;--accfg:#fff;--warn:#b45309;--bad:#b91c1c;--ok:#0b6b4f;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141412;--card:#1f1e1b;--ink:#efede6;--mute:#9a968b;--line:#33312c;--acc:#3ecf9b;--accfg:#06261b;--warn:#fbbf24;--bad:#f87171;--ok:#3ecf9b}}
+:root[data-theme="dark"]{--bg:#141412;--card:#1f1e1b;--ink:#efede6;--mute:#9a968b;--line:#33312c;--acc:#3ecf9b;--accfg:#06261b;--warn:#fbbf24;--bad:#f87171;--ok:#3ecf9b}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+main{max-width:760px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:22px;margin:0 0 4px}
+p.sub{margin:0 0 16px;color:var(--mute)}
+.drop{border:2px dashed var(--line);border-radius:14px;background:var(--card);padding:28px 16px;text-align:center;cursor:pointer}
+.drop.on{border-color:var(--acc)}
+.drop b{display:block;margin-bottom:4px}
+.drop span{color:var(--mute);font-size:13px}
+button{font:inherit;border:0;border-radius:10px;padding:10px 14px;background:var(--acc);color:var(--accfg);font-weight:600;cursor:pointer}
+button.alt{background:transparent;color:var(--ink);border:1px solid var(--line)}
+button:disabled{opacity:.5;cursor:default}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+.thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.thumbs img{height:64px;border-radius:8px;border:1px solid var(--line)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:12px}
+.row{display:flex;gap:12px}
+.row img{width:72px;height:auto;max-height:130px;object-fit:cover;border-radius:8px;border:1px solid var(--line);align-self:flex-start}
+.amt{font-size:24px;font-weight:700}
+.tag{display:inline-block;font-size:12px;padding:1px 8px;border-radius:99px;border:1px solid var(--line);color:var(--mute);margin-right:4px}
+dl{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;margin:8px 0 0;font-size:14px}
+dt{color:var(--mute)}dd{margin:0;word-break:break-all}
+.flag{color:var(--warn);font-size:13px;margin-top:6px}
+.err{color:var(--bad)}
+.ok{color:var(--ok)}
+.wrap{overflow-x:auto;margin-top:12px}
+table{border-collapse:collapse;width:100%;font-size:13px;white-space:nowrap}
+th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left}
+details{margin-top:18px;color:var(--mute);font-size:13px}
+</style>
+</head>
+<body>
+<main>
+<h1>UPI Screenshot Reader</h1>
+<p class="sub">Reads GPay, PhonePe, Paytm, BHIM and bank-app payment screenshots, then checks the fields against UPI rules.</p>
+
+<div class="drop" id="drop"><b>Tap to add screenshots</b><span>or drop them here · several at once is fine</span></div>
+<input type="file" id="file" accept="image/*" multiple hidden>
+<div class="thumbs" id="thumbs"></div>
+
+<div class="bar">
+  <button id="go" disabled>Read screenshots</button>
+  <button class="alt" id="clear" disabled>Clear</button>
+</div>
+<div id="status" class="sub"></div>
+<div id="results"></div>
+
+<div class="bar" id="exports" hidden>
+  <button class="alt" id="copyjson">Copy JSON</button>
+  <button class="alt" id="copycsv">Copy CSV</button>
+  <button class="alt" id="dlcsv">Download CSV</button>
+</div>
+<div class="wrap" id="tablewrap" hidden></div>
+
+<details><summary>How it works</summary>
+<p>A vision model reads each screenshot and returns labelled fields, so it understands that PhonePe’s “UPI Ref No”, GPay’s “UPI transaction ID” and Paytm’s “UTR” are the same 12-digit reference. Then the page validates the result in code: amount parsed from Indian grouping (₹1,50,000), reference must be exactly 12 digits, UPI ID must look like name@bank. Anything that fails is flagged so you can fix it by eye. Images stay in your browser session and are sent only to Claude for reading.</p></details>
+</main>
+
+<script>
+const $=id=>document.getElementById(id);
+let files=[],rows=[];
+const FIELDS=["app","status","direction","amount","counterparty","upi_id","utr","google_txn_id","date","time","bank","account_last4","note"];
+
+function setFiles(list){
+  files=files.concat([...list].filter(f=>f.type.startsWith("image/")));
+  $("thumbs").innerHTML="";
+  files.forEach(f=>{const i=new Image();i.src=URL.createObjectURL(f);$("thumbs").appendChild(i)});
+  $("go").disabled=!files.length;$("clear").disabled=!files.length;
+}
+$("drop").onclick=()=>$("file").click();
+$("file").onchange=e=>{setFiles(e.target.files);e.target.value=""};
+["dragover","dragenter"].forEach(t=>$("drop").addEventListener(t,e=>{e.preventDefault();$("drop").classList.add("on")}));
+["dragleave","drop"].forEach(t=>$("drop").addEventListener(t,e=>{e.preventDefault();$("drop").classList.remove("on")}));
+$("drop").addEventListener("drop",e=>setFiles(e.dataTransfer.files));
+$("clear").onclick=()=>{files=[];rows=[];$("thumbs").innerHTML="";$("results").innerHTML="";$("status").textContent="";$("exports").hidden=true;$("tablewrap").hidden=true;$("go").disabled=true;$("clear").disabled=true};
+
+async function shrink(file){
+  try{
+    const bmp=await createImageBitmap(file);const s=Math.min(1,1800/Math.max(bmp.width,bmp.height));
+    if(s===1&&file.size<2e6)return file;
+    const c=document.createElement("canvas");c.width=Math.round(bmp.width*s);c.height=Math.round(bmp.height*s);
+    c.getContext("2d").drawImage(bmp,0,0,c.width,c.height);
+    return await new Promise(r=>c.toBlob(r,"image/jpeg",.92));
+  }catch(e){return file}
+}
+
+const PROMPT=`You read screenshots of Indian digital payments (UPI apps such as Google Pay, PhonePe, Paytm, BHIM, CRED, Amazon Pay, bank apps) and return structured data.
+Return ONLY one JSON object with exactly these keys (use null when the screenshot does not show the value):
+app (GPay|PhonePe|Paytm|BHIM|CRED|AmazonPay|BankApp|Other),
+status (Success|Failed|Pending),
+direction (paid|received),
+amount (number in rupees, no symbol or commas; convert Indian grouping like 1,50,000 to 150000),
+counterparty (person or merchant name),
+upi_id (VPA such as name@okicici),
+utr (the 12-digit NPCI reference: "UPI Ref No" on PhonePe, "UPI transaction ID" on GPay, "UTR" on Paytm; digits only),
+google_txn_id (GPay "Google transaction ID" if shown, e.g. starts with CICAg),
+date (YYYY-MM-DD; Indian dates are day-first),
+time (24h HH:MM),
+bank (bank name),
+account_last4 (last 4 digits of the account),
+note (free-text note or message).
+Rules: copy digits exactly, do not guess a missing digit; a 12-digit UTR never contains letters, so read O as 0 and I or l as 1 only if the context makes clear it is a digit. Do not invent values.`;
+
+async function readOne(file,sample){
+  const blob=await shrink(file);
+  const o=await sample.json(PROMPT,{images:[blob],modelTier:"default",cache:false});
+  return o&&o.length?o[0]:o;
+}
+
+function validate(o){
+  const f=[];
+  if(o.amount!=null){o.amount=Number(String(o.amount).replace(/[₹,\s]/g,""));if(!isFinite(o.amount)||o.amount<=0)f.push("Amount unreadable")}else f.push("No amount found");
+  if(o.utr!=null){o.utr=String(o.utr).replace(/\s/g,"");if(!/^\d{12}$/.test(o.utr))f.push("UTR should be exactly 12 digits, check it against the screenshot")}
+  else if(!o.google_txn_id)f.push("No reference number found");
+  if(o.upi_id&&!/^[\w.\-]{2,256}@[a-zA-Z][a-zA-Z0-9.\-]{1,}$/.test(o.upi_id))f.push("UPI ID looks malformed");
+  if(o.date&&!/^\d{4}-\d{2}-\d{2}$/.test(o.date))f.push("Date format unclear");
+  if(o.account_last4&&!/^\d{4}$/.test(String(o.account_last4)))f.push("Account digits unclear");
+  o._flags=f;return o;
+}
+
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const inr=n=>"₹"+Number(n).toLocaleString("en-IN",{maximumFractionDigits:2});
+
+function card(o,url,name){
+  const flags=o._flags||[];
+  let h=`<div class="card"><div class="row"><img src="${url}" alt=""><div style="flex:1;min-width:0">`;
+  if(o._error){h+=`<div class="err">${esc(name)}: ${esc(o._error)}</div>`}
+  else{
+    h+=`<span class="tag">${esc(o.app||"App?")}</span><span class="tag">${esc(o.status||"?")}</span><span class="tag">${esc(o.direction||"")}</span>`;
+    h+=`<div class="amt">${o.amount?inr(o.amount):"—"}</div><dl>`;
+    [["counterparty","To / from"],["upi_id","UPI ID"],["utr","UTR / Ref"],["google_txn_id","Google txn ID"],["date","Date"],["time","Time"],["bank","Bank"],["account_last4","A/c ending"],["note","Note"]].forEach(([k,l])=>{if(o[k]!=null&&o[k]!=="")h+=`<dt>${l}</dt><dd>${esc(o[k])}</dd>`});
+    h+=`</dl>`;
+    h+=flags.length?flags.map(x=>`<div class="flag">⚠ ${esc(x)}</div>`).join(""):`<div class="ok" style="font-size:13px;margin-top:6px">✓ All checks passed</div>`;
+  }
+  return h+`</div></div></div>`;
+}
+
+function csv(){
+  const q=v=>{v=v==null?"":String(v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
+  return [FIELDS.join(",")].concat(rows.filter(r=>!r._error).map(r=>FIELDS.map(k=>q(r[k])).join(","))).join("\n");
+}
+function table(){
+  const ok=rows.filter(r=>!r._error);
+  $("tablewrap").innerHTML="<table><tr>"+FIELDS.map(k=>`<th>${k}</th>`).join("")+"</tr>"+ok.map(r=>"<tr>"+FIELDS.map(k=>`<td>${esc(r[k]??"")}</td>`).join("")+"</tr>").join("")+"</table>";
+  $("tablewrap").hidden=!ok.length;$("exports").hidden=!ok.length;
+}
+
+$("go").onclick=async()=>{
+  $("go").disabled=true;rows=[];$("results").innerHTML="";
+  let sample=null;
+  try{sample=await claude.use("sample")}catch(e){}
+  if(!sample){$("status").innerHTML='<span class="err">Reading is unavailable in this view. Open the artifact on claude.ai and sign in.</span>';$("go").disabled=false;return}
+  try{const l=await sample.limits();if(l&&l.images===false){$("status").innerHTML='<span class="err">Image reading is not enabled for this page.</span>';$("go").disabled=false;return}}catch(e){}
+  for(let i=0;i<files.length;i++){
+    $("status").textContent=`Reading ${i+1} of ${files.length}…`;
+    const url=URL.createObjectURL(files[i]);let o;
+    try{o=validate(await readOne(files[i],sample))}
+    catch(e){o={_error:(e&&e.code==="not_granted")?"Permission was declined":(e&&e.message)||"Could not read this image"};if(e&&e.code==="rate_limited"){rows.push(o);$("results").insertAdjacentHTML("beforeend",card(o,url,files[i].name));break}}
+    rows.push(o);$("results").insertAdjacentHTML("beforeend",card(o,url,files[i].name));
+  }
+  const bad=rows.filter(r=>r._error||(r._flags&&r._flags.length)).length;
+  $("status").textContent=bad?`Done. ${bad} need a quick look.`:"Done. Everything checked out.";
+  table();$("go").disabled=false;
+};
+
+$("copyjson").onclick=()=>navigator.clipboard.writeText(JSON.stringify(rows.filter(r=>!r._error).map(r=>{const c={};FIELDS.forEach(k=>c[k]=r[k]??null);return c}),null,2)).then(()=>$("status").textContent="JSON copied").catch(()=>{});
+$("copycsv").onclick=()=>navigator.clipboard.writeText(csv()).then(()=>$("status").textContent="CSV copied").catch(()=>{});
+$("dlcsv").onclick=async()=>{
+  try{const d=await claude.use("downloads");if(!d)throw 0;await d.save({filename:"upi-transactions.csv",data:new Blob([csv()],{type:"text/csv"})})}
+  catch(e){$("status").textContent="Download unavailable here, use Copy CSV instead."}
+};
+</script>
+</body>
+</html>
