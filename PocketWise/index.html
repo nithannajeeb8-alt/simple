@@ -141,7 +141,7 @@
         <div class="insights-controls"><div class="insights-actions"><button class="secondary-button" id="goals-jump">Savings goals</button><select id="insights-period" class="compact-select"><option value="month">This month</option><option value="last-month">Last month</option><option value="year">This year</option><option value="all">All records</option></select></div></div>
         <section class="finance-command-center" aria-labelledby="finance-overview-title">
           <article class="card finance-overview-card">
-            <div class="section-header finance-overview-heading"><div><span class="section-kicker">YOUR FINANCIAL POSITION</span><h2 id="finance-overview-title">Financial overview</h2><p class="muted small">A reconciled view of money moving through your tracked accounts.</p></div>
+            <div class="section-header finance-overview-heading"><div><span class="section-kicker">YOUR FINANCIAL POSITION</span><h2 id="finance-overview-title">Financial overview</h2><p class="muted small">Choose a period and download the detailed financial sheets.</p></div>
               <div class="finance-period-controls"><select id="finance-period-type" class="compact-select" aria-label="Financial reporting period"><option value="week">Week</option><option value="month" selected>Month</option><option value="year">Year</option><option value="custom">Custom dates</option></select><input id="finance-period-anchor" type="date" aria-label="Date within reporting period"><button class="mini-button" id="finance-period-prev" type="button" aria-label="Previous period">‹</button><button class="mini-button" id="finance-period-next" type="button" aria-label="Next period">›</button></div>
             </div>
             <div class="finance-custom-range" id="finance-custom-range" hidden><label>From <input id="finance-custom-start" type="date"></label><label>To <input id="finance-custom-end" type="date"></label></div>
@@ -151,28 +151,32 @@
           </article>
           <section class="finance-report-downloads" aria-label="Download financial reports">
             <div class="finance-report-download-heading">
-              <div><span class="section-kicker">DETAILED REPORTS</span><h2>Download your financial sheets</h2><p class="muted small">Choose a week, month, year or custom range above. Full statements and detailed figures are kept in the downloaded documents, not on this screen.</p></div>
+              <div><span class="section-kicker">DETAILED REPORTS</span><h2>Download your financial sheets</h2><p class="muted small">Choose a period above. Full statements and detailed figures stay in your downloads.</p></div>
             </div>
             <div class="finance-report-download-grid">
               <article class="finance-report-download-card">
-                <span class="finance-report-download-icon" aria-hidden="true"><i class="bi bi-arrow-left-right"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M4 7h15l-4-4m5 14H5l4 4"/></svg></span>
+                <span class="finance-report-download-icon" aria-hidden="true"><svg viewBox="0 0 24 24" class="icon-fallback"><path d="M4 12h16m-6-6 6 6-6 6"/></svg></span>
                 <div class="finance-report-download-copy"><strong>Cash Flow Statement</strong><small>Money in and out, reconciled closing position, salary allocations and budget plan.</small></div>
                 <button class="secondary-button" id="finance-report-cashflow" type="button" aria-label="Download cash flow statement">Download</button>
               </article>
               <article class="finance-report-download-card">
-                <span class="finance-report-download-icon" aria-hidden="true"><i class="bi bi-clipboard-data"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M8 4H5v17h14V4h-3M9 3h6v4H9zM8 12h8M8 16h8"/></svg></span>
+                <span class="finance-report-download-icon" aria-hidden="true"><svg viewBox="0 0 24 24" class="icon-fallback"><path d="M7 3h7l5 5v13H7zM14 3v5h5M10 13h6M10 17h6"/></svg></span>
                 <div class="finance-report-download-copy"><strong>Personal Balance Sheet</strong><small>Assets, liabilities, receivables and net worth as of the selected period end.</small></div>
                 <button class="secondary-button" id="finance-report-balance" type="button" aria-label="Download personal balance sheet">Download</button>
+              </article>
+              <article class="finance-report-download-card">
+                <span class="finance-report-download-icon" aria-hidden="true"><svg viewBox="0 0 24 24" class="icon-fallback"><path d="M4 20V11h4v9M10 20V5h4v15M16 20V8h4v12"/></svg></span>
+                <div class="finance-report-download-copy"><strong>Category Comparison</strong><small>Selected vs previous period graph, category totals and spending changes.</small></div>
+                <button class="secondary-button" id="finance-report-category" type="button" aria-label="Download category comparison report">Download</button>
               </article>
             </div>
             <p class="finance-report-period-hint" id="finance-report-period-hint">Reports will use the selected reporting period.</p>
           </section>
           <article class="card finance-category-card">
-            <div class="section-header"><div><span class="section-kicker">CATEGORY COMPARISON</span><h2 id="finance-category-title">This week vs last week</h2><p class="muted small">Same weekdays compared across periods. Solid lines are selected period; dashed lines are previous.</p></div></div>
-            <canvas id="finance-category-chart" class="chart-canvas" height="250" aria-label="Category spending compared with the previous period"></canvas>
-            <div id="finance-category-monthly" class="finance-monthly-category-grid" hidden aria-label="Monthly category comparison by calendar week"></div>
-            <div id="finance-category-legend" class="finance-category-legend"></div>
-            <div id="finance-category-summary" class="finance-category-summary"></div>
+            <div class="section-header finance-category-heading"><div><span class="section-kicker">CATEGORY COMPARISON</span><h2 id="finance-category-title">This month vs previous month</h2></div></div>
+            <div class="finance-category-legend finance-category-pair-legend" aria-label="Chart series"><span><i class="is-current"></i>Selected period</span><span><i class="is-previous"></i>Previous period</span></div>
+            <div id="finance-category-chart-view" class="finance-category-chart-view" aria-live="polite"></div>
+            <p id="finance-category-accessibility-summary" class="sr-only" aria-live="polite"></p>
           </article>
           <div class="finance-planning-grid">
             <article class="card finance-budget-card">

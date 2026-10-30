@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pocketwise-shell-v2.4.2-download-only-statements';
+const CACHE_NAME = 'pocketwise-shell-v2.4.4-compact-entry-and-reports';
 const PADDLE_RUNTIME_CACHE = 'pocketwise-paddle-runtime-v243';
 const BASE_URL = self.registration.scope;
 const asset = path => new URL(path, BASE_URL).href;

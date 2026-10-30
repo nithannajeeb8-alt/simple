@@ -348,9 +348,11 @@
       const sign = tx.type === 'refund' ? -1 : 1;
       row[target][index] = major(minor(row[target][index]) + sign * minor(tx.amount));
     });
+    // Keep signed bucket values: a refund can exceed purchases in one bucket and
+    // still offset purchases in another bucket of the same reporting period.
+    // Clamping each bucket independently would overstate net category spending.
     const rows = [...byId.values()].map(row => ({
       ...row,
-      current: row.current.map(v => Math.max(0, v)), previous: row.previous.map(v => Math.max(0, v)),
       currentTotal: sum(row.current), previousTotal: sum(row.previous)
     })).filter(row => row.currentTotal || row.previousTotal).sort((a, b) => (b.currentTotal + b.previousTotal) - (a.currentTotal + a.previousTotal));
     const visible = rows.slice(0, 5);

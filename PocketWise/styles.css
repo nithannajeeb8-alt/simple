@@ -2600,3 +2600,162 @@ textarea,
   .finance-plan-actions{justify-content:flex-start;width:100%;margin-top:8px}
   .finance-budget-card>.section-header{align-items:flex-start;flex-wrap:wrap}
 }
+
+
+/* PocketWise 2.4.3 · compact category trends, accessible series key and calmer transaction entry. */
+.finance-category-card{min-width:0;overflow:hidden}
+.finance-category-pair-legend{display:flex;align-items:center;gap:14px;margin:2px 0 9px;flex-wrap:wrap;color:var(--muted);font-size:10px}
+.finance-category-pair-legend span{display:inline-flex;align-items:center;gap:6px}
+.finance-category-pair-legend i{display:inline-block;width:18px;height:0;border-top:2.5px solid var(--ink);border-radius:4px}
+.finance-category-pair-legend i.is-previous{border-top-style:dashed;opacity:.55}
+.finance-category-pair-legend i.is-current{border-top-color:var(--green)}
+.finance-category-name-legend{display:flex;align-items:center;gap:7px 13px;flex-wrap:wrap;margin:4px 0 8px;min-width:0}
+.finance-category-name-legend span{display:inline-flex;align-items:center;gap:6px;min-width:0;color:var(--muted);font-size:10px;line-height:1.35}
+.finance-category-name-legend i{display:inline-block;flex:0 0 8px;width:8px;height:8px;border-radius:50%;background:var(--category-color)}
+.finance-category-chart-view{width:100%;max-width:100%;min-width:0;overflow:hidden}
+.finance-category-compare-svg{display:block;width:100%;height:auto;max-width:100%;overflow:visible;color:var(--muted)}
+.finance-category-compare-svg text{font-family:var(--font);font-variant-numeric:tabular-nums}
+.finance-category-compare-svg.is-aggregate{max-height:380px}
+.finance-report-download-icon{color:var(--green)}
+.finance-report-download-icon svg{display:block;width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round}
+.finance-report-download-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.finance-report-download-card{align-items:center}
+.finance-report-download-card .secondary-button{min-width:82px}
+@media(max-width:900px){.finance-report-download-grid{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:720px){
+  .finance-category-card{padding:16px}
+  .finance-category-pair-legend{gap:10px 13px;margin-bottom:7px}
+  .finance-category-name-legend{gap:6px 10px;margin:3px 0 6px}
+  .finance-category-name-legend span{font-size:9px}
+  .finance-category-compare-svg{width:100%;height:auto}
+  .finance-report-download-grid{grid-template-columns:minmax(0,1fr)}
+}
+
+/* Transaction entry: clearer amount focus, grouped details and thumb-friendly actions. */
+.transaction-entry-form{display:grid;gap:15px;padding-top:16px}
+.transaction-entry-type,.transaction-entry-section{display:grid;gap:9px;min-width:0}
+.transaction-entry-label{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;min-width:0}
+.transaction-entry-label>span{font-size:10px;letter-spacing:.09em;font-weight:800;color:var(--muted)}
+.transaction-entry-label small{font-size:10px;color:var(--subtle);text-align:right;line-height:1.35}
+.transaction-entry-form .type-switch{margin:0;grid-template-columns:repeat(4,minmax(0,1fr));gap:3px}
+.transaction-entry-form .type-switch button{min-width:0;padding:11px 4px;font-size:11px;white-space:nowrap}
+.transaction-amount-panel{padding:15px 16px 12px;border:1px solid color-mix(in srgb,var(--green) 24%,var(--line));border-radius:17px;background:color-mix(in srgb,var(--green-soft) 22%,var(--surface));min-width:0}
+.transaction-amount-field{margin-top:5px}
+.transaction-amount-field .amount-input{width:100%;min-height:56px;font-size:clamp(35px,9vw,46px)!important;line-height:1.1;padding:5px 0 8px!important;border-bottom:1px solid color-mix(in srgb,var(--green) 28%,var(--line))!important;letter-spacing:-.045em}
+.transaction-amount-panel .amount-helper{margin:5px 0 0;font-size:10px;line-height:1.4}
+.transaction-entry-section{padding:1px 0 0}
+.transaction-details-grid{gap:12px}
+.transaction-details-grid .form-field{gap:6px}
+.transaction-details-grid .form-field label{font-size:9px;letter-spacing:.06em}
+.transaction-details-grid .form-field input,.transaction-details-grid .form-field select,.transaction-details-grid .form-field textarea{min-height:44px;border-radius:12px;font-size:14px;padding:11px 12px}
+.transaction-details-grid .form-field textarea{min-height:72px}
+.transaction-entry-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:2px}
+.transaction-entry-actions button{min-width:0;min-height:46px;white-space:normal;line-height:1.25;padding:10px}
+.transaction-entry-actions button[type="submit"][value="save"]{grid-column:1/-1}
+.transaction-entry-actions button[type="submit"][value="another"]{grid-column:1/-1}
+.transaction-entry-form .form-note{margin:0;line-height:1.45}
+@media(max-width:420px){
+  .transaction-entry-form{gap:13px;padding:15px 17px 20px}
+  .transaction-entry-form .type-switch button{font-size:10px;padding:10px 2px}
+  .transaction-amount-panel{padding:13px 14px 11px}
+  .transaction-details-grid{grid-template-columns:minmax(0,1fr);gap:10px}
+  .transaction-details-grid .form-field.full{grid-column:auto}
+  .transaction-entry-actions{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .transaction-entry-actions button[type="submit"][value="save"],.transaction-entry-actions button[type="submit"][value="another"]{grid-column:1/-1}
+}
+@media(prefers-reduced-motion:reduce){.transaction-entry-form *{scroll-behavior:auto!important}}
+
+
+/* Quick entry refinement: clear progress, amount focus and readable one-thumb controls. */
+.quick-progress{gap:6px;padding:15px 22px 0}
+.quick-progress span{height:4px;background:var(--surface-3);transition:background .18s ease}
+.quick-flow{display:grid;gap:0;padding-top:18px}
+.quick-flow .quick-step-label{margin-bottom:8px;font-size:9px;letter-spacing:.13em}
+.quick-flow h3{font-size:clamp(27px,7vw,34px);margin-bottom:7px}
+.quick-flow>.muted{font-size:12px;line-height:1.5;margin:0 0 15px;max-width:42ch}
+.quick-amount-wrap{gap:9px;margin:8px 0 8px;padding:12px 14px 10px;border:1px solid color-mix(in srgb,var(--green) 28%,var(--line));border-radius:17px;background:color-mix(in srgb,var(--green-soft) 24%,var(--surface));color:var(--green-deep)}
+.quick-amount-wrap>span{font-size:25px;color:var(--muted)}
+.quick-flow-value{min-height:58px;font-size:clamp(42px,11vw,56px)}
+.quick-next{min-height:50px;margin-top:14px;border-radius:14px}
+.quick-paste-button{min-height:44px;margin-top:9px;border-radius:13px;font-size:12px}
+.quick-flow .quick-cancel{min-height:40px;padding:8px 12px}
+.quick-choice-list{gap:9px;margin-top:3px}
+.quick-choice{min-height:68px;padding:11px;border-radius:15px;transition:border-color .16s ease,background .16s ease,transform .16s ease}
+.quick-choice:active{transform:scale(.99);border-color:var(--green)}
+.quick-category-grid{gap:8px;margin:14px 0 6px}
+.quick-category{min-height:88px;padding:11px;border-radius:14px;gap:8px}
+.quick-summary{margin:12px 0;padding:13px;border-radius:14px}
+.quick-extra-fields{gap:10px;margin-top:12px}
+@media(max-width:520px){
+  .quick-progress{padding:13px 18px 0}
+  .quick-flow{padding:17px 18px 20px}
+  .quick-flow>.muted{margin-bottom:12px}
+  .quick-amount-wrap{margin-top:7px;padding:11px 12px 9px}
+  .quick-flow-value{font-size:clamp(40px,12vw,53px)}
+  .quick-extra-fields{grid-template-columns:minmax(0,1fr)}
+  .quick-extra-fields .form-field{grid-column:auto}
+  .quick-choice{min-height:65px}
+}
+@media(prefers-reduced-motion:reduce){.quick-progress span,.quick-choice{transition:none!important}}
+
+/* PocketWise 2.4.4 · keep dense financial detail in the downloadable sheets. */
+.finance-overview-card #finance-overview-metrics{display:none!important}
+.finance-overview-card .finance-coverage-note{margin:9px 0 0;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);font-size:10px;line-height:1.45}
+.finance-report-download-heading h2{margin:5px 0 4px;font-size:17px;letter-spacing:-.35px}
+.finance-report-download-heading p{max-width:54ch;margin:0;font-size:11px;line-height:1.45}
+.finance-report-download-grid{gap:9px}
+.finance-report-download-card{min-width:0;padding:13px 14px;border-radius:15px;gap:11px}
+.finance-report-download-copy{min-width:0;display:grid;gap:3px}
+.finance-report-download-copy strong{font-size:12px;line-height:1.3}
+.finance-report-download-copy small{font-size:10px;line-height:1.4;color:var(--muted)}
+.finance-report-download-card .secondary-button{min-width:84px;min-height:42px;padding:9px 12px}
+.finance-report-download-icon{width:38px;height:38px;flex-basis:38px;border-radius:12px}
+.finance-report-download-icon svg{width:20px;height:20px}
+
+/* Salary-plan entry: grouped fields, no compressed multi-column controls. */
+.finance-salary-form{display:grid;gap:17px}
+.finance-salary-intro{padding:14px 15px;border:1px solid var(--line);border-radius:15px;background:var(--surface-2)}
+.finance-salary-intro>strong{display:block;font-family:var(--display);font-size:14px;letter-spacing:-.25px}
+.finance-salary-intro p{margin:5px 0 0;color:var(--muted);font-size:11px;line-height:1.5}
+.finance-salary-section{display:grid;gap:13px;min-width:0;padding:2px 0 15px;border-bottom:1px solid var(--line)}
+.finance-salary-section-heading{display:flex;align-items:center;gap:10px;min-width:0}
+.finance-salary-step{display:grid;place-items:center;flex:0 0 30px;width:30px;height:30px;border-radius:10px;background:var(--green-soft);color:var(--green);font-size:10px;font-weight:800;font-variant-numeric:tabular-nums}
+.finance-salary-section-heading>div{display:grid;gap:2px;min-width:0}
+.finance-salary-section-heading strong{font-size:12px;font-weight:800}
+.finance-salary-section-heading small{font-size:10px;color:var(--muted);line-height:1.35}
+.finance-pay-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.finance-pay-grid .finance-pay-amount{grid-column:1/-1}
+.finance-salary-form .form-field{gap:6px}
+.finance-salary-form .form-field label{font-size:9px;letter-spacing:.07em}
+.finance-salary-form .form-field input,.finance-salary-form .form-field select{min-height:46px;background:var(--surface-2);border-radius:12px;font-size:14px;padding:11px 12px}
+.finance-salary-form .finance-pay-amount input{font-family:var(--display);font-size:21px;font-weight:800;letter-spacing:-.5px;font-variant-numeric:tabular-nums}
+.finance-salary-form .form-field>small{color:var(--muted);font-size:9px;line-height:1.4}
+.finance-allocation-list{display:grid;gap:9px}
+.finance-modal-allocation-row{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--surface-2);min-width:0}
+.finance-modal-allocation-top{display:grid;grid-template-columns:minmax(0,1fr) 40px;gap:9px;align-items:end;min-width:0}
+.finance-modal-allocation-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px 10px;min-width:0}
+.finance-modal-allocation-row .form-field{gap:6px}
+.finance-modal-allocation-row label{font-size:9px;letter-spacing:.07em}
+.finance-modal-allocation-row .form-field input,.finance-modal-allocation-row .form-field select{width:100%;min-width:0;min-height:46px;padding:11px 12px;background:var(--surface);border:1px solid var(--line);border-radius:11px;font-size:14px}
+.finance-modal-allocation-remove{width:40px;height:44px;display:grid;place-items:center;border-radius:12px;font-size:20px;line-height:1;color:var(--muted)}
+.finance-allocation-enabled{grid-column:1/-1;display:flex;align-items:center;gap:9px;min-height:34px;margin:0;padding:7px 9px;border-radius:10px;background:var(--surface);font-size:10px;letter-spacing:0!important;color:var(--ink)}
+.finance-allocation-enabled input{width:17px;height:17px;min-width:17px;margin:0;accent-color:var(--green)}
+.finance-add-allocation-button{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:46px;padding:10px 13px;border:1px dashed color-mix(in srgb,var(--green) 44%,var(--line));border-radius:12px;background:var(--green-soft);color:var(--green);font-size:11px;font-weight:800}
+.finance-add-allocation-button span{font-size:18px;line-height:1}
+.finance-form-guidance{margin:0;padding:10px 12px;border-radius:11px;background:var(--surface-2);color:var(--muted);font-size:10px;line-height:1.5}
+.finance-salary-form-actions{display:flex;gap:9px;margin-top:0;padding-top:2px}
+.finance-salary-form-actions button{flex:1 1 0;min-height:48px}
+@media(max-width:720px){
+  .finance-pay-grid{grid-template-columns:minmax(0,1fr);gap:11px}
+  .finance-pay-grid .finance-pay-amount{grid-column:auto}
+  .finance-modal-allocation-row{grid-template-columns:minmax(0,1fr)!important;padding:11px;gap:10px}
+  .finance-modal-allocation-top{grid-template-columns:minmax(0,1fr) 42px;gap:8px}
+  .finance-modal-allocation-controls{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+  .finance-salary-form-actions{position:sticky;bottom:0;padding:10px 0 max(2px,env(safe-area-inset-bottom));background:var(--surface)}
+  .finance-report-download-card{padding:12px;gap:10px}
+}
+@media(max-width:390px){
+  .finance-report-download-icon{width:34px;height:34px;flex-basis:34px}
+  .finance-report-download-card .secondary-button{min-width:76px;padding:8px 10px;font-size:11px}
+  .finance-report-download-copy small{font-size:9px}
+}
