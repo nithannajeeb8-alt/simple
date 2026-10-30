@@ -1526,6 +1526,17 @@
     return {amount,type,date,reference:ref,referenceType,utr,transactionId,upi,upiProvider,sourceApp,accountSuffix:acct,party,status,confidence:Math.min(0.99,confidence),needsReview,reviewReasons,raw:text};
   }
   function pwHasDuplicate(parsed){return state.transactions.some(t=>{const note=String(t.note||'');const refs=[parsed.reference,parsed.utr,parsed.transactionId].filter((v,i,a)=>v&&a.indexOf(v)===i);if(refs.some(ref=>new RegExp(`(?:RRN|UTR|Ref(?:erence)?|Transaction\\s*ID|Txn\\s*ID):?\\s*${String(ref).replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}`,'i').test(note)))return true;return Number(t.amount)===parsed.amount&&String(t.date||'')===parsed.date&&(/UPI/i.test(String(t.paymentMethod||''))||parsed.upi&&note.includes(parsed.upi))&&(!parsed.party||note.toLowerCase().includes(parsed.party.toLowerCase()));});}
+  function pwFriendlyOcrError(error){
+    const raw=String(error&&error.message||error||'').trim();
+    if(/unsafe-eval|trusted-types-eval|content security policy|blocked by csp/i.test(raw))
+      return 'The OCR engine could not start because this browser blocked part of its runtime. Close and reopen PocketWise, then try again. You can also paste the payment text manually.';
+    if(/failed to fetch|networkerror|load failed|importing a module script failed|offline|download failed|could not download/i.test(raw))
+      return 'Connect to the internet once to load the OCR engine and its models, then try again. Your screenshot stays on this device. You can also paste the payment text manually.';
+    if(/out of memory|memory access out of bounds|allocation failed|wasm memory/i.test(raw))
+      return 'This screenshot is too large for the available memory. Try a smaller or cropped screenshot, or paste the payment text manually.';
+    if(!raw)return 'OCR could not read this screenshot. Try a clearer image or paste the payment text manually.';
+    return raw.length>220?'OCR could not read this screenshot. Try a clearer image or paste the payment text manually.':raw;
+  }
   function pwShowImport(){window.PocketWiseLastReceiptOCR=null;openModal('Import a payment',`<div class="modal-body pw-import"><p>Choose a payment screenshot from your photo gallery, or take a new photo. OCR extracts likely payment details for review.</p><button type="button" class="secondary-button pw-statement-entry" id="pw-open-statement-import">${icon('file')}<span>Import a bank statement <small>PDF or CSV · review every transaction before saving</small></span></button><div class="pw-upload-zone"><input id="pw-payment-gallery" type="file" accept="image/*" hidden><input id="pw-payment-camera" type="file" accept="image/*" capture="environment" hidden><div class="pw-upload-actions"><button type="button" class="pw-upload-button" id="pw-choose-gallery"><span class="pw-upload-symbol">▧</span><strong>Choose from gallery</strong><small>Select an existing screenshot</small></button><button type="button" class="pw-upload-button" id="pw-choose-camera"><span class="pw-upload-symbol">＋</span><strong>Take a photo</strong><small>Open your camera</small></button></div><img id="pw-image-preview" alt="Selected payment screenshot preview" hidden><div id="pw-ocr-status" class="pw-ocr-status" role="status" aria-live="polite">Your image stays on this device. Choose a screenshot to begin.</div><button class="secondary-button" id="pw-run-ocr" type="button" disabled>Read screenshot with OCR</button></div><label class="form-field"><span>OR PASTE BANK SMS / OCR TEXT</span><textarea id="pw-import-raw" rows="5" placeholder="Paste payment text here…"></textarea></label><div class="form-actions"><button class="secondary-button" type="button" data-cancel-modal>Cancel</button><button class="primary-button" type="button" id="pw-parse-payment">Extract details</button></div><p class="fine-print">Uses PaddleOCR locally on this device. Its model is downloaded once and cached for later offline scans where browser storage allows. Receipt images are not uploaded. Verify every field before saving.</p></div>`,'IMPORT · REVIEW BEFORE SAVING');
     const gallery=$('#pw-payment-gallery'),camera=$('#pw-payment-camera'),run=$('#pw-run-ocr'),preview=$('#pw-image-preview'),status=$('#pw-ocr-status');let selectedFile=null;
     $('#pw-choose-gallery')?.addEventListener('click',()=>gallery?.click());
@@ -1592,7 +1603,7 @@
         status.textContent=`Text extracted with ${engine}. Review it below, then tap Extract details.`;
         $('#pw-import-raw').focus({preventScroll:true});
       }catch(error){
-        status.textContent=error.message||'OCR failed. Paste the text manually instead.';
+        status.textContent=pwFriendlyOcrError(error);
       }finally{
         run.disabled=false;
       }

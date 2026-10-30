@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pocketwise-shell-v2.3.44';
+const CACHE_NAME = 'pocketwise-shell-v2.3.45';
 const PADDLE_RUNTIME_CACHE = 'pocketwise-paddle-runtime-v243';
 const BASE_URL = self.registration.scope;
 const asset = path => new URL(path, BASE_URL).href;
@@ -8,6 +8,7 @@ const APP_SHELL = [
   asset('styles.css'),
   asset('app.js'),
   asset('paddleocr-pwa.js'),
+  asset('paddleocr-sandbox.html'),
   asset('rupee-ocr.js'),
   asset('receipt-ocr-parser.js'),
   asset('statement-parser.js'),

@@ -2,7 +2,8 @@
  * PocketWise PaddleOCR browser integration.
  * Uses the official @paddleocr/paddleocr-js PP-OCRv6 small models and local OCR.
  * Paddle model archives are cached on this origin after first download for offline use.
- * Receipt pixels are passed only to local browser inference; they are never uploaded.
+ * The eval-dependent runtime is isolated in a script-only opaque-origin iframe; the main app CSP stays strict.
+ * Receipt pixels are passed to that local browser runtime only; they are never uploaded.
  */
 (function () {
   'use strict';
@@ -10,13 +11,18 @@
   const SDK_URL = 'https://cdn.jsdelivr.net/npm/@paddleocr/paddleocr-js@0.4.2/+esm';
   const MODEL_NAMES = Object.freeze({ det: 'PP-OCRv6_small_det', rec: 'PP-OCRv6_small_rec' });
   const MODEL_CACHE = 'pocketwise-paddle-models-v243';
-  const SDK_RUNTIME_CACHE = 'pocketwise-paddle-runtime-v243';
+  const SANDBOX_FILE = 'paddleocr-sandbox.html';
+  const SCRIPT_BASE = (typeof document !== 'undefined' && document.currentScript && document.currentScript.src) || '';
   const MODEL_BOS = 'https://paddle-model-ecology.bj.bcebos.com/paddlex/official_inference_model/paddle3.0.0/';
   const MODEL_HF = 'https://huggingface.co/PaddlePaddle/';
   const MAX_TILE_SIDE = 2200;
   const TILE_OVERLAP = 260;
   let enginePromise = null;
-  const objectUrls = [];
+  let sandboxFrame = null;
+  let sandboxReadyPromise = null;
+  let sandboxReadyResolve = null;
+  let sandboxRequestSequence = 0;
+  const pendingSandboxRequests = new Map();
 
   function report(onStatus, message) {
     if (typeof onStatus === 'function') { try { onStatus(message); } catch (_) { /* status is non-critical */ } }
@@ -107,30 +113,128 @@
     return blob;
   }
 
-  async function loadSdk(onStatus) {
-    report(onStatus, 'Loading official PaddleOCR browser runtime…');
-    const sdk = await import(SDK_URL);
-    if (!sdk || !sdk.PaddleOCR || typeof sdk.PaddleOCR.create !== 'function') throw new Error('PaddleOCR browser SDK did not expose PaddleOCR.create().');
-    return sdk.PaddleOCR;
+
+  function handleSandboxMessage(event) {
+    if (!sandboxFrame || event.source !== sandboxFrame.contentWindow) return;
+    const data = event.data;
+    if (!data || data.channel !== 'pocketwise-paddle-sandbox') return;
+    if (data.type === 'ready') {
+      if (sandboxReadyResolve) sandboxReadyResolve();
+      return;
+    }
+    if (data.type !== 'response' || !data.id) return;
+    const pending = pendingSandboxRequests.get(data.id);
+    if (!pending) return;
+    pendingSandboxRequests.delete(data.id);
+    clearTimeout(pending.timer);
+    if (data.ok) pending.resolve(data.result);
+    else pending.reject(new Error(String(data.error || 'The isolated OCR engine could not complete the request.')));
   }
+  if (typeof window.addEventListener === 'function') window.addEventListener('message', handleSandboxMessage, false);
+
+  function getSandbox() {
+    if (sandboxReadyPromise) return sandboxReadyPromise;
+    sandboxReadyPromise = new Promise(function (resolve, reject) {
+      const frame = document.createElement('iframe');
+      frame.setAttribute('sandbox', 'allow-scripts');
+      frame.setAttribute('aria-hidden', 'true');
+      frame.setAttribute('tabindex', '-1');
+      frame.setAttribute('title', 'PocketWise local OCR engine');
+      frame.style.cssText = 'position:absolute;width:1px;height:1px;left:-10000px;top:0;border:0;opacity:0;pointer-events:none;';
+      sandboxFrame = frame;
+      let settled = false;
+      const timer = setTimeout(function () {
+        if (settled) return;
+        settled = true;
+        sandboxReadyPromise = null;
+        sandboxReadyResolve = null;
+        try { frame.remove(); } catch (_) {}
+        if (sandboxFrame === frame) sandboxFrame = null;
+        reject(new Error('The isolated OCR runtime did not start. Reopen PocketWise and try again.'));
+      }, 20000);
+      sandboxReadyResolve = function () {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        sandboxReadyResolve = null;
+        resolve(frame);
+      };
+      frame.addEventListener('error', function () {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        sandboxReadyPromise = null;
+        sandboxReadyResolve = null;
+        if (sandboxFrame === frame) sandboxFrame = null;
+        reject(new Error('The isolated OCR runtime could not be loaded.'));
+      }, { once: true });
+      frame.src = new URL(SANDBOX_FILE, SCRIPT_BASE || document.baseURI).href;
+      document.body.appendChild(frame);
+    });
+    return sandboxReadyPromise;
+  }
+
+  async function sandboxRequest(type, payload, timeoutMs) {
+    const frame = await getSandbox();
+    const id = 'pw-ocr-' + (++sandboxRequestSequence);
+    return new Promise(function (resolve, reject) {
+      const timer = setTimeout(function () {
+        pendingSandboxRequests.delete(id);
+        reject(new Error(type === 'predict'
+          ? 'OCR took too long on this device. Try a smaller screenshot.'
+          : 'The local OCR runtime timed out while starting.'));
+      }, Number.isFinite(timeoutMs) ? timeoutMs : 120000);
+      pendingSandboxRequests.set(id, { resolve: resolve, reject: reject, timer: timer });
+      try {
+        frame.contentWindow.postMessage(Object.assign({
+          channel: 'pocketwise-paddle-sandbox', type: type, id: id
+        }, payload || {}), '*');
+      } catch (error) {
+        clearTimeout(timer);
+        pendingSandboxRequests.delete(id);
+        reject(error);
+      }
+    });
+  }
+
+  function canvasToBlob(canvas) {
+    return new Promise(function (resolve, reject) {
+      if (!canvas || typeof canvas.toBlob !== 'function') {
+        reject(new Error('This browser cannot prepare the image for local OCR.'));
+        return;
+      }
+      try {
+        canvas.toBlob(function (blob) {
+          if (!blob || !blob.size) reject(new Error('The screenshot could not be prepared for OCR.'));
+          else resolve(blob);
+        }, 'image/png');
+      } catch (error) { reject(error); }
+    });
+  }
+
   async function createEngine(onStatus) {
     if (enginePromise) return enginePromise;
     enginePromise = (async function () {
-      const PaddleOCR = await loadSdk(onStatus);
       const [detBlob, recBlob] = await Promise.all([
         downloadModel(MODEL_NAMES.det, onStatus), downloadModel(MODEL_NAMES.rec, onStatus)
       ]);
-      const detUrl = URL.createObjectURL(detBlob), recUrl = URL.createObjectURL(recBlob);
-      objectUrls.push(detUrl, recUrl);
-      report(onStatus, 'Initialising PaddleOCR PP-OCRv6 small…');
-      const engine = await PaddleOCR.create({
-        textDetectionModelName: MODEL_NAMES.det,
-        textDetectionModelAsset: { url: detUrl },
-        textRecognitionModelName: MODEL_NAMES.rec,
-        textRecognitionModelAsset: { url: recUrl },
-        ortOptions: { backend: 'auto', numThreads: 1, simd: true }
-      });
-      if (!engine || typeof engine.predict !== 'function') throw new Error('PaddleOCR did not initialise correctly.');
+      report(onStatus, 'Starting isolated PaddleOCR runtime…');
+      await sandboxRequest('init', {
+        detectionModel: detBlob,
+        recognitionModel: recBlob,
+        detectionModelName: MODEL_NAMES.det,
+        recognitionModelName: MODEL_NAMES.rec
+      }, 180000);
+      const engine = {
+        predict: async function (canvas, options) {
+          const image = await canvasToBlob(canvas);
+          const result = await sandboxRequest('predict', { image: image, options: options || {} }, 120000);
+          return result ? [result] : [];
+        },
+        dispose: async function () {
+          try { await sandboxRequest('dispose', {}, 15000); } catch (_) { /* iframe may already be gone */ }
+        }
+      };
       return engine;
     })().catch(function (error) { enginePromise = null; throw error; });
     return enginePromise;
