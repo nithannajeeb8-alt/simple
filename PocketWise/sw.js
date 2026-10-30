@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pocketwise-shell-v2.4.5-four-metric-insights-and-report-layout';
+const CACHE_NAME = 'pocketwise-shell-v2.4.6-structure-and-report-regression-fix';
 const PADDLE_RUNTIME_CACHE = 'pocketwise-paddle-runtime-v243';
 const BASE_URL = self.registration.scope;
 const asset = path => new URL(path, BASE_URL).href;
