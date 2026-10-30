@@ -2359,3 +2359,51 @@ html[data-input-modality="pointer"] :where(button, a, [role="button"], [tabindex
 .pw-native-paste-target:focus{border-color:var(--green);box-shadow:0 0 0 3px color-mix(in srgb,var(--green) 14%,transparent)}
 
 /* 2.3.50: aligned separate text and image Shortcut actions in Settings */
+
+/* PocketWise 2.3.54: keep the app at a fixed viewport scale on touch devices.
+   Inputs remain editable/selectable so typing and native paste still work. */
+html,
+body,
+body * {
+  /* Apply to nested scroll surfaces as well as the document. Horizontal and
+     vertical scrolling remain enabled; pinch and double-tap page zoom do not. */
+  touch-action: pan-x pan-y;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+body,
+body * {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+input,
+textarea,
+[contenteditable="true"],
+[contenteditable="plaintext-only"] {
+  -webkit-user-select: text;
+  user-select: text;
+  /* Preserve paste/edit context actions only inside editable controls. */
+  -webkit-touch-callout: default;
+}
+@media (hover: none) and (pointer: coarse) {
+  /* Keep the original UI typography when idle. iOS Safari auto-zooms focused
+     editable controls below 16px, so raise only the active control at focus. */
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="hidden"]):not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="image"]):not([type="color"]):not(.amount-input):focus,
+  select:focus,
+  textarea:focus,
+  [contenteditable="true"]:focus,
+  [contenteditable="plaintext-only"]:focus {
+    font-size: 16px !important;
+  }
+}
+/* The native paste surface must retain the iOS long-press Paste menu while
+   remaining non-zoomable. It is intentionally the only non-form text target
+   that allows selection. */
+.pw-native-paste-target {
+  -webkit-user-select: text;
+  user-select: text;
+  -webkit-touch-callout: default;
+  touch-action: pan-x pan-y;
+}
+
