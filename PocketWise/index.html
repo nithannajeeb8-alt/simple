@@ -131,7 +131,7 @@
 
       <section class="page" id="page-activity" data-page-panel="activity">
         <div class="activity-search-row"><div class="search-box"><span class="icon-wrap"><i class="bi bi-search"></i><svg class="icon-fallback" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg></span><input id="activity-search" type="search" placeholder="Try ₹500, yesterday, food, from Alex…" aria-label="Search transactions"></div></div>
-        <div class="activity-toolbar"><button class="secondary-button" id="export-csv"><span class="icon-wrap"><i class="bi bi-download"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 18v3h16v-3"/></svg></span> Export CSV</button><select id="activity-period" class="compact-select" aria-label="Activity date range"><option value="month">This month</option><option value="all">All time</option><option value="year">This year</option></select></div>
+        <div class="activity-toolbar"><button class="secondary-button" id="export-csv"><span class="icon-wrap"><i class="bi bi-download"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 18v3h16v-3"/></svg></span> Export CSV</button><select id="activity-period" class="compact-select" aria-label="Activity date range"><option value="week">This week</option><option value="month" selected>This month</option><option value="year">This year</option><option value="all">All activity</option></select></div>
         <div class="filter-row" id="activity-filters" aria-label="Filter activity"><button class="filter-pill active" data-filter="all">All activity</button><button class="filter-pill" data-filter="expense">Expenses</button><button class="filter-pill" data-filter="income">Income</button><button class="filter-pill" data-filter="transfer">Transfers</button><button class="filter-pill" data-filter="debt">Debt activity</button><button class="filter-pill" data-filter="refund">Refunds</button></div>
         <article class="card activity-card"><div class="section-header"><div><span class="section-kicker">THE FULL PICTURE</span><h2>Transaction history <span class="subtle-count" id="transaction-total">0</span></h2></div><button class="icon-button" id="activity-add" aria-label="Add transaction"><span class="icon-wrap"><i class="bi bi-plus-lg"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span></button></div><div id="all-transactions" class="transaction-list"></div></article>
         <article class="card activities-manager"><div class="section-header"><div><span class="section-kicker">YOUR SHORTCUTS</span><h2>Most-used activities</h2><p class="muted small">Your frequent choices rise to the top automatically.</p></div><button class="secondary-button" id="manage-activities"><span class="icon-wrap"><i class="bi bi-tags"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="m3 3 8 0 10 10-8 8L3 11Z"/><circle cx="7" cy="7" r="1"/></svg></span> Add activity</button></div><div id="frequent-activities" class="activity-chip-list"></div></article>
@@ -139,6 +139,44 @@
 
       <section class="page" id="page-insights" data-page-panel="insights">
         <div class="insights-controls"><div class="insights-actions"><button class="secondary-button" id="goals-jump">Savings goals</button><select id="insights-period" class="compact-select"><option value="month">This month</option><option value="last-month">Last month</option><option value="year">This year</option><option value="all">All records</option></select></div></div>
+        <section class="finance-command-center" aria-labelledby="finance-overview-title">
+          <article class="card finance-overview-card">
+            <div class="section-header finance-overview-heading"><div><span class="section-kicker">YOUR FINANCIAL POSITION</span><h2 id="finance-overview-title">Financial overview</h2><p class="muted small">A reconciled view of money moving through your tracked accounts.</p></div>
+              <div class="finance-period-controls"><select id="finance-period-type" class="compact-select" aria-label="Financial reporting period"><option value="week">Week</option><option value="month" selected>Month</option><option value="year">Year</option><option value="custom">Custom dates</option></select><input id="finance-period-anchor" type="date" aria-label="Date within reporting period"><button class="mini-button" id="finance-period-prev" type="button" aria-label="Previous period">‹</button><button class="mini-button" id="finance-period-next" type="button" aria-label="Next period">›</button></div>
+            </div>
+            <div class="finance-custom-range" id="finance-custom-range" hidden><label>From <input id="finance-custom-start" type="date"></label><label>To <input id="finance-custom-end" type="date"></label></div>
+            <div class="finance-period-label" id="finance-period-label">This month</div>
+            <div class="finance-metric-grid" id="finance-overview-metrics"></div>
+            <p class="finance-coverage-note" id="finance-coverage-note" role="status"></p>
+          </article>
+          <div class="finance-statement-grid">
+            <article class="card finance-statement-card">
+              <div class="section-header"><div><span class="section-kicker">MONEY IN & OUT</span><h2>Cash Flow Statement</h2><p class="muted small">Actual account movements, with financing kept separate from earned income.</p></div><button class="mini-button" id="finance-report-cashflow" type="button" aria-label="Download cash flow report" title="Download cash flow report">↓</button></div>
+              <div id="finance-cashflow-panel"></div>
+            </article>
+            <article class="card finance-statement-card">
+              <div class="section-header"><div><span class="section-kicker">WHAT YOU OWN & OWE</span><h2>Personal Balance Sheet</h2><p class="muted small">Tracked position at the end of the selected period.</p></div><button class="mini-button" id="finance-report-balance" type="button" aria-label="Download balance sheet report" title="Download balance sheet report">↓</button></div>
+              <div id="finance-balance-sheet-panel"></div>
+            </article>
+          </div>
+          <article class="card finance-category-card">
+            <div class="section-header"><div><span class="section-kicker">CATEGORY COMPARISON</span><h2 id="finance-category-title">This week vs last week</h2><p class="muted small">Same weekdays compared across periods. Solid lines are selected period; dashed lines are previous.</p></div></div>
+            <canvas id="finance-category-chart" class="chart-canvas" height="250" aria-label="Category spending compared with the previous period"></canvas>
+            <div id="finance-category-legend" class="finance-category-legend"></div>
+            <div id="finance-category-summary" class="finance-category-summary"></div>
+          </article>
+          <div class="finance-planning-grid">
+            <article class="card finance-budget-card">
+              <div class="section-header"><div><span class="section-kicker">PLAN AGAINST REAL INCOME</span><h2>Salary & budget allocation</h2><p class="muted small">Planning rules never create transactions or move money.</p></div><button class="secondary-button" id="finance-salary-edit" type="button">Configure</button></div>
+              <div id="finance-salary-panel"></div>
+              <div id="finance-budget-panel"></div>
+            </article>
+            <article class="card finance-priority-card">
+              <div class="section-header"><div><span class="section-kicker">WHAT NEEDS ATTENTION FIRST</span><h2>Priority insights</h2><p class="muted small">Sorted by potential financial impact, with the calculation shown.</p></div></div>
+              <div id="finance-priority-panel"></div>
+            </article>
+          </div>
+        </section>
         <div class="insight-metrics"><article class="card metric-card"><span class="metric-label">Income</span><strong data-money="insight-income">₹0</strong><span class="metric-foot positive-text">Money received</span></article><article class="card metric-card"><span class="metric-label">Expenses</span><strong data-money="insight-expense">₹0</strong><span class="metric-foot">Money spent</span></article><article class="card metric-card"><span class="metric-label">Net cash flow</span><strong data-money="insight-net">₹0</strong><span class="metric-foot">Income minus spending</span></article><article class="card metric-card"><span class="metric-label">Daily average</span><strong data-money="daily-average">₹0</strong><span class="metric-foot">For selected period</span></article></div>
         <section class="planning-grid insights-grid" aria-label="Money planning tools">
           <article class="card insight-wide planner-calendar-card">
@@ -217,6 +255,7 @@
   <script src="paddleocr-pwa.js"></script>
   <script src="rupee-ocr.js"></script>
   <script src="receipt-ocr-parser.js"></script>
+  <script src="finance-analytics.js"></script>
   <script src="app.js"></script>
   <script src="onboarding.js"></script>
   <script src="statement-parser.js"></script>

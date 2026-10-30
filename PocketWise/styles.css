@@ -2407,3 +2407,122 @@ textarea,
   touch-action: pan-x pan-y;
 }
 
+
+/* PocketWise 2.4.0 · connected financial analytics */
+.finance-command-center{display:grid;gap:16px;margin-bottom:22px;min-width:0}
+.finance-overview-card,.finance-statement-card,.finance-category-card,.finance-budget-card,.finance-priority-card{min-width:0;overflow:hidden}
+.finance-overview-heading{align-items:flex-start;gap:14px;flex-wrap:wrap}
+.finance-period-controls{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.finance-period-controls input[type="date"]{width:142px;min-width:0;min-height:38px;border:1px solid var(--line);border-radius:12px;padding:7px 9px;background:var(--surface-2);color:var(--ink);font:inherit;font-size:12px}
+.finance-period-controls .mini-button{min-width:34px;height:34px;font-size:20px;line-height:1}
+.finance-custom-range{display:flex;gap:12px;flex-wrap:wrap;margin:0 0 12px;color:var(--muted);font-size:11px}
+.finance-custom-range[hidden]{display:none}
+.finance-custom-range label{display:flex;align-items:center;gap:7px}
+.finance-custom-range input{width:142px;min-height:36px;border:1px solid var(--line);border-radius:10px;padding:6px 8px;background:var(--surface-2);color:var(--ink);font:inherit;font-size:12px}
+.finance-period-label{font-size:12px;font-weight:700;color:var(--muted);margin:2px 0 12px}
+.finance-metric-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.finance-metric{padding:12px 13px;border:1px solid var(--line);border-radius:15px;background:var(--surface-2);min-width:0}
+.finance-metric small{display:block;color:var(--muted);font-size:10px;line-height:1.35;margin-bottom:6px}
+.finance-metric strong{display:block;color:var(--ink);font-size:clamp(15px,2.2vw,21px);font-weight:750;letter-spacing:-.04em;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.finance-metric em{display:block;margin-top:4px;color:var(--muted);font-size:10px;font-style:normal;line-height:1.35}
+.finance-coverage-note{margin:11px 0 0;color:var(--muted);font-size:10px;line-height:1.5}
+.finance-statement-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;min-width:0}
+.finance-statement-card .section-header{align-items:flex-start}
+.finance-report-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:12px}
+.finance-report-table th,.finance-report-table td{padding:8px 0;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;overflow-wrap:anywhere}
+.finance-report-table th:last-child,.finance-report-table td:last-child{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;padding-left:8px}
+.finance-report-table th{color:var(--muted);font-size:9px;letter-spacing:.08em;text-transform:uppercase;font-weight:750}
+.finance-report-table tr:last-child td{border-bottom:0}
+.finance-report-table .finance-subtotal td{font-weight:750;border-top:1px solid var(--line);padding-top:11px}
+.finance-report-table .finance-total td{font-weight:800;font-size:13px;border-top:1px solid var(--line);padding-top:12px}
+.finance-statement-note{margin:10px 0 0;color:var(--muted);font-size:10px;line-height:1.5}
+.finance-balance-groups{display:grid;gap:10px}
+.finance-balance-group{padding:10px 0;border-bottom:1px solid var(--line)}
+.finance-balance-group:last-child{border-bottom:0}
+.finance-balance-group h3{margin:0 0 6px;color:var(--muted);font-size:9px;letter-spacing:.09em;text-transform:uppercase}
+.finance-balance-row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:5px 0;font-size:12px}
+.finance-balance-row span{min-width:0;overflow-wrap:anywhere;color:var(--ink)}
+.finance-balance-row strong{white-space:nowrap;font-variant-numeric:tabular-nums}
+.finance-balance-total{display:flex;justify-content:space-between;gap:12px;padding:11px 12px;margin-top:8px;border-radius:13px;background:var(--surface-2);font-size:12px}
+.finance-balance-total strong{font-size:17px;font-variant-numeric:tabular-nums}
+.finance-category-card .chart-canvas{display:block;width:100%;max-width:100%;height:250px}
+.finance-category-legend{display:flex;gap:8px 14px;flex-wrap:wrap;margin:4px 0 12px}
+.finance-category-legend-item{display:flex;align-items:center;gap:7px;font-size:10px;color:var(--muted);min-width:0}
+.finance-category-swatch{width:9px;height:9px;border-radius:50%;flex:0 0 9px}
+.finance-category-legend-item strong{color:var(--ink);font-weight:650}
+.finance-category-summary{overflow-x:auto;max-width:100%}
+.finance-category-summary .finance-report-table{min-width:370px}
+.finance-line-key{display:inline-flex;align-items:center;gap:5px;color:var(--muted);font-size:9px;margin-right:9px}
+.finance-line-key i{display:inline-block;width:17px;border-top:2px solid currentColor}
+.finance-line-key.previous i{border-top-style:dashed;opacity:.6}
+.finance-planning-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;min-width:0}
+.finance-salary-overview{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.finance-salary-stat{padding:10px;border-radius:12px;background:var(--surface-2);min-width:0}
+.finance-salary-stat small{display:block;font-size:9px;color:var(--muted);margin-bottom:4px}
+.finance-salary-stat strong{font-size:14px;display:block;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.finance-allocation-warning{padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--amber) 12%,var(--surface));color:var(--ink);font-size:11px;line-height:1.45;margin:9px 0}
+.finance-allocation-row{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:11px}
+.finance-allocation-row:last-child{border-bottom:0}
+.finance-allocation-row small{display:block;color:var(--muted);font-size:9px;margin-top:3px}
+.finance-allocation-row strong{white-space:nowrap;font-variant-numeric:tabular-nums}
+.finance-budget-summary{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:10px 0;margin-top:8px;border-top:1px solid var(--line);font-size:11px}
+.finance-budget-table-wrap{overflow-x:auto;max-width:100%;margin-top:8px}
+.finance-budget-table{min-width:430px}
+.finance-budget-bar{height:5px;border-radius:20px;background:var(--surface-3);overflow:hidden;margin-top:5px}
+.finance-budget-bar span{display:block;height:100%;border-radius:inherit;background:var(--green)}
+.finance-priority-list{display:grid;gap:9px}
+.finance-priority-item{padding:11px 12px;border:1px solid var(--line);border-radius:14px;background:var(--surface-2)}
+.finance-priority-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.finance-priority-top strong{font-size:12px;line-height:1.4}
+.finance-priority-amount{white-space:nowrap;font-size:12px;font-weight:750;font-variant-numeric:tabular-nums}
+.finance-priority-meta{color:var(--muted);font-size:9px;font-weight:750;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px}
+.finance-priority-item p{margin:5px 0 0;color:var(--muted);font-size:10px;line-height:1.5}
+.finance-priority-item p b{color:var(--ink);font-weight:650}
+.finance-empty{padding:15px 0;color:var(--muted);font-size:11px;line-height:1.5}
+.finance-modal-allocation-row{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(88px,.7fr) minmax(90px,.7fr) auto;gap:8px;align-items:end;padding:9px 0;border-bottom:1px solid var(--line)}
+.finance-modal-allocation-row .form-field{margin:0;min-width:0}
+.finance-modal-allocation-row label{font-size:9px}
+.finance-modal-allocation-row input,.finance-modal-allocation-row select{min-width:0;width:100%}
+.finance-modal-allocation-remove{width:34px;height:38px;border:1px solid var(--line);background:var(--surface-2);color:var(--muted);border-radius:10px}
+@media(max-width:760px){
+  .finance-statement-grid,.finance-planning-grid{grid-template-columns:minmax(0,1fr)}
+  .finance-metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .finance-period-controls{justify-content:flex-start;width:100%}
+  .finance-period-controls select{flex:1 1 90px;min-width:90px}
+  .finance-period-controls input[type="date"]{flex:1 1 125px;width:125px}
+  .finance-overview-heading{display:block}
+  .finance-overview-heading .section-header{align-items:flex-start}
+  .finance-modal-allocation-row{grid-template-columns:minmax(0,1fr) minmax(82px,.75fr) minmax(82px,.7fr) 34px}
+}
+@media(max-width:420px){
+  .finance-metric{padding:10px}
+  .finance-metric strong{font-size:15px}
+  .finance-modal-allocation-row{grid-template-columns:minmax(0,1fr) minmax(74px,.7fr) minmax(76px,.7fr) 32px;gap:5px}
+  .finance-modal-allocation-remove{width:32px}
+}
+@media print{
+  .finance-command-center{break-inside:avoid}
+  .finance-statement-card,.finance-category-card,.finance-budget-card,.finance-priority-card{break-inside:avoid}
+}
+/* Grouped transaction timeline and salary plan controls. */
+.activity-date-group{margin:12px 0 16px;padding:0;min-width:0}
+.activity-date-group>header{display:grid;gap:7px;margin:0 2px 7px}
+.activity-date-group>header>strong{font-size:12px;font-weight:800;color:var(--ink)}
+.activity-period-summary{display:flex;align-items:center;gap:6px 13px;flex-wrap:wrap;color:var(--muted);font-size:9px}
+.activity-period-summary span{white-space:nowrap}
+.activity-period-summary b{color:var(--ink);font-weight:750}
+.activity-date-group-list{display:grid;gap:4px}
+.activity-year-group{border:1px solid var(--line);border-radius:14px;background:var(--surface);overflow:hidden}
+.activity-year-group>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 14px;list-style:none;cursor:pointer;font-size:12px;font-weight:750}
+.activity-year-group>summary::-webkit-details-marker{display:none}
+.activity-year-group>summary:after{content:'+';color:var(--muted);font-size:16px;margin-left:5px}
+.activity-year-group[open]>summary:after{content:'−'}
+.activity-year-group>summary small{font-size:9px;color:var(--muted);font-weight:500;margin-left:auto;text-align:right}
+.activity-year-group .activity-date-group-body{padding:0 12px 12px;border-top:1px solid var(--line)}
+.activity-year-group .activity-date-group{margin:12px 0 2px}
+.finance-allocation-enabled{grid-column:1/-1;display:flex;align-items:center;gap:7px;margin-top:-2px;color:var(--muted);font-size:10px}
+.finance-allocation-enabled input{width:auto;min-width:0;accent-color:var(--green)}
+.finance-category-legend-item{flex-wrap:wrap}
+.finance-category-legend-item small{font-size:9px;color:var(--muted)}
+.finance-priority-item{overflow-wrap:anywhere}
+@media(max-width:520px){.activity-period-summary{gap:5px 9px}.activity-year-group>summary{align-items:flex-start}.activity-year-group>summary small{max-width:45%}.finance-allocation-enabled{font-size:9px}}
