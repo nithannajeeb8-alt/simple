@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pocketwise-shell-v2.3.47';
+const CACHE_NAME = 'pocketwise-shell-v2.3.48';
 const PADDLE_RUNTIME_CACHE = 'pocketwise-paddle-runtime-v243';
 const BASE_URL = self.registration.scope;
 const asset = path => new URL(path, BASE_URL).href;
@@ -18,6 +18,7 @@ const APP_SHELL = [
   asset('statement-import.js'),
   asset('onboarding.js'),
   asset('pwa.js'),
+  asset('clipboard-import.js'),
   asset('manifest.webmanifest'),
   asset('share-target.html'),
   asset('assets/icons/icon.svg'),
