@@ -1,4 +1,5 @@
-const CACHE_NAME = 'pocketwise-shell-v2.3.41';
+const CACHE_NAME = 'pocketwise-shell-v2.3.43';
+const PADDLE_RUNTIME_CACHE = 'pocketwise-paddle-runtime-v243';
 const BASE_URL = self.registration.scope;
 const asset = path => new URL(path, BASE_URL).href;
 const APP_SHELL = [
@@ -8,6 +9,7 @@ const APP_SHELL = [
   asset('app.js'),
   asset('paddleocr-pwa.js'),
   asset('rupee-ocr.js'),
+  asset('receipt-ocr-parser.js'),
   asset('statement-parser.js'),
   asset('local-ai.js'),
   asset('local-ai-worker.js'),
@@ -34,7 +36,31 @@ self.addEventListener('fetch', event => {
   const req = event.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
-  if (url.origin !== self.location.origin || !url.pathname.startsWith(new URL(BASE_URL).pathname)) return;
+  // Cache the official PaddleOCR.js ESM runtime and its jsDelivr dependencies after
+  // first use. This lets the already-installed PWA load the runtime offline later.
+  // Receipt images are never sent to this cache or to a remote OCR endpoint.
+  if (url.origin !== self.location.origin) {
+    if (url.hostname === 'cdn.jsdelivr.net' && url.pathname.startsWith('/npm/')) {
+      event.respondWith((async () => {
+        const cache = await caches.open(PADDLE_RUNTIME_CACHE);
+        const cached = await cache.match(req);
+        if (cached) return cached;
+        try {
+          const response = await fetch(req);
+          if (response && response.ok && response.type !== 'opaque') {
+            try { await cache.put(req, response.clone()); } catch (_) { /* quota failures keep the network response usable */ }
+          }
+          return response;
+        } catch (error) {
+          const fallback = await cache.match(req);
+          if (fallback) return fallback;
+          throw error;
+        }
+      })());
+    }
+    return;
+  }
+  if (!url.pathname.startsWith(new URL(BASE_URL).pathname)) return;
   if (req.mode === 'navigate') {
     event.respondWith(fetch(req).then(res => {
       if (res && res.ok) caches.open(CACHE_NAME).then(cache => cache.put(asset('index.html'), res.clone()));

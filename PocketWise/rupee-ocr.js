@@ -115,18 +115,17 @@
   }
 
   function findAmount(text) {
-    var re = /(?:\d{1,3}(?:,\d{2,3})+|\d{1,9})(?:\.\d{1,2})?/g, m;
-    while ((m = re.exec(text))) {
+    var re = /(?:\d{1,3}(?:,\d{2,3})+|\d+)(?:\.\d{1,2})?/g, m;
+    while ((m = re.exec(String(text || '')))) {
       var digits = m[0].replace(/\D/g, '').length;
-      if (digits > 10 || m.index > Math.max(12, text.length * 0.72)) continue;
-      if (digits >= 2 || m[0].indexOf('.') >= 0 ||
-          /(?:₹|Rs\.?|INR|amount|total|paid|spent|debited|credited|received)/i.test(text)) {
+      // No arbitrary 9/10 digit OCR ceiling. Unsafe numeric precision is rejected later
+      // by the structured receipt parser, never silently truncated here.
+      if (digits >= 1 || /(?:₹|Rs\.?|INR|amount|total|paid|spent|debited|credited|received)/i.test(text)) {
         return { value: m[0], index: m.index };
       }
     }
     return null;
   }
-
   function amountKey(text) {
     var found = findAmount(text);
     if (!found) return '';
@@ -223,9 +222,23 @@
       if (!box || !amount) return;
       var score = bestMatch(data, iw, ih, box, itemText, templates);
       if (score < 0.58) return;
-      lines[li] = insertSymbol(lines[li], amount);
+      var currentLine = lines[li];
+      // Paddle may recognise the first ₹ glyph as the digit 2. Only when the actual
+      // leading pixels match a rendered ₹ template do we consume that one OCR character.
+      // This is a local, geometry-backed correction; ordinary amount digits are untouched.
+      if (amount.index === 0 && /^2/.test(currentLine)) {
+        var afterFalseSymbol = currentLine.slice(1).replace(/^[,\s]+/, '');
+        var remainder = findAmount(afterFalseSymbol);
+        if (remainder && remainder.index === 0 && /\d/.test(afterFalseSymbol)) {
+          lines[li] = '₹ ' + afterFalseSymbol;
+          matches.push({ lineIndex: li, confidence: Math.round(score * 1000) / 1000, correction: 'leading-2-visually-verified-as-rupee' });
+          used[li] = true;
+          return;
+        }
+      }
+      lines[li] = insertSymbol(currentLine, amount);
       used[li] = true;
-      matches.push({ lineIndex: li, confidence: Math.round(score * 1000) / 1000 });
+      matches.push({ lineIndex: li, confidence: Math.round(score * 1000) / 1000, correction: 'rupee-symbol-restored' });
     });
     if (!matches.length) return unchanged;
     return { text: lines.join('\n'), detected: matches.length, matches: matches, engine: 'PocketWise Rupee Glyph Detector' };

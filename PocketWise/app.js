@@ -1465,16 +1465,27 @@
   // Screenshot OCR runs through the browser engines in the PWA; all extracted details remain review-before-save.
   function pwParsePaymentText(raw){
     const text=String(raw||'').replace(/\u00a0/g,' ').trim(); if(!text)return null;
+    const lastOCR=window.PocketWiseLastReceiptOCR;
+    const spatial=lastOCR&&String(lastOCR.sourceText||'').trim()===text?lastOCR.fields:null;
     if(/\b(OTP|one time password|verification code|offer|cashback|won a prize)\b/i.test(text) && !/\b(debited|credited|sent|received|paid|payment)\b/i.test(text))return {ignored:true,reason:'This looks like an OTP or promotional message, not a transaction.'};
     // Prefer an amount adjacent to transaction language over arbitrary currency figures
     // (promotions, balances and cashback banners often contain several rupee values).
     const contextualAmount=text.match(/\b(?:debited|credited|spent|received|paid|payment of|amount)\b(?:\s+(?:by|with|of|for))?\s*(?:₹|Rs\.?|INR\s*)?\s*([0-9][0-9,]*(?:\.\d{1,2})?)/i);
-    const currencyAmount=text.match(/(?:₹|Rs\.?|INR\s*)\s*([0-9,]+(?:\.\d{1,2})?)/i);
-    const amountText=contextualAmount?.[1]||currencyAmount?.[1];
+    const currencyAmount=text.match(/(?:₹|Rs\.?|INR\s*)\s*([0-9][0-9,]*(?:\.\d{1,2})?)/i);
+    const spatialAmount=spatial?.amount&&Number(spatial.amount.confidence)>=.62?spatial.amount:null;
+    const amountText=spatialAmount?.formatted||contextualAmount?.[1]||currencyAmount?.[1];
     if(!amountText)return {error:'No clear INR amount found. Check the pasted text.'};
-    const amount=Number(amountText.replace(/,/g,'')); if(!Number.isFinite(amount)||amount<=0)return {error:'The amount could not be read safely.'};
-    const ref=(text.match(/\b(?:RRN|UTR|UPI\s*Ref(?:erence)?(?:\s*No)?|Ref(?:erence)?(?:\s*No)?|Txn\s*ID|Transaction\s*ID)\s*[:#.-]?\s*([A-Z0-9]{6,30})/i)||text.match(/\bRRN\s+([0-9]{8,})/i)||[])[1]||'';
-    const upi=(text.match(/[A-Z0-9._-]+@[A-Z0-9.-]+/i)||[])[0]||'';
+    const amount=spatialAmount?Number(spatialAmount.value):Number(amountText.replace(/,/g,'')); if(!Number.isFinite(amount)||amount<=0)return {error:'The amount could not be read safely.'};
+    const spatialUTR=String(spatial?.references?.utr||'').trim();
+    const spatialTxn=String(spatial?.references?.transactionId||'').trim();
+    const textUTR=(text.match(/\b(?:UTR|RRN|UPI\s*Ref(?:erence)?(?:\s*No)?|Bank\s*Reference)\s*[:#.-]?\s*([A-Z0-9/-]{6,40})/i)||[])[1]||'';
+    const textTxn=(text.match(/\b(?:UPI\s*)?(?:Txn\s*ID|Transaction\s*ID|Transaction\s*Reference)\s*[:#.-]?\s*([A-Z0-9/-]{6,40})/i)||[])[1]||'';
+    const utr=spatialUTR||textUTR;
+    const transactionId=spatialTxn||textTxn;
+    const genericReference=(text.match(/\b(?:Ref(?:erence)?(?:\s*No)?)\s*[:#.-]?\s*([A-Z0-9/-]{6,40})/i)||[])[1]||'';
+    const ref=utr||transactionId||genericReference;
+    const referenceType=utr?'UTR':transactionId?'Transaction ID':genericReference?'Reference':'';
+    const upi=String(spatial?.upi?.id||((text.match(/[A-Z0-9._-]+@[A-Z0-9.-]+/i)||[])[0]||''));
     const acct=(text.match(/(?:A\/c|account|acct)\s*[*xX-]*\s*([0-9]{3,6})/i)||[])[1]||'';
     const monthNumbers={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
     let date=''; const isoDate=text.match(/\b(\d{4})-(\d{2})-(\d{2})\b/);
@@ -1489,17 +1500,27 @@
     const failed=/\b(?:failed|declined|unsuccessful|reversed|reversal)\b/i.test(text);
     const pending=/\b(?:pending|processing|initiated|awaiting confirmation)\b/i.test(text);
     const status=failed?'failed':pending?'pending':/\b(?:successful|success|completed|paid successfully|transaction successful)\b/i.test(text)?'successful':'unknown';
-    const type=transfer?'transfer':incoming&&!outgoing?'income':'expense';
+    const spatialIncoming=spatial?.direction==='incoming'&&!outgoing;
+    const type=transfer?'transfer':((incoming&&!outgoing)||spatialIncoming)?'income':'expense';
     const partyStop=String.raw`(?:on|at|via|UPI|RRN|UTR|Ref(?:erence)?(?:\s*No)?|A\/c|from)`;
     const to=text.match(new RegExp(String.raw`\bto\s+([^,.;\n]+?)(?=\s+${partyStop}\b|[,.]|$)`,'i'));
     const from=text.match(new RegExp(String.raw`\bfrom\s+([^,.;\n]+?)(?=\s+${partyStop}\b|[,.]|$)`,'i'));
     const screenParty=text.match(/\b(?:paid|sent|payment)\s+to\s*[:：-]?\s*([^\n\r]+?)(?=\s{2,}|\n|\r|\b(?:UPI\s*ID|UPI\s*transaction|transaction\s*ID|reference|bank\s*reference|\d{1,2}[:.]\d{2}\s*(?:am|pm))\b|$)/i);
-    const party=(screenParty?.[1]|| (incoming?(from||to):(to||from))?.[1]||upi||'').trim().replace(/\s+/g,' ').replace(/\s*(?:₹|Rs\.?|INR)\s*[\d,]+(?:\.\d{1,2})?.*$/i,'').slice(0,100);
-    const confidence=(amountText?0.48:0)+(ref?0.18:0)+(party?0.16:0)+(date?0.1:0)+(status!=='unknown'?0.08:0);
-    return {amount,type,date,reference:ref,upi,accountSuffix:acct,party,status,confidence:Math.min(0.99,confidence),needsReview:status==='unknown'||!party||!ref,raw:text};
+    // A VPA is a payment address, not a person's display name. Remove it from
+    // any captured party text and leave the name unconfirmed when no name remains.
+    const partyCandidate=(screenParty?.[1]||(incoming?(from||to):(to||from))?.[1]||'').trim();
+    const party=String(spatial?.party?.confidence>=.62?spatial.party.name:partyCandidate)
+      .replace(/[A-Z0-9._-]+@[A-Z0-9.-]+/ig,' ')
+      .replace(/\s+/g,' ')
+      .replace(/^\s*(?:UPI\s*ID|VPA)\s*[:：-]?\s*/i,'')
+      .replace(/^[-|·,:;\s]+|[-|·,:;\s]+$/g,'')
+      .replace(/\s*(?:₹|Rs\.?|INR)\s*[\d,]+(?:\.\d{1,2})?.*$/i,'')
+      .trim().slice(0,100);
+    const confidence=(amountText?0.48:0)+(ref?0.18:0)+(party?0.16:0)+(date?0.1:0)+(status!=='unknown'?0.08:0)+(spatialAmount?Math.min(.05,spatialAmount.confidence*.05):0);
+    return {amount,type,date,reference:ref,referenceType,utr,transactionId,upi,accountSuffix:acct,party,status,confidence:Math.min(0.99,confidence),needsReview:status==='unknown'||!party||!ref||!!spatialAmount&&spatialAmount.confidence<.78,raw:text};
   }
-  function pwHasDuplicate(parsed){return state.transactions.some(t=>{const note=String(t.note||'');if(parsed.reference&&new RegExp(`(?:RRN|UTR|Ref(?:erence)?):?\\s*${parsed.reference.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}`,'i').test(note))return true;return Number(t.amount)===parsed.amount&&String(t.date||'')===parsed.date&&(/UPI/i.test(String(t.paymentMethod||''))||parsed.upi&&note.includes(parsed.upi))&&(!parsed.party||note.toLowerCase().includes(parsed.party.toLowerCase()));});}
-  function pwShowImport(){openModal('Import a payment',`<div class="modal-body pw-import"><p>Choose a payment screenshot from your photo gallery, or take a new photo. OCR extracts likely payment details for review.</p><button type="button" class="secondary-button pw-statement-entry" id="pw-open-statement-import">${icon('file')}<span>Import a bank statement <small>PDF or CSV · review every transaction before saving</small></span></button><div class="pw-upload-zone"><input id="pw-payment-gallery" type="file" accept="image/*" hidden><input id="pw-payment-camera" type="file" accept="image/*" capture="environment" hidden><div class="pw-upload-actions"><button type="button" class="pw-upload-button" id="pw-choose-gallery"><span class="pw-upload-symbol">▧</span><strong>Choose from gallery</strong><small>Select an existing screenshot</small></button><button type="button" class="pw-upload-button" id="pw-choose-camera"><span class="pw-upload-symbol">＋</span><strong>Take a photo</strong><small>Open your camera</small></button></div><img id="pw-image-preview" alt="Selected payment screenshot preview" hidden><div id="pw-ocr-status" class="pw-ocr-status" role="status" aria-live="polite">Your image stays on this device. Choose a screenshot to begin.</div><button class="secondary-button" id="pw-run-ocr" type="button" disabled>Read screenshot with OCR</button></div><label class="form-field"><span>OR PASTE BANK SMS / OCR TEXT</span><textarea id="pw-import-raw" rows="5" placeholder="Paste payment text here…"></textarea></label><div class="form-actions"><button class="secondary-button" type="button" data-cancel-modal>Cancel</button><button class="primary-button" type="button" id="pw-parse-payment">Extract details</button></div><p class="fine-print">Uses browser-based PaddleOCR when available, with Tesseract.js as a fallback. The OCR engine and model may need an internet connection the first time. Images are processed on this device and are not uploaded to PocketWise. Verify every field before saving.</p></div>`,'IMPORT · REVIEW BEFORE SAVING');
+  function pwHasDuplicate(parsed){return state.transactions.some(t=>{const note=String(t.note||'');const refs=[parsed.reference,parsed.utr,parsed.transactionId].filter((v,i,a)=>v&&a.indexOf(v)===i);if(refs.some(ref=>new RegExp(`(?:RRN|UTR|Ref(?:erence)?|Transaction\\s*ID|Txn\\s*ID):?\\s*${String(ref).replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}`,'i').test(note)))return true;return Number(t.amount)===parsed.amount&&String(t.date||'')===parsed.date&&(/UPI/i.test(String(t.paymentMethod||''))||parsed.upi&&note.includes(parsed.upi))&&(!parsed.party||note.toLowerCase().includes(parsed.party.toLowerCase()));});}
+  function pwShowImport(){window.PocketWiseLastReceiptOCR=null;openModal('Import a payment',`<div class="modal-body pw-import"><p>Choose a payment screenshot from your photo gallery, or take a new photo. OCR extracts likely payment details for review.</p><button type="button" class="secondary-button pw-statement-entry" id="pw-open-statement-import">${icon('file')}<span>Import a bank statement <small>PDF or CSV · review every transaction before saving</small></span></button><div class="pw-upload-zone"><input id="pw-payment-gallery" type="file" accept="image/*" hidden><input id="pw-payment-camera" type="file" accept="image/*" capture="environment" hidden><div class="pw-upload-actions"><button type="button" class="pw-upload-button" id="pw-choose-gallery"><span class="pw-upload-symbol">▧</span><strong>Choose from gallery</strong><small>Select an existing screenshot</small></button><button type="button" class="pw-upload-button" id="pw-choose-camera"><span class="pw-upload-symbol">＋</span><strong>Take a photo</strong><small>Open your camera</small></button></div><img id="pw-image-preview" alt="Selected payment screenshot preview" hidden><div id="pw-ocr-status" class="pw-ocr-status" role="status" aria-live="polite">Your image stays on this device. Choose a screenshot to begin.</div><button class="secondary-button" id="pw-run-ocr" type="button" disabled>Read screenshot with OCR</button></div><label class="form-field"><span>OR PASTE BANK SMS / OCR TEXT</span><textarea id="pw-import-raw" rows="5" placeholder="Paste payment text here…"></textarea></label><div class="form-actions"><button class="secondary-button" type="button" data-cancel-modal>Cancel</button><button class="primary-button" type="button" id="pw-parse-payment">Extract details</button></div><p class="fine-print">Uses PaddleOCR locally on this device. Its model is downloaded once and cached for later offline scans where browser storage allows. Receipt images are not uploaded. Verify every field before saving.</p></div>`,'IMPORT · REVIEW BEFORE SAVING');
     const gallery=$('#pw-payment-gallery'),camera=$('#pw-payment-camera'),run=$('#pw-run-ocr'),preview=$('#pw-image-preview'),status=$('#pw-ocr-status');let selectedFile=null;
     $('#pw-choose-gallery')?.addEventListener('click',()=>gallery?.click());
     $('#pw-choose-camera')?.addEventListener('click',()=>camera?.click());
@@ -1509,7 +1530,8 @@
       if(typeof createImageBitmap!=='function')return file;
       const bitmap=await createImageBitmap(file);
       try{
-        const scale=Math.min(2.2,1400/Math.max(1,Math.min(bitmap.width,bitmap.height)),3600/Math.max(bitmap.width,bitmap.height));
+        const shortest=Math.min(bitmap.width,bitmap.height),longest=Math.max(bitmap.width,bitmap.height);
+        const scale=Math.min(1.6,shortest<1050?1400/Math.max(1,shortest):1,4200/Math.max(1,longest));
         const width=Math.max(1,Math.round(bitmap.width*scale)),height=Math.max(1,Math.round(bitmap.height*scale));
         const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;
         const ctx=canvas.getContext('2d',{willReadFrequently:true});if(!ctx)throw new Error('Image preprocessing is unavailable in this browser.');
@@ -1519,7 +1541,7 @@
         ctx.putImageData(image,0,0);return canvas;
       }finally{bitmap.close?.();}
     };
-    const onImageSelected=(input)=>{const file=input?.files?.[0];if(!file)return;if(!file.type.startsWith('image/')){toast('Choose an image file.','error');input.value='';return;}if(file.size>15*1024*1024){toast('Choose an image smaller than 15 MB.','error');input.value='';return;}selectedFile=file;preview.src=URL.createObjectURL(file);preview.hidden=false;run.disabled=false;status.textContent=`Selected ${file.name}. Tap “Read screenshot with OCR” to extract the text.`;};
+    const onImageSelected=(input)=>{const file=input?.files?.[0];if(!file)return;if(!file.type.startsWith('image/')){toast('Choose an image file.','error');input.value='';return;}if(file.size>15*1024*1024){toast('Choose an image smaller than 15 MB.','error');input.value='';return;}selectedFile=file;window.PocketWiseLastReceiptOCR=null;preview.src=URL.createObjectURL(file);preview.hidden=false;run.disabled=false;status.textContent=`Selected ${file.name}. Tap “Read screenshot with OCR” to extract the text.`;};
     gallery?.addEventListener('change',()=>onImageSelected(gallery));camera?.addEventListener('change',()=>onImageSelected(camera));
     run?.addEventListener('click',async()=>{
       const file=selectedFile;
@@ -1529,10 +1551,11 @@
       try{
         const prepared=await prepareOcrImage(file);
         let recognized='';
-        let engine='browser OCR';
+        let engine='PaddleOCR.js PP-OCRv6 small';
         let ocrItems=[];
+        window.PocketWiseLastReceiptOCR=null;
 
-        // Use the browser engine available to an installed PWA, then the established fallback.
+        // PaddleOCR is the only screenshot recognition engine in the PWA path.
         if(window.PocketWisePaddleWebOCR&&typeof window.PocketWisePaddleWebOCR.recognize==='function'){
           try{
             status.textContent='Loading PaddleOCR in browser…';
@@ -1543,41 +1566,22 @@
             ocrItems=Array.isArray(paddleResult?.items)?paddleResult.items:[];
             if(recognized)engine=paddleResult.engine||'PaddleOCR.js';
           }catch(paddleError){
-            console.warn('PocketWise PaddleOCR.js unavailable; using Tesseract.js fallback.',paddleError);
-            status.textContent='PaddleOCR unavailable; trying browser OCR…';
+            console.warn('PocketWise PaddleOCR.js could not read this receipt.',paddleError);
+            throw new Error(paddleError?.message||'PaddleOCR could not initialise. Connect once to download its model, or paste payment text manually.');
           }
         }
 
-        if(!recognized){
-          if(!window.Tesseract){
-            await new Promise((resolve,reject)=>{
-              const script=document.createElement('script');
-              script.src='https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';
-              script.crossOrigin='anonymous';
-              script.referrerPolicy='no-referrer';
-              script.onload=resolve;
-              script.onerror=()=>reject(new Error('Could not load browser OCR. Connect to the internet, or paste the payment text manually.'));
-              document.head.appendChild(script);
-            });
-          }
-          status.textContent='Reading screenshot…';
-          const result=await window.Tesseract.recognize(prepared,'eng',{
-            logger:m=>{if(m.status==='recognizing text')status.textContent=`Reading screenshot… ${Math.round((m.progress||0)*100)}%`;}
-          });
-          recognized=String(result?.data?.text||'').trim();
-          ocrItems=Array.isArray(result?.data?.lines)?result.data.lines.map(line=>({
-            text:String(line.text||'').trim(),
-            score:Number(line.confidence||0)/100,
-            poly:line.bbox?[[line.bbox.x0,line.bbox.y0],[line.bbox.x1,line.bbox.y0],[line.bbox.x1,line.bbox.y1],[line.bbox.x0,line.bbox.y1]]:null
-          })).filter(item=>item.poly&&item.poly.every(point=>point.every(Number.isFinite))):[];
-          engine='Tesseract.js';
-        }
 
         if(!recognized)throw new Error('No readable text found. Try a clearer screenshot or paste the payment text.');
         if(window.PocketWiseRupeeOCR&&ocrItems.length){
           const repaired=window.PocketWiseRupeeOCR.recover({image:prepared,text:recognized,items:ocrItems});
           if(repaired&&repaired.detected){recognized=repaired.text;engine+=' + rupee-symbol recovery';}
         }
+        const correctedLines=recognized.split(/\r?\n/);
+        const parserItems=ocrItems.map((item,index)=>Object.assign({},item,{text:correctedLines[index]||item.text}));
+        const spatialFields=window.PocketWiseReceiptParser&&typeof window.PocketWiseReceiptParser.extract==='function'
+          ?window.PocketWiseReceiptParser.extract({text:recognized,items:parserItems}):null;
+        window.PocketWiseLastReceiptOCR={sourceText:recognized,fields:spatialFields,engine:engine};
         $('#pw-import-raw').value=recognized;
         status.textContent=`Text extracted with ${engine}. Review it below, then tap Extract details.`;
         $('#pw-import-raw').focus({preventScroll:true});
@@ -1589,7 +1593,7 @@
     });
   }
   function pwReviewImport(d){if(d.ignored){toast(d.reason,'amber');return;}if(d.error){toast(d.error,'error');return;}if(pwHasDuplicate(d)){toast('This looks like a duplicate transaction. Nothing was added.','amber');return;}
-    const details=[d.party,d.upi?`UPI: ${d.upi}`:'',d.accountSuffix?`Account ending ${d.accountSuffix}`:'',d.reference?`RRN: ${d.reference}`:'',`Imported text: ${d.raw.slice(0,240)}`].filter(Boolean).join(' · ');
+    const details=[d.party,d.upi?`UPI: ${d.upi}`:'',d.accountSuffix?`Account ending ${d.accountSuffix}`:'',d.utr?`UTR: ${d.utr}`:'',d.transactionId?`Transaction ID: ${d.transactionId}`:'',!d.utr&&!d.transactionId&&d.reference?`${d.referenceType||'RRN'}: ${d.reference}`:'',`Imported text: ${d.raw.slice(0,240)}`].filter(Boolean).join(' · ');
     openModal('Review imported transaction',`<div class="modal-body"><div class="pw-import-summary"><span>${d.type==='income'?'Money received':'Money sent'}</span><strong>${escapeHTML(money(d.amount))}</strong><small>${escapeHTML(d.date)} · Status: ${escapeHTML(d.status||"unknown")} · Confidence: ${Math.round((d.confidence||0)*100)}%</small></div><dl class="pw-import-details"><dt>Direction</dt><dd>${d.type==='income'?'Incoming':'Outgoing'}</dd><dt>Merchant / UPI</dt><dd>${escapeHTML(d.party||d.upi||'Not identified')}</dd><dt>Reference</dt><dd>${escapeHTML(d.reference||'Not found')}</dd><dt>Account suffix</dt><dd>${escapeHTML(d.accountSuffix||'Not found')}</dd></dl><p class="fine-print">Confirm the category and account on the next screen. Missing information is not guessed.</p><div class="form-actions"><button class="secondary-button" type="button" data-cancel-modal>Cancel</button><button class="primary-button" type="button" id="pw-confirm-import">Review category & save</button></div></div>`,'CHECK THE DETAILS');
     $('#pw-confirm-import').addEventListener('click',()=>{transactionForm(null,d.type);const form=$('#transaction-form');$('#tx-amount').value=String(d.amount);$('#tx-date').value=d.date;$('#tx-payment-method').value='UPI';$('#tx-note').value=details;form.dataset.importReference=d.reference||'';form.dataset.importUpi=d.upi||'';});
   }
