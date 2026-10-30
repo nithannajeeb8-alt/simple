@@ -149,16 +149,24 @@
             <div class="finance-metric-grid" id="finance-overview-metrics"></div>
             <p class="finance-coverage-note" id="finance-coverage-note" role="status"></p>
           </article>
-          <div class="finance-statement-grid">
-            <article class="card finance-statement-card">
-              <div class="section-header"><div><span class="section-kicker">MONEY IN & OUT</span><h2>Cash Flow Statement</h2><p class="muted small">Actual account movements, with financing kept separate from earned income.</p></div><button class="mini-button" id="finance-report-cashflow" type="button" aria-label="Download cash flow report" title="Download cash flow report">↓</button></div>
-              <div id="finance-cashflow-panel"></div>
-            </article>
-            <article class="card finance-statement-card">
-              <div class="section-header"><div><span class="section-kicker">WHAT YOU OWN & OWE</span><h2>Personal Balance Sheet</h2><p class="muted small">Tracked position at the end of the selected period.</p></div><button class="mini-button" id="finance-report-balance" type="button" aria-label="Download balance sheet report" title="Download balance sheet report">↓</button></div>
-              <div id="finance-balance-sheet-panel"></div>
-            </article>
-          </div>
+          <section class="finance-report-downloads" aria-label="Download financial reports">
+            <div class="finance-report-download-heading">
+              <div><span class="section-kicker">DETAILED REPORTS</span><h2>Download your financial sheets</h2><p class="muted small">Choose a week, month, year or custom range above. Full statements and detailed figures are kept in the downloaded documents, not on this screen.</p></div>
+            </div>
+            <div class="finance-report-download-grid">
+              <article class="finance-report-download-card">
+                <span class="finance-report-download-icon" aria-hidden="true"><i class="bi bi-arrow-left-right"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M4 7h15l-4-4m5 14H5l4 4"/></svg></span>
+                <div class="finance-report-download-copy"><strong>Cash Flow Statement</strong><small>Money in and out, reconciled closing position, salary allocations and budget plan.</small></div>
+                <button class="secondary-button" id="finance-report-cashflow" type="button" aria-label="Download cash flow statement">Download</button>
+              </article>
+              <article class="finance-report-download-card">
+                <span class="finance-report-download-icon" aria-hidden="true"><i class="bi bi-clipboard-data"></i><svg class="icon-fallback" viewBox="0 0 24 24"><path d="M8 4H5v17h14V4h-3M9 3h6v4H9zM8 12h8M8 16h8"/></svg></span>
+                <div class="finance-report-download-copy"><strong>Personal Balance Sheet</strong><small>Assets, liabilities, receivables and net worth as of the selected period end.</small></div>
+                <button class="secondary-button" id="finance-report-balance" type="button" aria-label="Download personal balance sheet">Download</button>
+              </article>
+            </div>
+            <p class="finance-report-period-hint" id="finance-report-period-hint">Reports will use the selected reporting period.</p>
+          </section>
           <article class="card finance-category-card">
             <div class="section-header"><div><span class="section-kicker">CATEGORY COMPARISON</span><h2 id="finance-category-title">This week vs last week</h2><p class="muted small">Same weekdays compared across periods. Solid lines are selected period; dashed lines are previous.</p></div></div>
             <canvas id="finance-category-chart" class="chart-canvas" height="250" aria-label="Category spending compared with the previous period"></canvas>
@@ -168,7 +176,7 @@
           </article>
           <div class="finance-planning-grid">
             <article class="card finance-budget-card">
-              <div class="section-header"><div><span class="section-kicker">PLAN AGAINST REAL INCOME</span><h2>Salary & budget allocation</h2><p class="muted small">Planning rules never create transactions or move money.</p></div><button class="secondary-button" id="finance-salary-edit" type="button">Configure</button></div>
+              <div class="section-header"><div><span class="section-kicker">PLAN AGAINST REAL INCOME</span><h2>Salary & budget planning</h2><p class="muted small">Configure plans here. Detailed allocation sheets are included in your download.</p></div><div class="finance-plan-actions"><button class="secondary-button" id="finance-salary-edit" type="button">Salary settings</button><button class="secondary-button" type="button" data-action="budget">Budget settings</button></div></div>
               <div id="finance-salary-panel"></div>
               <div id="finance-budget-panel"></div>
             </article>

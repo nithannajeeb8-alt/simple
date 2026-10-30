@@ -740,37 +740,6 @@
   }
   function financeDateLabel(date,options={day:'numeric',month:'short',year:'numeric'}){return dateFrom(date).toLocaleDateString(undefined,options);}
   function financeMetricHTML(label,value,note='',color=''){return `<div class="finance-metric"><small>${escapeHTML(label)}</small><strong ${color?`style="color:${color}"`:''}>${escapeHTML(fmtHidden(value))}</strong><em>${escapeHTML(note)}</em></div>`;}
-  function financeTable(rows){return `<table class="finance-report-table"><tbody>${rows.map(row=>`<tr class="${row.total?'finance-total':row.subtotal?'finance-subtotal':''}"><td>${escapeHTML(row.label)}</td><td>${escapeHTML(row.value)}</td></tr>`).join('')}</tbody></table>`;}
-  function renderFinanceCashFlow(statement){
-    const inflow=statement.inflows,outflow=statement.outflows;
-    const rows=[
-      {label:'Opening cash position',value:fmtHidden(statement.openingBalance),subtotal:true},
-      {label:'Salary',value:fmtHidden(inflow.salary)},{label:'Other earned income',value:fmtHidden(inflow.otherIncome)},
-      {label:'Refunds',value:fmtHidden(inflow.refunds)},{label:'Money received from borrowers',value:fmtHidden(inflow.repaymentsReceived)},
-      {label:'Money borrowed',value:fmtHidden(inflow.borrowed)},{label:'Other recorded inflows',value:fmtHidden(inflow.other)},
-      {label:'Total cash inflows',value:fmtHidden(statement.totalInflows),subtotal:true},
-      {label:'Everyday expenses',value:fmtHidden(outflow.everydayExpenses)},{label:'Bills',value:fmtHidden(outflow.bills)},
-      {label:'Shopping',value:fmtHidden(outflow.shopping)},{label:'Subscriptions',value:fmtHidden(outflow.subscriptions)},
-      {label:'Debt principal repayments',value:fmtHidden(outflow.debtRepayments)},{label:'Money lent to others',value:fmtHidden(outflow.moneyLent)},
-      {label:'Other recorded outflows',value:fmtHidden(outflow.other)},{label:'Total cash outflows',value:fmtHidden(statement.totalOutflows),subtotal:true},
-      {label:'Net cash movement',value:fmtHidden(statement.netCashMovement),subtotal:true},{label:'Closing cash position',value:fmtHidden(statement.closingBalance),total:true}
-    ];
-    $('#finance-cashflow-panel').innerHTML=financeTable(rows)+`<p class="finance-statement-note">Internal transfers are excluded from consolidated inflows and outflows (${fmtHidden(statement.internalTransfers)} recorded transferred). ${statement.openingComplete&&statement.closingComplete?'Balances reconcile to tracked accounts.':'Historical coverage is incomplete; figures are provisional.'} ${Math.abs(statement.reconciliationDifference)>0.01?`Reconciliation difference: ${money(statement.reconciliationDifference)}.`:''}</p>`;
-  }
-  function renderFinanceBalanceSheet(sheet){
-    const accountAssets=sheet.accounts.filter(row=>row.amount!==null&&row.amount>=0),accountLiabilities=sheet.accounts.filter(row=>row.amount!==null&&row.amount<0);
-    const accountRows=accountAssets.map(row=>({label:`${row.name} · ${row.type}`,value:fmtHidden(row.amount)}));
-    const negativeRows=accountLiabilities.map(row=>({label:`${row.name} · negative balance`,value:fmtHidden(Math.abs(row.amount))}));
-    const receivableRows=sheet.receivablesList.map(row=>({label:`${row.person} · receivable`,value:fmtHidden(row.amount)}));
-    const payableRows=sheet.debtsPayableList.map(row=>({label:`${row.person} · debt payable`,value:fmtHidden(row.amount)}));
-    let html='<div class="finance-balance-groups">';
-    html+=`<div class="finance-balance-group"><h3>Assets · tracked account balances</h3>${accountRows.length?accountRows.map(row=>`<div class="finance-balance-row"><span>${escapeHTML(row.label)}</span><strong>${escapeHTML(row.value)}</strong></div>`).join(''):'<div class="finance-empty">No positive account balances recorded.</div>'}</div>`;
-    html+=`<div class="finance-balance-group"><h3>Money owed to you</h3>${receivableRows.length?receivableRows.map(row=>`<div class="finance-balance-row"><span>${escapeHTML(row.label)}</span><strong>${escapeHTML(row.value)}</strong></div>`).join(''):'<div class="finance-empty">No outstanding lending records.</div>'}</div>`;
-    html+=`<div class="finance-balance-group"><h3>Liabilities</h3>${[...negativeRows,...payableRows].length?[...negativeRows,...payableRows].map(row=>`<div class="finance-balance-row"><span>${escapeHTML(row.label)}</span><strong>${escapeHTML(row.value)}</strong></div>`).join(''):'<div class="finance-empty">No tracked liabilities.</div>'}</div>`;
-    html+='</div>';
-    html+=`<div class="finance-balance-total"><span>Total assets<strong>${escapeHTML(fmtHidden(sheet.totalAssets))}</strong></span><span>Total liabilities<strong>${escapeHTML(fmtHidden(sheet.totalLiabilities))}</strong></span><span>Net worth<strong>${escapeHTML(fmtHidden(sheet.netWorth))}</strong></span></div><p class="finance-statement-note">${escapeHTML(sheet.coverageNote)}</p>`;
-    $('#finance-balance-sheet-panel').innerHTML=html;
-  }
   function renderFinanceCategoryComparison(range){
     if(!finance)return;
     const type=range.type,comparison=finance.compareCategories(state,type,range.start,range);
@@ -799,12 +768,21 @@
   function lightenFinanceColor(hex,amount=.58){const value=String(hex).replace('#','');if(!/^[0-9a-f]{6}$/i.test(value))return hex;const channels=[0,2,4].map(i=>parseInt(value.slice(i,i+2),16));return '#'+channels.map(c=>Math.round(c+(255-c)*amount).toString(16).padStart(2,'0')).join('');}
   function renderFinanceSalaryAndBudget(range){
     const budget=finance.budgetDashboard(state,range,today()),salary=budget.salary;
-    const periodLabel={week:'this week',month:'this month',year:'this year',custom:'this selected period'}[range.type]||'this period';
-    const frequencyLabel={monthly:'Monthly',fortnightly:'Fortnightly',weekly:'Weekly'}[salary.frequency||state.settings.salaryPlan?.frequency||'monthly'];
-    const expectedForPeriod=salary.expectedSalaryForPeriod??salary.expectedSalary;
-    $('#finance-salary-panel').innerHTML=`<div class="finance-salary-overview"><div class="finance-salary-stat"><small>Expected ${frequencyLabel.toLowerCase()} pay · ${salary.payCycles} cycle${salary.payCycles===1?'':'s'}</small><strong>${escapeHTML(fmtHidden(expectedForPeriod))}</strong></div><div class="finance-salary-stat"><small>Actual salary received</small><strong>${escapeHTML(fmtHidden(salary.actualSalary))}</strong></div><div class="finance-salary-stat"><small>Unallocated income</small><strong>${escapeHTML(fmtHidden(salary.unallocated))}</strong></div></div>${salary.overAllocated?'<div class="finance-allocation-warning">Enabled allocations exceed salary available in this reporting period. Adjust fixed amounts or percentages.</div>':salary.percentageOver100?'<div class="finance-allocation-warning">Percentage-based rules exceed 100% before fixed allocations are counted.</div>':''}${salary.allocations.length?salary.allocations.map(row=>{const activity=row.activityId?activityById(row.activityId):null;const name=activity?.name||({savings:'Savings plan',debt:'Debt repayment plan',discretionary:'Discretionary spending'}[row.type]||row.type||'Allocation');return `<div class="finance-allocation-row"><span>${escapeHTML(name)}<small>${row.mode==='percent'?`${Number(row.value)||0}% of ${salary.usesActual?'actual':'expected'} salary`:'Fixed allocation'} · ${salary.payCycles} pay cycle${salary.payCycles===1?'':'s'}</small></span><strong>${escapeHTML(fmtHidden(row.amount))}</strong>${salary.frequency!=='monthly'?`<small>≈ ${escapeHTML(fmtHidden(row.monthlyAmount))} monthly</small>`:''}</div>`;}).join(''):'<div class="finance-empty">No salary allocation rules configured. Use Configure to build a plan.</div>'}<p class="finance-statement-note">Allocation window: ${escapeHTML(financeDateLabel(range.start))} – ${escapeHTML(financeDateLabel(range.end))}. Rules are plans only; no cash is transferred and no transaction is created.</p>`;
-    const rows=budget.rows;
-    $('#finance-budget-panel').innerHTML=`<div class="finance-budget-summary"><span>${escapeHTML(({week:'Weekly',month:'Monthly',year:'Annual',custom:'Period'})[range.type]||'Period')} budget <b>${escapeHTML(fmtHidden(budget.totalBudget))}</b></span><span>Spent <b>${escapeHTML(fmtHidden(budget.totalSpent))}</b></span><span>Remaining <b>${escapeHTML(fmtHidden(budget.totalRemaining))}</b></span></div>${budget.categoryBudgetsExceedTotal?`<div class="finance-allocation-warning">Category limits total ${escapeHTML(fmtHidden(budget.categoryBudgetTotal))}, above the overall ${escapeHTML(periodLabel)} budget of ${escapeHTML(fmtHidden(budget.totalBudget))}. Existing limits are preserved; review the overlap.</div>`:''}${budget.projectedTotal!==null?`<p class="finance-statement-note">Estimated ${escapeHTML(({week:'week-end',month:'month-end',year:'year-end',custom:'period-end'})[range.type]||'period-end')} spending: <strong>${escapeHTML(fmtHidden(budget.projectedTotal))}</strong>, based on ${budget.elapsedDays} elapsed days and ${budget.projectionEvidence.count} expense entries.</p>`:`<p class="finance-statement-note">A reliable ${escapeHTML(periodLabel)} projection needs at least 7 elapsed days, 5 expense entries across 3 days, and reasonably distributed spending. Historical periods are not projected.</p>`}<div class="finance-budget-table-wrap">${rows.length?`<table class="finance-report-table finance-budget-table"><thead><tr><th>Category</th><th>Plan</th><th>Spent</th><th>Left</th><th>Used</th><th>Projected</th><th>vs previous</th></tr></thead><tbody>${rows.map(row=>`<tr><td>${escapeHTML(row.name)}</td><td>${escapeHTML(fmtHidden(row.plannedAllocation))}${row.incomeAllocationPct!==null?`<small>${row.incomeAllocationPct.toFixed(1)}% of income / plan</small>`:''}</td><td>${escapeHTML(fmtHidden(row.spent))}</td><td>${escapeHTML(fmtHidden(row.remaining))}</td><td>${row.percentUsed===null?'—':`${row.percentUsed.toFixed(0)}%`}</td><td>${row.projectedSpending===null?'—':escapeHTML(fmtHidden(row.projectedSpending))}</td><td>${row.change>=0?'+':'−'}${escapeHTML(fmtHidden(Math.abs(row.change)))}</td></tr>`).join('')}</tbody></table>`:'<div class="finance-empty">Set category budgets or salary allocation rules to compare plans with spending.</div>'}</div>`;
+    const plan=state.settings.salaryPlan||{};
+    const activeRules=(plan.allocations||[]).filter(rule=>rule&&rule.enabled!==false&&Number(rule.value)>0).length;
+    const frequencyLabel={monthly:'Monthly',fortnightly:'Fortnightly',weekly:'Weekly'}[salary.frequency||plan.frequency||'monthly'];
+    const salaryConfigured=Number(plan.expectedSalary)>0||activeRules>0;
+    const categoryLimits=budget.rows.filter(row=>toMinorUnits(row.plannedAllocation)>0).length;
+    const budgetConfigured=toMinorUnits(budget.totalBudget)>0||categoryLimits>0;
+    const alerts=[];
+    if(salary.overAllocated)alerts.push('Salary allocations exceed the available pay for this period.');
+    else if(salary.percentageOver100)alerts.push('Percentage allocations exceed 100%.');
+    if(budget.categoryBudgetsExceedTotal)alerts.push('Category limits add up to more than the overall budget.');
+    if(toMinorUnits(budget.totalBudget)>0&&toMinorUnits(budget.totalSpent)>toMinorUnits(budget.totalBudget))alerts.push('Recorded spending is above the overall budget.');
+    if(budget.rows.some(row=>toMinorUnits(row.plannedAllocation)>0&&toMinorUnits(row.spent)>=toMinorUnits(row.plannedAllocation)))alerts.push('One or more category limits have been reached or exceeded.');
+    const alertCopy=alerts.length?`<div class="finance-plan-alert" role="status"><span aria-hidden="true">!</span><div><strong>${alerts.length} item${alerts.length===1?'':'s'} need review</strong><small>${escapeHTML(alerts[0])}${alerts.length>1?` + ${alerts.length-1} more`:''}</small></div></div>`:`<div class="finance-plan-clear" role="status"><span aria-hidden="true">✓</span><span>${salaryConfigured||budgetConfigured?'No allocation or budget warnings for this period.':'Set up a salary plan or budget to enable personalised alerts.'}</span></div>`;
+    $('#finance-salary-panel').innerHTML=`<div class="finance-plan-status"><span class="finance-plan-status-icon" aria-hidden="true">₹</span><div class="finance-plan-status-copy"><strong>${salaryConfigured?'Salary plan configured':'No salary plan yet'}</strong><small>${salaryConfigured?`${frequencyLabel} pay · ${activeRules} active allocation rule${activeRules===1?'':'s'}`:'Add expected take-home pay and allocation rules.'}</small></div><span class="finance-plan-state ${salaryConfigured?'is-configured':''}">${salaryConfigured?'Configured':'Not set'}</span></div>`;
+    $('#finance-budget-panel').innerHTML=`<div class="finance-plan-status"><span class="finance-plan-status-icon" aria-hidden="true">◷</span><div class="finance-plan-status-copy"><strong>${budgetConfigured?'Budget monitoring active':'No budget limits yet'}</strong><small>${budgetConfigured?`${categoryLimits} category limit${categoryLimits===1?'':'s'} configured`:'Add an overall or category budget to track spending.'}</small></div><span class="finance-plan-state ${state.settings.notifyBudget?'is-configured':''}">${state.settings.notifyBudget?'Alerts on':'Alerts off'}</span></div>${alertCopy}<p class="finance-plan-report-note">Detailed salary allocations, category plans, actual spending and remaining amounts are included in the downloadable Cash Flow Statement for the selected period. Plans never create transactions or move money.</p>`;
   }
   function renderFinancePriorities(){
     const insights=finance.priorityInsights(state,finance.periodRange('month',today()),today());
@@ -813,10 +791,10 @@
   function renderFinanceAnalytics(){
     if(!finance||!$('#finance-overview-metrics'))return;
     const range=financeSelectedRange();if(!range){$('#finance-coverage-note').textContent='Choose valid start and end dates for this report.';return;}
-    const period=finance.calculatePeriod(state,{range,today:today()}),currentRange={...range,end:range.effectiveEnd};
-    const statement=finance.cashFlowStatement(state,currentRange),asOf=range.effectiveEnd||range.end,sheet=finance.balanceSheet(state,asOf);
+    const period=finance.calculatePeriod(state,{range,today:today()});
     const partialPeriod=range.effectiveEnd<range.end;const label=range.type==='custom'?`${financeDateLabel(range.start)} – ${financeDateLabel(range.effectiveEnd)}`:range.type==='week'?`Week of ${financeDateLabel(range.start)} – ${financeDateLabel(range.end)}`:range.type==='year'?range.start.slice(0,4):financeDateLabel(range.start,{month:'long',year:'numeric'});
     $('#finance-period-label').textContent=partialPeriod?`${label} · through ${financeDateLabel(range.effectiveEnd)}`:label;
+    const reportHint=$('#finance-report-period-hint');if(reportHint)reportHint.textContent=`Downloads use ${partialPeriod?`${label} · through ${financeDateLabel(range.effectiveEnd)}`:label}. Detailed figures appear only in the downloaded report.`;
 
     $('#finance-custom-range').hidden=range.type!=='custom';
     const actual=totalBalance();
@@ -836,10 +814,10 @@
       financeMetricHTML('vs previous period',prevDelta,pct===null?'Percentage change unavailable':`${pct>=0?'+':''}${pct.toFixed(1)}% net cash movement`,prevDelta<0?'var(--red)':'var(--green)'),
       financeMetricHTML('Average daily spending',averageDaily,`${elapsedDays} elapsed calendar days`)
     ].join('');
-    const coverage=[period.historyNote,sheet.coverageNote];
+    const coverage=[period.historyNote];
     if(Math.abs(period.reconciliationDifference)>0.01)coverage.push(`Period movements and account balances differ by ${money(period.reconciliationDifference)}. Check uncategorised or missing account entries.`);
     $('#finance-coverage-note').textContent=coverage.join(' ');
-    renderFinanceCashFlow(statement);renderFinanceBalanceSheet(sheet);renderFinanceCategoryComparison(range);renderFinanceSalaryAndBudget(range);renderFinancePriorities();
+    renderFinanceCategoryComparison(range);renderFinanceSalaryAndBudget(range);renderFinancePriorities();
     const type=$('#finance-period-type');if(type)type.value=range.type;
     const anchor=$('#finance-period-anchor');if(anchor)anchor.value=financeAnchor;
     const customStart=$('#finance-custom-start'),customEnd=$('#finance-custom-end');if(customStart&&!customStart.value){customStart.value=range.start;customEnd.value=range.end;}
