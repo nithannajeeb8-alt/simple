@@ -390,30 +390,76 @@
     while (addDays(iso(lastPayday), 14) <= today) lastPayday.setDate(lastPayday.getDate() + 14);
     return { start: iso(lastPayday), end: addDays(iso(lastPayday), 13), frequency, anchored: false };
   }
-  function salaryAllocationSummary(state, today) {
+  function scheduledPaydays(plan, start, end, today) {
+    const frequency = ['monthly', 'fortnightly', 'weekly'].includes(plan && plan.frequency) ? plan.frequency : 'monthly';
+    if (!validISO(start) || !validISO(end) || start > end) return [];
+    const results = [];
+    if (frequency === 'monthly') {
+      const first = dateOf(`${start.slice(0, 7)}-01`);
+      const last = dateOf(`${end.slice(0, 7)}-01`);
+      const cursor = new Date(first);
+      while (cursor <= last && results.length < 240) {
+        const payday = monthDate(cursor.getFullYear(), cursor.getMonth(), plan && plan.paydayDay || 1);
+        if (payday >= start && payday <= end) results.push(payday);
+        cursor.setMonth(cursor.getMonth() + 1);
+      }
+      return results;
+    }
+    const interval = frequency === 'weekly' ? 7 : 14;
+    let anchor;
+    if (validISO(plan && plan.paydayDate)) anchor = plan.paydayDate;
+    else if (frequency === 'weekly') {
+      const weekday = Number.isInteger(Number(plan && plan.paydayDay)) ? Math.max(0, Math.min(6, Number(plan.paydayDay))) : 5;
+      const d = dateOf(start);
+      d.setDate(d.getDate() + ((weekday - d.getDay() + 7) % 7));
+      anchor = iso(d);
+    } else {
+      const cycle = salaryCycleRange(plan, today || end);
+      anchor = cycle && cycle.start || start;
+    }
+    const offset = Math.floor((dateOf(start) - dateOf(anchor)) / DAY_MS);
+    let payday = addDays(anchor, Math.floor(offset / interval) * interval);
+    let guard = 0;
+    while (payday < start && guard++ < 500) payday = addDays(payday, interval);
+    while (payday <= end && results.length < 520 && guard++ < 1100) {
+      results.push(payday);
+      payday = addDays(payday, interval);
+    }
+    return results;
+  }
+  function salaryAllocationSummary(state, today, selectedRange) {
     const plan = state.settings && state.settings.salaryPlan || {};
     const expected = Math.max(0, minor(plan.expectedSalary || 0));
+    const frequency = ['monthly', 'fortnightly', 'weekly'].includes(plan.frequency) ? plan.frequency : 'monthly';
     const cycle = salaryCycleRange(plan, today);
-    const salaryTransactions = (state.transactions || []).filter(tx => tx.type === 'income' && txWithin(tx, cycle.start, today) && ((tx.activityId === 'salary') || /salary|wage|payroll/i.test(activityName(state, tx))));
+    const hasRange = selectedRange && validISO(selectedRange.start) && validISO(selectedRange.end);
+    const rangeStart = hasRange ? selectedRange.start : cycle.start;
+    const rangeEnd = hasRange ? (selectedRange.effectiveEnd || selectedRange.end) : today;
+    const paydays = hasRange ? scheduledPaydays(plan, selectedRange.start, selectedRange.end, today) : [cycle.start];
+    const salaryTransactions = (state.transactions || []).filter(tx => tx.type === 'income' && txWithin(tx, rangeStart, rangeEnd) && ((tx.activityId === 'salary') || /salary|wage|payroll/i.test(activityName(state, tx))));
     const actual = salaryTransactions.reduce((total, tx) => total + minor(tx.amount), 0);
-    const base = actual > 0 ? actual : expected;
+    const payCycles = Math.max(paydays.length, actual > 0 && paydays.length === 0 ? 1 : 0);
+    const expectedForPeriod = expected * payCycles;
+    const base = actual > 0 ? actual : (hasRange ? expectedForPeriod : expected);
     let allocated = 0, fixed = 0, percentage = 0;
     const rows = (Array.isArray(plan.allocations) ? plan.allocations : []).filter(rule => rule && rule.enabled !== false).map(rule => {
       const value = Number(rule.value);
-      const amount = rule.mode === 'percent' ? Math.round(base * Math.max(0, value) / 100) : Math.max(0, minor(value));
+      const perCycleFixed = rule.mode === 'percent' ? 0 : Math.max(0, minor(value));
+      const amount = rule.mode === 'percent' ? Math.round(base * Math.max(0, value) / 100) : perCycleFixed * (hasRange ? payCycles : 1);
       allocated += amount;
       if (rule.mode === 'percent') percentage += Number(value) || 0; else fixed += amount;
-      const monthlyFactor = plan.frequency === 'weekly' ? 52 / 12 : plan.frequency === 'fortnightly' ? 26 / 12 : 1;
-      return { ...rule, amount: major(amount), monthlyAmount: major(Math.round(amount * monthlyFactor)) };
+      const monthlyFactor = frequency === 'weekly' ? 52 / 12 : frequency === 'fortnightly' ? 26 / 12 : 1;
+      const perCycleAmount = rule.mode === 'percent' ? Math.round((actual > 0 && hasRange ? (payCycles ? actual / payCycles : actual) : expected) * Math.max(0, value) / 100) : perCycleFixed;
+      return { ...rule, amount: major(amount), perCycleAmount: major(perCycleAmount), monthlyAmount: major(Math.round(perCycleAmount * monthlyFactor)) };
     });
-    const monthlyFactor = plan.frequency === 'weekly' ? 52 / 12 : plan.frequency === 'fortnightly' ? 26 / 12 : 1;
+    const monthlyFactor = frequency === 'weekly' ? 52 / 12 : frequency === 'fortnightly' ? 26 / 12 : 1;
+    const reportCycle = hasRange ? { start: selectedRange.start, end: selectedRange.end, frequency, payCycles } : cycle;
     return {
-      expectedSalary: major(expected), actualSalary: major(actual), baseSalary: major(base), usesActual: actual > 0,
-      monthlyBaseSalary: major(Math.round(base * monthlyFactor)),
-      cycle, allocations: rows, totalAllocated: major(allocated), monthlyAllocated: major(Math.round(allocated * monthlyFactor)), unallocated: major(base - allocated),
+      expectedSalary: major(expected), expectedSalaryForPeriod: major(expectedForPeriod), actualSalary: major(actual), baseSalary: major(base), usesActual: actual > 0,
+      monthlyBaseSalary: major(Math.round((hasRange && payCycles ? base / payCycles : base) * monthlyFactor)), frequency, payCycles,
+      cycle: reportCycle, allocations: rows, totalAllocated: major(allocated), monthlyAllocated: major(Math.round(rows.reduce((n, row) => n + minor(row.perCycleAmount), 0) * monthlyFactor)), unallocated: major(base - allocated),
       overAllocated: allocated > base, percentageTotal: percentage, fixedTotal: major(fixed),
-      percentageOver100: percentage > 100,
-      salaryTransactions: salaryTransactions.length
+      percentageOver100: percentage > 100, salaryTransactions: salaryTransactions.length
     };
   }
   function categorySpend(state, start, end, activityId) {
@@ -425,9 +471,11 @@
     });
     return major(Math.max(0, total));
   }
-  function projectionEvidence(state, start, end, today, activityId) {
-    const elapsed = Math.max(1, Math.round((dateOf(today) - dateOf(start)) / DAY_MS) + 1);
-    const txs = (state.transactions || []).filter(tx => tx.type === 'expense' && txWithin(tx, start, today) && (!activityId || tx.activityId === activityId));
+  function projectionEvidence(state, start, end, today, activityId, observedEnd) {
+    const stop = observedEnd && validISO(observedEnd) ? observedEnd : today;
+    const isCurrentPeriod = validISO(end) && end >= today;
+    const elapsed = Math.max(1, Math.round((dateOf(stop) - dateOf(start)) / DAY_MS) + 1);
+    const txs = (state.transactions || []).filter(tx => tx.type === 'expense' && txWithin(tx, start, stop) && (!activityId || tx.activityId === activityId));
     const dayTotals = new Map();
     txs.forEach(tx => dayTotals.set(tx.date, (dayTotals.get(tx.date) || 0) + minor(tx.amount)));
     const total = [...dayTotals.values()].reduce((n, v) => n + v, 0);
@@ -437,46 +485,65 @@
     const totalDays = Math.max(1, Math.round((dateOf(end) - dateOf(start)) / DAY_MS) + 1);
     return {
       elapsed, totalDays, count: txs.length, distinctDays: dayTotals.size, largestDayShare,
-      reliable: enoughObservations && sufficientlyDistributed,
-      projectedMinor: enoughObservations && sufficientlyDistributed ? Math.round(total / elapsed * totalDays) : null
+      reliable: isCurrentPeriod && enoughObservations && sufficientlyDistributed,
+      projectedMinor: isCurrentPeriod && enoughObservations && sufficientlyDistributed ? Math.round(total / elapsed * totalDays) : null
     };
   }
+  function periodBudgetMultiplier(range) {
+    if (range.type === 'week') return 12 / 52;
+    if (range.type === 'year') return 12;
+    const days = Math.max(1, Math.round((dateOf(range.end) - dateOf(range.start)) / DAY_MS) + 1);
+    if (range.type === 'month') return 1;
+    return days / 30.436875;
+  }
   function budgetDashboard(state, range, today) {
-    const startMonth = monthBounds(today);
-    const end = range.end > today ? today : range.end;
-    const current = range.type === 'month' && range.start === startMonth.start ? range : { start: startMonth.start, end: today, type: 'month' };
-    const previous = previousRange({ ...startMonth, type: 'month' });
-    const salary = salaryAllocationSummary(state, today);
+    const fallback = periodRange('month', today);
+    const selected = range && validISO(range.start) && validISO(range.end) && range.start <= range.end ? range : fallback;
+    const periodEnd = selected.end;
+    const observedEnd = selected.effectiveEnd && validISO(selected.effectiveEnd) ? selected.effectiveEnd : (periodEnd > today ? today : periodEnd);
+    const end = observedEnd < selected.start ? addDays(selected.start, -1) : observedEnd;
+    const current = { start: selected.start, end, periodEnd, type: selected.type || 'month' };
+    const fullPrevious = previousRange({ start: selected.start, end: periodEnd, type: selected.type || 'month' }) || previousRange(fallback);
+    const elapsedDays = end >= current.start ? Math.max(1, Math.round((dateOf(end) - dateOf(current.start)) / DAY_MS) + 1) : 0;
+    const fullDays = Math.max(1, Math.round((dateOf(periodEnd) - dateOf(current.start)) / DAY_MS) + 1);
+    const partial = end < periodEnd;
+    const previous = partial && elapsedDays ? { ...fullPrevious, end: addDays(fullPrevious.start, elapsedDays - 1) > fullPrevious.end ? fullPrevious.end : addDays(fullPrevious.start, elapsedDays - 1) } : fullPrevious;
+    const multiplier = periodBudgetMultiplier({ ...selected, end: periodEnd });
+    const salary = salaryAllocationSummary(state, today, { ...selected, effectiveEnd: end });
     const plannedByCategory = {};
     salary.allocations.forEach(rule => {
-      if (rule.type === 'category' && rule.activityId) plannedByCategory[rule.activityId] = major(minor(plannedByCategory[rule.activityId] || 0) + minor(rule.monthlyAmount ?? rule.amount));
+      if (rule.type === 'category' && rule.activityId) plannedByCategory[rule.activityId] = (plannedByCategory[rule.activityId] || 0) + minor(rule.amount);
     });
+    const scaleMonthly = value => Math.max(0, Math.round(minor(value || 0) * multiplier));
+    const actualIncome = (state.transactions || []).filter(tx => tx.type === 'income' && txWithin(tx, current.start, current.end)).reduce((n, tx) => n + minor(tx.amount), 0);
+    const incomeBasis = actualIncome > 0 ? actualIncome : minor(salary.baseSalary);
     const rows = (state.activities || []).filter(a => a.kind === 'expense' || a.kind === 'both').map(activity => {
-      const budget = Number(state.budgets && state.budgets.categories && state.budgets.categories[activity.id]) || 0;
-      const salaryAllocation = Number(plannedByCategory[activity.id] || 0);
-      const planned = budget > 0 ? budget : salaryAllocation;
+      const monthlyBudget = Number(state.budgets && state.budgets.categories && state.budgets.categories[activity.id]) || 0;
+      const budgetMinor = scaleMonthly(monthlyBudget);
+      const salaryAllocationMinor = plannedByCategory[activity.id] || 0;
+      const plannedMinor = budgetMinor > 0 ? budgetMinor : salaryAllocationMinor;
       const spent = categorySpend(state, current.start, current.end, activity.id);
       const previousSpent = categorySpend(state, previous.start, previous.end, activity.id);
-      const evidence = projectionEvidence(state, current.start, current.end, today, activity.id);
-      const actualIncomeMonth = (state.transactions || []).filter(tx => tx.type === 'income' && txWithin(tx, current.start, current.end)).reduce((n, tx) => n + minor(tx.amount), 0);
+      const evidence = projectionEvidence(state, current.start, periodEnd, today, activity.id, current.end);
       const projected = evidence.projectedMinor === null ? null : major(evidence.projectedMinor);
-      return { id: activity.id, name: activity.name, plannedAllocation: major(minor(planned)), salaryAllocation: major(minor(salaryAllocation)), budgetLimit: major(minor(budget)), spent, remaining: major(minor(planned) - minor(spent)), percentUsed: planned > 0 ? spent / planned * 100 : null, projectedSpending: projected, previousSpent, change: major(minor(spent) - minor(previousSpent)), incomeAllocationPct: actualIncomeMonth ? minor(planned) / actualIncomeMonth * 100 : null, spendingShareOfIncome: actualIncomeMonth ? minor(spent) / actualIncomeMonth * 100 : null, canProject: evidence.reliable, projectionEvidence: evidence };
+      return { id: activity.id, name: activity.name, plannedAllocation: major(plannedMinor), salaryAllocation: major(salaryAllocationMinor), budgetLimit: major(budgetMinor), spent, remaining: major(plannedMinor - minor(spent)), percentUsed: plannedMinor > 0 ? minor(spent) / plannedMinor * 100 : null, projectedSpending: projected, previousSpent, change: major(minor(spent) - minor(previousSpent)), incomeAllocationPct: incomeBasis ? plannedMinor / incomeBasis * 100 : null, spendingShareOfIncome: incomeBasis ? minor(spent) / incomeBasis * 100 : null, canProject: evidence.reliable, projectionEvidence: evidence };
     }).filter(row => row.plannedAllocation > 0 || row.spent > 0).sort((a, b) => (b.percentUsed || 0) - (a.percentUsed || 0));
     const grossExpense = (state.transactions || []).filter(tx => tx.type === 'expense' && txWithin(tx, current.start, current.end)).reduce((n, tx) => n + minor(tx.amount), 0);
     const refund = (state.transactions || []).filter(tx => tx.type === 'refund' && txWithin(tx, current.start, current.end)).reduce((n, tx) => n + minor(tx.amount), 0);
-    const netSpent = major(Math.max(0, grossExpense - refund));
+    const netSpentMinor = Math.max(0, grossExpense - refund);
     const configuredTotalBudget = Math.max(0, minor(state.budgets && state.budgets.total || 0));
-    const totalBudget = configuredTotalBudget || rows.reduce((n, row) => n + minor(row.plannedAllocation), 0);
-    const actualIncome = (state.transactions || []).filter(tx => tx.type === 'income' && txWithin(tx, current.start, current.end)).reduce((n, tx) => n + minor(tx.amount), 0);
-    const projection = projectionEvidence(state, current.start, current.end, today, null);
+    const periodTotalBudget = configuredTotalBudget ? Math.round(configuredTotalBudget * multiplier) : rows.reduce((n, row) => n + minor(row.plannedAllocation), 0);
+    const projection = projectionEvidence(state, current.start, periodEnd, today, null, current.end);
     const categoryBudgetTotal = rows.reduce((n, row) => n + minor(row.budgetLimit), 0);
+    const label = current.type === 'week' ? 'week' : current.type === 'year' ? 'year' : current.type === 'custom' ? 'selected period' : 'month';
     return {
-      range: current, rows, salary, totalBudget: major(totalBudget), totalSpent: netSpent,
-      totalRemaining: major(totalBudget - minor(netSpent)), actualIncome: major(actualIncome),
-      totalPercentUsed: totalBudget ? netSpent / major(totalBudget) * 100 : null,
+      range: current, previousRange: previous, periodLabel: label, rows, salary, totalBudget: major(periodTotalBudget), totalSpent: major(netSpentMinor),
+      totalRemaining: major(periodTotalBudget - netSpentMinor), actualIncome: major(actualIncome),
+      totalPercentUsed: periodTotalBudget ? netSpentMinor / periodTotalBudget * 100 : null,
       projectedTotal: projection.projectedMinor === null ? null : major(projection.projectedMinor),
-      canProjectTotal: projection.reliable, projectionEvidence: projection, elapsedDays: projection.elapsed, periodDays: projection.totalDays,
-      categoryBudgetTotal: major(categoryBudgetTotal), categoryBudgetsExceedTotal: configuredTotalBudget > 0 && categoryBudgetTotal > configuredTotalBudget
+      canProjectTotal: projection.reliable, projectionEvidence: projection, elapsedDays: projection.elapsed, periodDays: fullDays,
+      categoryBudgetTotal: major(categoryBudgetTotal), categoryBudgetsExceedTotal: periodTotalBudget > 0 && categoryBudgetTotal > periodTotalBudget,
+      budgetMultiplier: multiplier, isPartialPeriod: partial
     };
   }
   function priorityInsights(state, range, today) {

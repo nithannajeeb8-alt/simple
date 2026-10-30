@@ -1,4 +1,6 @@
-# PocketWise 2.4.0 — Financial Analytics & Smart Budgeting
+# PocketWise Financial Analytics — Original 2.4.0 Design Notes
+
+> Historical implementation notes for the 2.4.0 analytics work. The current source includes the 2.4.1 runtime and selected-period fixes documented in `RELEASE-2.4.1-NOTES.md`.
 
 ## What changed
 
@@ -25,7 +27,7 @@ This is an additive upgrade to the existing PocketWise PWA. It retains the curre
 | `app.js` | Integrates finance calculations with the existing state, account opening-date editing, period navigation, finance panels, Activity grouping, salary settings, report generation and deduplicated alerts. |
 | `index.html` | Adds the analytics module script and finance / activity UI controls within the existing application structure. |
 | `styles.css` | Adds responsive finance panel, grouped activity, chart legend/table and print-report styling using the existing theme. |
-| `sw.js` | Bumps the shell cache to `pocketwise-shell-v2.4.0-financial-analytics` and precaches `finance-analytics.js`. |
+| `sw.js` | Bumps the shell cache to `pocketwise-shell-v2.4.1-analytics-runtime-fixes` (updated in 2.4.1) and precaches `finance-analytics.js`. |
 | `tests/finance-analytics.test.js` | New focused calculation regression suite (57 assertions). |
 | `tests/clipboard-import.test.js` | Updates expected service-worker cache identifier; existing clipboard behavior tests remain intact. |
 | `tests/shortcut-settings.test.js` | Updates expected service-worker cache identifier; existing Shortcut behavior tests remain intact. |
@@ -83,4 +85,4 @@ The regression suites cover clipboard and Shortcut behavior, spatial import hand
 
 ## Version note
 
-This source package is labelled **2.4.0 Financial Analytics** for the additive finance module and cache generation. It is based on the supplied `2.3.54-iOS-Viewport-Lock-Fix` source and the corresponding core files checked against the connected GitHub repository on 2026-10-30. No GitHub commit or live deployment was made as part of this package creation.
+The original source package was labelled **2.4.0 Financial Analytics** for the additive finance module and cache generation. It is based on the supplied `2.3.54-iOS-Viewport-Lock-Fix` source and the corresponding core files checked against the connected GitHub repository on 2026-10-30. No GitHub commit or live deployment was made as part of this package creation.
