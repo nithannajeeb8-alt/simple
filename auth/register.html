@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101827">
+  <meta name="description" content="Create your account.">
+  <title>Create account | Account</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/config.js" defer></script>
+  <script src="js/auth.js" defer></script>
+</head>
+<body data-page="register">
+  <main class="auth-shell">
+    <section class="auth-card" aria-labelledby="page-title">
+      <a class="brand" href="index.html" aria-label="Account home">
+        <span class="brand-mark" aria-hidden="true">A</span>
+        <span>Account</span>
+      </a>
+
+      <div class="intro">
+        <p class="eyebrow">GET STARTED</p>
+        <h1 id="page-title">Create your account</h1>
+        <p class="muted">Add your details below to get started.</p>
+      </div>
+
+      <form id="register-form" class="auth-form" novalidate>
+        <label for="username">Username</label>
+        <input id="username" name="username" type="text" autocomplete="username" minlength="2" maxlength="40" placeholder="Your name" required>
+
+        <label for="email">Email address</label>
+        <input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+
+        <label for="password">Password</label>
+        <div class="password-wrap">
+          <input id="password" name="password" type="password" autocomplete="new-password" minlength="8" placeholder="At least 8 characters" required>
+          <button class="password-toggle" type="button" data-toggle-password="password" aria-label="Show password">Show</button>
+        </div>
+
+        <label for="confirm-password">Confirm password</label>
+        <div class="password-wrap">
+          <input id="confirm-password" name="confirmPassword" type="password" autocomplete="new-password" minlength="8" placeholder="Enter your password again" required>
+          <button class="password-toggle" type="button" data-toggle-password="confirm-password" aria-label="Show password">Show</button>
+        </div>
+
+        <button class="primary-button" type="submit" id="register-submit">
+          <span class="button-label">Create account</span>
+          <span class="button-spinner" aria-hidden="true"></span>
+        </button>
+        <p id="register-message" class="form-message" role="status" aria-live="polite"></p>
+      </form>
+
+      <p class="switch-auth">Already have an account? <a href="index.html">Sign in</a></p>
+      <p class="footnote">Your password will be sent to the backend over the configured connection and must be hashed there with bcrypt.</p>
+    </section>
+  </main>
+</body>
+</html>
