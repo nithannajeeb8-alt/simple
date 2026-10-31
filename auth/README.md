@@ -1,31 +1,49 @@
 # Authentication frontend (`/auth/`)
 
-This is a static HTML/CSS/JavaScript frontend for the Express authentication API described in the project brief. It is designed to be copied into the `auth/` directory of your existing GitHub Pages repository.
+This folder contains the static HTML/CSS/JavaScript interface for the Express authentication API.
 
 ## Files
 
-- `index.html` — sign-in page and entry point for `https://your-domain.example/auth/`
-- `register.html` — create-account form
-- `dashboard.html` — profile page that checks the signed-in session with the backend
+- `index.html` — sign-in page
+- `register.html` — create-account page
+- `dashboard.html` — profile page; it checks the signed-in session with the backend
 - `css/style.css` — shared responsive styling
-- `js/config.js` — backend address and API route configuration
+- `js/config.js` — same-origin API configuration
 - `js/auth.js` — form handling, API requests, session check, profile display, and sign-out
 
-## 1. Set the Redmi backend address
+## Local development with the Redmi backend
 
-Open `js/config.js` and edit `API_BASE_URL`:
+For the first working test, serve the frontend from the same Express server as the API. This avoids the browser blocking GitHub Pages HTTPS requests to the Redmi's plain HTTP address, and avoids needing cross-origin cookies or CORS for this local test.
 
-```js
-API_BASE_URL: "http://192.168.29.64:3000",
-```
+1. Copy this entire `auth` folder into `~/website-backend/public/` on the Redmi. The final path must be:
 
-That is the Redmi Wi-Fi address supplied in the project brief. It may change when the phone reconnects to Wi-Fi. Replace it with the current address when necessary.
+   `~/website-backend/public/auth/index.html`
 
-This is public frontend configuration. Never put your `.env` values, session secret, passwords, or database file in this directory.
+2. In the backend `server.js`, add `const path = require("path");` near the other imports.
 
-## 2. Expected API contract
+3. After the session middleware and before `app.use("/auth", authRoutes);`, add:
 
-The frontend currently calls these endpoints:
+   ```js
+   app.use("/auth", express.static(path.join(__dirname, "public", "auth")));
+   ```
+
+4. Keep the existing API route immediately after it:
+
+   ```js
+   app.use("/auth", authRoutes);
+   ```
+
+   Static files are served when a matching file exists. API paths such as `/auth/login` continue to fall through to the router.
+
+5. Restart the backend and open this URL on the laptop, while both devices are on the same Wi-Fi:
+
+   `http://192.168.29.64:3000/auth/`
+
+   Replace the IP if the Redmi's Wi-Fi address changes.
+
+`js/config.js` uses `window.location.origin`, so API requests automatically go to the same host and port that served the page. Do not open the GitHub Pages copy for this local HTTP test.
+
+## API contract
 
 | Method | Path | JSON request body |
 | --- | --- | --- |
@@ -34,53 +52,14 @@ The frontend currently calls these endpoints:
 | `POST` | `/auth/logout` | none |
 | `GET` | `/auth/me` | none |
 
-The frontend expects the API to use an HTTP session cookie. Fetch requests therefore use `credentials: "include"`.
+The frontend sends `credentials: "include"` so the browser can use the Express session cookie. The `/auth/me` endpoint should return a user object directly or `{ "user": { ... } }`.
 
-For the profile, `/auth/me` should return either a user object directly or an object shaped like `{ "user": { "id": 1, "username": "...", "email": "...", "created_at": "..." } }`. The page handles both shapes.
+## GitHub Pages and public deployment
 
-The registration and login endpoints should return JSON with a helpful `message` when possible. The backend must validate all fields, enforce unique email addresses, hash passwords with bcrypt, and never return password hashes to the browser.
+GitHub Pages can host the static frontend, but it cannot run Express. The current Redmi URL is an HTTP address on a private Wi-Fi network and is not a public production API. Do not expose the Redmi server to the internet for this test.
 
-## 3. Add it to your existing GitHub repository
+When a backend is deployed publicly, it must use HTTPS, a persistent session store, secure cookie settings, restricted CORS if frontend and API use different origins, rate limiting, CSRF protections appropriate to the architecture, and server-side authorization for every private endpoint. At that point, update `API_BASE_URL` to the public HTTPS backend origin and test the cookie/CORS configuration deliberately.
 
-Extract this ZIP. Copy the included `auth` folder into the **root** of your existing website repository, so the repository looks like this:
+## Security scope
 
-```text
-your-existing-repository/
-├── (your existing website files stay here)
-└── auth/
-    ├── index.html
-    ├── register.html
-    ├── dashboard.html
-    ├── README.md
-    ├── css/
-    │   └── style.css
-    └── js/
-        ├── config.js
-        └── auth.js
-```
-
-Do not replace your existing root `index.html` or any other website files. Only add the new `auth/` folder. GitHub Pages will then serve it at `/auth/` once the change is published.
-
-## 4. Important local-testing note
-
-GitHub Pages is HTTPS, while the current Redmi API address is plain HTTP. Browsers block an HTTPS page from calling an HTTP API as mixed content. For the first local test, serve this static folder from your laptop over a local HTTP development server and use the Redmi's current Wi-Fi IP in `config.js`.
-
-The backend must also allow the exact frontend origin through CORS with credentials enabled. The session cookie settings must be compatible with the origins and protocol being used. Because the laptop frontend and Redmi API are on different hosts, browser cross-site-cookie rules may prevent a session cookie from being stored or sent over plain HTTP. Do not weaken production cookie settings to work around this. We should configure and test the local development cookie/CORS setup deliberately before connecting the pages to your existing backend.
-
-A common CORS configuration needs to:
-
-- allow only the development frontend origin (not `*` when credentials are used);
-- set `credentials: true`;
-- handle preflight `OPTIONS` requests.
-
-For public deployment, use HTTPS for both the website and API, configure secure session cookies, use a persistent production session store, and enforce backend-side authorization on every private route.
-
-## 5. Test the frontend without the backend
-
-You can open the HTML files to inspect the layout, but form submission needs the API. A local development server (for example, VS Code Live Server) is preferable to opening files directly with `file://`.
-
-The dashboard is not secured merely because JavaScript redirects signed-out visitors. The backend must validate the session on `/auth/me` and on every future private data endpoint. Never send private account data to the browser before the backend has checked the session.
-
-## Scope of this first frontend stage
-
-This package includes registration, login, logout, session checking, and a basic profile dashboard. Password reset and email verification are not included yet because the backend routes and email workflow have not been verified. We should add those pages only after agreeing on the matching secure backend endpoints and token workflow.
+This is a learning-stage frontend. The dashboard's visual redirect is not security by itself; the backend must validate the session for `/auth/me` and every private API route. Password reset and email verification are not included until the matching backend token and email workflows exist.
