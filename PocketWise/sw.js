@@ -1,5 +1,7 @@
-const CACHE_NAME = 'pocketwise-shell-v2.4.9-ios-pdf-share-entry-layout';
+const CACHE_NAME = 'pocketwise-shell-v2.4.10-offline-export-receipts-icons';
 const PADDLE_RUNTIME_CACHE = 'pocketwise-paddle-runtime-v243';
+const PDF_RENDERER_URL = 'https://cdn.jsdelivr.net/npm/html2pdf.js@0.14.0/dist/html2pdf.bundle.min.js';
+const BOOTSTRAP_ICONS_CSS_URL = 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.2/font/bootstrap-icons.min.css';
 const BASE_URL = self.registration.scope;
 const asset = path => new URL(path, BASE_URL).href;
 const APP_SHELL = [
@@ -29,10 +31,48 @@ const APP_SHELL = [
   asset('assets/icons/icon-192.PNG'),
   asset('assets/icons/icon-512.PNG')
 ];
+async function cacheRuntimeAsset(cache, url) {
+  try {
+    const request = new Request(url, { mode: 'cors', credentials: 'omit' });
+    const cached = await cache.match(request);
+    if (cached && cached.type !== 'opaque') return true;
+    const response = await fetch(request);
+    if (!response || !response.ok || response.type === 'opaque') return false;
+    await cache.put(request, response.clone());
+
+    // Bootstrap Icons loads its font from a relative URL in the stylesheet.
+    // Cache those CORS-readable font files too, so the SVG fallbacks can be
+    // replaced by the real glyphs after a successful first online load.
+    const contentType = response.headers.get('content-type') || '';
+    if (url === BOOTSTRAP_ICONS_CSS_URL && /text\/css/i.test(contentType)) {
+      const css = await response.clone().text();
+      const references = [...css.matchAll(/url\(\s*(['"]?)([^)'"]+)\1\s*\)/g)];
+      await Promise.all(references.map(async match => {
+        const source = String(match[2] || '').trim();
+        if (!source || source.startsWith('data:')) return;
+        const fontUrl = new URL(source, url);
+        if (fontUrl.hostname !== 'cdn.jsdelivr.net' || !fontUrl.pathname.startsWith('/npm/')) return;
+        await cacheRuntimeAsset(cache, fontUrl.href);
+      }));
+    }
+    return true;
+  } catch (_) {
+    // This is a best-effort warm-up: a first install while offline must still work.
+    return false;
+  }
+}
+
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME)
     .then(cache => cache.addAll(APP_SHELL.map(url => new Request(url, { cache: 'reload' }))))
-    .then(() => self.skipWaiting()));
+    .then(async () => {
+      const runtimeCache = await caches.open(PADDLE_RUNTIME_CACHE);
+      await Promise.all([
+        cacheRuntimeAsset(runtimeCache, PDF_RENDERER_URL),
+        cacheRuntimeAsset(runtimeCache, BOOTSTRAP_ICONS_CSS_URL)
+      ]);
+      await self.skipWaiting();
+    }));
 });
 self.addEventListener('activate', event => {
   event.waitUntil(caches.keys()
@@ -150,8 +190,8 @@ self.addEventListener('fetch', event => {
     return;
   }
   if (req.method !== 'GET') return;
-  // Cache approved jsDelivr runtime assets, including PaddleOCR.js and the pinned
-  // HTML-to-PDF renderer, after first use. They can then be reused offline later.
+  // Cache approved jsDelivr runtime assets, including PaddleOCR.js, html2pdf and
+  // Bootstrap Icons CSS/fonts. CORS-enabled requests are cacheable and reusable offline.
   // Receipt images are never sent to this cache or to a remote OCR endpoint.
   if (url.origin !== self.location.origin) {
     if (url.hostname === 'cdn.jsdelivr.net' && url.pathname.startsWith('/npm/')) {

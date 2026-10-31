@@ -1,7 +1,24 @@
 /* Pocketwise: local-first personal finance PWA prototype. */
 (() => {
   'use strict';
-  (() => { const link = document.querySelector('link[href*="bootstrap-icons"]'); const mark = () => document.documentElement.classList.add('bi-loaded'); if (link) { if (link.sheet) mark(); else link.addEventListener('load', mark, { once: true }); } })();
+  (() => {
+    const link = document.querySelector('link[href*="bootstrap-icons"]');
+    if (!link || !document.fonts || typeof document.fonts.load !== 'function') return;
+    const markWhenFontIsReady = async () => {
+      try {
+        const loadedFaces = await document.fonts.load('16px "bootstrap-icons"');
+        const faceIsLoaded = loadedFaces.some(face => face && face.status === 'loaded');
+        if (faceIsLoaded && document.fonts.check('16px "bootstrap-icons"')) {
+          document.documentElement.classList.add('bi-loaded');
+        }
+      } catch (_) {
+        // Keep the SVG fallbacks visible when the CDN or its font file is unavailable.
+      }
+    };
+    if (link.sheet) void markWhenFontIsReady();
+    else link.addEventListener('load', () => { void markWhenFontIsReady(); }, { once: true });
+    link.addEventListener('error', () => document.documentElement.classList.remove('bi-loaded'), { once: true });
+  })();
   const isAndroid = /Android/i.test(navigator.userAgent || '') || /Android/i.test(navigator.userAgentData?.platform || '');
   document.documentElement.classList.toggle('is-android', isAndroid);
 
@@ -1390,23 +1407,33 @@
     eventPlannerDraft = draft;
     return { valid, draft, result, error };
   }
-  async function saveEventPlanFromForm() {
-    const check = validateEventPlannerForm();
-    if (!check.valid) { toast(check.error || 'Fix the event allocation before saving.', 'error'); return; }
+  async function persistEventPlanDraft(draft) {
     const snapshot = JSON.stringify(state);
-    const record = { ...check.draft, id: check.draft.id || uid('event'), createdAt: check.draft.createdAt || new Date().toISOString(), updatedAt: new Date().toISOString() };
+    const record = { ...draft, id: draft.id || uid('event'), createdAt: draft.createdAt || new Date().toISOString(), updatedAt: new Date().toISOString() };
     const index = state.eventPlans.findIndex(item => item.id === record.id);
     if (index >= 0) state.eventPlans[index] = record; else state.eventPlans.unshift(record);
     if (state.eventPlans.length > 200) state.eventPlans.length = 200;
-    if (!(await persistMutation(snapshot, 'Could not save this event plan. Your previous records were restored.'))) return;
+    if (!(await persistMutation(snapshot, 'Could not save this event plan. Your previous records were restored.'))) return null;
     eventPlannerDraft = record;
+    return record;
+  }
+  async function saveEventPlanFromForm() {
+    const check = validateEventPlannerForm();
+    if (!check.valid) { toast(check.error || 'Fix the event allocation before saving.', 'error'); return; }
+    const saved = await persistEventPlanDraft(check.draft);
+    if (!saved) return;
     showEventPlannerHub();
     toast('Event plan saved. Transaction history and account balances are unchanged.');
   }
   async function downloadEventPlanFromForm() {
     const check = validateEventPlannerForm();
     if (!check.valid) { toast(check.error || 'Fix the event allocation before downloading.', 'error'); return; }
-    const { draft, result } = check;
+    // Persist before rendering or showing the PDF sheet. If PDF creation/sharing is
+    // cancelled or fails, the event remains available in the Event planning list.
+    const saved = await persistEventPlanDraft(check.draft);
+    if (!saved) return;
+    const draft = saved;
+    const { result } = check;
     const categoryRows = result.categories.map(category => `<tr><td>${escapeHTML(category.name)}</td><td class="numeric">${escapeHTML(money(fromMinorUnits(category.amountMinor)))}</td><td>${escapeHTML(category.mode === 'equal' ? 'Equal' : category.mode === 'percent' ? 'Percentage' : 'Exact amounts')}</td></tr>`).join('');
     const groupRows = result.groups.map(group => `<tr><td>${escapeHTML(group.name)}</td><td>${escapeHTML(group.members.map(person => person.name).join(', '))}</td><td class="numeric">${escapeHTML(money(fromMinorUnits(group.amountMinor)))}</td></tr>`).join('');
     const peopleRows = result.people.map(person => `<tr><td>${escapeHTML(person.name)}</td><td class="numeric">${escapeHTML(money(fromMinorUnits(person.amountMinor)))}</td><td class="numeric">${(person.amountMinor / result.totalMinor * 100).toFixed(2)}%</td></tr>`).join('');
@@ -1644,8 +1671,17 @@
   }
   async function shareTransactionReceipt(id){
     const tx=state.transactions.find(item=>item.id===id);if(!tx){toast('This transaction could not be found.','error');return;}
-    const title='PocketWise transaction receipt',filename=receiptFilename(tx).replace(/\.html$/i,'.pdf');
-    await deliverGeneratedPDF(standaloneReceiptHTML(tx),filename,title);
+    const title='PocketWise transaction receipt',text=receiptShareText(tx);
+    if(typeof navigator.share==='function'){
+      try{await navigator.share({title,text});toast('Receipt shared.');return;}
+      catch(error){if(error?.name==='AbortError')return;console.warn('Native receipt sharing failed.',error);}
+    }
+    try{
+      if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(text);toast('Receipt details copied. You can paste them into a message.');return;}
+    }catch(error){console.warn('Receipt copy fallback failed.',error);}
+    const filename=receiptFilename(tx).replace(/\.html$/i,'.txt');
+    downloadBlob(filename,new Blob([text],{type:'text/plain;charset=utf-8'}));
+    toast('Receipt details downloaded as a text file.','amber');
   }
   function downloadTransactionReceipt(id){
     const tx=state.transactions.find(item=>item.id===id);if(!tx){toast('This transaction could not be found.','error');return;}
@@ -1657,10 +1693,22 @@
       toast('Receipt download started. Check Downloads or Files.');
     }catch(error){console.error('Receipt download failed.',error);toast('Could not download this receipt. Use Share receipt or Print / Save PDF instead.','error');}
   }
-  async function printTransactionReceipt(id){
+  function printTransactionReceipt(id){
     const tx=state.transactions.find(item=>item.id===id);if(!tx){toast('This transaction could not be found.','error');return;}
-    const filename=receiptFilename(tx).replace(/\.html$/i,'.pdf');
-    await deliverGeneratedPDF(standaloneReceiptHTML(tx),filename,'PocketWise transaction receipt');
+    // Open synchronously from the user's tap so Safari/iOS keeps the print gesture trusted.
+    const printWindow=window.open('about:blank','_blank');
+    if(!printWindow){toast('Allow pop-ups for PocketWise to print this receipt.','amber');return;}
+    try{
+      const autoPrint=`<script>window.addEventListener('load',function(){window.setTimeout(function(){window.print();},300);},{once:true});<\/script>`;
+      const html=standaloneReceiptHTML(tx).replace('</body>',`${autoPrint}</body>`);
+      printWindow.document.open();
+      printWindow.document.write(html);
+      printWindow.document.close();
+    }catch(error){
+      try{printWindow.close();}catch(_){}
+      console.error('Receipt print view could not be opened.',error);
+      toast('Could not open the print view. Try Download copy instead.','error');
+    }
   }
   const deletingTransactionIds = new Set();
   async function confirmDeleteTransaction(id){
@@ -1727,6 +1775,7 @@
 
   const PDF_RENDERER_URL='https://cdn.jsdelivr.net/npm/html2pdf.js@0.14.0/dist/html2pdf.bundle.min.js';
   let pendingGeneratedPDF=null;
+  let pdfReturnModal=null;
   function isIOSShareContext(){
     const ua=navigator.userAgent||'';
     return /iPad|iPhone|iPod/i.test(ua)||(navigator.platform==='MacIntel'&&Number(navigator.maxTouchPoints)>1);
@@ -1739,7 +1788,7 @@
     frame.style.cssText='position:fixed;left:-12000px;top:0;width:794px;height:1123px;border:0;pointer-events:none;z-index:-1';
     document.body.appendChild(frame);
     try{
-      const rendererTag=`<script src="${PDF_RENDERER_URL}"><\/script>`;
+      const rendererTag=`<script src="${PDF_RENDERER_URL}" crossorigin="anonymous"><\/script>`;
       const source=String(html||'').replace(/<\/head>/i,`${rendererTag}</head>`);
       if(source===String(html||''))throw new Error('The report document is missing its head section.');
       await new Promise((resolve,reject)=>{
@@ -1768,7 +1817,39 @@
     try{return typeof File==='function'&&typeof navigator.share==='function'&&typeof navigator.canShare==='function'&&navigator.canShare({files:[file]});}
     catch(_){return false;}
   }
+  function capturePDFReturnModal(){
+    const dialog=$('#app-modal'),content=$('#modal-content');
+    if(!dialog?.open)return null;
+    const controls=content?[...content.querySelectorAll('input,select,textarea')].map(control=>({
+      tagName:control.tagName,
+      type:control.type||'',
+      value:control.type==='file'?'':control.value,
+      checked:'checked'in control?!!control.checked:null,
+      selectedValues:control.tagName==='SELECT'?[...control.selectedOptions].map(option=>option.value):null
+    })):[];
+    return {title:$('#modal-title')?.textContent||'',kicker:$('#modal-kicker')?.textContent||'',body:content?.innerHTML||'',controls,scrollTop:dialog.scrollTop,contentScrollTop:content?.scrollTop||0};
+  }
+  function restorePDFReturnModal(){
+    const previous=pdfReturnModal;
+    pdfReturnModal=null;
+    pendingGeneratedPDF=null;
+    if(!previous){closeModal();return;}
+    openModal(previous.title,previous.body,previous.kicker);
+    const dialog=$('#app-modal'),content=$('#modal-content');
+    const controls=content?[...content.querySelectorAll('input,select,textarea')]:[];
+    (previous.controls||[]).forEach((saved,index)=>{
+      const control=controls[index];
+      if(!control||control.tagName!==saved.tagName||control.type==='file')return;
+      if(control.tagName==='SELECT'&&Array.isArray(saved.selectedValues)){
+        const selected=new Set(saved.selectedValues);
+        [...control.options].forEach(option=>{option.selected=selected.has(option.value);});
+      }else if(saved.value!==undefined)control.value=saved.value;
+      if(saved.checked!==null&&saved.checked!==undefined&&'checked'in control)control.checked=saved.checked;
+    });
+    requestAnimationFrame(()=>{if(dialog?.open)dialog.scrollTop=previous.scrollTop||0;if(content)content.scrollTop=previous.contentScrollTop||0;});
+  }
   function showPDFReadyActions(file,title,shareSupported=true){
+    pdfReturnModal=capturePDFReturnModal();
     pendingGeneratedPDF={file,title,shareSupported};
     const message=shareSupported
       ?'The PDF is ready on this device. Tap Share PDF to open the iOS share sheet, or save a copy to Files.'
@@ -1792,7 +1873,7 @@
       return true;
     }catch(error){
       console.error('PocketWise PDF export failed.',error);
-      toast('Could not create the PDF. Connect to the internet once, then retry. The PDF renderer is cached for later offline exports.','error');
+      toast('Could not create the PDF. Check the connection and PDF renderer, then retry.','error');
       return false;
     }
   }
@@ -1800,11 +1881,11 @@
     const pending=pendingGeneratedPDF;
     if(!pending)return;
     if(!pending.shareSupported||!canSharePDFFile(pending.file)){
-      downloadBlob(pending.file.name,pending.file);pendingGeneratedPDF=null;closeModal();toast('PDF download started. Check Files or Downloads.');return;
+      downloadBlob(pending.file.name,pending.file);restorePDFReturnModal();toast('PDF download started. Check Files or Downloads.');return;
     }
     try{
       await navigator.share({title:pending.title,files:[pending.file]});
-      pendingGeneratedPDF=null;closeModal();toast('PDF shared.');
+      restorePDFReturnModal();toast('PDF shared.');
     }catch(error){
       if(error?.name==='AbortError')return;
       console.warn('The iOS share sheet could not be opened from the follow-up action.',error);
@@ -1848,8 +1929,13 @@
   function bindEvents(){
     if(isAndroid){$('#shortcut-import-setting')?.remove();$('#apple-shortcut-setting')?.remove();$('#apple-image-shortcut-setting')?.remove();$('#backtap-setting')?.remove();}
     const appModal=$('#app-modal');
-    appModal.addEventListener('cancel',()=>{ currentEditId=null; });
-    appModal.addEventListener('click',event=>{ if(event.target===appModal)closeModal(); });
+    appModal.addEventListener('cancel',event=>{
+      if(pendingGeneratedPDF){event.preventDefault();restorePDFReturnModal();return;}
+      currentEditId=null;
+    });
+    appModal.addEventListener('click',event=>{
+      if(event.target===appModal){if(pendingGeneratedPDF)restorePDFReturnModal();else closeModal();}
+    });
     document.addEventListener('click', async event=>{
       const openSwipeShell=document.querySelector('.transaction-swipe-shell.is-open');
       const clickedSwipeShell=event.target.closest('.transaction-swipe-shell');
@@ -1879,11 +1965,11 @@
       const clearBudgetInput=event.target.closest('[data-clear-budget-input]');if(clearBudgetInput){const form=$('#budget-form'),field=form?.elements.namedItem(`cat-${clearBudgetInput.dataset.clearBudgetInput}`);if(field){field.value='';field.dispatchEvent(new Event('input',{bubbles:true}));}return;}
       const typeBtn=event.target.closest('.type-switch button[data-type]');if(typeBtn&&typeBtn.closest('#transaction-form')){event.preventDefault();currentTxType=typeBtn.dataset.type;const form=$('#transaction-form');form.dataset.type=currentTxType;$$('.type-switch [data-type]',form).forEach(b=>{b.classList.toggle('selected',b===typeBtn);b.setAttribute('aria-pressed',b===typeBtn?'true':'false');});syncGlassSegmentIndicators(typeBtn.closest('.type-switch'));const act=$('#tx-activity');const wanted=currentTxType==='income'?'salary':currentTxType==='refund'?'refunds':'food';act.innerHTML=activityOptions(currentTxType,wanted);const note=$('#tx-form-note');if(note)note.textContent=currentTxType==='transfer'?'Transfers change account balances but do not count as income or spending.':currentTxType==='refund'?'Refunds reduce recorded spending, rather than inflate income.':'Tap an activity to keep your records organized. You can add a note after choosing it.';if(currentTxType==='transfer'&&!$('#tx-to-account')){$('#tx-account').parentElement.insertAdjacentHTML('afterend',`<div class="form-field full" id="tx-to-account-wrap"><label for="tx-to-account">TO ACCOUNT</label><select id="tx-to-account" name="toAccountId">${accountOptions(state.accounts.find(a=>a.id!==$('#tx-account').value)?.id)}</select></div>`);}else if(currentTxType!=='transfer')$('#tx-to-account-wrap')?.remove();return;}
       const debtDir=event.target.closest('[data-debt-direction]');if(debtDir){const direction=debtDir.dataset.debtDirection;$('#debt-direction').value=direction;$$('[data-debt-direction]').forEach(b=>{b.classList.toggle('selected',b===debtDir);b.setAttribute('aria-pressed',b===debtDir?'true':'false')});const label=$('#debt-amount')?.closest('.form-field')?.querySelector('label');if(label)label.textContent=(direction==='lent'?'AMOUNT THEY OWE YOU':'AMOUNT YOU OWE')+' · INR';const note=$('.debt-form .form-note');if(note)note.textContent=direction==='lent'?'This tracks money you expect to get back. It is not counted as spending.':'This tracks money you need to repay. It is not counted as income.';return;}
-      const closeBtn=event.target.closest('[data-cancel-modal]');if(closeBtn){closeModal();return;}
+      const closeBtn=event.target.closest('[data-cancel-modal]');if(closeBtn){if(pendingGeneratedPDF)restorePDFReturnModal();else closeModal();return;}
       if(event.target.closest('[data-close-notifications]')){$('#notifications-modal').close();return;}
-      if(event.target.closest('#modal-close')){closeModal();return;}
+      if(event.target.closest('#modal-close')){if(pendingGeneratedPDF)restorePDFReturnModal();else closeModal();return;}
       if(event.target.closest('#share-ready-pdf')){await sharePendingGeneratedPDF();return;}
-      if(event.target.closest('#download-ready-pdf')){if(pendingGeneratedPDF){downloadBlob(pendingGeneratedPDF.file.name,pendingGeneratedPDF.file);pendingGeneratedPDF=null;}closeModal();toast('PDF download started. Check Files or Downloads.');return;}
+      if(event.target.closest('#download-ready-pdf')){if(pendingGeneratedPDF){downloadBlob(pendingGeneratedPDF.file.name,pendingGeneratedPDF.file);restorePDFReturnModal();}else closeModal();toast('PDF download started. Check Files or Downloads.');return;}
       if(event.target.closest('#mobile-add')){showAddEntryChoices();return;}
       if(event.target.closest('#start-simple-entry')){quickAddStart();return;}
       if(event.target.closest('#start-detailed-entry')){showDetailedEntryTools();return;}
@@ -1906,7 +1992,7 @@
       const removeEventGroup=event.target.closest('[data-event-remove-group]');if(removeEventGroup){const draft=captureEventPlannerForm();if(draft.groups.length<=1){toast('Keep at least one group.','amber');return;}const removed=removeEventGroup.dataset.eventRemoveGroup;draft.groups=draft.groups.filter(group=>group.id!==removed);const fallback=draft.groups[0].id;draft.participants.forEach(person=>{if(person.groupId===removed)person.groupId=fallback;});draft.groups.forEach(group=>{group.memberIds=draft.participants.filter(person=>person.groupId===group.id).map(person=>person.id);});renderEventPlannerEditor(draft);return;}
       const removeEventCategory=event.target.closest('[data-event-remove-category]');if(removeEventCategory){const draft=captureEventPlannerForm();if(draft.categories.length<=1){toast('Keep at least one cost category.','amber');return;}draft.categories=draft.categories.filter(category=>category.id!==removeEventCategory.dataset.eventRemoveCategory);renderEventPlannerEditor(draft);return;}
       if(event.target.closest('#bill-split-download')){await downloadBillSplitFromForm();return;}
-      if(event.target.closest('#event-plan-download')){downloadEventPlanFromForm();return;}
+      if(event.target.closest('#event-plan-download')){await downloadEventPlanFromForm();return;}
       const addType=event.target.closest('[data-add-type]');if(addType){transactionForm(null,addType.dataset.addType);return;}
       const action=event.target.closest('[data-action]')?.dataset.action;if(action){if(action==='budget')budgetForm();else if(action==='debts')showDebts();else if(action==='new-debt')debtForm();else if(action==='accounts')accountsManager();return;}
       if(event.target.closest('#theme-toggle')){const snapshot=JSON.stringify(state);state.settings.theme=state.settings.theme==='dark'?'light':'dark';if(!(await persistMutation(snapshot,'Could not change the theme. Your previous settings were restored.'))){applyTheme();return;}applyTheme();scheduleCharts();return;}
