@@ -1780,6 +1780,28 @@
     const ua=navigator.userAgent||'';
     return /iPad|iPhone|iPod/i.test(ua)||(navigator.platform==='MacIntel'&&Number(navigator.maxTouchPoints)>1);
   }
+  function getPDFRenderScale(root,ios=isIOSShareContext()){
+    if(!ios)return 2;
+    // html2pdf.js renders the complete report into one canvas before splitting it
+    // into A4 pages. iOS WebKit has lower, device-dependent canvas limits, so keep
+    // the backing canvas below a conservative pixel and dimension budget.
+    const rect=root?.getBoundingClientRect?.();
+    const width=Math.max(320,Math.ceil(root?.scrollWidth||rect?.width||794));
+    const height=Math.max(900,Math.ceil(root?.scrollHeight||rect?.height||1123));
+    const maxPixels=2_800_000,maxDimension=3900;
+    const areaScale=Math.sqrt(maxPixels/(width*height));
+    return Math.max(0.25,Math.min(1.15,areaScale,maxDimension/width,maxDimension/height));
+  }
+  async function assertValidPDFBlob(blob){
+    if(!blob||typeof blob.size!=='number'||blob.size<500)throw new Error('The PDF renderer returned an empty document.');
+    let signature='';
+    try{signature=await blob.slice(0,5).text();}catch(_){
+      const buffer=await blob.slice(0,5).arrayBuffer();
+      signature=String.fromCharCode(...new Uint8Array(buffer));
+    }
+    if(signature!=='%PDF-')throw new Error('The PDF renderer returned an invalid file. Please retry.');
+    return blob;
+  }
   async function renderPDFBlobFromHTML(html,filename){
     const frame=document.createElement('iframe');
     frame.setAttribute('title','PDF rendering surface');
@@ -1801,16 +1823,31 @@
       if(!win||!doc||typeof win.html2pdf!=='function')throw new Error('PDF renderer did not initialize.');
       try{await doc.fonts?.ready;}catch(_){}
       const root=doc.querySelector('.report-page,.report,.receipt-paper,main')||doc.body;
-      const result=await win.html2pdf().set({
-        margin:[10,10,12,10],
-        filename,
-        image:{type:'jpeg',quality:0.96},
-        html2canvas:{scale:2,useCORS:true,allowTaint:false,logging:false,backgroundColor:'#ffffff',windowWidth:794},
-        jsPDF:{unit:'mm',format:'a4',orientation:'portrait',compress:true},
-        pagebreak:{mode:['css','legacy'],avoid:['.brand','.report-brand-row','.summary','.report-note','.note','.report-footer','.receipt-brand','.receipt-fields']}
-      }).from(root).outputPdf('blob');
-      if(!result||typeof result.size!=='number'||result.size<500)throw new Error('The PDF renderer returned an empty document.');
-      return new Blob([result],{type:'application/pdf'});
+      const ios=isIOSShareContext(),baseScale=getPDFRenderScale(root,ios);
+      const scales=ios?[baseScale,Math.max(0.2,baseScale*0.72),Math.max(0.18,baseScale*0.52)].filter((value,index,list)=>list.indexOf(value)===index):[baseScale];
+      let lastError=null;
+      for(let attempt=0;attempt<scales.length;attempt++){
+        try{
+          const width=Math.max(794,Math.ceil(root.scrollWidth||root.getBoundingClientRect().width||794));
+          const height=Math.max(1123,Math.ceil(root.scrollHeight||root.getBoundingClientRect().height||1123));
+          const result=await win.html2pdf().set({
+            margin:[10,10,12,10],
+            filename,
+            image:{type:'jpeg',quality:ios?0.9:0.96},
+            html2canvas:{scale:scales[attempt],useCORS:true,allowTaint:false,logging:false,backgroundColor:'#ffffff',windowWidth:width,windowHeight:height,imageTimeout:15000},
+            jsPDF:{unit:'mm',format:'a4',orientation:'portrait',compress:true},
+            pagebreak:{mode:['css','legacy'],avoid:['.brand','.report-brand-row','.summary','.report-note','.note','.report-footer','.receipt-brand','.receipt-fields']}
+          }).from(root).outputPdf('blob');
+          const blob=await assertValidPDFBlob(new Blob([result],{type:'application/pdf'}));
+          return blob;
+        }catch(error){
+          lastError=error;
+          if(!ios||attempt===scales.length-1)throw error;
+          // Release the previous html2canvas allocation before retrying smaller.
+          await new Promise(resolve=>requestAnimationFrame(()=>setTimeout(resolve,80)));
+        }
+      }
+      throw lastError||new Error('Could not render the PDF on this device.');
     }finally{frame.remove();}
   }
   function canSharePDFFile(file){
@@ -1853,7 +1890,7 @@
     pendingGeneratedPDF={file,title,shareSupported};
     const message=shareSupported
       ?'The PDF is ready on this device. Tap Share PDF to open the iOS share sheet, or save a copy to Files.'
-      :'This iOS browser cannot share PDF files directly. Save a copy, then share it from Files.';
+      :'This iOS browser cannot share PDF files directly. Save PDF opens the PDF preview, where you can use Share to save it to Files.';
     openModal('Your PDF is ready',`<div class="modal-body generated-pdf-ready"><div class="shared-cost-intro"><strong>${escapeHTML(file.name)}</strong><p>${message}</p></div><div class="form-actions"><button type="button" class="secondary-button" data-cancel-modal>Close</button><button type="button" class="secondary-button" id="download-ready-pdf">Save PDF</button>${shareSupported?'<button type="button" class="primary-button" id="share-ready-pdf">Share PDF</button>':''}</div></div>`,'PDF EXPORT');
   }
   async function deliverGeneratedPDF(html,filename,title){
@@ -1873,23 +1910,59 @@
       return true;
     }catch(error){
       console.error('PocketWise PDF export failed.',error);
-      toast('Could not create the PDF. Check the connection and PDF renderer, then retry.','error');
+      toast('Could not create the PDF. Please retry, or choose a shorter report period.','error');
       return false;
     }
+  }
+  function openPDFInBrowser(file){
+    const url=URL.createObjectURL(file);
+    let opened=null;
+    try{opened=window.open(url,'_blank');}catch(_){}
+    if(!opened){
+      const link=document.createElement('a');
+      link.href=url;link.target='_blank';link.rel='noopener';link.setAttribute('aria-label','Open generated PDF');
+      document.body.appendChild(link);link.click();link.remove();
+    }
+    // iOS PDF preview may fetch the blob after the new browsing context starts.
+    window.setTimeout(()=>URL.revokeObjectURL(url),300000);
+    return true;
+  }
+  async function savePendingGeneratedPDF(){
+    const pending=pendingGeneratedPDF;
+    if(!pending)return;
+    if(isIOSShareContext()){
+      if(!pending.shareSupported||!canSharePDFFile(pending.file)){
+        openPDFInBrowser(pending.file);restorePDFReturnModal();toast('PDF opened. Use Share, then Save to Files.','amber');return;
+      }
+      try{
+        // iOS Web Share file payloads are more reliable when kept to files only.
+        // The user can choose “Save to Files” in the native share sheet.
+        await navigator.share({files:[pending.file]});
+        restorePDFReturnModal();toast('PDF shared. Choose Save to Files to keep a copy.');return;
+      }catch(error){
+        if(error?.name==='AbortError')return;
+        console.warn('iOS PDF save via Share Sheet failed; the browser preview fallback is available.',error);
+        pending.shareSupported=false;
+        toast('The share sheet could not open. Tap Save PDF again to open the PDF preview.','amber');return;
+      }
+    }
+    downloadBlob(pending.file.name,pending.file);restorePDFReturnModal();toast('PDF download started. Check Files or Downloads.');
   }
   async function sharePendingGeneratedPDF(){
     const pending=pendingGeneratedPDF;
     if(!pending)return;
     if(!pending.shareSupported||!canSharePDFFile(pending.file)){
-      downloadBlob(pending.file.name,pending.file);restorePDFReturnModal();toast('PDF download started. Check Files or Downloads.');return;
+      openPDFInBrowser(pending.file);restorePDFReturnModal();toast('PDF opened. Use Share, then Save to Files.','amber');return;
     }
     try{
-      await navigator.share({title:pending.title,files:[pending.file]});
+      // File-only payload avoids iOS Web Share failures seen with extra metadata.
+      await navigator.share({files:[pending.file]});
       restorePDFReturnModal();toast('PDF shared.');
     }catch(error){
       if(error?.name==='AbortError')return;
       console.warn('The iOS share sheet could not be opened from the follow-up action.',error);
-      toast('The share sheet could not be opened. Save PDF is available instead.','amber');
+      pending.shareSupported=false;
+      toast('The share sheet could not open. Tap Save PDF to open the PDF preview.','amber');
     }
   }
   async function exportBackup(){const snapshot=JSON.stringify(state);state.settings.lastBackup=new Date().toISOString();if(!(await persistMutation(snapshot,'Could not update backup metadata. Your previous records were restored.')))return;const pack={app:'Pocketwise',format:'pocketwise-backup',version:2,exportedAt:state.settings.lastBackup,description:'Complete local financial records. Keep this file private.',data:state};downloadBlob(`pocketwise-backup-${today()}.json`,new Blob([JSON.stringify(pack,null,2)],{type:'application/json'}));renderSettingsSummary();toast('Full backup exported. Keep it somewhere safe.');}
@@ -1969,7 +2042,7 @@
       if(event.target.closest('[data-close-notifications]')){$('#notifications-modal').close();return;}
       if(event.target.closest('#modal-close')){if(pendingGeneratedPDF)restorePDFReturnModal();else closeModal();return;}
       if(event.target.closest('#share-ready-pdf')){await sharePendingGeneratedPDF();return;}
-      if(event.target.closest('#download-ready-pdf')){if(pendingGeneratedPDF){downloadBlob(pendingGeneratedPDF.file.name,pendingGeneratedPDF.file);restorePDFReturnModal();}else closeModal();toast('PDF download started. Check Files or Downloads.');return;}
+      if(event.target.closest('#download-ready-pdf')){if(pendingGeneratedPDF)await savePendingGeneratedPDF();else closeModal();return;}
       if(event.target.closest('#mobile-add')){showAddEntryChoices();return;}
       if(event.target.closest('#start-simple-entry')){quickAddStart();return;}
       if(event.target.closest('#start-detailed-entry')){showDetailedEntryTools();return;}

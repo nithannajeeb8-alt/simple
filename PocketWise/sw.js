@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pocketwise-shell-v2.4.10-offline-export-receipts-icons';
+const CACHE_NAME = 'pocketwise-shell-v2.4.11-ios-pdf-render-fallback';
 const PADDLE_RUNTIME_CACHE = 'pocketwise-paddle-runtime-v243';
 const PDF_RENDERER_URL = 'https://cdn.jsdelivr.net/npm/html2pdf.js@0.14.0/dist/html2pdf.bundle.min.js';
 const BOOTSTRAP_ICONS_CSS_URL = 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.2/font/bootstrap-icons.min.css';
