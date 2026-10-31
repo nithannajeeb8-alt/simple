@@ -923,7 +923,7 @@
     if(!(await persistMutation(snapshot,'Could not save the salary plan. Your previous settings were restored.')))return;
     closeModal();renderAll();const summary=finance.salaryAllocationSummary(state,today());toast(summary.overAllocated?'Salary plan saved, but enabled allocations exceed available pay.':'Salary allocation plan saved.',summary.overAllocated?'amber':'success');
   }
-  function openFinancialReport(kind){
+  async function openFinancialReport(kind){
     if(!finance)return;
     const range=financeSelectedRange();if(!range){toast('Choose valid report dates first.','error');return;}
     const effectiveRange={start:range.start,end:range.effectiveEnd,type:range.type};
@@ -1029,8 +1029,8 @@
     `;
     const html=`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>PocketWise · ${escapeHTML(title)}</title><style>${reportStyles}</style></head><body><div class="report-actions"><button type="button" onclick="window.print()">Print / Save as PDF</button></div><main class="report-page"><header class="report-brand-row"><div class="report-brand"><span class="report-mark">₹</span><span>PocketWise</span></div><span class="report-private">Private · Stored on this device</span></header><div class="report-eyebrow">Personal finance report</div><h1>${escapeHTML(title)}</h1><div class="report-meta"><span class="report-period-chip">${escapeHTML(periodLabel)}</span><span>Generated ${escapeHTML(generated)}</span><span>Currency: INR (₹)</span></div>${sections}<footer class="report-footer"><span>PocketWise · Private local report</span><span>Generated ${escapeHTML(reportDate)}</span></footer></main></body></html>`;
     const reportSlug={cashflow:'cash-flow-statement',balance:'personal-balance-sheet',category:'category-comparison'}[kind]||'financial-report';
-    const fileName=`pocketwise-${reportSlug}-${range.effectiveEnd}.html`;
-    downloadBlob(fileName,new Blob([html],{type:'text/html;charset=utf-8'}));toast('Print-ready report downloaded. Open it and choose Print / Save as PDF.');
+    const fileName=`pocketwise-${reportSlug}-${range.effectiveEnd}.pdf`;
+    await deliverGeneratedPDF(html,fileName,`PocketWise ${title}`);
   }
   function renderInsights(){const period=$('#insights-period')?.value||'month';const txs=periodTransactions(period);let filtered=txs;if(period==='last-month')filtered=periodTransactions('last-month');const t=totalsFor(filtered);$$('[data-money="insight-income"]').forEach(e=>e.textContent=fmtHidden(t.income));$$('[data-money="insight-expense"]').forEach(e=>e.textContent=fmtHidden(t.expenses));$$('[data-money="insight-net"]').forEach(e=>{e.textContent=fmtHidden(t.net);e.style.color=t.net<0?'var(--red)':'var(--green)'});let [start,end]=getPeriodRange(period);if(period==='all'){start=state.transactions.length?state.transactions.reduce((min,t)=>t.date<min? t.date:min,today()):today();end=today();}const span=Math.max(1,Math.ceil((dateFrom(end)-dateFrom(start))/86400000)+1);$$('[data-money="daily-average"]').forEach(e=>e.textContent=fmtHidden(t.expenses/Math.max(1,Math.min(span,Math.ceil((dateFrom(today())-dateFrom(start))/86400000)||span))));renderCategoryLegend(period);renderHeatmap(period);renderRankings(period);renderGoals();renderInsightDebts();renderYearArchive();renderPlanningTools();renderFinanceAnalytics();scheduleCharts();}
   const chartColors=['#22C55E','#EF4444','#60A5FA','#FBBF24','#A78BFA','#2DD4BF','#FB923C','#9CA3AF','#F472B6'];
@@ -1131,14 +1131,14 @@
   let quickAddSaving = false;
   function showAddEntryChoices(){
     openModal('Add an entry',`<div class="modal-body add-entry-choices">
-      <p class="muted">Choose the fastest way to record or organize a cost.</p>
+      <p class="muted">Choose how much detail you need.</p>
       <section class="entry-choice-primary"><span class="entry-choice-label">FASTEST WAY TO RECORD</span>
-        <button type="button" class="quick-choice quick-choice-primary" id="start-simple-entry"><span class="quick-choice-icon">✎</span><span><strong>Quick entry</strong><small>Enter an amount, choose the type and category, then save. Your familiar four-step flow stays the same.</small></span><span class="entry-choice-badge">QUICK</span></button>
+        <button type="button" class="quick-choice quick-choice-primary" id="start-simple-entry" aria-label="Quick entry. Add an amount in a few taps."><span class="quick-choice-icon" aria-hidden="true">✎</span><span class="quick-choice-copy"><strong>Quick entry</strong><small>Add an amount in a few taps.</small></span><span class="quick-choice-arrow" aria-hidden="true">›</span></button>
       </section>
       <div class="entry-choice-secondary" aria-label="Other entry methods">
-        <button type="button" class="quick-choice" id="start-detailed-entry"><span class="quick-choice-icon">☷</span><span><strong>Detailed entry</strong><small>Split bills or plan an event.</small></span><span>›</span></button>
-        <button type="button" class="quick-choice" id="start-payment-import"><span class="quick-choice-icon">▧</span><span><strong>Import entry</strong><small>Paste a payment or import a statement.</small></span><span>›</span></button>
-        <button type="button" class="quick-choice" id="start-advanced-entry"><span class="quick-choice-icon">⌘</span><span><strong>Advanced entry</strong><small>Full transaction, transfers and debts.</small></span><span>›</span></button>
+        <button type="button" class="quick-choice" id="start-advanced-entry"><span class="quick-choice-icon" aria-hidden="true">⌘</span><span><strong>Advanced entry</strong><small>Transactions, transfers and debts.</small></span><span aria-hidden="true">›</span></button>
+        <button type="button" class="quick-choice" id="start-payment-import"><span class="quick-choice-icon" aria-hidden="true">▧</span><span><strong>Import entry</strong><small>Paste a payment or import a statement.</small></span><span aria-hidden="true">›</span></button>
+        <button type="button" class="quick-choice" id="start-detailed-entry"><span class="quick-choice-icon" aria-hidden="true">☷</span><span><strong>Detailed entry</strong><small>Split bills and plan an event.</small></span><span aria-hidden="true">›</span></button>
       </div>
       <div class="form-actions"><button class="secondary-button" type="button" data-cancel-modal>Cancel</button></div>
     </div>`,'ADD TRANSACTION');
@@ -1249,18 +1249,9 @@
       :root{color-scheme:light}*{box-sizing:border-box}body{margin:0;background:#f2f4f3;color:#17211c;font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}.report{max-width:820px;margin:28px auto;padding:42px 48px;background:#fff;box-shadow:0 8px 35px #10241912}.brand{display:flex;justify-content:space-between;gap:24px;align-items:center;padding-bottom:18px;border-bottom:2px solid #1fbd65}.brand-mark{font-size:12px;font-weight:850;letter-spacing:.16em;color:#159653}.meta{font-size:10px;color:#66736b;text-align:right}.eyebrow{margin:28px 0 5px;color:#168b4c;font-size:10px;font-weight:850;letter-spacing:.15em;text-transform:uppercase}h1{margin:0;font-size:29px;line-height:1.15;letter-spacing:-.04em} .subtitle{margin:9px 0 25px;color:#68746c;font-size:12px}.summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0 0 25px}.summary>div{padding:13px;border:1px solid #e2e8e3;border-radius:10px;background:#f8faf8}.summary small{display:block;color:#66736b;font-size:10px}.summary strong{display:block;margin-top:5px;font-size:17px;font-variant-numeric:tabular-nums}.report h2{margin:24px 0 10px;font-size:14px}.report-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:11px}.report-table th{padding:9px 8px;background:#eff5f0;color:#526258;font-size:9px;text-align:left;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #cfd9d1}.report-table td{padding:10px 8px;border-bottom:1px solid #e6ebe7;vertical-align:top;overflow-wrap:anywhere}.report-table tr{break-inside:avoid}.report-table .numeric{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}.report-table tfoot td{font-weight:800;border-top:2px solid #aebdb2;background:#f8faf8}.report-note{margin-top:18px;padding:12px 14px;border-left:3px solid #1fbd65;background:#f3f8f4;color:#536159;font-size:10px}.report-footer{display:flex;justify-content:space-between;gap:16px;margin-top:30px;padding-top:12px;border-top:1px solid #dce4dd;color:#748077;font-size:9px}.report-actions{display:flex;justify-content:flex-end;gap:10px;margin:0 auto 28px;max-width:820px;padding:0 48px}.report-actions button{padding:10px 18px;border:0;border-radius:9px;background:#159653;color:#fff;font-weight:750}.report-actions button.secondary{background:#e3eae4;color:#203128}@page{size:A4 portrait;margin:14mm}@media print{body{background:#fff}.report{max-width:none;margin:0;padding:0;box-shadow:none}.report-actions{display:none!important}.brand,.report-table tr,.summary,.report-note{break-inside:avoid}.report-table{font-size:10px}.report-table th{padding:7px 7px}.report-table td{padding:6px 7px}.report h2{margin:17px 0 8px}.summary{margin-bottom:18px}.report-table thead{display:table-header-group}.report-table tfoot{display:table-row-group}h1,h2{break-after:avoid}.report-note{margin-top:10px;padding:8px 10px}.report-footer{break-inside:avoid;page-break-inside:avoid;margin-top:8px;padding-top:6px;font-size:8px}a{color:inherit;text-decoration:none}}@media(max-width:600px){.report{margin:0;padding:24px 18px}.report-actions{padding:0 18px}.summary{grid-template-columns:1fr 1fr}}
     </style></head><body><main class="report"><header class="brand"><div class="brand-mark">POCKETWISE · PERSONAL FINANCE</div><div class="meta">PRIVATE DOCUMENT<br>Generated ${escapeHTML(generated)}</div></header><p class="eyebrow">Shared cost record</p><h1>${escapeHTML(title)}</h1><p class="subtitle">${escapeHTML(subtitle)}</p>${content}${notes ? `<aside class="report-note">${notes}</aside>` : ''}<footer class="report-footer"><span>PocketWise · Prepared locally on this device</span><span>Amounts shown in Indian rupees (INR)</span></footer></main><div class="report-actions"><button class="secondary" onclick="window.close()">Close</button><button onclick="window.print()">Print / Save as PDF</button></div></body></html>`;
   }
-  function openSharedCostReport(title, subtitle, content, filename, notes = '', openedWindow = null) {
+  async function openSharedCostReport(title, subtitle, content, filename, notes = '') {
     const html = sharedCostReportDocument(title, subtitle, content, notes);
-    let reportWindow = openedWindow;
-    if (!reportWindow) { try { reportWindow = window.open('about:blank', '_blank'); } catch (_) { reportWindow = null; } }
-    if (reportWindow && !reportWindow.closed) {
-      reportWindow.document.open(); reportWindow.document.write(html); reportWindow.document.close();
-      try { reportWindow.document.title = title; reportWindow.focus(); } catch (_) {}
-      return true;
-    }
-    downloadBlob(filename.replace(/\.pdf$/i, '.html'), new Blob([html], { type: 'text/html;charset=utf-8' }));
-    toast('Your report was downloaded as HTML. Open it and choose Print / Save as PDF.', 'amber');
-    return false;
+    return deliverGeneratedPDF(html, filename, `PocketWise · ${title}`);
   }
   async function saveBillSplitRecord(draft, showToast = true) {
     const snapshot = JSON.stringify(state);
@@ -1280,15 +1271,14 @@
     if (saved) renderBillSplitEditor(saved);
   }
   async function downloadBillSplitFromForm() {
-    const opened = (() => { try { return window.open('about:blank', '_blank'); } catch (_) { return null; } })();
     const check = validateBillSplitForm();
-    if (!check.valid) { opened?.close(); toast('Fix the bill split amounts before downloading.', 'error'); return; }
+    if (!check.valid) { toast('Fix the bill split amounts before downloading.', 'error'); return; }
     const draft = check.draft;
     const saved = await saveBillSplitRecord({ ...draft, date: draft.date || today() }, false);
-    if (!saved) { opened?.close(); return; }
+    if (!saved) return;
     const rows = saved.people.map(person => `<tr><td>${escapeHTML(person.name)}</td><td class="numeric">${escapeHTML(money(fromMinorUnits(person.amountMinor)))}</td><td class="numeric">${(person.amountMinor / Math.max(1, saved.totalMinor) * 100).toFixed(2)}%</td></tr>`).join('');
     const content = `<section class="summary"><div><small>Total bill</small><strong>${escapeHTML(money(fromMinorUnits(saved.totalMinor)))}</strong></div><div><small>People</small><strong>${saved.people.length}</strong></div><div><small>Total allocated</small><strong>${escapeHTML(money(fromMinorUnits(saved.totalMinor)))}</strong></div></section><h2>Individual shares</h2><table class="report-table"><thead><tr><th style="width:48%">Person</th><th class="numeric" style="width:30%">Share</th><th class="numeric" style="width:22%">Share of bill</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><td>Total allocated</td><td class="numeric">${escapeHTML(money(fromMinorUnits(saved.people.reduce((sum, person) => sum + person.amountMinor, 0))))}</td><td class="numeric">100.00%</td></tr></tfoot></table>`;
-    openSharedCostReport(saved.name || 'Bill split', `Split date: ${saved.date || today()} · ${saved.people.length} participants`, content, `pocketwise-bill-split-${today()}.pdf`, "This is a shared-cost calculation, not a bank transaction or proof of payment. Each person’s share is entered or agreed by the participants.", opened);
+    await openSharedCostReport(saved.name || 'Bill split', `Split date: ${saved.date || today()} · ${saved.people.length} participants`, content, `pocketwise-bill-split-${today()}.pdf`, "This is a shared-cost calculation, not a bank transaction or proof of payment. Each person’s share is entered or agreed by the participants.");
   }
   function showEventPlannerHub() {
     const plans = Array.isArray(state.eventPlans) ? state.eventPlans : [];
@@ -1413,17 +1403,16 @@
     showEventPlannerHub();
     toast('Event plan saved. Transaction history and account balances are unchanged.');
   }
-  function downloadEventPlanFromForm() {
-    const opened = (() => { try { return window.open('about:blank', '_blank'); } catch (_) { return null; } })();
+  async function downloadEventPlanFromForm() {
     const check = validateEventPlannerForm();
-    if (!check.valid) { opened?.close(); toast(check.error || 'Fix the event allocation before downloading.', 'error'); return; }
+    if (!check.valid) { toast(check.error || 'Fix the event allocation before downloading.', 'error'); return; }
     const { draft, result } = check;
     const categoryRows = result.categories.map(category => `<tr><td>${escapeHTML(category.name)}</td><td class="numeric">${escapeHTML(money(fromMinorUnits(category.amountMinor)))}</td><td>${escapeHTML(category.mode === 'equal' ? 'Equal' : category.mode === 'percent' ? 'Percentage' : 'Exact amounts')}</td></tr>`).join('');
     const groupRows = result.groups.map(group => `<tr><td>${escapeHTML(group.name)}</td><td>${escapeHTML(group.members.map(person => person.name).join(', '))}</td><td class="numeric">${escapeHTML(money(fromMinorUnits(group.amountMinor)))}</td></tr>`).join('');
     const peopleRows = result.people.map(person => `<tr><td>${escapeHTML(person.name)}</td><td class="numeric">${escapeHTML(money(fromMinorUnits(person.amountMinor)))}</td><td class="numeric">${(person.amountMinor / result.totalMinor * 100).toFixed(2)}%</td></tr>`).join('');
     const categoryDetails = result.categories.map(category => `<h2>${escapeHTML(category.name)} · ${escapeHTML(money(fromMinorUnits(category.amountMinor)))}</h2><table class="report-table"><thead><tr><th style="width:45%">${draft.splitMode === 'groups' ? 'Group / people' : 'Person'}</th><th class="numeric" style="width:30%">Share</th><th class="numeric" style="width:25%">Split mode</th></tr></thead><tbody>${category.allocations.map(unit => `<tr><td>${escapeHTML(unit.unitName)}${unit.members.length > 1 ? `<br><small>${escapeHTML(unit.members.map(person => person.name).join(', '))}</small>` : ''}</td><td class="numeric">${escapeHTML(money(fromMinorUnits(unit.amountMinor)))}</td><td class="numeric">${escapeHTML(category.mode === 'equal' ? 'Equal' : category.mode === 'percent' ? 'Percent' : 'Amount')}</td></tr>`).join('')}</tbody></table>`).join('');
     const content = `<section class="summary"><div><small>Total event cost</small><strong>${escapeHTML(money(fromMinorUnits(result.totalMinor)))}</strong></div><div><small>Participants</small><strong>${result.people.length}</strong></div><div><small>Categories</small><strong>${result.categories.length}</strong></div></section><h2>Category budget</h2><table class="report-table"><thead><tr><th style="width:48%">Category</th><th class="numeric" style="width:30%">Cost</th><th style="width:22%">Allocation</th></tr></thead><tbody>${categoryRows}</tbody><tfoot><tr><td>Total categories</td><td class="numeric">${escapeHTML(money(fromMinorUnits(result.categoryTotalMinor)))}</td><td>100%</td></tr></tfoot></table>${draft.splitMode === 'groups' ? `<h2>Group allocation</h2><table class="report-table"><thead><tr><th style="width:28%">Group</th><th style="width:47%">Members</th><th class="numeric" style="width:25%">Total share</th></tr></thead><tbody>${groupRows}</tbody></table>` : ''}<h2>Final contribution per person</h2><table class="report-table"><thead><tr><th style="width:50%">Person</th><th class="numeric" style="width:28%">Contribution</th><th class="numeric" style="width:22%">Share</th></tr></thead><tbody>${peopleRows}</tbody><tfoot><tr><td>Total contributions</td><td class="numeric">${escapeHTML(money(fromMinorUnits(result.allocatedMinor)))}</td><td>100%</td></tr></tfoot></table>${categoryDetails}`;
-    openSharedCostReport(draft.name, `Event date: ${draft.date} · ${draft.splitMode === 'groups' ? 'Group allocation' : 'Individual allocation'}`, content, `pocketwise-event-plan-${today()}.pdf`, 'This is a planning and cost-allocation document. It does not represent payment, create transactions or change bank/account balances. Group allocations are divided equally among members of each group unless the event plan is edited.', opened);
+    await openSharedCostReport(draft.name, `Event date: ${draft.date} · ${draft.splitMode === 'groups' ? 'Group allocation' : 'Individual allocation'}`, content, `pocketwise-event-plan-${today()}.pdf`, 'This is a planning and cost-allocation document. It does not represent payment, create transactions or change bank/account balances. Group allocations are divided equally among members of each group unless the event plan is edited.');
   }
   function addEventParticipant() {
     const draft = captureEventPlannerForm(); if (!draft) return;
@@ -1655,17 +1644,8 @@
   }
   async function shareTransactionReceipt(id){
     const tx=state.transactions.find(item=>item.id===id);if(!tx){toast('This transaction could not be found.','error');return;}
-    const title='PocketWise transaction receipt',text=receiptShareText(tx),filename=receiptFilename(tx),html=standaloneReceiptHTML(tx);
-    try{
-      if(typeof File==='function'&&navigator.share&&typeof navigator.canShare==='function'){
-        const file=new File([html],filename,{type:'text/html'});
-        if(navigator.canShare({files:[file]})){await navigator.share({title,files:[file]});return;}
-      }
-    }catch(error){if(error?.name==='AbortError')return;console.warn('PocketWise receipt file sharing unavailable; trying a supported fallback.',error);}
-    try{
-      if(navigator.share){await navigator.share({title,text});return;}
-    }catch(error){if(error?.name==='AbortError')return;console.warn('PocketWise receipt share failed; offering a download instead.',error);}
-    downloadTransactionReceipt(id);
+    const title='PocketWise transaction receipt',filename=receiptFilename(tx).replace(/\.html$/i,'.pdf');
+    await deliverGeneratedPDF(standaloneReceiptHTML(tx),filename,title);
   }
   function downloadTransactionReceipt(id){
     const tx=state.transactions.find(item=>item.id===id);if(!tx){toast('This transaction could not be found.','error');return;}
@@ -1677,13 +1657,10 @@
       toast('Receipt download started. Check Downloads or Files.');
     }catch(error){console.error('Receipt download failed.',error);toast('Could not download this receipt. Use Share receipt or Print / Save PDF instead.','error');}
   }
-  function printTransactionReceipt(id){
+  async function printTransactionReceipt(id){
     const tx=state.transactions.find(item=>item.id===id);if(!tx){toast('This transaction could not be found.','error');return;}
-    // Use the browser's print dialog in the PWA.
-    try{
-      if(typeof window.print==='function'){window.print();return;}
-      toast('Printing is unavailable here. Use Share receipt or Download copy instead.','amber');
-    }catch(error){console.error('PocketWise receipt print failed.',error);toast('Could not open printing. Use Share receipt or Download copy instead.','error');}
+    const filename=receiptFilename(tx).replace(/\.html$/i,'.pdf');
+    await deliverGeneratedPDF(standaloneReceiptHTML(tx),filename,'PocketWise transaction receipt');
   }
   const deletingTransactionIds = new Set();
   async function confirmDeleteTransaction(id){
@@ -1747,6 +1724,93 @@
   async function evaluateBudgetAlerts(allowSystem=true){const alerts=makeAlerts().filter(a=>a.id!=='all-clear'),snapshot=JSON.stringify(state);state.settings.sentAlerts=state.settings.sentAlerts||[];state.settings.notifications=state.settings.notifications||[];let added=false;for(const a of alerts){if(state.settings.sentAlerts.includes(a.id))continue;state.settings.sentAlerts.push(a.id);state.settings.notifications.unshift({...a,createdAt:new Date().toISOString()});added=true;if(allowSystem&&'Notification'in window&&Notification.permission==='granted'&&!isQuietNow()){try{await showSystemNotification(a.title,{body:a.body,tag:a.id});}catch(error){console.warn('System notification could not be shown.',error);}}}if(state.settings.notifications.length>100)state.settings.notifications.length=100;if(added&&await persistMutation(snapshot,'Could not save alert history. Your previous records were restored.'))renderAlerts();}
   function openNotifications(){const active=makeAlerts().filter(a=>a.id!=='all-clear'),history=state.settings.notifications||[],previousSeen=[...(state.settings.seenAlerts||[])];active.forEach(a=>{if(!state.settings.seenAlerts.includes(a.id))state.settings.seenAlerts.push(a.id)});$('#notifications-content').innerHTML=(history.length?[...history.slice(0,20)]:active).map(a=>`<div class="notification-record"><span class="alert-symbol ${a.type||'blue'}">${icon(a.icon||'bell')}</span><div><strong>${escapeHTML(a.title||'Financial reminder')}</strong><p>${escapeHTML(a.body||'')}</p><small>${escapeHTML(a.createdAt?new Date(a.createdAt).toLocaleString():a.time||'Current')}</small></div></div>`).join('')||'<div class="empty-state"><span class="empty-icon">'+icon('bell')+'</span><h3>All caught up</h3><p>Important reminders will show up here.</p></div>';$('#notifications-modal').showModal();persist().then(()=>renderAlerts()).catch(error=>{state.settings.seenAlerts=previousSeen;console.error('Could not persist notification read state.',error);toast('Could not save notification read status. Your other records are unchanged.','error');renderAlerts();});}
   function downloadBlob(filename,blob){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=filename;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1800);}
+
+  const PDF_RENDERER_URL='https://cdn.jsdelivr.net/npm/html2pdf.js@0.14.0/dist/html2pdf.bundle.min.js';
+  let pendingGeneratedPDF=null;
+  function isIOSShareContext(){
+    const ua=navigator.userAgent||'';
+    return /iPad|iPhone|iPod/i.test(ua)||(navigator.platform==='MacIntel'&&Number(navigator.maxTouchPoints)>1);
+  }
+  async function renderPDFBlobFromHTML(html,filename){
+    const frame=document.createElement('iframe');
+    frame.setAttribute('title','PDF rendering surface');
+    frame.setAttribute('aria-hidden','true');
+    frame.tabIndex=-1;
+    frame.style.cssText='position:fixed;left:-12000px;top:0;width:794px;height:1123px;border:0;pointer-events:none;z-index:-1';
+    document.body.appendChild(frame);
+    try{
+      const rendererTag=`<script src="${PDF_RENDERER_URL}"><\/script>`;
+      const source=String(html||'').replace(/<\/head>/i,`${rendererTag}</head>`);
+      if(source===String(html||''))throw new Error('The report document is missing its head section.');
+      await new Promise((resolve,reject)=>{
+        const timeout=window.setTimeout(()=>reject(new Error('PDF renderer loading timed out. Check the connection and retry.')),20000);
+        frame.onload=()=>{window.clearTimeout(timeout);resolve();};
+        frame.onerror=()=>{window.clearTimeout(timeout);reject(new Error('Could not load the PDF renderer.'));};
+        frame.srcdoc=source;
+      });
+      const win=frame.contentWindow,doc=frame.contentDocument;
+      if(!win||!doc||typeof win.html2pdf!=='function')throw new Error('PDF renderer did not initialize.');
+      try{await doc.fonts?.ready;}catch(_){}
+      const root=doc.querySelector('.report-page,.report,.receipt-paper,main')||doc.body;
+      const result=await win.html2pdf().set({
+        margin:[10,10,12,10],
+        filename,
+        image:{type:'jpeg',quality:0.96},
+        html2canvas:{scale:2,useCORS:true,allowTaint:false,logging:false,backgroundColor:'#ffffff',windowWidth:794},
+        jsPDF:{unit:'mm',format:'a4',orientation:'portrait',compress:true},
+        pagebreak:{mode:['css','legacy'],avoid:['.brand','.report-brand-row','.summary','.report-note','.note','.report-footer','.receipt-brand','.receipt-fields']}
+      }).from(root).outputPdf('blob');
+      if(!result||typeof result.size!=='number'||result.size<500)throw new Error('The PDF renderer returned an empty document.');
+      return new Blob([result],{type:'application/pdf'});
+    }finally{frame.remove();}
+  }
+  function canSharePDFFile(file){
+    try{return typeof File==='function'&&typeof navigator.share==='function'&&typeof navigator.canShare==='function'&&navigator.canShare({files:[file]});}
+    catch(_){return false;}
+  }
+  function showPDFReadyActions(file,title,shareSupported=true){
+    pendingGeneratedPDF={file,title,shareSupported};
+    const message=shareSupported
+      ?'The PDF is ready on this device. Tap Share PDF to open the iOS share sheet, or save a copy to Files.'
+      :'This iOS browser cannot share PDF files directly. Save a copy, then share it from Files.';
+    openModal('Your PDF is ready',`<div class="modal-body generated-pdf-ready"><div class="shared-cost-intro"><strong>${escapeHTML(file.name)}</strong><p>${message}</p></div><div class="form-actions"><button type="button" class="secondary-button" data-cancel-modal>Close</button><button type="button" class="secondary-button" id="download-ready-pdf">Save PDF</button>${shareSupported?'<button type="button" class="primary-button" id="share-ready-pdf">Share PDF</button>':''}</div></div>`,'PDF EXPORT');
+  }
+  async function deliverGeneratedPDF(html,filename,title){
+    try{
+      const safeName=String(filename||'PocketWise-report.pdf').replace(/[^a-zA-Z0-9._-]+/g,'-').replace(/\.html$/i,'.pdf');
+      const blob=await renderPDFBlobFromHTML(html,safeName);
+      if(typeof File!=='function'){downloadBlob(safeName,blob);toast('PDF download started. Check Files or Downloads.');return true;}
+      const file=new File([blob],safeName,{type:'application/pdf',lastModified:Date.now()});
+      if(isIOSShareContext()){
+        const shareSupported=canSharePDFFile(file);
+        showPDFReadyActions(file,title||'PocketWise PDF',shareSupported);
+        toast(shareSupported?'PDF ready. Tap Share PDF to open the iOS share sheet.':'PDF ready. Save it first, then share from Files.',shareSupported?'green':'amber');
+        return true;
+      }
+      downloadBlob(safeName,blob);
+      toast('PDF download started. Check Files or Downloads.');
+      return true;
+    }catch(error){
+      console.error('PocketWise PDF export failed.',error);
+      toast('Could not create the PDF. Connect to the internet once, then retry. The PDF renderer is cached for later offline exports.','error');
+      return false;
+    }
+  }
+  async function sharePendingGeneratedPDF(){
+    const pending=pendingGeneratedPDF;
+    if(!pending)return;
+    if(!pending.shareSupported||!canSharePDFFile(pending.file)){
+      downloadBlob(pending.file.name,pending.file);pendingGeneratedPDF=null;closeModal();toast('PDF download started. Check Files or Downloads.');return;
+    }
+    try{
+      await navigator.share({title:pending.title,files:[pending.file]});
+      pendingGeneratedPDF=null;closeModal();toast('PDF shared.');
+    }catch(error){
+      if(error?.name==='AbortError')return;
+      console.warn('The iOS share sheet could not be opened from the follow-up action.',error);
+      toast('The share sheet could not be opened. Save PDF is available instead.','amber');
+    }
+  }
   async function exportBackup(){const snapshot=JSON.stringify(state);state.settings.lastBackup=new Date().toISOString();if(!(await persistMutation(snapshot,'Could not update backup metadata. Your previous records were restored.')))return;const pack={app:'Pocketwise',format:'pocketwise-backup',version:2,exportedAt:state.settings.lastBackup,description:'Complete local financial records. Keep this file private.',data:state};downloadBlob(`pocketwise-backup-${today()}.json`,new Blob([JSON.stringify(pack,null,2)],{type:'application/json'}));renderSettingsSummary();toast('Full backup exported. Keep it somewhere safe.');}
   function csvCell(v){let s=String(v??'');const formulaPrefix=/^[\u0000-\u0020]*[=+\-@]/.test(s);const plainNumber=/^-?\d+(?:\.\d+)?$/.test(s);if(formulaPrefix&&!plainNumber)s="'"+s;return `"${s.replace(/"/g,'""')}"`;}
   function exportCSV(){const headers=['id','date','type','amount_inr','activity','account','to_account','debt_person','note'];const rows=state.transactions.slice().sort((a,b)=>a.date.localeCompare(b.date)).map(t=>[t.id,t.date,typeLabel(t.type),t.amount,txActivity(t).name,accountById(t.accountId).name,t.toAccountId?accountById(t.toAccountId).name:'',t.debtId?debtById(t.debtId)?.person||'':'',t.note]);const csv=[headers,...rows].map(r=>r.map(csvCell).join(',')).join('\r\n');downloadBlob(`pocketwise-transactions-${today()}.csv`,new Blob(['\ufeff',csv],{type:'text/csv;charset=utf-8'}));toast('CSV ready for your spreadsheet.');}
@@ -1818,6 +1882,8 @@
       const closeBtn=event.target.closest('[data-cancel-modal]');if(closeBtn){closeModal();return;}
       if(event.target.closest('[data-close-notifications]')){$('#notifications-modal').close();return;}
       if(event.target.closest('#modal-close')){closeModal();return;}
+      if(event.target.closest('#share-ready-pdf')){await sharePendingGeneratedPDF();return;}
+      if(event.target.closest('#download-ready-pdf')){if(pendingGeneratedPDF){downloadBlob(pendingGeneratedPDF.file.name,pendingGeneratedPDF.file);pendingGeneratedPDF=null;}closeModal();toast('PDF download started. Check Files or Downloads.');return;}
       if(event.target.closest('#mobile-add')){showAddEntryChoices();return;}
       if(event.target.closest('#start-simple-entry')){quickAddStart();return;}
       if(event.target.closest('#start-detailed-entry')){showDetailedEntryTools();return;}

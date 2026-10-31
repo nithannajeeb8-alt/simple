@@ -2876,3 +2876,201 @@ textarea,
 .event-participant-row.is-group-member select { box-sizing:border-box; width:100%; min-width:0; min-height:38px; padding:8px 6px; border:1px solid var(--line); border-radius:9px; background:var(--surface-2); color:var(--ink); font-size:14px!important; }
 .event-participant-row .event-remove-button { align-self:center; }
 .event-group-card-head { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+
+/* PocketWise 2.4.9 · lock the app canvas horizontally while preserving deliberate scrollers. */
+html,body{
+  overflow-x:clip;
+  overscroll-behavior-x:none;
+}
+html,body,body *{
+  touch-action:pan-y;
+}
+.filter-row#activity-filters,
+.daily-story-scroller,
+.yearly-table-wrap,
+.pw-statement-table-wrap,
+.finance-category-summary,
+.finance-budget-table-wrap{
+  touch-action:pan-x pan-y;
+  overscroll-behavior-x:contain;
+  -webkit-overflow-scrolling:touch;
+}
+input[type="range"]{touch-action:pan-x pan-y;}
+
+/* Modal flex children must be allowed to shrink to the phone width. */
+.app-modal{
+  box-sizing:border-box;
+  max-width:calc(100vw - 24px);
+  overflow:hidden;
+}
+.app-modal>.modal-head{
+  box-sizing:border-box;
+  width:100%;
+  min-width:0;
+}
+#modal-content{
+  box-sizing:border-box;
+  flex:1 1 auto;
+  width:100%;
+  min-width:0;
+  max-width:100%;
+  overflow-x:hidden;
+  overflow-y:auto;
+  touch-action:pan-y;
+}
+#modal-content>.modal-body{
+  box-sizing:border-box;
+  width:100%;
+  min-width:0;
+  max-width:100%;
+}
+.event-planner-form,
+.event-planner-form>* ,
+.event-planner-section,
+.event-group-list,
+.event-category-list,
+.event-group-card,
+.event-category-card,
+.event-member-list,
+.event-share-list{
+  box-sizing:border-box;
+  min-width:0;
+  max-width:100%;
+}
+.event-planner-section-heading{
+  align-items:flex-start;
+  flex-wrap:wrap;
+}
+.event-planner-section-heading>div{
+  flex:1 1 150px;
+  min-width:0;
+}
+.event-planner-section-heading .event-add-inline{
+  flex:0 0 auto;
+  max-width:100%;
+  white-space:nowrap;
+}
+.event-category-top,.event-category-controls,.event-share-row{
+  min-width:0;
+  max-width:100%;
+}
+.event-category-card input,.event-category-card select,.event-group-card input,
+.event-member-item input,.event-member-item select,.event-share-row input{
+  box-sizing:border-box;
+  min-width:0;
+  max-width:100%;
+  width:100%;
+}
+.event-planner-form .form-actions{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:9px;
+  min-width:0;
+}
+.event-planner-form .form-actions>*{
+  box-sizing:border-box;
+  min-width:0;
+  max-width:100%;
+  white-space:normal;
+}
+.event-planner-form .form-actions .primary-button{
+  grid-column:1/-1;
+}
+
+/* The primary quick action is intentionally one clean, uncluttered row. */
+.add-entry-choices .entry-choice-primary{
+  display:grid;
+  gap:10px;
+  padding:4px 0 14px;
+  border-bottom:1px solid var(--line);
+}
+.add-entry-choices .entry-choice-primary .entry-choice-label{
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.12em;
+  color:var(--muted);
+}
+.add-entry-choices .quick-choice-primary{
+  display:grid;
+  grid-template-columns:48px minmax(0,1fr) 22px;
+  align-items:center;
+  gap:14px;
+  min-height:94px;
+  padding:17px 18px;
+  border:1px solid color-mix(in srgb,var(--green) 38%,var(--line));
+  border-radius:19px;
+  background:linear-gradient(135deg,color-mix(in srgb,var(--green-soft) 82%,var(--surface)),var(--surface));
+  box-shadow:0 8px 22px color-mix(in srgb,var(--green) 9%,transparent);
+}
+.add-entry-choices .quick-choice-primary .quick-choice-icon{
+  display:grid;
+  place-items:center;
+  width:46px;
+  height:46px;
+  border-radius:15px;
+  background:var(--green);
+  color:#fff;
+  font-size:22px;
+  line-height:1;
+}
+.add-entry-choices .quick-choice-primary .quick-choice-copy{
+  display:grid;
+  gap:5px;
+  min-width:0;
+}
+.add-entry-choices .quick-choice-primary strong{
+  font-size:17px;
+  line-height:1.2;
+}
+.add-entry-choices .quick-choice-primary small{
+  max-width:none;
+  font-size:11px;
+  line-height:1.4;
+  color:var(--muted);
+}
+.add-entry-choices .quick-choice-primary .quick-choice-arrow{
+  justify-self:end;
+  color:var(--green-deep);
+  font-size:27px;
+  line-height:1;
+}
+.add-entry-choices .entry-choice-secondary{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:9px;
+}
+.add-entry-choices .entry-choice-secondary .quick-choice{
+  box-sizing:border-box;
+  min-width:0;
+  min-height:76px;
+}
+.add-entry-choices .entry-choice-secondary .quick-choice:last-child{
+  grid-column:1/-1;
+}
+@media(max-width:520px){
+  #modal-content>.event-planner-form{
+    padding-left:14px;
+    padding-right:14px;
+  }
+  .event-planner-form .form-grid,
+  .event-category-top,
+  .event-category-controls,
+  .event-share-row{
+    grid-template-columns:minmax(0,1fr);
+  }
+  .event-planner-form .form-field.full{grid-column:auto;}
+  .event-planner-form .form-actions{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .event-planner-form .form-actions .primary-button{grid-column:1/-1;}
+  .event-planner-section{padding:11px;}
+  .add-entry-choices .quick-choice-primary{
+    grid-template-columns:44px minmax(0,1fr) 18px;
+    min-height:88px;
+    gap:11px;
+    padding:15px 13px;
+  }
+  .add-entry-choices .quick-choice-primary .quick-choice-icon{
+    width:42px;height:42px;border-radius:14px;font-size:20px;
+  }
+  .add-entry-choices .entry-choice-secondary{grid-template-columns:minmax(0,1fr);}
+  .add-entry-choices .entry-choice-secondary .quick-choice:last-child{grid-column:auto;}
+}

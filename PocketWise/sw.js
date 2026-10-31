@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pocketwise-shell-v2.4.8-shared-cost-tools';
+const CACHE_NAME = 'pocketwise-shell-v2.4.9-ios-pdf-share-entry-layout';
 const PADDLE_RUNTIME_CACHE = 'pocketwise-paddle-runtime-v243';
 const BASE_URL = self.registration.scope;
 const asset = path => new URL(path, BASE_URL).href;
@@ -150,8 +150,8 @@ self.addEventListener('fetch', event => {
     return;
   }
   if (req.method !== 'GET') return;
-  // Cache the official PaddleOCR.js ESM runtime and its jsDelivr dependencies after
-  // first use. This lets the already-installed PWA load the runtime offline later.
+  // Cache approved jsDelivr runtime assets, including PaddleOCR.js and the pinned
+  // HTML-to-PDF renderer, after first use. They can then be reused offline later.
   // Receipt images are never sent to this cache or to a remote OCR endpoint.
   if (url.origin !== self.location.origin) {
     if (url.hostname === 'cdn.jsdelivr.net' && url.pathname.startsWith('/npm/')) {
