@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pocketwise-shell-v2.4.7-excel-statements-stories-default';
+const CACHE_NAME = 'pocketwise-shell-v2.4.8-shared-cost-tools';
 const PADDLE_RUNTIME_CACHE = 'pocketwise-paddle-runtime-v243';
 const BASE_URL = self.registration.scope;
 const asset = path => new URL(path, BASE_URL).href;
@@ -7,6 +7,7 @@ const APP_SHELL = [
   asset('index.html'),
   asset('styles.css'),
   asset('finance-analytics.js'),
+  asset('shared-costs.js'),
   asset('app.js'),
   asset('paddleocr-pwa.js'),
   asset('paddleocr-sandbox.html'),

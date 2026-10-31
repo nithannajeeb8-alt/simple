@@ -2389,7 +2389,7 @@ textarea,
 @media (hover: none) and (pointer: coarse) {
   /* Keep the original UI typography when idle. iOS Safari auto-zooms focused
      editable controls below 16px, so raise only the active control at focus. */
-  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="hidden"]):not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="image"]):not([type="color"]):not(.amount-input):focus,
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="hidden"]):not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="image"]):not([type="color"]):not(.amount-input):not(.quick-flow-value):focus,
   select:focus,
   textarea:focus,
   [contenteditable="true"]:focus,
@@ -2769,3 +2769,110 @@ textarea,
 .finance-overview-card .finance-metric em{max-width:100%;overflow-wrap:anywhere}
 @media(max-width:760px){.finance-overview-card #finance-overview-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:360px){.finance-overview-card #finance-overview-metrics{gap:7px}.finance-overview-card .finance-metric{padding:9px}.finance-overview-card .finance-metric strong{font-size:14px}}
+
+
+/* PocketWise 2.4.8 · entry hierarchy, shared-cost tools and Activity group rhythm. */
+@media (hover:none) and (pointer:coarse){
+  .quick-flow-value,.quick-flow-value:focus{font-size:clamp(40px,12vw,54px)!important;line-height:1.08!important;-webkit-text-size-adjust:100%;}
+}
+.quick-amount-wrap{min-width:0}
+.quick-amount-wrap .quick-flow-value{flex:1 1 0%;width:0;min-width:0;max-width:100%;font-size:clamp(42px,11vw,56px)!important;line-height:1.06!important;}
+.quick-amount-wrap .quick-flow-value:focus{font-size:clamp(42px,11vw,56px)!important;outline:none!important;}
+.add-entry-choices{gap:13px}
+.entry-choice-primary{display:grid;gap:8px;padding:4px 0 12px;border-bottom:1px solid var(--line)}
+.entry-choice-primary .entry-choice-label,.entry-tools-kicker{font-size:9px;font-weight:850;letter-spacing:.13em;color:var(--green-deep)}
+.add-entry-choices .quick-choice{min-height:68px}
+.add-entry-choices .quick-choice-primary{min-height:104px;grid-template-columns:50px minmax(0,1fr) auto;padding:17px;border-color:color-mix(in srgb,var(--green) 45%,var(--line));background:color-mix(in srgb,var(--green-soft) 48%,var(--surface));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--green) 10%,transparent)}
+.quick-choice-primary .quick-choice-icon{width:48px;height:48px;background:var(--green);color:#07180e;border-radius:15px;font-size:27px}
+.quick-choice-primary strong{font-size:17px;letter-spacing:-.3px}
+.quick-choice-primary small{font-size:11px;line-height:1.5;max-width:34ch}
+.quick-choice-primary .entry-choice-badge{align-self:start;padding:5px 8px;border-radius:99px;background:var(--green);color:#07180e;font-size:9px;font-weight:850;letter-spacing:.04em;white-space:nowrap}
+.entry-choice-secondary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.entry-choice-secondary .quick-choice{grid-template-columns:34px minmax(0,1fr) 12px;gap:8px;min-height:76px;padding:10px}
+.entry-choice-secondary .quick-choice-icon{width:34px;height:34px;border-radius:11px;font-size:18px}
+.entry-choice-secondary .quick-choice strong{font-size:11px;line-height:1.3}
+.entry-choice-secondary .quick-choice small{font-size:9px;line-height:1.35}
+.entry-choice-secondary .quick-choice>span:last-child{font-size:17px}
+.entry-tools-list{display:grid;gap:10px;margin-top:12px}
+.entry-tools-list .quick-choice{min-height:78px}
+.entry-tools-back{margin:2px 0 0}
+/* Date sections are visually separated without adding another heavy card per week. */
+#page-activity .activity-date-group{position:relative;margin:13px 0 17px;padding-top:11px;border-top:1px solid var(--line)}
+#page-activity .activity-date-group:first-child{padding-top:0;border-top:0}
+#page-activity .activity-date-group>header>strong{font-size:12px;letter-spacing:.005em}
+#page-activity .activity-period-summary{padding-bottom:7px;border-bottom:1px solid color-mix(in srgb,var(--line) 65%,transparent)}
+/* Shared cost forms retain PocketWise typography while giving calculation rows room to breathe. */
+.shared-cost-form{display:grid;gap:15px}
+.shared-cost-intro{padding:13px 14px;border:1px solid var(--line);border-radius:14px;background:var(--surface-2)}
+.shared-cost-intro strong{display:block;font-size:13px}
+.shared-cost-intro p{margin:5px 0 0;color:var(--muted);font-size:10px;line-height:1.5}
+.shared-cost-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:10px 0}
+.shared-cost-summary>div{min-width:0;padding:10px 11px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2)}
+.shared-cost-summary small{display:block;color:var(--muted);font-size:9px;line-height:1.35}
+.shared-cost-summary strong{display:block;margin-top:4px;font-size:14px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.shared-cost-person-list,.event-group-list,.event-category-list{display:grid;gap:9px}
+.shared-cost-person-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(100px,.7fr);gap:9px;align-items:end;padding:10px;border:1px solid var(--line);border-radius:13px;background:var(--surface)}
+.shared-cost-person-row label,.event-group-card label,.event-category-card label{display:grid;gap:5px;min-width:0;color:var(--muted);font-size:9px;font-weight:750;letter-spacing:.035em}
+.shared-cost-person-row input,.event-group-card input,.event-category-card input,.event-category-card select{box-sizing:border-box;width:100%;min-width:0;min-height:42px;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);color:var(--ink);font:inherit;font-size:16px!important;letter-spacing:normal}
+.shared-cost-person-row input[data-bill-share]{font-variant-numeric:tabular-nums;text-align:right}
+.shared-cost-total-line{display:flex;justify-content:space-between;gap:12px;padding:12px;border-radius:12px;background:var(--surface-2);font-size:11px}
+.shared-cost-total-line strong{font-variant-numeric:tabular-nums}
+.shared-cost-validation{padding:10px 12px;border:1px solid var(--line);border-radius:11px;color:var(--muted);font-size:10px;line-height:1.45}
+.shared-cost-validation.is-valid{border-color:color-mix(in srgb,var(--green) 32%,var(--line));background:var(--green-soft);color:var(--green-deep)}
+.shared-cost-validation.is-invalid{border-color:color-mix(in srgb,var(--red) 35%,var(--line));background:var(--red-soft);color:var(--red)}
+.shared-cost-form .form-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.shared-cost-form .form-actions>*{min-width:0;min-height:46px}
+.shared-cost-form .form-actions .primary-button{grid-column:1/-1}
+.event-planner-form{display:grid;gap:15px}
+.event-planner-section{display:grid;gap:11px;padding:13px;border:1px solid var(--line);border-radius:15px;background:var(--surface)}
+.event-planner-section-heading{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.event-planner-section-heading strong{font-size:12px}
+.event-planner-section-heading small{display:block;margin-top:3px;color:var(--muted);font-size:9px;line-height:1.4}
+.event-group-card,.event-category-card{display:grid;gap:10px;padding:12px;border:1px solid var(--line);border-radius:13px;background:var(--surface-2);min-width:0}
+.event-group-card-head,.event-category-card-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.event-group-card-head strong,.event-category-card-head strong{font-size:11px}
+.event-member-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.event-member-item{display:grid;grid-template-columns:minmax(0,1fr) 30px;gap:5px;align-items:center;min-width:0}
+.event-member-item input{font-size:14px!important;min-height:38px}
+.event-remove-button{display:grid;place-items:center;width:30px;height:30px;border:1px solid var(--line);border-radius:9px;background:var(--surface);color:var(--red);font-size:16px}
+.event-add-inline{justify-self:start;min-height:34px;padding:7px 10px;border:1px dashed var(--line);border-radius:9px;background:transparent;color:var(--green-deep);font-size:10px;font-weight:750}
+.event-category-top{display:grid;grid-template-columns:minmax(0,1fr) minmax(110px,.72fr);gap:9px;align-items:end}
+.event-category-controls{display:grid;grid-template-columns:minmax(0,1fr) minmax(110px,.72fr);gap:9px}
+.event-share-list{display:grid;gap:7px;padding-top:8px;border-top:1px solid var(--line)}
+.event-share-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(94px,.7fr);gap:8px;align-items:center;font-size:10px}
+.event-share-row small{color:var(--muted);line-height:1.3}
+.event-share-row input{min-height:37px;text-align:right;font-variant-numeric:tabular-nums}
+.event-planner-summary{padding:12px;border-radius:13px;background:var(--green-soft);color:var(--green-deep);font-size:10px;line-height:1.5}
+.event-planner-summary strong{display:block;font-size:17px;font-variant-numeric:tabular-nums}
+.event-plan-list{display:grid;gap:9px;margin-top:12px}
+.event-plan-list-item{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px;border:1px solid var(--line);border-radius:13px;background:var(--surface)}
+.event-plan-list-item>div{display:grid;gap:4px;min-width:0}
+.event-plan-list-item strong{font-size:12px;overflow-wrap:anywhere}
+.event-plan-list-item small{font-size:9px;color:var(--muted)}
+.event-plan-list-item button{flex:0 0 auto}
+@media(max-width:520px){
+  .entry-choice-primary .quick-choice-primary{grid-template-columns:43px minmax(0,1fr);min-height:98px;padding:14px}
+  .quick-choice-primary .entry-choice-badge{grid-column:2;justify-self:start;margin-top:-2px}
+  .entry-choice-secondary{grid-template-columns:1fr;gap:8px}
+  .entry-choice-secondary .quick-choice{grid-template-columns:36px minmax(0,1fr) 12px;min-height:65px}
+  .shared-cost-summary{gap:6px}
+  .shared-cost-summary>div{padding:8px}
+  .shared-cost-summary strong{font-size:12px}
+  .shared-cost-person-row{grid-template-columns:minmax(0,1fr) minmax(100px,.72fr)}
+  .event-member-list{grid-template-columns:minmax(0,1fr)}
+  .event-category-top,.event-category-controls{grid-template-columns:minmax(0,1fr) minmax(100px,.72fr)}
+}
+@media(prefers-reduced-motion:reduce){.entry-choice-primary .quick-choice-primary,.entry-choice-secondary .quick-choice,.event-plan-list-item{transition:none!important}}
+
+/* Keep the Quick entry amount visually stable when iOS focuses the numeric field. */
+.quick-flow input.quick-flow-value,
+.quick-flow input.quick-flow-value:focus,
+.quick-amount-wrap input.quick-flow-value:focus {
+  font-size: clamp(42px, 11vw, 56px) !important;
+  line-height: 1.06 !important;
+  -webkit-text-size-adjust: 100%;
+}
+.event-participant-row.is-group-member { grid-template-columns: minmax(0,1fr) minmax(88px,.72fr) 30px; }
+.event-participant-row.is-group-member select { box-sizing:border-box; width:100%; min-width:0; min-height:38px; padding:8px 6px; border:1px solid var(--line); border-radius:9px; background:var(--surface-2); color:var(--ink); font-size:14px!important; }
+.event-participant-row .event-remove-button { align-self:center; }
+.event-group-card-head { display:flex; justify-content:space-between; align-items:center; gap:8px; }

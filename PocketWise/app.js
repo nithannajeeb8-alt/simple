@@ -171,7 +171,7 @@
     settings:{theme:'light',liquidGlass:false,smartUI:false,dailyStory:true,dailyStoryPreferenceSet:false,profileName:'',profileColor:'mint',profileComplete:false,hideBalances:false,alertThreshold:90,notifyBudget:true,notifyPositive:true,notifyBills:true,notifyDebts:true,notifyWeekly:true,quietStart:'21:00',quietEnd:'08:00',lastBackup:null,lastPositiveMonth:null,seenAlerts:[],notifications:[],categoryChart:'doughnut',weeklyAllowance:0,debtPayoffMonthly:0,debtStrategy:'snowball',smartRules:[],salaryPlan:{expectedSalary:0,frequency:'monthly',paydayDay:1,paydayDate:null,allocations:[]}},
     accounts:[{id:'cash',name:'Cash',type:'cash',openingBalance:0,openingBalanceDate:null},{id:'bank',name:'Bank / UPI',type:'bank',openingBalance:0,openingBalanceDate:null},{id:'card',name:'Card',type:'card',openingBalance:0,openingBalanceDate:null}],
     activities: activityDefaults.map(a=>({...a})),
-    budgets:{total:0,categories:{},note:''}, goals:[], reminders:[], debts:[], transactions:[]
+    budgets:{total:0,categories:{},note:''}, goals:[], reminders:[], debts:[], transactions:[], billSplits:[], eventPlans:[]
   });
   let state = initialState();
   let db = null;
@@ -256,7 +256,7 @@
   function validStoredDate(value){if(value===undefined||value===null)return true;if(typeof value!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(value))return false;const [year,month,day]=value.split('-').map(Number),date=new Date(year,month-1,day);return date.getFullYear()===year&&date.getMonth()===month-1&&date.getDate()===day;}
   function isLoadableState(record){
     if(!record||typeof record!=='object'||Array.isArray(record)||!Array.isArray(record.transactions))return false;
-    const recordKeys=['transactions','accounts','activities','debts','goals','reminders'];
+    const recordKeys=['transactions','accounts','activities','debts','goals','reminders','billSplits','eventPlans'];
     for(const key of recordKeys){
       if(key!=='transactions'&&record[key]===undefined)continue;
       const list=record[key];
@@ -269,7 +269,7 @@
     if(record.settings?.smartRules!==undefined&&(!Array.isArray(record.settings.smartRules)||record.settings.smartRules.some(rule=>!rule||typeof rule!=='object'||Array.isArray(rule)||!validRecordId(rule.id))))return false;
     return record.transactions.every(tx=>validStoredAmount(tx.amount)&&validStoredDate(tx.date));
   }
-  const BACKUP_COLLECTION_LIMITS={transactions:100000,accounts:500,activities:2000,debts:20000,goals:20000,reminders:20000,smartRules:2000,seenAlerts:10000,notifications:10000,sentAlerts:10000};
+  const BACKUP_COLLECTION_LIMITS={transactions:100000,accounts:500,activities:2000,debts:20000,goals:20000,reminders:20000,billSplits:20000,eventPlans:20000,smartRules:2000,seenAlerts:10000,notifications:10000,sentAlerts:10000};
   function hasSafeBackupShape(value,depth=0,key=''){
     if(depth>12)return false;
     if(value===null||typeof value==='boolean')return true;
@@ -288,7 +288,7 @@
   function isSafeBackupState(record){
     if(!isLoadableState(record)||!hasSafeBackupShape(record))return false;
     if(record.transactions.length>BACKUP_COLLECTION_LIMITS.transactions||record.accounts.length>BACKUP_COLLECTION_LIMITS.accounts||record.activities.length>BACKUP_COLLECTION_LIMITS.activities)return false;
-    for(const key of ['debts','goals','reminders'])if(record[key]!==undefined&&(!Array.isArray(record[key])||record[key].length>BACKUP_COLLECTION_LIMITS[key]))return false;
+    for(const key of ['debts','goals','reminders','billSplits','eventPlans'])if(record[key]!==undefined&&(!Array.isArray(record[key])||record[key].length>BACKUP_COLLECTION_LIMITS[key]))return false;
     if(record.settings){for(const key of ['smartRules','seenAlerts','notifications','sentAlerts'])if(record.settings[key]!==undefined&&(!Array.isArray(record.settings[key])||record.settings[key].length>BACKUP_COLLECTION_LIMITS[key]))return false;}
     return true;
   }
@@ -303,7 +303,7 @@
   function normalizeStateShape(record){
     const defaults=initialState(),source=record&&typeof record==='object'?record:{};
     const next={...defaults,...source};
-    for(const key of ['transactions','accounts','activities','debts','goals','reminders'])if(!Array.isArray(source[key]))next[key]=defaults[key];
+    for(const key of ['transactions','accounts','activities','debts','goals','reminders','billSplits','eventPlans'])if(!Array.isArray(source[key]))next[key]=defaults[key];
     if(!next.accounts.length)next.accounts=defaults.accounts.map(a=>({...a}));
     if(!next.activities.length)next.activities=defaults.activities.map(a=>({...a}));
     next.settings=normalizeDailyStoryPreference({...defaults.settings,...(source.settings&&typeof source.settings==='object'&&!Array.isArray(source.settings)?source.settings:{})});
@@ -1130,8 +1130,319 @@
   let quickAddDraft = null;
   let quickAddSaving = false;
   function showAddEntryChoices(){
-    openModal('Add an entry',`<div class="modal-body add-entry-choices"><p class="muted">Choose how you want to add a transaction.</p><button type="button" class="quick-choice" id="start-simple-entry"><span class="quick-choice-icon">✎</span><span><strong>Quick entry</strong><small>Fast amount, type and category. No date field or extra form.</small></span><span>›</span></button><button type="button" class="quick-choice" id="start-detailed-entry"><span class="quick-choice-icon">☷</span><span><strong>Detailed entry</strong><small>Choose date, account, payment method, repeat and notes.</small></span><span>›</span></button><button type="button" class="quick-choice" id="start-payment-import"><span class="quick-choice-icon">▧</span><span><strong>Import payment</strong><small>Upload a UPI screenshot or paste a bank SMS. OCR extracts details for review.</small></span><span>›</span></button><div class="form-actions"><button class="secondary-button" type="button" data-cancel-modal>Cancel</button></div></div>`,'ADD TRANSACTION');
+    openModal('Add an entry',`<div class="modal-body add-entry-choices">
+      <p class="muted">Choose the fastest way to record or organize a cost.</p>
+      <section class="entry-choice-primary"><span class="entry-choice-label">FASTEST WAY TO RECORD</span>
+        <button type="button" class="quick-choice quick-choice-primary" id="start-simple-entry"><span class="quick-choice-icon">✎</span><span><strong>Quick entry</strong><small>Enter an amount, choose the type and category, then save. Your familiar four-step flow stays the same.</small></span><span class="entry-choice-badge">QUICK</span></button>
+      </section>
+      <div class="entry-choice-secondary" aria-label="Other entry methods">
+        <button type="button" class="quick-choice" id="start-detailed-entry"><span class="quick-choice-icon">☷</span><span><strong>Detailed entry</strong><small>Split bills or plan an event.</small></span><span>›</span></button>
+        <button type="button" class="quick-choice" id="start-payment-import"><span class="quick-choice-icon">▧</span><span><strong>Import entry</strong><small>Paste a payment or import a statement.</small></span><span>›</span></button>
+        <button type="button" class="quick-choice" id="start-advanced-entry"><span class="quick-choice-icon">⌘</span><span><strong>Advanced entry</strong><small>Full transaction, transfers and debts.</small></span><span>›</span></button>
+      </div>
+      <div class="form-actions"><button class="secondary-button" type="button" data-cancel-modal>Cancel</button></div>
+    </div>`,'ADD TRANSACTION');
   }
+  function showDetailedEntryTools(){
+    const savedSplits=(state.billSplits||[]).slice(0,5);
+    openModal('Detailed entry',`<div class="modal-body add-entry-choices"><p class="muted">Tools for shared costs, trips and gatherings. Calculations are saved separately from your bank transactions.</p><div class="entry-tools-list">
+      <button type="button" class="quick-choice" id="start-bill-split"><span class="quick-choice-icon">÷</span><span><strong>Quick bill split</strong><small>Divide a bill, adjust each person's share and create a print-ready settlement sheet.</small></span><span>›</span></button>
+      <button type="button" class="quick-choice" id="start-event-planner"><span class="quick-choice-icon">✦</span><span><strong>Event planning</strong><small>Plan trips, gatherings or events with categories, groups and unequal contributions.</small></span><span>›</span></button>
+    </div>${savedSplits.length?`<section class="event-planner-section"><div class="event-planner-section-heading"><strong>RECENT BILL SPLITS</strong></div><div class="event-plan-list">${savedSplits.map(item=>`<div class="event-plan-list-item"><div><strong>${escapeHTML(item.name||'Shared bill')}</strong><small>${escapeHTML(item.date||'')} · ${escapeHTML(money(fromMinorUnits(item.totalMinor||0)))}</small></div><button type="button" class="mini-button" data-bill-open="${escapeHTML(item.id)}">Open</button></div>`).join('')}</div></section>`:''}<button class="text-button entry-tools-back" type="button" id="entry-tools-back">← Back to entry methods</button></div>`,'SHARED COST TOOLS');
+  }
+  function showAdvancedEntryTools(){
+    openModal('Advanced entry',`<div class="modal-body add-entry-choices"><p class="muted">Use the full transaction controls when a record needs extra detail.</p><div class="entry-tools-list">
+      <button type="button" class="quick-choice" id="advanced-manual-entry"><span class="quick-choice-icon">☷</span><span><strong>Detailed transaction</strong><small>Set category, date, account, payment method, reminder and notes.</small></span><span>›</span></button>
+      <button type="button" class="quick-choice" id="advanced-transfer-entry"><span class="quick-choice-icon">⇄</span><span><strong>Account transfer</strong><small>Move money between your own accounts without counting it as income or spending.</small></span><span>›</span></button>
+      <button type="button" class="quick-choice" id="advanced-debt-entry"><span class="quick-choice-icon">↗</span><span><strong>Money owed</strong><small>Track lending, borrowing and repayments.</small></span><span>›</span></button>
+    </div><button class="text-button entry-tools-back" type="button" id="entry-tools-back">← Back to entry methods</button></div>`,'ADVANCED CONTROLS');
+  }
+  let billSplitDraft = null;
+  let eventPlannerDraft = null;
+  const sharedCosts = () => window.PocketwiseSharedCosts;
+  const safeMinorInput = value => sharedCosts().toMinorUnits(String(value ?? '').trim());
+  const minorToInput = minor => (minor / 100).toFixed(2);
+  const makePerson = index => ({ id: uid('person'), name: `Person ${index + 1}` });
+  const eventUnits = plan => plan.splitMode === 'groups' ? plan.groups : plan.participants;
+  function eventShareDefaults(category, units) {
+    if (category.mode === 'equal') return [];
+    if (category.mode === 'percent') {
+      const base = Math.floor(10000 / Math.max(1, units.length));
+      let left = 10000 - base * units.length;
+      return units.map((unit, index) => ({ unitId: unit.id, value: (base + (index < left ? 1 : 0)) / 100 }));
+    }
+    const amounts = sharedCosts().equalSplit(Math.max(0, Number(category.amountMinor) || 0), Math.max(1, units.length));
+    return units.map((unit, index) => ({ unitId: unit.id, value: amounts[index] }));
+  }
+  function normalizeEventCategoryShares(plan) {
+    const units = eventUnits(plan);
+    plan.categories.forEach(category => {
+      if (category.mode === 'equal') { category.shares = []; return; }
+      const expected = units.map(unit => unit.id);
+      const current = Array.isArray(category.shares) ? category.shares : [];
+      if (current.length !== expected.length || expected.some(id => !current.some(share => String(share.unitId) === String(id)))) {
+        category.shares = eventShareDefaults(category, units);
+      }
+    });
+  }
+  function showBillSplitStart() {
+    billSplitDraft = null;
+    openModal('Quick bill split', `<form id="bill-split-start-form" class="modal-body shared-cost-form">
+      <div class="shared-cost-intro"><strong>Split a shared bill fairly</strong><p>Enter the total and number of people. PocketWise divides every paise exactly, then lets you adjust names and individual shares.</p></div>
+      <div class="form-field"><label for="bill-split-name">BILL OR MEAL NAME · OPTIONAL</label><input id="bill-split-name" name="name" maxlength="80" placeholder="e.g. Dinner at the cafe"></div>
+      <div class="form-field"><label for="bill-split-total">TOTAL AMOUNT · INR</label><input id="bill-split-total" name="total" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00" required></div>
+      <div class="form-field"><label for="bill-split-count">NUMBER OF PEOPLE</label><input id="bill-split-count" name="count" type="number" inputmode="numeric" min="2" max="100" step="1" value="2" required></div>
+      <div class="form-actions"><button class="secondary-button" type="button" data-cancel-modal>Cancel</button><button class="primary-button" type="submit">Divide bill</button></div>
+    </form>`, 'SHARED COSTS');
+    $('#bill-split-total')?.focus({ preventScroll: true });
+  }
+  function renderBillSplitEditor(draft) {
+    billSplitDraft = draft;
+    const total = draft.totalMinor;
+    const rows = draft.people.map((person, index) => `<div class="shared-cost-person-row" data-bill-person="${escapeHTML(person.id)}">
+      <label>PERSON ${index + 1}<input type="text" maxlength="48" data-bill-name="${escapeHTML(person.id)}" value="${escapeHTML(person.name)}" aria-label="Person ${index + 1} name"></label>
+      <label>SHARE · INR<input type="text" inputmode="decimal" autocomplete="off" data-bill-share="${escapeHTML(person.id)}" value="${escapeHTML(minorToInput(person.amountMinor))}" aria-label="Person ${index + 1} share in rupees"></label>
+    </div>`).join('');
+    openModal(draft.id ? 'Edit bill split' : 'Bill split', `<form id="bill-split-form" class="modal-body shared-cost-form" data-id="${escapeHTML(draft.id || '')}">
+      <div class="shared-cost-intro"><strong>${escapeHTML(draft.name || 'Shared bill')}</strong><p>${draft.people.length} people · ${escapeHTML(money(fromMinorUnits(total)))} total. Edit each person's name or share. The amounts must add up exactly.</p></div>
+      <div class="form-field"><label for="bill-split-edit-name">BILL OR MEAL NAME</label><input id="bill-split-edit-name" maxlength="80" value="${escapeHTML(draft.name || '')}" placeholder="e.g. Dinner at the cafe"></div>
+      <div class="shared-cost-summary"><div><small>Total bill</small><strong>${escapeHTML(money(fromMinorUnits(total)))}</strong></div><div><small>People</small><strong>${draft.people.length}</strong></div><div><small>Starting share</small><strong>${escapeHTML(money(fromMinorUnits(Math.floor(total / draft.people.length))))}</strong></div></div>
+      <div class="shared-cost-person-list">${rows}</div>
+      <div class="shared-cost-total-line"><span>Allocated shares</span><strong id="bill-split-allocated">${escapeHTML(money(fromMinorUnits(draft.people.reduce((sum, person) => sum + person.amountMinor, 0))))}</strong></div>
+      <div id="bill-split-validation" class="shared-cost-validation" role="status" aria-live="polite">Checking shares…</div>
+      <div class="form-actions"><button class="secondary-button" type="button" data-cancel-modal>Close</button><button class="secondary-button" type="button" id="bill-split-download">Download PDF</button><button class="primary-button" type="submit">Save bill split</button></div>
+      <p class="form-note">A split is a planning record. Saving it does not create transactions or change account balances.</p>
+    </form>`, 'SHARED COSTS');
+    validateBillSplitForm();
+  }
+  function readBillSplitForm() {
+    const form = $('#bill-split-form');
+    if (!form || !billSplitDraft) return null;
+    const people = billSplitDraft.people.map(person => ({
+      id: person.id,
+      name: String(form.querySelector(`[data-bill-name="${CSS.escape(person.id)}"]`)?.value || '').trim(),
+      amountMinor: safeMinorInput(form.querySelector(`[data-bill-share="${CSS.escape(person.id)}"]`)?.value)
+    }));
+    return { ...billSplitDraft, name: String($('#bill-split-edit-name')?.value || '').trim(), people };
+  }
+  function validateBillSplitForm() {
+    const draft = readBillSplitForm();
+    const status = $('#bill-split-validation');
+    const allocated = $('#bill-split-allocated');
+    const button = $('#bill-split-download');
+    if (!draft || !status) return { valid: false };
+    const parsed = draft.people.map(person => person.amountMinor);
+    const validNames = draft.people.every(person => person.name && person.name.length <= 48);
+    const validAmounts = parsed.every(Number.isSafeInteger) && parsed.every(value => value >= 0);
+    const sum = validAmounts ? parsed.reduce((total, value) => total + value, 0) : NaN;
+    const valid = !!draft.name && validNames && validAmounts && Number.isSafeInteger(sum) && sum === draft.totalMinor;
+    if (allocated) allocated.textContent = validAmounts ? money(fromMinorUnits(sum)) : 'Check amounts';
+    status.classList.toggle('is-valid', valid);
+    status.classList.toggle('is-invalid', !valid);
+    status.textContent = valid ? 'All shares reconcile exactly to the bill total.' : !draft.name ? 'Enter a name for this bill.' : !validNames ? 'Give every person a name.' : !validAmounts ? 'Enter valid non-negative shares with up to two decimal places.' : `Shares are ${money(fromMinorUnits(Math.abs(draft.totalMinor - (Number.isFinite(sum) ? sum : 0))))} ${sum < draft.totalMinor ? 'short' : 'over'} the bill total.`;
+    if (button) button.disabled = !valid;
+    return { valid, draft };
+  }
+  function sharedCostReportDocument(title, subtitle, content, notes = '') {
+    const generated = new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
+    return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHTML(title)}</title><style>
+      :root{color-scheme:light}*{box-sizing:border-box}body{margin:0;background:#f2f4f3;color:#17211c;font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}.report{max-width:820px;margin:28px auto;padding:42px 48px;background:#fff;box-shadow:0 8px 35px #10241912}.brand{display:flex;justify-content:space-between;gap:24px;align-items:center;padding-bottom:18px;border-bottom:2px solid #1fbd65}.brand-mark{font-size:12px;font-weight:850;letter-spacing:.16em;color:#159653}.meta{font-size:10px;color:#66736b;text-align:right}.eyebrow{margin:28px 0 5px;color:#168b4c;font-size:10px;font-weight:850;letter-spacing:.15em;text-transform:uppercase}h1{margin:0;font-size:29px;line-height:1.15;letter-spacing:-.04em} .subtitle{margin:9px 0 25px;color:#68746c;font-size:12px}.summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0 0 25px}.summary>div{padding:13px;border:1px solid #e2e8e3;border-radius:10px;background:#f8faf8}.summary small{display:block;color:#66736b;font-size:10px}.summary strong{display:block;margin-top:5px;font-size:17px;font-variant-numeric:tabular-nums}.report h2{margin:24px 0 10px;font-size:14px}.report-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:11px}.report-table th{padding:9px 8px;background:#eff5f0;color:#526258;font-size:9px;text-align:left;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #cfd9d1}.report-table td{padding:10px 8px;border-bottom:1px solid #e6ebe7;vertical-align:top;overflow-wrap:anywhere}.report-table tr{break-inside:avoid}.report-table .numeric{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}.report-table tfoot td{font-weight:800;border-top:2px solid #aebdb2;background:#f8faf8}.report-note{margin-top:18px;padding:12px 14px;border-left:3px solid #1fbd65;background:#f3f8f4;color:#536159;font-size:10px}.report-footer{display:flex;justify-content:space-between;gap:16px;margin-top:30px;padding-top:12px;border-top:1px solid #dce4dd;color:#748077;font-size:9px}.report-actions{display:flex;justify-content:flex-end;gap:10px;margin:0 auto 28px;max-width:820px;padding:0 48px}.report-actions button{padding:10px 18px;border:0;border-radius:9px;background:#159653;color:#fff;font-weight:750}.report-actions button.secondary{background:#e3eae4;color:#203128}@page{size:A4 portrait;margin:14mm}@media print{body{background:#fff}.report{max-width:none;margin:0;padding:0;box-shadow:none}.report-actions{display:none!important}.brand,.report-table tr,.summary,.report-note{break-inside:avoid}.report-table{font-size:10px}.report-table th{padding:7px 7px}.report-table td{padding:6px 7px}.report h2{margin:17px 0 8px}.summary{margin-bottom:18px}.report-table thead{display:table-header-group}.report-table tfoot{display:table-row-group}h1,h2{break-after:avoid}.report-note{margin-top:10px;padding:8px 10px}.report-footer{break-inside:avoid;page-break-inside:avoid;margin-top:8px;padding-top:6px;font-size:8px}a{color:inherit;text-decoration:none}}@media(max-width:600px){.report{margin:0;padding:24px 18px}.report-actions{padding:0 18px}.summary{grid-template-columns:1fr 1fr}}
+    </style></head><body><main class="report"><header class="brand"><div class="brand-mark">POCKETWISE · PERSONAL FINANCE</div><div class="meta">PRIVATE DOCUMENT<br>Generated ${escapeHTML(generated)}</div></header><p class="eyebrow">Shared cost record</p><h1>${escapeHTML(title)}</h1><p class="subtitle">${escapeHTML(subtitle)}</p>${content}${notes ? `<aside class="report-note">${notes}</aside>` : ''}<footer class="report-footer"><span>PocketWise · Prepared locally on this device</span><span>Amounts shown in Indian rupees (INR)</span></footer></main><div class="report-actions"><button class="secondary" onclick="window.close()">Close</button><button onclick="window.print()">Print / Save as PDF</button></div></body></html>`;
+  }
+  function openSharedCostReport(title, subtitle, content, filename, notes = '', openedWindow = null) {
+    const html = sharedCostReportDocument(title, subtitle, content, notes);
+    let reportWindow = openedWindow;
+    if (!reportWindow) { try { reportWindow = window.open('about:blank', '_blank'); } catch (_) { reportWindow = null; } }
+    if (reportWindow && !reportWindow.closed) {
+      reportWindow.document.open(); reportWindow.document.write(html); reportWindow.document.close();
+      try { reportWindow.document.title = title; reportWindow.focus(); } catch (_) {}
+      return true;
+    }
+    downloadBlob(filename.replace(/\.pdf$/i, '.html'), new Blob([html], { type: 'text/html;charset=utf-8' }));
+    toast('Your report was downloaded as HTML. Open it and choose Print / Save as PDF.', 'amber');
+    return false;
+  }
+  async function saveBillSplitRecord(draft, showToast = true) {
+    const snapshot = JSON.stringify(state);
+    const record = { ...draft, id: draft.id || uid('split'), createdAt: draft.createdAt || new Date().toISOString(), updatedAt: new Date().toISOString() };
+    const index = state.billSplits.findIndex(item => item.id === record.id);
+    if (index >= 0) state.billSplits[index] = record; else state.billSplits.unshift(record);
+    if (state.billSplits.length > 500) state.billSplits.length = 500;
+    if (!(await persistMutation(snapshot, 'Could not save this bill split. Your previous records were restored.'))) return null;
+    billSplitDraft = record;
+    if (showToast) toast('Bill split saved. No transactions or account balances were changed.');
+    return record;
+  }
+  async function saveBillSplitFromForm() {
+    const check = validateBillSplitForm();
+    if (!check.valid) { toast('Fix the bill split amounts before saving.', 'error'); return; }
+    const saved = await saveBillSplitRecord({ ...check.draft, date: check.draft.date || today() });
+    if (saved) renderBillSplitEditor(saved);
+  }
+  async function downloadBillSplitFromForm() {
+    const opened = (() => { try { return window.open('about:blank', '_blank'); } catch (_) { return null; } })();
+    const check = validateBillSplitForm();
+    if (!check.valid) { opened?.close(); toast('Fix the bill split amounts before downloading.', 'error'); return; }
+    const draft = check.draft;
+    const saved = await saveBillSplitRecord({ ...draft, date: draft.date || today() }, false);
+    if (!saved) { opened?.close(); return; }
+    const rows = saved.people.map(person => `<tr><td>${escapeHTML(person.name)}</td><td class="numeric">${escapeHTML(money(fromMinorUnits(person.amountMinor)))}</td><td class="numeric">${(person.amountMinor / Math.max(1, saved.totalMinor) * 100).toFixed(2)}%</td></tr>`).join('');
+    const content = `<section class="summary"><div><small>Total bill</small><strong>${escapeHTML(money(fromMinorUnits(saved.totalMinor)))}</strong></div><div><small>People</small><strong>${saved.people.length}</strong></div><div><small>Total allocated</small><strong>${escapeHTML(money(fromMinorUnits(saved.totalMinor)))}</strong></div></section><h2>Individual shares</h2><table class="report-table"><thead><tr><th style="width:48%">Person</th><th class="numeric" style="width:30%">Share</th><th class="numeric" style="width:22%">Share of bill</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><td>Total allocated</td><td class="numeric">${escapeHTML(money(fromMinorUnits(saved.people.reduce((sum, person) => sum + person.amountMinor, 0))))}</td><td class="numeric">100.00%</td></tr></tfoot></table>`;
+    openSharedCostReport(saved.name || 'Bill split', `Split date: ${saved.date || today()} · ${saved.people.length} participants`, content, `pocketwise-bill-split-${today()}.pdf`, "This is a shared-cost calculation, not a bank transaction or proof of payment. Each person’s share is entered or agreed by the participants.", opened);
+  }
+  function showEventPlannerHub() {
+    const plans = Array.isArray(state.eventPlans) ? state.eventPlans : [];
+    openModal('Event planning', `<div class="modal-body"><div class="shared-cost-intro"><strong>Plan together, settle clearly</strong><p>Build a trip, gathering or event budget. Allocate each category equally, by percentage or by exact amount across people or groups. Nothing is posted as a transaction.</p></div><button type="button" class="primary-button" id="event-plan-new">Create an event plan</button><div class="event-plan-list">${plans.length ? plans.map(plan => `<div class="event-plan-list-item"><div><strong>${escapeHTML(plan.name || 'Untitled event')}</strong><small>${escapeHTML(plan.date || '')} · ${escapeHTML(money(fromMinorUnits(Number(plan.totalMinor) || 0)))}</small></div><button type="button" class="mini-button" data-event-open="${escapeHTML(plan.id)}">Open</button></div>`).join('') : '<div class="empty-inline">No event plans yet. Your saved trips and gatherings will appear here.</div>'}</div><div class="form-actions"><button type="button" class="secondary-button" id="entry-tools-back">← Back to entry methods</button><button type="button" class="secondary-button" data-cancel-modal>Close</button></div></div>`, 'TRIPS · GATHERINGS · EVENTS');
+  }
+  function showEventPlannerStart(existing = null) {
+    eventPlannerDraft = existing ? JSON.parse(JSON.stringify(existing)) : null;
+    openModal(existing ? 'Edit event plan' : 'New event plan', `<form id="event-plan-start-form" class="modal-body event-planner-form">
+      <div class="shared-cost-intro"><strong>Start with the event outline</strong><p>Name the event, enter its full cost, then decide whether costs are split between individuals or groups. You can create and customize categories next.</p></div>
+      <div class="form-field"><label for="event-start-name">EVENT NAME</label><input id="event-start-name" name="name" maxlength="80" value="${escapeHTML(existing?.name || '')}" placeholder="e.g. Munnar weekend trip" required></div>
+      <div class="form-grid"><div class="form-field"><label for="event-start-date">EVENT DATE</label><input id="event-start-date" name="date" type="date" value="${escapeHTML(existing?.date || today())}" required></div><div class="form-field"><label for="event-start-total">TOTAL COST · INR</label><input id="event-start-total" name="total" type="text" inputmode="decimal" placeholder="0.00" value="${existing ? escapeHTML(minorToInput(existing.totalMinor)) : ''}" required></div><div class="form-field"><label for="event-start-count">NUMBER OF PEOPLE</label><input id="event-start-count" name="count" type="number" inputmode="numeric" min="1" max="100" step="1" value="${existing?.participants?.length || 2}" required></div><div class="form-field"><label for="event-start-mode">ALLOCATION BASIS</label><select id="event-start-mode" name="splitMode"><option value="individual" ${!existing || existing.splitMode === 'individual' ? 'selected' : ''}>Individual people</option><option value="groups" ${existing?.splitMode === 'groups' ? 'selected' : ''}>Groups</option></select></div><div class="form-field full" id="event-start-groups-wrap" ${existing?.splitMode === 'groups' ? '' : 'hidden'}><label for="event-start-groups">NUMBER OF GROUPS</label><input id="event-start-groups" name="groupCount" type="number" inputmode="numeric" min="1" max="25" step="1" value="${existing?.groups?.length || 2}"></div></div>
+      <div class="form-actions"><button class="secondary-button" type="button" data-cancel-modal>Cancel</button><button class="primary-button" type="submit">${existing ? 'Continue editing' : 'Create plan'}</button></div>
+    </form>`, 'EVENT BUDGET');
+  }
+  function createEventPlanFromStart(form) {
+    const fd = new FormData(form);
+    const name = String(fd.get('name') || '').trim();
+    const totalMinor = safeMinorInput(fd.get('total'));
+    const date = String(fd.get('date') || '');
+    const count = Number(fd.get('count'));
+    const splitMode = fd.get('splitMode') === 'groups' ? 'groups' : 'individual';
+    const groupCount = splitMode === 'groups' ? Number(fd.get('groupCount')) : 0;
+    if (!name || name.length > 80 || !Number.isSafeInteger(totalMinor) || totalMinor <= 0 || !/^\d{4}-\d{2}-\d{2}$/.test(date) || !Number.isInteger(count) || count < 1 || count > 100) throw new Error('Check the event name, date, total cost and number of people.');
+    if (splitMode === 'groups' && (!Number.isInteger(groupCount) || groupCount < 1 || groupCount > 25 || groupCount > count)) throw new Error('Choose between 1 and 25 groups, no more than the number of people.');
+    if (eventPlannerDraft && eventPlannerDraft.id) {
+      const old = eventPlannerDraft;
+      const participants = Array.from({ length: count }, (_, index) => old.participants[index] ? { ...old.participants[index] } : makePerson(index));
+      let groups = splitMode === 'groups' ? old.groups?.slice(0, groupCount).map(group => ({ ...group, memberIds: [] })) || [] : [];
+      while (splitMode === 'groups' && groups.length < groupCount) groups.push({ id: uid('group'), name: `Group ${groups.length + 1}`, memberIds: [] });
+      if (splitMode === 'groups') participants.forEach((person, index) => { const previous = old.groups?.find(group => group.memberIds?.includes(person.id)); const group = groups.find(item => item.id === previous?.id) || groups[index % groups.length]; group.memberIds.push(person.id); });
+      const categories = (old.categories || []).map(category => ({ ...category }));
+      if (categories.length) categories[0].amountMinor = Math.max(0, Math.max(0, Number(categories[0].amountMinor) || 0) + totalMinor - old.totalMinor);
+      eventPlannerDraft = { ...old, name, date, totalMinor, splitMode, participants, groups, categories };
+    } else {
+      const participants = Array.from({ length: count }, (_, index) => makePerson(index));
+      const groups = splitMode === 'groups' ? Array.from({ length: groupCount }, (_, index) => ({ id: uid('group'), name: `Group ${index + 1}`, memberIds: [] })) : [];
+      if (groups.length) participants.forEach((person, index) => groups[index % groups.length].memberIds.push(person.id));
+      eventPlannerDraft = { id: null, name, date, totalMinor, splitMode, participants, groups, categories: [{ id: uid('category'), name: 'General costs', amountMinor: totalMinor, mode: 'equal', shares: [] }], createdAt: null };
+    }
+    normalizeEventCategoryShares(eventPlannerDraft);
+    renderEventPlannerEditor(eventPlannerDraft);
+  }
+  function captureEventPlannerForm() {
+    const form = $('#event-plan-form');
+    if (!form || !eventPlannerDraft) return null;
+    const draft = JSON.parse(JSON.stringify(eventPlannerDraft));
+    draft.name = String($('#event-plan-name')?.value || '').trim();
+    draft.date = String($('#event-plan-date')?.value || '');
+    draft.totalMinor = safeMinorInput($('#event-plan-total')?.value);
+    draft.splitMode = $('#event-plan-mode')?.value === 'groups' ? 'groups' : 'individual';
+    draft.participants = $$('.event-participant-row', form).map(row => {
+      const id = row.dataset.eventPerson;
+      const previous = draft.participants.find(person => person.id === id);
+      const groupControl = row.querySelector('[data-event-person-group]');
+      return { id, name: String(row.querySelector('[data-event-person-name]')?.value || '').trim(), groupId: groupControl ? String(groupControl.value || '') : String(previous?.groupId || '') };
+    });
+    const renderedGroups = $$('.event-group-card', form).map(card => ({ id: card.dataset.eventGroup, name: String(card.querySelector('[data-event-group-name]')?.value || '').trim(), memberIds: [] }));
+    if (renderedGroups.length) draft.groups = renderedGroups;
+    if (draft.splitMode === 'groups') {
+      const groupIds = new Set(draft.groups.map(group => group.id));
+      draft.participants.forEach(person => {
+        if (groupIds.has(person.groupId)) draft.groups.find(group => group.id === person.groupId).memberIds.push(person.id);
+      });
+    }
+    draft.categories = $$('.event-category-card', form).map(card => {
+      const id = card.dataset.eventCategory;
+      const mode = card.querySelector('[data-event-category-mode]')?.value || 'equal';
+      const shares = mode === 'equal' ? [] : $$('.event-share-row', card).map(row => {
+        const raw = row.querySelector('[data-event-share-value]')?.value ?? '';
+        return { unitId: row.dataset.eventUnit, value: mode === 'percent' ? Number(raw) : safeMinorInput(raw) };
+      });
+      return { id, name: String(card.querySelector('[data-event-category-name]')?.value || '').trim(), amountMinor: safeMinorInput(card.querySelector('[data-event-category-amount]')?.value), mode, shares };
+    });
+    return draft;
+  }
+  function renderEventPlannerEditor(draft) {
+    eventPlannerDraft = JSON.parse(JSON.stringify(draft));
+    normalizeEventCategoryShares(eventPlannerDraft);
+    const plan = eventPlannerDraft;
+    const units = eventUnits(plan);
+    const groupsHTML = plan.splitMode === 'groups' ? `<section class="event-planner-section"><div class="event-planner-section-heading"><div><strong>YOUR GROUPS</strong><small>Name each group, then assign people below.</small></div><button type="button" class="event-add-inline" id="event-add-group">+ Add group</button></div><div class="event-group-list">${plan.groups.map((group, index) => `<div class="event-group-card" data-event-group-card data-event-group="${escapeHTML(group.id)}"><div class="event-group-card-head"><strong>GROUP ${index + 1}</strong>${plan.groups.length > 1 ? `<button type="button" class="event-remove-button" data-event-remove-group="${escapeHTML(group.id)}" aria-label="Remove group">×</button>` : ''}</div><label>GROUP NAME<input data-event-group-name maxlength="48" value="${escapeHTML(group.name)}"></label></div>`).join('')}</div></section>` : '';
+    const membersHTML = `<section class="event-planner-section"><div class="event-planner-section-heading"><div><strong>PEOPLE</strong><small>${plan.participants.length} participants · Give everyone a name${plan.splitMode === 'groups' ? ' and assign them to a group' : ''}.</small></div><button type="button" class="event-add-inline" id="event-add-person">+ Add person</button></div><div class="event-member-list">${plan.participants.map((person, index) => `<div class="event-participant-row event-member-item ${plan.splitMode === 'groups' ? 'is-group-member' : ''}" data-event-person="${escapeHTML(person.id)}"><label class="sr-only" for="event-person-${escapeHTML(person.id)}">Person ${index + 1} name</label><input id="event-person-${escapeHTML(person.id)}" data-event-person-name maxlength="48" value="${escapeHTML(person.name)}" aria-label="Person ${index + 1} name">${plan.splitMode === 'groups' ? `<select data-event-person-group aria-label="${escapeHTML(person.name || `Person ${index + 1}`)} group">${plan.groups.map(group => `<option value="${escapeHTML(group.id)}" ${person.groupId === group.id || (!person.groupId && group.memberIds.includes(person.id)) ? 'selected' : ''}>${escapeHTML(group.name)}</option>`).join('')}</select><button type="button" class="event-remove-button" data-event-remove-person="${escapeHTML(person.id)}" aria-label="Remove person ${index + 1}">×</button>` : `<button type="button" class="event-remove-button" data-event-remove-person="${escapeHTML(person.id)}" aria-label="Remove person ${index + 1}">×</button>`}</div>`).join('')}</div></section>`;
+    const categoriesHTML = `<section class="event-planner-section"><div class="event-planner-section-heading"><div><strong>COST CATEGORIES</strong><small>Each category amount must add up to the event total. Use equal, percentage or exact rupee shares.</small></div><button type="button" class="event-add-inline" id="event-add-category">+ Add category</button></div><div class="event-category-list">${plan.categories.map((category, index) => `<div class="event-category-card" data-event-category-card data-event-category="${escapeHTML(category.id)}"><div class="event-category-card-head"><strong>CATEGORY ${index + 1}</strong>${plan.categories.length > 1 ? `<button type="button" class="event-remove-button" data-event-remove-category="${escapeHTML(category.id)}" aria-label="Remove category">×</button>` : ''}</div><div class="event-category-top"><label>CATEGORY NAME<input data-event-category-name maxlength="48" value="${escapeHTML(category.name)}"></label><label>CATEGORY COST · INR<input data-event-category-amount type="text" inputmode="decimal" value="${escapeHTML(minorToInput(Number(category.amountMinor) || 0))}"></label></div><div class="event-category-controls"><label>HOW TO ALLOCATE<select data-event-category-mode><option value="equal" ${category.mode === 'equal' ? 'selected' : ''}>Equal shares</option><option value="percent" ${category.mode === 'percent' ? 'selected' : ''}>Percentage</option><option value="amount" ${category.mode === 'amount' ? 'selected' : ''}>Exact amounts</option></select></label><div class="shared-cost-total-line"><span>Allocated unit</span><strong>${plan.splitMode === 'groups' ? 'Groups' : 'People'}</strong></div></div>${category.mode === 'equal' ? '<p class="form-note">This category is split equally across the selected people or groups.</p>' : `<div class="event-share-list">${units.map((unit, unitIndex) => { const share = category.shares.find(item => item.unitId === unit.id) || { value: 0 }; return `<div class="event-share-row" data-event-share-row data-event-unit="${escapeHTML(unit.id)}"><small>${escapeHTML(unit.name || `${plan.splitMode === 'groups' ? 'Group' : 'Person'} ${unitIndex + 1}`)}</small><label class="sr-only">${category.mode === 'percent' ? 'Percentage share' : 'Amount share in rupees'}</label><input type="text" inputmode="decimal" data-event-share-value value="${escapeHTML(category.mode === 'percent' ? String(share.value) : minorToInput(Number(share.value) || 0))}" aria-label="${escapeHTML(unit.name)} ${category.mode === 'percent' ? 'percentage' : 'amount'} share">${category.mode === 'percent' ? '<small>%</small>' : '<small>INR</small>'}</div>`; }).join('')}</div>`}</div>`).join('')}</div></section>`;
+    openModal(plan.id ? 'Edit event plan' : 'Event planning', `<form id="event-plan-form" class="modal-body event-planner-form" data-id="${escapeHTML(plan.id || '')}"><div class="shared-cost-intro"><strong>Plan your shared costs</strong><p>Set each category and decide what every person or group contributes. Totals are reconciled in paise; a plan never creates fake purchases or transfers.</p></div><div class="form-grid"><div class="form-field full"><label for="event-plan-name">EVENT NAME</label><input id="event-plan-name" maxlength="80" value="${escapeHTML(plan.name)}" required></div><div class="form-field"><label for="event-plan-date">EVENT DATE</label><input id="event-plan-date" type="date" value="${escapeHTML(plan.date)}" required></div><div class="form-field"><label for="event-plan-total">TOTAL EVENT COST · INR</label><input id="event-plan-total" type="text" inputmode="decimal" value="${escapeHTML(minorToInput(plan.totalMinor))}" required></div><div class="form-field full"><label for="event-plan-mode">SPLIT BETWEEN</label><select id="event-plan-mode"><option value="individual" ${plan.splitMode === 'individual' ? 'selected' : ''}>Individual people</option><option value="groups" ${plan.splitMode === 'groups' ? 'selected' : ''}>Groups (split each group's share equally among its members)</option></select></div></div>${groupsHTML}${membersHTML}${categoriesHTML}<div id="event-plan-validation" class="shared-cost-validation" role="status" aria-live="polite">Checking event allocation…</div><div id="event-plan-summary" class="event-planner-summary" aria-live="polite"></div><div class="form-actions"><button type="button" class="secondary-button" data-cancel-modal>Close</button><button type="button" class="secondary-button" id="event-plan-download">Download PDF</button><button type="submit" class="primary-button">Save event plan</button></div><p class="form-note">Saved plans remain separate from your transaction history and account balances.</p></form>`, 'EVENT BUDGET');
+    validateEventPlannerForm();
+  }
+  function validateEventPlannerForm() {
+    const status = $('#event-plan-validation');
+    const summary = $('#event-plan-summary');
+    const save = $('#event-plan-form button[type="submit"]');
+    const draft = captureEventPlannerForm();
+    if (!draft || !status) return { valid: false };
+    let result = null, error = '';
+    try {
+      if (!draft.name || draft.name.length > 80) throw new Error('Enter an event name.');
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(draft.date)) throw new Error('Choose the event date.');
+      if (!Number.isSafeInteger(draft.totalMinor) || draft.totalMinor <= 0) throw new Error('Enter a total event cost greater than zero.');
+      if (draft.participants.some(person => !person.name || person.name.length > 48)) throw new Error('Give every participant a name.');
+      if (draft.splitMode === 'groups' && draft.groups.some(group => !group.name || group.name.length > 48)) throw new Error('Give every group a name.');
+      if (draft.categories.some(category => !category.name || category.name.length > 48)) throw new Error('Give every category a name.');
+      result = sharedCosts().calculateEvent(draft);
+    } catch (exception) { error = exception.message || 'Check the event allocations.'; }
+    const valid = !!result;
+    status.classList.toggle('is-valid', valid);
+    status.classList.toggle('is-invalid', !valid);
+    status.textContent = valid ? 'All category costs and participant shares reconcile exactly to the event total.' : error;
+    if (summary) summary.innerHTML = valid ? `<strong>${escapeHTML(money(fromMinorUnits(result.totalMinor)))}</strong>${result.people.length} people · ${result.categories.length} categories · ${draft.splitMode === 'groups' ? `${result.groups.length} groups` : 'Individual allocation'} · fully allocated` : 'Complete the event details and make sure category amounts add up to the total.';
+    if (save) save.disabled = !valid;
+    eventPlannerDraft = draft;
+    return { valid, draft, result, error };
+  }
+  async function saveEventPlanFromForm() {
+    const check = validateEventPlannerForm();
+    if (!check.valid) { toast(check.error || 'Fix the event allocation before saving.', 'error'); return; }
+    const snapshot = JSON.stringify(state);
+    const record = { ...check.draft, id: check.draft.id || uid('event'), createdAt: check.draft.createdAt || new Date().toISOString(), updatedAt: new Date().toISOString() };
+    const index = state.eventPlans.findIndex(item => item.id === record.id);
+    if (index >= 0) state.eventPlans[index] = record; else state.eventPlans.unshift(record);
+    if (state.eventPlans.length > 200) state.eventPlans.length = 200;
+    if (!(await persistMutation(snapshot, 'Could not save this event plan. Your previous records were restored.'))) return;
+    eventPlannerDraft = record;
+    showEventPlannerHub();
+    toast('Event plan saved. Transaction history and account balances are unchanged.');
+  }
+  function downloadEventPlanFromForm() {
+    const opened = (() => { try { return window.open('about:blank', '_blank'); } catch (_) { return null; } })();
+    const check = validateEventPlannerForm();
+    if (!check.valid) { opened?.close(); toast(check.error || 'Fix the event allocation before downloading.', 'error'); return; }
+    const { draft, result } = check;
+    const categoryRows = result.categories.map(category => `<tr><td>${escapeHTML(category.name)}</td><td class="numeric">${escapeHTML(money(fromMinorUnits(category.amountMinor)))}</td><td>${escapeHTML(category.mode === 'equal' ? 'Equal' : category.mode === 'percent' ? 'Percentage' : 'Exact amounts')}</td></tr>`).join('');
+    const groupRows = result.groups.map(group => `<tr><td>${escapeHTML(group.name)}</td><td>${escapeHTML(group.members.map(person => person.name).join(', '))}</td><td class="numeric">${escapeHTML(money(fromMinorUnits(group.amountMinor)))}</td></tr>`).join('');
+    const peopleRows = result.people.map(person => `<tr><td>${escapeHTML(person.name)}</td><td class="numeric">${escapeHTML(money(fromMinorUnits(person.amountMinor)))}</td><td class="numeric">${(person.amountMinor / result.totalMinor * 100).toFixed(2)}%</td></tr>`).join('');
+    const categoryDetails = result.categories.map(category => `<h2>${escapeHTML(category.name)} · ${escapeHTML(money(fromMinorUnits(category.amountMinor)))}</h2><table class="report-table"><thead><tr><th style="width:45%">${draft.splitMode === 'groups' ? 'Group / people' : 'Person'}</th><th class="numeric" style="width:30%">Share</th><th class="numeric" style="width:25%">Split mode</th></tr></thead><tbody>${category.allocations.map(unit => `<tr><td>${escapeHTML(unit.unitName)}${unit.members.length > 1 ? `<br><small>${escapeHTML(unit.members.map(person => person.name).join(', '))}</small>` : ''}</td><td class="numeric">${escapeHTML(money(fromMinorUnits(unit.amountMinor)))}</td><td class="numeric">${escapeHTML(category.mode === 'equal' ? 'Equal' : category.mode === 'percent' ? 'Percent' : 'Amount')}</td></tr>`).join('')}</tbody></table>`).join('');
+    const content = `<section class="summary"><div><small>Total event cost</small><strong>${escapeHTML(money(fromMinorUnits(result.totalMinor)))}</strong></div><div><small>Participants</small><strong>${result.people.length}</strong></div><div><small>Categories</small><strong>${result.categories.length}</strong></div></section><h2>Category budget</h2><table class="report-table"><thead><tr><th style="width:48%">Category</th><th class="numeric" style="width:30%">Cost</th><th style="width:22%">Allocation</th></tr></thead><tbody>${categoryRows}</tbody><tfoot><tr><td>Total categories</td><td class="numeric">${escapeHTML(money(fromMinorUnits(result.categoryTotalMinor)))}</td><td>100%</td></tr></tfoot></table>${draft.splitMode === 'groups' ? `<h2>Group allocation</h2><table class="report-table"><thead><tr><th style="width:28%">Group</th><th style="width:47%">Members</th><th class="numeric" style="width:25%">Total share</th></tr></thead><tbody>${groupRows}</tbody></table>` : ''}<h2>Final contribution per person</h2><table class="report-table"><thead><tr><th style="width:50%">Person</th><th class="numeric" style="width:28%">Contribution</th><th class="numeric" style="width:22%">Share</th></tr></thead><tbody>${peopleRows}</tbody><tfoot><tr><td>Total contributions</td><td class="numeric">${escapeHTML(money(fromMinorUnits(result.allocatedMinor)))}</td><td>100%</td></tr></tfoot></table>${categoryDetails}`;
+    openSharedCostReport(draft.name, `Event date: ${draft.date} · ${draft.splitMode === 'groups' ? 'Group allocation' : 'Individual allocation'}`, content, `pocketwise-event-plan-${today()}.pdf`, 'This is a planning and cost-allocation document. It does not represent payment, create transactions or change bank/account balances. Group allocations are divided equally among members of each group unless the event plan is edited.', opened);
+  }
+  function addEventParticipant() {
+    const draft = captureEventPlannerForm(); if (!draft) return;
+    if (draft.participants.length >= 100) { toast('An event can contain at most 100 participants.', 'amber'); return; }
+    const person = makePerson(draft.participants.length);
+    if (draft.splitMode === 'groups') { if (!draft.groups.length) draft.groups.push({ id: uid('group'), name: 'Group 1', memberIds: [] }); person.groupId = draft.groups[0].id; }
+    draft.participants.push(person); renderEventPlannerEditor(draft);
+  }
+  function addEventGroup() {
+    const draft = captureEventPlannerForm(); if (!draft) return;
+    if (draft.groups.length >= 25) { toast('An event can contain at most 25 groups.', 'amber'); return; }
+    draft.groups.push({ id: uid('group'), name: `Group ${draft.groups.length + 1}`, memberIds: [] }); renderEventPlannerEditor(draft);
+  }
+  function addEventCategory() {
+    const draft = captureEventPlannerForm(); if (!draft) return;
+    if (draft.categories.length >= 30) { toast('An event can contain at most 30 categories.', 'amber'); return; }
+    draft.categories.push({ id: uid('category'), name: `Category ${draft.categories.length + 1}`, amountMinor: 0, mode: 'equal', shares: [] }); renderEventPlannerEditor(draft);
+  }
+
   function quickAddStart(){
     quickAddDraft={amount:'',type:'',activityId:'',accountId:state.settings.lastQuickAddAccountId||state.accounts[0]?.id||'cash',paymentMethod:state.settings.lastQuickAddPaymentMethod||'Cash',note:'',date:today()};
     renderQuickAddStep('amount');
@@ -1142,7 +1453,7 @@
     const progress=`<div class="quick-progress" aria-label="Step ${({amount:1,type:2,activity:3,note:4})[step]} of 4">${['amount','type','activity','note'].map((x,i)=>`<span class="${['amount','type','activity','note'].indexOf(step)>=i?'done':''}"></span>`).join('')}</div>`;
     let body='';
     if(step==='amount'){
-      body=`<form id="quick-flow-amount" class="modal-body quick-flow"><p class="quick-step-label">STEP 1 OF 4</p><h3>How much?</h3><p class="muted">Enter the amount first. You can add the details in a few quick taps.</p><label class="quick-amount-wrap" for="quick-flow-value"><span>₹</span><input id="quick-flow-value" name="amount" class="quick-flow-value" inputmode="decimal" enterkeyhint="done" type="text" autocomplete="off" placeholder="0" value="${escapeHTML(d.amount)}" required aria-label="Amount in rupees"></label><p id="quick-flow-error" class="field-error" hidden></p><button class="primary-button quick-next" type="submit">Continue <span aria-hidden="true">→</span></button><button class="secondary-button quick-paste-button" type="button" id="paste-bank-sms-quick">Paste bank SMS</button>${isAndroid?'':`<button class="secondary-button quick-paste-button" type="button" id="paste-shortcut-quick">${icon('clipboard')} Paste image or Shortcut</button><button class="text-button" type="button" id="enter-shortcut-key">Enter transaction key manually</button><p class="quick-paste-help">Paste a copied payment screenshot or use an older Shortcut's transaction details.</p>`}<button class="text-button quick-cancel" type="button" data-cancel-modal>Cancel</button></form>`;
+      body=`<form id="quick-flow-amount" class="modal-body quick-flow"><p class="quick-step-label">STEP 1 OF 4</p><h3>How much?</h3><p class="muted">Enter the amount first. You can add the details in a few quick taps.</p><label class="quick-amount-wrap" for="quick-flow-value"><span>₹</span><input id="quick-flow-value" name="amount" class="quick-flow-value" inputmode="decimal" enterkeyhint="done" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="0" value="${escapeHTML(d.amount)}" style="font-size:clamp(44px,13vw,58px)!important;font-family:var(--display)!important;font-weight:800!important;line-height:1.06!important;-webkit-text-size-adjust:100%;font-variant-numeric:tabular-nums" required aria-label="Amount in rupees"></label><p id="quick-flow-error" class="field-error" hidden></p><button class="primary-button quick-next" type="submit">Continue <span aria-hidden="true">→</span></button><button class="secondary-button quick-paste-button" type="button" id="paste-bank-sms-quick">Paste bank SMS</button>${isAndroid?'':`<button class="secondary-button quick-paste-button" type="button" id="paste-shortcut-quick">${icon('clipboard')} Paste image or Shortcut</button><button class="text-button" type="button" id="enter-shortcut-key">Enter transaction key manually</button><p class="quick-paste-help">Paste a copied payment screenshot or use an older Shortcut's transaction details.</p>`}<button class="text-button quick-cancel" type="button" data-cancel-modal>Cancel</button></form>`;
     } else if(step==='type'){
       body=`<div class="modal-body quick-flow"><p class="quick-step-label">STEP 2 OF 4 · ${escapeHTML(money(parseAmount(d.amount)))}</p><h3>What happened?</h3><p class="muted">Choose how this amount should affect your records.</p><div class="quick-choice-list"><button class="quick-choice income-choice" data-quick-type="income"><span class="quick-choice-icon">↗</span><span><strong>Income</strong><small>Allowance, salary or other money received</small></span><span>›</span></button><button class="quick-choice expense-choice" data-quick-type="expense"><span class="quick-choice-icon">↘</span><span><strong>Purchase / expense</strong><small>A purchase, bill, food, travel or another cost</small></span><span>›</span></button><button class="quick-choice" data-quick-type="refund"><span class="quick-choice-icon">↩</span><span><strong>I got a refund</strong><small>Money returned for a previous purchase</small></span><span>›</span></button></div><button class="text-button quick-cancel" type="button" data-quick-back="amount">← Change amount</button></div>`;
     } else if(step==='activity'){
@@ -1152,7 +1463,7 @@
       body=`<form id="quick-flow-note" class="modal-body quick-flow"><p class="quick-step-label">STEP 4 OF 4 · ${escapeHTML(activityById(d.activityId).name)}</p><h3>${d.fromShortcut?'Review transaction':'Add a note'}</h3><p class="muted">${d.fromShortcut?'Imported from your iPhone Shortcut. Check the details before saving.':'Optional. A short note makes the receipt easier to recognize later.'}</p><div class="quick-summary"><span>${escapeHTML(d.type==='income'?'Income':d.type==='refund'?'Refund':'Purchase')}</span><strong>${escapeHTML(money(parseAmount(d.amount)))}</strong><small>${escapeHTML(activityById(d.activityId).name)}</small></div><div class="form-field"><label for="quick-flow-note-value">NOTE · OPTIONAL</label><textarea id="quick-flow-note-value" name="note" rows="2" maxlength="240" placeholder="What was it for?" autofocus>${escapeHTML(d.note||'')}</textarea></div><div class="form-grid quick-extra-fields"><div class="form-field"><label for="quick-flow-account">ACCOUNT</label><select id="quick-flow-account" name="accountId">${accountOptions(d.accountId)}</select></div><div class="form-field"><label for="quick-flow-payment">PAID USING</label><select id="quick-flow-payment" name="paymentMethod">${['Cash','UPI','Bank transfer','Debit card','Credit card','Wallet','Other'].map(v=>`<option value="${v}" ${d.paymentMethod===v?'selected':''}>${v}</option>`).join('')}</select></div></div><button class="primary-button quick-next" type="submit">Save transaction · ${escapeHTML(money(parseAmount(d.amount)))}</button><button class="text-button quick-cancel" type="button" id="quick-flow-skip">Skip note & save</button><button class="text-button quick-cancel" type="button" data-quick-back="activity">← Change category</button></form>`;
     }
     openModal('Quick Add',`${progress}${body}`,'QUICK ENTRY · PRIVATE ON THIS DEVICE');
-    if(step==='amount')setTimeout(()=>$('#quick-flow-value')?.focus({preventScroll:true}),60);
+    if(step==='amount')setTimeout(()=>{const amountField=$('#quick-flow-value');if(amountField){amountField.style.setProperty('font-size','clamp(44px,13vw,58px)','important');amountField.style.setProperty('font-family','var(--display)','important');amountField.style.setProperty('font-weight','800','important');amountField.style.setProperty('line-height','1.06','important');amountField.style.setProperty('-webkit-text-size-adjust','100%');amountField.focus({preventScroll:true});}},60);
     if(step==='note')setTimeout(()=>$('#quick-flow-note-value')?.focus({preventScroll:true}),60);
   }
   async function saveQuickAdd(){
@@ -1281,7 +1592,7 @@
   }
   function debtDetail(debt){const txs=state.transactions.filter(t=>t.debtId===debt.id).sort((a,b)=>a.date.localeCompare(b.date));const rem=debtRemaining(debt),paid=debtPaid(debt);openModal(debt.person,'<div class="modal-body"><div class="detail-grid"><div class="detail-cell"><small>ORIGINAL AMOUNT</small><strong>'+money(debt.amount)+'</strong></div><div class="detail-cell"><small>OUTSTANDING</small><strong>'+money(rem)+'</strong></div><div class="detail-cell"><small>DIRECTION</small><strong>'+(debt.direction==='lent'?'Money lent':'Money borrowed')+'</strong></div><div class="detail-cell"><small>REPAID</small><strong>'+money(paid)+'</strong></div></div><div class="note-box"><small>NOTE</small><p>'+escapeHTML(debt.note||'No note added.')+'</p></div><div class="section-header"><h2>History</h2><span class="muted tiny">'+txs.length+' entries</span></div><div class="entity-list">'+txs.map(t=>`<div class="entity-row"><span class="transaction-icon ${['repay_in'].includes(t.type)?'positive':t.type==='repay_out'?'negative':'blue'}">${icon(t.type==='repay_in'?'income':t.type==='repay_out'?'expense':'people')}</span><div class="entity-copy"><strong>${escapeHTML(typeLabel(t.type))}</strong><small>${niceDate(t.date)} · ${escapeHTML(t.note||'No note')}</small></div><div class="entity-value">${money(t.amount)}</div></div>`).join('')+'</div><div class="form-actions"><button class="secondary-button" data-cancel-modal>Close</button>'+(rem>0?`<button class="primary-button" data-debt-repay="${debt.id}">Record repayment</button>`:'<span class="status-pill success-pill"><i></i> Settled</span>')+'</div></div>','REPAYMENT HISTORY');}
 
-  function ensurePersonalWorkspace(){if(!state.sample)return;state.transactions=[];state.debts=[];state.goals=[];state.reminders=[];state.accounts.forEach(a=>a.openingBalance=0);state.budgets={total:0,categories:{},note:''};state.settings.notifications=[];state.settings.sentAlerts=[];state.settings.seenAlerts=[];state.sample=false;toast('Sample records cleared. You are now using your own workspace.');}
+  function ensurePersonalWorkspace(){if(!state.sample)return;state.transactions=[];state.debts=[];state.goals=[];state.reminders=[];state.billSplits=[];state.eventPlans=[];state.accounts.forEach(a=>a.openingBalance=0);state.budgets={total:0,categories:{},note:''};state.settings.notifications=[];state.settings.sentAlerts=[];state.settings.seenAlerts=[];state.sample=false;toast('Sample records cleared. You are now using your own workspace.');}
   function showTransactionDetail(tx){const a=txActivity(tx),account=accountById(tx.accountId),debt=tx.debtId?debtById(tx.debtId):null;let title=tx.note||a.name;if(debt)title=tx.type==='borrowed'?`Borrowed from ${debt.person}`:tx.type==='lent'?`Lent to ${debt.person}`:tx.type==='repay_out'?`Repayment to ${debt.person}`:`Repayment from ${debt.person}`;if(tx.type==='transfer')title=`Transfer · ${account.name} to ${accountById(tx.toAccountId).name}`;
     const detailType=['expense','repay_out','lent'].includes(tx.type)?'out':'in';const editable=!tx.debtId;
     openModal(title,`<div class="modal-body"><div class="detail-grid"><div class="detail-cell"><small>AMOUNT</small><strong class="${detailType==='in'?'amount-positive':''}">${['expense','repay_out','lent'].includes(tx.type)?'−':''}${money(tx.amount)}</strong></div><div class="detail-cell"><small>TYPE</small><strong>${escapeHTML(typeLabel(tx.type))}</strong></div><div class="detail-cell"><small>ACTIVITY</small><strong>${escapeHTML(a.name)}</strong></div><div class="detail-cell"><small>ACCOUNT</small><strong>${escapeHTML(account.name)}${tx.toAccountId?` → ${escapeHTML(accountById(tx.toAccountId).name)}`:''}</strong></div><div class="detail-cell"><small>DATE</small><strong>${niceDate(tx.date)}</strong></div><div class="detail-cell"><small>IDENTIFIER</small><strong style="font-size:9px;word-break:break-all">${escapeHTML(tx.id)}</strong></div></div><div class="note-box"><small>NOTE</small><p>${escapeHTML(tx.note||'No note added.')}</p></div>${debt?`<div class="form-note">Linked debt: ${escapeHTML(debt.person)} · ${money(debtRemaining(debt))} remains. Repayment history is preserved.</div>`:''}<div class="form-actions"><button class="secondary-button" data-cancel-modal>Close</button>${debt?`<button class="secondary-button" data-debt-detail="${debt.id}">Debt history</button>`:editable?`<button class="secondary-button" data-tx-edit="${tx.id}">${icon('edit')} Edit</button>`:''}<button class="secondary-button" data-tx-receipt="${tx.id}">${icon('receipt')} Receipt</button><button class="danger-button" data-tx-delete="${tx.id}">Delete</button></div></div>`,'ACTIVITY DETAILS');}
@@ -1453,7 +1764,7 @@
         const merge=confirm('Merge records instead? Existing record identifiers will not be duplicated.');if(!merge)return;
         mutated=true;ensurePersonalWorkspace();
         const mergeItems=key=>{const list=state[key]||[],ids=new Set(list.map(x=>x.id));(imported[key]||[]).forEach(x=>{if(!ids.has(x.id)){list.push(x);ids.add(x.id);}});state[key]=list;};
-        ['accounts','activities','transactions','debts','goals','reminders'].forEach(mergeItems);
+        ['accounts','activities','transactions','debts','goals','reminders','billSplits','eventPlans'].forEach(mergeItems);
         state.budgets={...state.budgets,...(imported.budgets||{})};state.settings={...state.settings,...(imported.settings||{}),theme:state.settings.theme};state.sample=false;
       }else{
         if(!confirm('Replace all current Pocketwise records with this backup? Export the current data first if you need it.'))return;
@@ -1509,14 +1820,34 @@
       if(event.target.closest('#modal-close')){closeModal();return;}
       if(event.target.closest('#mobile-add')){showAddEntryChoices();return;}
       if(event.target.closest('#start-simple-entry')){quickAddStart();return;}
-      if(event.target.closest('#start-detailed-entry')){closeModal();transactionForm();return;}if(event.target.closest('#start-payment-import')){pwShowImport();return;}if(event.target.closest('#paste-shortcut-quick')||event.target.closest('#paste-shortcut-settings')){await pasteShortcutTransaction();return;}if(event.target.closest('#enter-shortcut-key')){showShortcutKeyPrompt();return;}if(event.target.closest('#top-add')){showAddEntryChoices();return;}if(event.target.closest('#activity-add')||event.target.closest('[data-action="add"]')){transactionForm();return;}
+      if(event.target.closest('#start-detailed-entry')){showDetailedEntryTools();return;}
+      if(event.target.closest('#start-advanced-entry')){showAdvancedEntryTools();return;}
+      if(event.target.closest('#entry-tools-back')){showAddEntryChoices();return;}
+      if(event.target.closest('#start-bill-split')){showBillSplitStart();return;}
+      if(event.target.closest('#start-event-planner')){showEventPlannerHub();return;}
+      if(event.target.closest('#start-payment-import')){pwShowImport();return;}
+      if(event.target.closest('#advanced-manual-entry')){transactionForm();return;}
+      if(event.target.closest('#advanced-transfer-entry')){transactionForm(null,'transfer');return;}
+      if(event.target.closest('#advanced-debt-entry')){debtForm();return;}
+      if(event.target.closest('#paste-shortcut-quick')||event.target.closest('#paste-shortcut-settings')){await pasteShortcutTransaction();return;}if(event.target.closest('#enter-shortcut-key')){showShortcutKeyPrompt();return;}if(event.target.closest('#top-add')){showAddEntryChoices();return;}if(event.target.closest('#activity-add')||event.target.closest('[data-action="add"]')){transactionForm();return;}
+      if(event.target.closest('#event-plan-new')){showEventPlannerStart();return;}
+      const openBillSplit=event.target.closest('[data-bill-open]');if(openBillSplit){const split=state.billSplits.find(item=>item.id===openBillSplit.dataset.billOpen);if(split)renderBillSplitEditor(split);return;}
+      const openEventPlan=event.target.closest('[data-event-open]');if(openEventPlan){const plan=state.eventPlans.find(item=>item.id===openEventPlan.dataset.eventOpen);if(plan)showEventPlannerStart(plan);return;}
+      if(event.target.closest('#event-add-person')){addEventParticipant();return;}
+      if(event.target.closest('#event-add-group')){addEventGroup();return;}
+      if(event.target.closest('#event-add-category')){addEventCategory();return;}
+      const removeEventPerson=event.target.closest('[data-event-remove-person]');if(removeEventPerson){const draft=captureEventPlannerForm();if(draft.participants.length<=1){toast('An event needs at least one participant.','amber');return;}draft.participants=draft.participants.filter(person=>person.id!==removeEventPerson.dataset.eventRemovePerson);draft.groups.forEach(group=>{group.memberIds=group.memberIds.filter(id=>id!==removeEventPerson.dataset.eventRemovePerson);});renderEventPlannerEditor(draft);return;}
+      const removeEventGroup=event.target.closest('[data-event-remove-group]');if(removeEventGroup){const draft=captureEventPlannerForm();if(draft.groups.length<=1){toast('Keep at least one group.','amber');return;}const removed=removeEventGroup.dataset.eventRemoveGroup;draft.groups=draft.groups.filter(group=>group.id!==removed);const fallback=draft.groups[0].id;draft.participants.forEach(person=>{if(person.groupId===removed)person.groupId=fallback;});draft.groups.forEach(group=>{group.memberIds=draft.participants.filter(person=>person.groupId===group.id).map(person=>person.id);});renderEventPlannerEditor(draft);return;}
+      const removeEventCategory=event.target.closest('[data-event-remove-category]');if(removeEventCategory){const draft=captureEventPlannerForm();if(draft.categories.length<=1){toast('Keep at least one cost category.','amber');return;}draft.categories=draft.categories.filter(category=>category.id!==removeEventCategory.dataset.eventRemoveCategory);renderEventPlannerEditor(draft);return;}
+      if(event.target.closest('#bill-split-download')){await downloadBillSplitFromForm();return;}
+      if(event.target.closest('#event-plan-download')){downloadEventPlanFromForm();return;}
       const addType=event.target.closest('[data-add-type]');if(addType){transactionForm(null,addType.dataset.addType);return;}
       const action=event.target.closest('[data-action]')?.dataset.action;if(action){if(action==='budget')budgetForm();else if(action==='debts')showDebts();else if(action==='new-debt')debtForm();else if(action==='accounts')accountsManager();return;}
       if(event.target.closest('#theme-toggle')){const snapshot=JSON.stringify(state);state.settings.theme=state.settings.theme==='dark'?'light':'dark';if(!(await persistMutation(snapshot,'Could not change the theme. Your previous settings were restored.'))){applyTheme();return;}applyTheme();scheduleCharts();return;}
       const themeBtn=event.target.closest('button[data-theme]');if(themeBtn){const snapshot=JSON.stringify(state);state.settings.theme=themeBtn.dataset.theme;if(!(await persistMutation(snapshot,'Could not change the theme. Your previous settings were restored.'))){applyTheme();return;}applyTheme();scheduleCharts();return;}
       if(event.target.closest('#hide-balances')){if(state.settings.hideBalances){const snapshot=JSON.stringify(state);state.settings.hideBalances=false;hiddenAmounts=false;if(!(await persistMutation(snapshot,'Could not save the balance visibility setting.'))){applyHiddenAmounts();return;}renderSettingsSummary();}else{hiddenAmounts=!hiddenAmounts;}applyHiddenAmounts();return;}
       if(event.target.closest('#open-notifications')||event.target.closest('#view-alerts')){openNotifications();return;}
-      if(event.target.closest('#clear-sample')){if(confirm('Clear all preview records, sample balances, goals and reminders so you can start with a clean workspace?')){const snapshot=JSON.stringify(state);state.transactions=[];state.debts=[];state.goals=[];state.reminders=[];state.accounts.forEach(a=>a.openingBalance=0);state.budgets={total:0,categories:{},note:''};state.sample=false;state.settings.notifications=[];state.settings.sentAlerts=[];state.settings.seenAlerts=[];if(!(await persistMutation(snapshot,'Could not clear preview records. Your previous records were restored.')))return;renderAll();toast('Clean workspace ready.');}return;}
+      if(event.target.closest('#clear-sample')){if(confirm('Clear all preview records, sample balances, goals and reminders so you can start with a clean workspace?')){const snapshot=JSON.stringify(state);state.transactions=[];state.debts=[];state.goals=[];state.reminders=[];state.billSplits=[];state.eventPlans=[];state.accounts.forEach(a=>a.openingBalance=0);state.budgets={total:0,categories:{},note:''};state.sample=false;state.settings.notifications=[];state.settings.sentAlerts=[];state.settings.seenAlerts=[];if(!(await persistMutation(snapshot,'Could not clear preview records. Your previous records were restored.')))return;renderAll();toast('Clean workspace ready.');}return;}
       const debtRepay=event.target.closest('[data-debt-repay]');if(debtRepay){const d=debtById(debtRepay.dataset.debtRepay);if(d&&debtRemaining(d)>0)repaymentForm(d);return;}
       const debtDetails=event.target.closest('[data-debt-detail]');if(debtDetails){const d=debtById(debtDetails.dataset.debtDetail);if(d)debtDetail(d);return;}
       const swipeDelete=event.target.closest('[data-tx-swipe-delete]');if(swipeDelete){const txId=swipeDelete.dataset.txSwipeDelete;closeTransactionSwipeActions();await confirmDeleteTransaction(txId);return;}
@@ -1579,7 +1910,7 @@
       if(event.target.closest('#install-guide')){showInstallGuide();return;}
       if(event.target.closest('#copy-quickadd')){const url='webapp://nithan.in/PocketWise/';try{await navigator.clipboard.writeText(url);toast('App launch URL copied.');}catch{toast(url,'amber');}return;}
       if(event.target.closest('#enable-notifications')){if(!('Notification'in window)){toast('System notifications are not supported in this browser.','amber');return;}const permission=Notification.permission==='granted'?'granted':await Notification.requestPermission();let message=permission==='granted'?'System notification permission enabled. Background delivery needs a configured push service.':'Permission was not granted.';if(permission==='granted'&&window.PocketWisePush?.isConfigured()){if(!confirm('Enable background bill reminders? PocketWise will send reminder titles and due dates to your configured push server so it can notify this device while the app is closed. Amounts, notes and transaction history are not sent.')){renderSettingsSummary();return;}try{const pushResult=await window.PocketWisePush.subscribe();if(pushResult.ok){await window.PocketWisePush.syncReminders(state.reminders||[]);message='Background bill reminders are enabled on this device.';}else message=pushResult.reason==='permission-denied'?'Notification permission was not granted.':'Push is unavailable on this device.';}catch(error){console.error('Push subscription failed.',error);message='Could not connect this device to the push service. Check the server settings.';}}if(permission==='granted'&&'serviceWorker'in navigator){try{await navigator.serviceWorker.ready;}catch(_){}}renderSettingsSummary();toast(message,permission==='granted'?'success':'amber');return;}
-      if(event.target.closest('#reset-data')){if(!confirm('Clear all transactions, debts, goals, accounts, budgets, activities and reminders stored in this app? This cannot be undone.'))return;if(!confirm('Last check: export a backup first if you want to keep any records. Continue clearing?'))return;const snapshot=JSON.stringify(state);state=initialState();state.sample=false;state.transactions=[];state.debts=[];state.goals=[];state.reminders=[];state.accounts=state.accounts.map(a=>({...a,openingBalance:0}));state.budgets={total:0,categories:{}};if(!(await persistMutation(snapshot,'Could not clear this workspace. Your previous records were restored.')))return;applyTheme();renderAll();toast('Workspace cleared.');return;}
+      if(event.target.closest('#reset-data')){if(!confirm('Clear all transactions, debts, goals, accounts, budgets, activities, reminders, bill splits and event plans stored in this app? This cannot be undone.'))return;if(!confirm('Last check: export a backup first if you want to keep any records. Continue clearing?'))return;const snapshot=JSON.stringify(state);state=initialState();state.sample=false;state.transactions=[];state.debts=[];state.goals=[];state.reminders=[];state.billSplits=[];state.eventPlans=[];state.accounts=state.accounts.map(a=>({...a,openingBalance:0}));state.budgets={total:0,categories:{}};if(!(await persistMutation(snapshot,'Could not clear this workspace. Your previous records were restored.')))return;applyTheme();renderAll();toast('Workspace cleared.');return;}
       if(event.target.closest('[data-reset-filters]')){$('#activity-search').value='';$('#activity-period').value='all';currentFilter='all';renderActivity();return;}
       const heat=event.target.closest('[data-heat-date]');if(heat){setPage('activity');$('#activity-period').value='all';$('#activity-search').value=heat.dataset.heatDate;renderActivity();return;}
       if(event.target.closest('#mix-view-toggle')){mixView=mixView==='doughnut'?'pie':mixView==='pie'?'bar':'doughnut';const btn=$('#mix-view-toggle');btn.title=mixView==='doughnut'?'Switch to pie chart':mixView==='pie'?'Switch to category bars':'Switch to doughnut chart';scheduleCharts();return;}
@@ -1587,6 +1918,14 @@
     });
     document.addEventListener('submit', async e=>{
       const form=e.target;if(!(form instanceof HTMLFormElement))return;e.preventDefault();
+      if(form.id==='bill-split-start-form'){
+        try{const fd=new FormData(form),totalMinor=safeMinorInput(fd.get('total')),count=Number(fd.get('count'));if(!Number.isSafeInteger(totalMinor)||totalMinor<=0)throw new Error('Enter a total amount greater than ₹0.');if(!Number.isInteger(count)||count<2||count>100)throw new Error('Choose between 2 and 100 people.');const people=Array.from({length:count},(_,index)=>makePerson(index));const calculated=sharedCosts().calculateBill(totalMinor,people);renderBillSplitEditor({id:null,name:String(fd.get('name')||'').trim()||'Shared bill',date:today(),totalMinor,people:calculated.shares,createdAt:null});}catch(error){toast(error.message||'Check the bill details.','error');}return;
+      }
+      if(form.id==='bill-split-form'){if(form.dataset.submitting==='true')return;form.dataset.submitting='true';try{await saveBillSplitFromForm();}finally{delete form.dataset.submitting;}return;}
+      if(form.id==='event-plan-start-form'){
+        try{createEventPlanFromStart(form);}catch(error){toast(error.message||'Check the event details.','error');}return;
+      }
+      if(form.id==='event-plan-form'){if(form.dataset.submitting==='true')return;form.dataset.submitting='true';try{await saveEventPlanFromForm();}finally{delete form.dataset.submitting;}return;}
       if(form.dataset.submitting==='true')return;
       form.dataset.submitting='true';
       const submitButtons=[...form.querySelectorAll('button[type="submit"],input[type="submit"]')];
@@ -1616,8 +1955,25 @@
     $('#modal-content').addEventListener('click',e=>{if(e.target.closest('#voice-entry'))voiceDraft();});
     $('#notifications-modal').addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.close();});
     $('#notifications-modal').addEventListener('click',e=>{if(e.target.closest('[data-cancel-modal]'))e.currentTarget.close();});
-    $('#modal-content').addEventListener('input',e=>{if(e.target.id==='profile-name-input'){const n=e.target.value.trim();$('#profile-form-preview-name').textContent=n||'Your name';$('#profile-form-avatar').textContent=([...(n||'P')][0]||'P').toLocaleUpperCase();}});
-    $('#modal-content').addEventListener('change',e=>{if(e.target.name==='profileColor'){const hex=profileColors[e.target.value]||profileColors.mint;$('#profile-form-avatar').style.background=hex;}if(e.target.id==='finance-salary-frequency')syncFinanceSalaryPaydayFields();});
+    $('#modal-content').addEventListener('input',e=>{
+      if(e.target.id==='profile-name-input'){const n=e.target.value.trim();$('#profile-form-preview-name').textContent=n||'Your name';$('#profile-form-avatar').textContent=([...(n||'P')][0]||'P').toLocaleUpperCase();}
+      if(e.target.closest('#bill-split-form')&&(e.target.matches('[data-bill-name],[data-bill-share],#bill-split-edit-name')))validateBillSplitForm();
+      if(e.target.closest('#event-plan-form')&&(e.target.matches('[data-event-person-name],[data-event-person-group],[data-event-group-name],[data-event-category-name],[data-event-category-amount],[data-event-share-value],#event-plan-name,#event-plan-date,#event-plan-total')))validateEventPlannerForm();
+    });
+    $('#modal-content').addEventListener('change',e=>{
+      if(e.target.name==='profileColor'){const hex=profileColors[e.target.value]||profileColors.mint;$('#profile-form-avatar').style.background=hex;}
+      if(e.target.id==='finance-salary-frequency')syncFinanceSalaryPaydayFields();
+      if(e.target.id==='event-start-mode'){const wrap=$('#event-start-groups-wrap');if(wrap)wrap.hidden=e.target.value!=='groups';}
+      if(e.target.id==='event-plan-mode'){
+        const draft=captureEventPlannerForm();draft.splitMode=e.target.value==='groups'?'groups':'individual';
+        if(draft.splitMode==='groups'&&!draft.groups.length){draft.groups=[{id:uid('group'),name:'Group 1',memberIds:[]}];draft.participants.forEach(person=>{person.groupId=draft.groups[0].id;draft.groups[0].memberIds.push(person.id);});}
+        if(draft.splitMode==='groups'&&draft.groups.length){draft.participants.forEach((person,index)=>{if(!draft.groups.some(group=>group.id===person.groupId))person.groupId=draft.groups[index%draft.groups.length].id;});draft.groups.forEach(group=>group.memberIds=draft.participants.filter(person=>person.groupId===group.id).map(person=>person.id));}
+        normalizeEventCategoryShares(draft);renderEventPlannerEditor(draft);return;
+      }
+      const modeSelect=e.target.closest('[data-event-category-mode]');if(modeSelect){const draft=captureEventPlannerForm(),category=draft.categories.find(item=>item.id===modeSelect.closest('.event-category-card')?.dataset.eventCategory);if(category){category.mode=modeSelect.value;category.shares=eventShareDefaults(category,eventUnits(draft));}renderEventPlannerEditor(draft);return;}
+      if(e.target.closest('#event-plan-form'))validateEventPlannerForm();
+      if(e.target.closest('#bill-split-form'))validateBillSplitForm();
+    });
     window.addEventListener('resize',scheduleCharts);window.matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change',()=>{if(state.settings.theme==='system'){applyTheme();scheduleCharts();}});
     window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();installedPrompt=e;});
   }
